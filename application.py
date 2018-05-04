@@ -1,6 +1,7 @@
 from flask import Flask
 from flask import request
 from APIProxy import APIProxy
+import sys
 
 # EB looks for an 'application' callable by default.
 application = Flask(__name__)
@@ -15,5 +16,7 @@ def proxy_search():
 if __name__ == '__main__':
     # Setting debug to True enables debug output. This line should be
     # removed before deploying a production app.
+    application.logger.warning('we are in main!')
+    sys.dont_write_bytecode = True
     application.debug = True
     application.run(threaded=True)
