@@ -12,7 +12,7 @@ To get started with a local instance for development:
 
 2. Create a virtual environment:
 ```
-~$ virtualenv ~/api-proxy-env
+~$ virtualenv --python=python3 ~/api-proxy-env
 ```
 
 3. Activate the virtual environment:
@@ -25,6 +25,11 @@ To get started with a local instance for development:
 ```
 (api-proxy-env) ~$ pip install -r requirements.txt
 ```
+
+  - At the time of this writing, in some situations you may encounter an SSL certificate error. If that happens, re-install pip using the following command and try step 4 again:
+  ```
+  curl https://bootstrap.pypa.io/get-pip.py | python
+  ```
 
 5. Run the dev server
 ```

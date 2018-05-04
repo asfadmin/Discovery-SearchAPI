@@ -1,0 +1,4 @@
+http://api-test.asf.alaska.edu/services/search/param?platform=R1&absoluteOrbit=25234&output=CSV
+http://127.0.0.1:5000/services/search/param?platform=R1&absoluteOrbit=25234&output=CSV
+http://127.0.0.1:5000/services/search/param?platform=E2&frame=1234&output=JSON
+http://127.0.0.1:5000/services/search/param?platform=E2&frame=1234&flightdirection=A&output=JSON
