@@ -2,3 +2,4 @@ http://127.0.0.1:5000/services/search/param?platform=R1&absoluteOrbit=25234&outp
 http://127.0.0.1:5000/services/search/param?platform=R1&absoluteOrbit=25234&output=CSV
 http://127.0.0.1:5000/services/search/param?platform=E2&frame=1234&output=JSON
 http://127.0.0.1:5000/services/search/param?platform=E2&frame=1234&flightdirection=A&output=JSON
+http://127.0.0.1:5000/services/search/param?granule_list=R1_65207_ST5_F155&output=CSV
