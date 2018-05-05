@@ -1,4 +1,5 @@
 import xml.etree.ElementTree as ET
+from datetime import datetime
 from jinja2 import Environment, PackageLoader, select_autoescape
 
 templateEnv = Environment(
@@ -89,7 +90,7 @@ def cmr_to_csv(r):
 def cmr_to_kml(r):
     products = parse_cmr_xml(r.text)
     template = templateEnv.get_template('kml.tmpl')
-    return template.render(products)
+    return template.render(products, search_time=datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC'))
 
 def cmr_to_json(r):
     products = parse_cmr_xml(r.text)

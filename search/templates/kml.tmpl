@@ -1,3 +1,37 @@
-"Granule Name","Platform","Sensor","Beam Mode","Beam Mode Description","Orbit","Path Number","Frame Number","Acquisition Date","Processing Date","Processing Level","Start Time","End Time","Center Lat","Center Lon","Near Start Lat","Near Start Lon","Far Start Lat","Far Start Lon","Near End Lat","Near End Lon","Far End Lat","Far End Lon","Faraday Rotation","Ascending or Descending?","URL","Size (MB)","Off Nadir Angle","Stack Size","Baseline Perp.","Doppler"
-{% for r in results %}"{{r.granuleName}}","{{r.platform}}","","{{r.beamMode}}","{{r.configurationName}}","{{r.absoluteOrbit}}","{{r.relativeOrbit}}","{{r.finalFrame}}","{{r.sceneDate}}","{{r.processingDate}}","{{r.processingLevel}}","{{r.startTime}}","{{r.stopTime}}","{{r.centerLat}}","{{r.centerLon}}","{{r.nearStartLat}}","{{r.nearStartLon}}","{{r.farStartLat}}","{{r.farStartLon}}","{{r.nearEndLat}}","{{r.nearEndLon}}","{{r.farEndLat}}","{{r.farEndLon}}","{{r.faradayRotation}}","{{r.flightDirection}}","{{r.downloadUrl}}","{{r.sizeMB}}","{{r.offNadirAngle}}","{{r.insarStackSize}}","{{r.baselinePerp}}","{{r.doppler}}"
-{% endfor %}
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>ASF Datapool Search Results</name>
+    <description>Search Performed: {{search_time}}</description>
+    <Style id="yellowLineGreenPoly">
+      <LineStyle>
+        <color>30ff8800</color>
+        <width>4</width>
+      </LineStyle>
+      <PolyStyle>
+        <color>7f00ff00</color>
+      </PolyStyle>
+    </Style>
+    {%- for r in results %}
+    <Placemark>
+      <name>{{r.granuleName}}</name>
+      <description> &lt;![CDATA[  <h1>{{r.platform}} ({{r.configurationName}}), acquired {{r.sceneDate}}</h1><h2>{{r.downloadUrl}}</h2><div style="position:absolute;left:20px;top:200px"><h3>Metadata</h3><ul><li>Processing type: {{r.processingTypeDisplay}}</li><li>Frame: {{r.finalFrame}}</li><li>Path: {{r.relativeOrbit}}</li><li>Orbit: {{r.absoluteOrbit}}</li><li>Start time: {{r.startTime}}</li><li>End time: {{r.stopTime}}</li><li>Faraday Rotation: {{r.faradayRotation}}</li><li>Ascending/Descending: {{r.flightDirection}}</li><li>Off Nadir Angle: {{r.offNadirAngle}}</li></ul></div><div style="position:absolute;left:300px;top:250px"><a href="{{r.browse}}"><img src="{{r.thumbnailUrl}}"/></a></div></description>
+      <styleUrl>#yellowLineGreenPoly</styleUrl>
+      <Polygon>
+        <extrude>1</extrude>
+        <altitudeMode>relativeToGround</altitudeMode>
+        <outerBoundaryIs>
+          <LinearRing>
+            <coordinates>-145.2655,63.0779,2000
+                    -145.8678,62.1315,2000
+                    -147.711,62.3629,2000
+                    -147.1686,63.3148,2000
+                    -145.2655,63.0779,2000
+                  </coordinates>
+          </LinearRing>
+        </outerBoundaryIs>
+      </Polygon>
+    </Placemark>
+    {%- endfor %}
+  </Document>
+</kml>
