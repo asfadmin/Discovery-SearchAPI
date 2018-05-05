@@ -1,22 +1,22 @@
 from flask import Flask
 from flask import request
-from APIProxy import APIProxy
+from APIProxy import APIProxyQuery
 import sys
+import logging
 
 # EB looks for an 'application' callable by default.
 application = Flask(__name__)
+application.logger.setLevel(logging.INFO)
 
-# Send the generated script as an attachment so it downloads directly
+# Either get the results from CMR, or pass the query through to the legacy API
 @application.route('/services/search/param', methods = ['GET', 'POST'])
 def proxy_search():
-    api = APIProxy(request)
+    api = APIProxyQuery(request)
     return api.get_response()
 
-# run the app
+# Run a dev server
 if __name__ == '__main__':
-    # Setting debug to True enables debug output. This line should be
-    # removed before deploying a production app.
-    application.logger.warning('we are in main!')
-    sys.dont_write_bytecode = True
-    application.debug = True
-    application.run(threaded=True)
+    sys.dont_write_bytecode = True  # prevent clutter
+    application.debug = True        # enable debugging mode
+    application.logger.setLevel(logging.DEBUG) # enable debugging output
+    application.run(threaded=True)  # run threaded to prevent a broken pipe error
