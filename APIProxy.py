@@ -1,7 +1,7 @@
 from flask import Response
 import requests
 import logging
-from CMRTranslate import cmr_res_to_metalink, cmr_res_to_csv, cmr_res_to_kml, cmr_res_to_json
+from CMRTranslate import cmr_to_metalink, cmr_to_csv, cmr_to_kml, cmr_to_json, cmr_to_download
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
@@ -12,10 +12,20 @@ class APIProxyQuery:
         self.asf_api_url = 'https://api.daac.asf.alaska.edu/services/search/param'
         self.cmr_api_url = 'https://cmr.earthdata.nasa.gov/search/granules.echo10'
         
+        # currently supported input params
         self.cmr_params = [
             'output',
             'granule_list'
         ]
+        # translators take a response object and return formatted text
+        self.translators = {
+            'metalink':     cmr_to_metalink,
+            'csv':          cmr_to_csv,
+            'kml':          cmr_to_kml,
+            'json':         cmr_to_json,
+            'echo10':       lambda r: r.text,
+            'download':     cmr_to_download
+        }
         
     def can_use_cmr(self):
         # make sure the provided params are a subset of the CMR-supported params
@@ -30,9 +40,10 @@ class APIProxyQuery:
             return self.query_cmr()
         logging.debug('get_response(): using ASF backend')
         return self.query_asf()
-
+        
+    # ASF API backend query
     def query_asf(self):
-        # ASF API backend query
+        # preserve GET/POST approach when querying ASF API
         logging.info('API passthrough from {0}'.format(self.request.access_route[-1]))
         if self.request.method == 'GET':
             param_string = 'api_proxy=1&{0}'.format(self.request.query_string.decode('utf-8'))
@@ -45,30 +56,28 @@ class APIProxyQuery:
         if r.status_code != 200:
             logging.warning('Received status_code {0} from ASF API with params {1}'.format(r.status_code, param_string))
         return Response(r.text, r.status_code, r.headers.items())
-    
+        
+    # CMR backend query
     def query_cmr(self):
-        # CMR backend query
         logging.info('CMR translation from {0}'.format(self.request.access_route[-1]))
         # always limit the results to ASF as the provider
         params = {
             'provider': 'ASF'
         }
+        
         # use specified output format or default metalink
         output = 'metalink'
         if self.request.values['output']:
-            output = self.request.values['output']
+            output = self.request.values['output'].lower()
+        if output not in self.translators.keys():
+            output = 'metalink'
         
-        # translate supported CMR params into query
+        # translate supported params into CMR query
         if self.request.values['granule_list']:
             params['readable_granule_name[]'] = self.request.values['granule_list'].split(',')
         
         # run the query, return the translated results
         r = requests.post(self.cmr_api_url, data=params)
-        text = {
-            'metalink': cmr_res_to_metalink,
-            'csv':      cmr_res_to_csv,
-            'kml':      cmr_res_to_kml,
-            'json':     cmr_res_to_json
-        }[output](r)
+        text = self.translators[output](r)
         return Response(text, r.status_code, r.headers.items())
 

@@ -1,4 +1,10 @@
 import xml.etree.ElementTree as ET
+from jinja2 import Environment, PackageLoader, select_autoescape
+
+templateEnv = Environment(
+    loader=PackageLoader('search', 'templates'),
+    autoescape=select_autoescape(['html', 'xml'])
+)
 
 def attr(name):
     return "./AdditionalAttributes/AdditionalAttribute/[Name='" + name + "']/Values/Value"
@@ -68,20 +74,27 @@ def parse_cmr_xml(xml):
                 'downloadUrl': granule.findtext("./OnlineAccessURLs/OnlineAccessURL/URL"),
                 'browse': granule.findtext("./AssociatedBrowseImageUrls/ProviderBrowseUrl/URL")
             })
-    return results
+    return {'results': results}
 
-def cmr_res_to_metalink(r):
+def cmr_to_metalink(r):
     products = parse_cmr_xml(r.text)
-    return t
+    template = templateEnv.get_template('metalink.tmpl')
+    return template.render(products)
 
-def cmr_res_to_csv(r):
+def cmr_to_csv(r):
     products = parse_cmr_xml(r.text)
-    return t
+    template = templateEnv.get_template('csv.tmpl')
+    return template.render(products)
 
-def cmr_res_to_kml(r):
+def cmr_to_kml(r):
     products = parse_cmr_xml(r.text)
-    return t
+    template = templateEnv.get_template('kml.tmpl')
+    return template.render(products)
 
-def cmr_res_to_json(r):
+def cmr_to_json(r):
     products = parse_cmr_xml(r.text)
-    return t
+    template = templateEnv.get_template('json.tmpl')
+    return template.render(products)
+
+def cmr_to_download(r):
+    return r
