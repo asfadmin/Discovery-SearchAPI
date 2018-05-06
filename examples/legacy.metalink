@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<metalink xmlns="http://www.metalinker.org/" version="3.0">
+    <publisher><name>Alaska Satellite Facility</name><url>http://www.asf.alaska.edu/</url></publisher>
+    <files>
+        <file name="E2_84697_STD_F293.zip"><resources><url type="http">https://datapool.asf.alaska.edu/L1/E2/E2_84697_STD_F293.zip</url></resources><verification><hash type="md5">72cdac9d23d9604e6c45c16a5d71a932</hash></verification><size>46348783</size></file>
+        <file name="E2_84697_STD_L0_F293.zip"><resources><url type="http">https://datapool.asf.alaska.edu/L0/E2/E2_84697_STD_L0_F293.zip</url></resources><verification><hash type="md5">3946d935a6f72138d7ad7acd6774c4d3</hash></verification><size>145265849</size></file>
+        <file name="E2_84697_STD_F293.jpg"><resources><url type="http">https://datapool.asf.alaska.edu/BROWSE/E2/E2_84697_STD_F293.jpg</url></resources><verification><hash type="md5">ffa9ba22ac02123b8b153b84b1d0b7fa</hash></verification><size>473747</size></file>
+        <file name="R1_65207_ST5_L0_F155.zip"><resources><url type="http">https://datapool.asf.alaska.edu/L0/R1/R1_65207_ST5_L0_F155.zip</url></resources><verification><hash type="md5">cdf7339d97515c630bb2fb18a9371471</hash></verification><size>152848144</size></file>
+        <file name="R1_65207_ST5_F155.zip"><resources><url type="http">https://datapool.asf.alaska.edu/L1/R1/R1_65207_ST5_F155.zip</url></resources><verification><hash type="md5">3be101eaf968db73d77c409ae9933b26</hash></verification><size>54268626</size></file>
+        <file name="R1_65207_ST5_F155.jpg"><resources><url type="http">https://datapool.asf.alaska.edu/BROWSE/R1/R1_65207_ST5_F155.jpg</url></resources><verification><hash type="md5">34b6f2efa76a2cbe1447d097d68ea18a</hash></verification><size>393975</size></file>
+    </files>
+</metalink>

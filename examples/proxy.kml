@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>ASF Datapool Search Results</name>
+    <description>Search Performed: 2018-05-06 00:40:26 UTC</description>
+    <Style id="yellowLineGreenPoly">
+      <LineStyle>
+        <color>30ff8800</color>
+        <width>4</width>
+      </LineStyle>
+      <PolyStyle>
+        <color>7f00ff00</color>
+      </PolyStyle>
+    </Style>
+    <Placemark>
+      <name>R1_65207_ST5_F155</name>
+      <description> &lt;![CDATA[  <h1>RADARSAT-1 (Radarsat-1 Standard Beam 5 SAR), acquired 2008-05-02T03:25:07Z</h1><h2>https://datapool.asf.alaska.edu/L0/R1/R1_65207_ST5_L0_F155.zip</h2><div style="position:absolute;left:20px;top:200px"><h3>Metadata</h3><ul><li>Processing type: Level Zero</li><li>Frame: 1239</li><li>Path: 296</li><li>Orbit: 65207</li><li>Start time: 2008-05-02T03:24:50Z</li><li>End time: 2008-05-02T03:25:07Z</li><li>Faraday Rotation: NA</li><li>Ascending/Descending: ASCENDING</li><li>Off Nadir Angle: -1</li></ul></div><div style="position:absolute;left:300px;top:250px"><a href="https://datapool.asf.alaska.edu/BROWSE/R1/R1_65207_ST5_F155.jpg"><img src="https://datapool.asf.alaska.edu/THUMBNAIL/R1/R1_65207_ST5_F155_THUMBNAIL.jpg"/></a></div></description>
+      <styleUrl>#yellowLineGreenPoly</styleUrl>
+      <Polygon>
+        <extrude>1</extrude>
+        <altitudeMode>relativeToGround</altitudeMode>
+        <outerBoundaryIs>
+          <LinearRing>
+            <coordinates>
+              -148.128267,61.411467,2000
+              -148.553558,62.374049,2000
+              -146.582047,62.518378,2000
+              -146.218082,61.55348,2000
+            </coordinates>
+          </LinearRing>
+        </outerBoundaryIs>
+      </Polygon>
+    </Placemark>
+    <Placemark>
+      <name>R1_65207_ST5_F155</name>
+      <description> &lt;![CDATA[  <h1>RADARSAT-1 (Radarsat-1 Standard Beam 5 SAR), acquired 2008-05-02T03:25:07Z</h1><h2>https://datapool.asf.alaska.edu/L1/R1/R1_65207_ST5_F155.zip</h2><div style="position:absolute;left:20px;top:200px"><h3>Metadata</h3><ul><li>Processing type: Level One Image</li><li>Frame: 1239</li><li>Path: 296</li><li>Orbit: 65207</li><li>Start time: 2008-05-02T03:24:50Z</li><li>End time: 2008-05-02T03:25:07Z</li><li>Faraday Rotation: NA</li><li>Ascending/Descending: ASCENDING</li><li>Off Nadir Angle: -1</li></ul></div><div style="position:absolute;left:300px;top:250px"><a href="https://datapool.asf.alaska.edu/BROWSE/R1/R1_65207_ST5_F155.jpg"><img src="https://datapool.asf.alaska.edu/THUMBNAIL/R1/R1_65207_ST5_F155_THUMBNAIL.jpg"/></a></div></description>
+      <styleUrl>#yellowLineGreenPoly</styleUrl>
+      <Polygon>
+        <extrude>1</extrude>
+        <altitudeMode>relativeToGround</altitudeMode>
+        <outerBoundaryIs>
+          <LinearRing>
+            <coordinates>
+              -148.128267,61.411467,2000
+              -148.553558,62.374049,2000
+              -146.582047,62.518378,2000
+              -146.218082,61.55348,2000
+            </coordinates>
+          </LinearRing>
+        </outerBoundaryIs>
+      </Polygon>
+    </Placemark>
+    <Placemark>
+      <name>E2_84697_STD_F293</name>
+      <description> &lt;![CDATA[  <h1>ERS-2 (ERS-1,ERS-2,JERS-1,SEASAT,SMAP Standard Beam SAR), acquired 2011-07-02T21:01:03Z</h1><h2>https://datapool.asf.alaska.edu/L1/E2/E2_84697_STD_F293.zip</h2><div style="position:absolute;left:20px;top:200px"><h3>Metadata</h3><ul><li>Processing type: Level One Image</li><li>Frame: 2336</li><li>Path: 17</li><li>Orbit: 84697</li><li>Start time: 2011-07-02T21:00:46Z</li><li>End time: 2011-07-02T21:01:03Z</li><li>Faraday Rotation: NA</li><li>Ascending/Descending: DESCENDING</li><li>Off Nadir Angle: -1</li></ul></div><div style="position:absolute;left:300px;top:250px"><a href="https://datapool.asf.alaska.edu/BROWSE/E2/E2_84697_STD_F293.jpg"><img src="https://datapool.asf.alaska.edu/THUMBNAIL/E2/E2_84697_STD_F293_THUMBNAIL.jpg"/></a></div></description>
+      <styleUrl>#yellowLineGreenPoly</styleUrl>
+      <Polygon>
+        <extrude>1</extrude>
+        <altitudeMode>relativeToGround</altitudeMode>
+        <outerBoundaryIs>
+          <LinearRing>
+            <coordinates>
+              -145.265475,63.077897,2000
+              -145.867805,62.131515,2000
+              -147.71099,62.362925,2000
+              -147.168567,63.314756,2000
+            </coordinates>
+          </LinearRing>
+        </outerBoundaryIs>
+      </Polygon>
+    </Placemark>
+    <Placemark>
+      <name>E2_84697_STD_F293</name>
+      <description> &lt;![CDATA[  <h1>ERS-2 (ERS-1,ERS-2,JERS-1,SEASAT,SMAP Standard Beam SAR), acquired 2011-07-02T21:01:03Z</h1><h2>https://datapool.asf.alaska.edu/L0/E2/E2_84697_STD_L0_F293.zip</h2><div style="position:absolute;left:20px;top:200px"><h3>Metadata</h3><ul><li>Processing type: Level Zero</li><li>Frame: 2336</li><li>Path: 17</li><li>Orbit: 84697</li><li>Start time: 2011-07-02T21:00:46Z</li><li>End time: 2011-07-02T21:01:03Z</li><li>Faraday Rotation: NA</li><li>Ascending/Descending: DESCENDING</li><li>Off Nadir Angle: -1</li></ul></div><div style="position:absolute;left:300px;top:250px"><a href="https://datapool.asf.alaska.edu/BROWSE/E2/E2_84697_STD_F293.jpg"><img src="https://datapool.asf.alaska.edu/THUMBNAIL/E2/E2_84697_STD_F293_THUMBNAIL.jpg"/></a></div></description>
+      <styleUrl>#yellowLineGreenPoly</styleUrl>
+      <Polygon>
+        <extrude>1</extrude>
+        <altitudeMode>relativeToGround</altitudeMode>
+        <outerBoundaryIs>
+          <LinearRing>
+            <coordinates>
+              -145.265475,63.077897,2000
+              -145.867805,62.131515,2000
+              -147.71099,62.362925,2000
+              -147.168567,63.314756,2000
+            </coordinates>
+          </LinearRing>
+        </outerBoundaryIs>
+      </Polygon>
+    </Placemark>
+  </Document>
+</kml>
