@@ -89,7 +89,6 @@ def parse_cmr_xml(xml):
                 'sarSceneId': None, # always None in API
                 'product_file_id': '{0}_{1}'.format(granule.findtext("./DataGranule/ProducerGranuleId"), granule.findtext(attr('PROCESSING_TYPE'))),
                 'sceneId': granule.findtext("./DataGranule/ProducerGranuleId"),
-                'productName': granule.findtext("./DataGranule/ProducerGranuleId"),
                 'firstFrame': granule.findtext(attr('CENTER_ESA_FRAME')),
                 'frequency': None, # always None in API
                 'catSceneId': None, # always None in API
