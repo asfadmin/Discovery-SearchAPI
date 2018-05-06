@@ -3,6 +3,8 @@ from datetime import datetime
 from jinja2 import Environment, PackageLoader, select_autoescape
 import logging
 import json
+import requests
+import urls
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
@@ -89,7 +91,6 @@ def parse_cmr_xml(xml):
                 'sarSceneId': None, # always None in API
                 'product_file_id': '{0}_{1}'.format(granule.findtext("./DataGranule/ProducerGranuleId"), granule.findtext(attr('PROCESSING_TYPE'))),
                 'sceneId': granule.findtext("./DataGranule/ProducerGranuleId"),
-                'productName': granule.findtext("./DataGranule/ProducerGranuleId"),
                 'firstFrame': granule.findtext(attr('CENTER_ESA_FRAME')),
                 'frequency': None, # always None in API
                 'catSceneId': None, # always None in API
@@ -201,4 +202,15 @@ def cmr_to_json(r):
     return json.dumps(json_data, sort_keys=True, indent=4, separators=(',', ':'))
 
 def cmr_to_download(r):
-    return r
+    products = parse_cmr_xml(r.text)
+    bd_res = requests.post(urls.bulk_download_api, data={'products': ','.join([p['downloadUrl'] for p in products['results']])})
+    return (bd_res.text)
+
+translators = {
+    'metalink':     cmr_to_metalink,
+    'csv':          cmr_to_csv,
+    'kml':          cmr_to_kml,
+    'json':         cmr_to_json,
+    'echo10':       lambda r: r.text,
+    'download':     cmr_to_download
+}
