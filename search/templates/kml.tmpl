@@ -22,12 +22,11 @@
         <altitudeMode>relativeToGround</altitudeMode>
         <outerBoundaryIs>
           <LinearRing>
-            <coordinates>-145.2655,63.0779,2000
-                    -145.8678,62.1315,2000
-                    -147.711,62.3629,2000
-                    -147.1686,63.3148,2000
-                    -145.2655,63.0779,2000
-                  </coordinates>
+            <coordinates>
+            {%- for p in r.shape %}
+              {{p.lon}},{{p.lat}},2000
+            {%- endfor %}
+            </coordinates>
           </LinearRing>
         </outerBoundaryIs>
       </Polygon>

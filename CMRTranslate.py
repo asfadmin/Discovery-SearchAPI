@@ -1,6 +1,9 @@
 import xml.etree.ElementTree as ET
 from datetime import datetime
 from jinja2 import Environment, PackageLoader, select_autoescape
+import logging
+
+logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 templateEnv = Environment(
     loader=PackageLoader('search', 'templates'),
@@ -15,6 +18,9 @@ def parse_cmr_xml(xml):
     results = []
     for result in root.iter('result'):
         for granule in result.iter('Granule'):
+            shape = []
+            for point in granule.iter('Point'):
+                shape.append({'lon': point.findtext('PointLongitude'), 'lat': point.findtext('PointLatitude')})
             results.append({
                 'granuleName': granule.findtext("./DataGranule/ProducerGranuleId"),
                 'sizeMB': granule.findtext("./DataGranule/SizeMBDataGranule"),
@@ -73,7 +79,8 @@ def parse_cmr_xml(xml):
                 'sensor': None,
                 'fileName': granule.findtext("./OnlineAccessURLs/OnlineAccessURL/URL").split('/')[-1],
                 'downloadUrl': granule.findtext("./OnlineAccessURLs/OnlineAccessURL/URL"),
-                'browse': granule.findtext("./AssociatedBrowseImageUrls/ProviderBrowseUrl/URL")
+                'browse': granule.findtext("./AssociatedBrowseImageUrls/ProviderBrowseUrl/URL"),
+                'shape': shape
             })
     return {'results': results}
 
