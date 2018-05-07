@@ -105,25 +105,25 @@ def parse_cmr_xml(xml):
         for k in r.keys():
             if r[k] == 'NULL':
                 r[k] = None
-    return {'results': results}
+    return results
 
 def cmr_to_metalink(r):
-    products = parse_cmr_xml(r.text)
+    products = {'results': r}
     template = templateEnv.get_template('metalink.tmpl')
     return template.render(products)
 
 def cmr_to_csv(r):
-    products = parse_cmr_xml(r.text)
+    products = {'results': r}
     template = templateEnv.get_template('csv.tmpl')
     return template.render(products)
 
 def cmr_to_kml(r):
-    products = parse_cmr_xml(r.text)
+    products = {'results': r}
     template = templateEnv.get_template('kml.tmpl')
     return template.render(products, search_time=datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC'))
 
 def cmr_to_json(r):
-    products = parse_cmr_xml(r.text)
+    products = {'results': r}
     legacy_json_keys = [
         'sceneSize',
         'absoluteOrbit',
@@ -202,15 +202,17 @@ def cmr_to_json(r):
     return json.dumps(json_data, sort_keys=True, indent=4, separators=(',', ':'))
 
 def cmr_to_download(r):
-    products = parse_cmr_xml(r.text)
-    bd_res = requests.post(urls.bulk_download_api, data={'products': ','.join([p['downloadUrl'] for p in products['results']])})
+    bd_res = requests.post(urls.bulk_download_api, data={'products': ','.join([p['downloadUrl'] for p in r])})
     return (bd_res.text)
+
+def finalize_echo10(r):
+    return r
 
 translators = {
     'metalink':     cmr_to_metalink,
     'csv':          cmr_to_csv,
     'kml':          cmr_to_kml,
     'json':         cmr_to_json,
-    'echo10':       lambda r: r.text,
+    'echo10':       finalize_echo10,
     'download':     cmr_to_download
 }
