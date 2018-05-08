@@ -2,36 +2,32 @@ from flask import Response
 import requests
 import logging
 from CMR.CMRQuery import CMRQuery
+from CMR.CMRTranslate import translate_params
 import urls
-
-logging.getLogger(__name__).addHandler(logging.NullHandler())
+from Analytics import post_analytics
 
 class APIProxyQuery:
     
     def __init__(self, request):
         self.request = request  # store the incoming request
-        
-        # currently supported input params
-        self.cmr_params = [
-            'output',
-            'granule_list',
-            'polygon',
-            #'platform'
-            'maxresults'
-        ]
+        self.cmr_params = {}
         
     def can_use_cmr(self):
         # make sure the provided params are a subset of the CMR-supported params
-        if set(self.request.values.keys()) <= set(self.cmr_params):
-            return True
-        return False
+        try:
+            self.cmr_params = translate_params(self.request.values)
+        except ValueError:
+            return False
+        return True
     
     def get_response(self):
         # pick a backend and go!
         if self.can_use_cmr():
             logging.debug('get_response(): using CMR backend')
+            post_analytics(self.request)
             return self.query_cmr()
         logging.debug('get_response(): using ASF backend')
+        post_analytics(self.request)
         return self.query_asf()
         
     # ASF API backend query
@@ -60,6 +56,7 @@ class APIProxyQuery:
             'scroll': 'true'
         }
         
+        # handle a few special parameters that we support but won't be going to CMR
         max_results = None
         if 'maxresults' in self.request.values:
             max_results = int(self.request.values['maxresults'])
@@ -70,13 +67,6 @@ class APIProxyQuery:
         output = 'metalink'
         if 'output' in self.request.values:
             output = self.request.values['output'].lower()
-        
-        
-        # translate supported params into CMR params
-        if 'granule_list' in self.request.values:
-            params['readable_granule_name[]'] = self.request.values['granule_list'].split(',')
-        if 'polygon' in self.request.values:
-            params['polygon'] = self.request.values['polygon']
         
         q = CMRQuery(params=params, output=output, max_results=max_results)
         r = q.get_results()
