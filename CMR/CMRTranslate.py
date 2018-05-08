@@ -9,7 +9,7 @@ import urls
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
 templateEnv = Environment(
-    loader=PackageLoader('search', 'templates'),
+    loader=PackageLoader('CMR', 'templates'),
     autoescape=select_autoescape(['html', 'xml'])
 )
 
