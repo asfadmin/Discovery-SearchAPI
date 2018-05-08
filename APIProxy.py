@@ -57,21 +57,21 @@ class APIProxyQuery:
         # always limit the results to ASF as the provider
         params = {
             'provider': 'ASF',
-            'page_size': 2000,
-            'scroll': 'true'
+            'page_size': 2000, # max page size by default
+            #'scroll': 'true'
         }
         
-        if 'count' in self.request.values:
-            params['page_size'] = 1
+        max_results = None
+        if 'maxresults' in self.request.values:
+            max_results = int(self.request.values['maxresults'])
+            if max_results < params['page_size']: # minimize data transfer
+                params['page_size'] = max_results
         
         # use specified output format or default metalink
         output = 'metalink'
         if 'output' in self.request.values:
             output = self.request.values['output'].lower()
         
-        max_results = None
-        if 'maxresults' in self.request.values:
-            max_results = self.request.values['maxresults']
         
         # translate supported params into CMR params
         if 'granule_list' in self.request.values:

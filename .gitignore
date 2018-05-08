@@ -3,5 +3,10 @@
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
+
+# python intermediate files
 *.pyc
 __pycache__/
+
+# dev files
+test.txt
