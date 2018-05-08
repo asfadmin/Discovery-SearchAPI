@@ -13,6 +13,7 @@ templateEnv = Environment(
     autoescape=select_autoescape(['html', 'xml'])
 )
 
+# for kml generation
 def wkt_from_gpolygon(gpoly):
     shape = []
     for point in gpoly.iter('Point'):
@@ -20,11 +21,12 @@ def wkt_from_gpolygon(gpoly):
     wkt = 'POLYGON(({0}))'.format(','.join(list(map(lambda x: '{0} {1}'.format(x['lon'], x['lat']), shape))))
     return shape, wkt
 
+# convenience method for handling echo10 additional attributes
 def attr(name):
     return "./AdditionalAttributes/AdditionalAttribute/[Name='" + name + "']/Values/Value"
 
-def parse_cmr_xml(xml):
-    root = ET.fromstring(xml)
+def parse_cmr_response(r):
+    root = ET.fromstring(r.text)
     results = []
     for result in root.iter('result'):
         for granule in result.iter('Granule'):
@@ -108,22 +110,22 @@ def parse_cmr_xml(xml):
     return results
 
 def cmr_to_metalink(r):
-    products = {'results': r}
+    products = {'results': parse_cmr_response(r)}
     template = templateEnv.get_template('metalink.tmpl')
     return template.render(products)
 
 def cmr_to_csv(r):
-    products = {'results': r}
+    products = {'results': parse_cmr_response(r)}
     template = templateEnv.get_template('csv.tmpl')
     return template.render(products)
 
 def cmr_to_kml(r):
-    products = {'results': r}
+    products = {'results': parse_cmr_response(r)}
     template = templateEnv.get_template('kml.tmpl')
     return template.render(products, search_time=datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC'))
 
 def cmr_to_json(r):
-    products = {'results': r}
+    products = {'results': parse_cmr_response(r)}
     legacy_json_keys = [
         'sceneSize',
         'absoluteOrbit',
@@ -202,11 +204,11 @@ def cmr_to_json(r):
     return json.dumps(json_data, sort_keys=True, indent=4, separators=(',', ':'))
 
 def cmr_to_download(r):
-    bd_res = requests.post(urls.bulk_download_api, data={'products': ','.join([p['downloadUrl'] for p in r])})
+    bd_res = requests.post(urls.bulk_download_api, data={'products': ','.join([p['downloadUrl'] for p in parse_cmr_response(r)])})
     return (bd_res.text)
 
 def finalize_echo10(r):
-    return r
+    return r.text
 
 translators = {
     'metalink':     cmr_to_metalink,
