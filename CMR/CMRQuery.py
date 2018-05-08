@@ -3,6 +3,7 @@ import requests
 from flask import Response, make_response
 import logging
 from CMR.CMRTranslate import translators, parse_cmr_response
+from Analytics import post_analytics
 
 class CMRQuery:
     
@@ -25,6 +26,7 @@ class CMRQuery:
         # forward anything other than a 200
         if r.status_code != 200:
             logging.warning('Non-200 response from CMR, forwarding to client')
+            post_analytics(r, 'error', 'CMR API {0}'.format(r.status_code))
             return Response(r.text, r.status_code, r.header_items())
         
         hits = int(r.headers['CMR-hits'])

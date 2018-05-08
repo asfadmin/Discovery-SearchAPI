@@ -14,7 +14,7 @@ templateEnv = Environment(
 def translate_params(p):
     # translate supported params into CMR params
     params = {}
-    for k in params.keys():
+    for k in p.keys():
         if k == 'output':
             pass
         elif k == 'maxresults':
