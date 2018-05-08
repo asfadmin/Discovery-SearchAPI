@@ -21,7 +21,7 @@ class CMRQuery:
         if self.output == 'count':
             return make_response(r.headers['CMR-hits'])
         
-        return make_response(translators.get(self.output, translators['metalink'])(r))
+        return make_response(translators.get(self.output, translators['metalink'])(r, self.max_results))
         
         # some probably defunct paging support but I want to keep it handy for later
         '''
