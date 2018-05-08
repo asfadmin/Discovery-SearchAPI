@@ -2,7 +2,7 @@ import urls
 import requests
 from flask import Response, make_response
 import logging
-from CMR.CMRTranslate import translators
+from CMR.CMRTranslate import translators, parse_cmr_response
 
 class CMRQuery:
     
@@ -16,6 +16,7 @@ class CMRQuery:
     def get_results(self):
         logging.debug('fetching query results')
         
+        # minimize data transfer if all we need is the hits header
         if self.output == 'count':
             self.params['page_size'] = 1
         
@@ -26,28 +27,24 @@ class CMRQuery:
             logging.warning('Non-200 response from CMR, forwarding to client')
             return Response(r.text, r.status_code, r.header_items())
         
+        hits = int(r.headers['CMR-hits'])
+        sid = r.headers['CMR-Scroll-Id']
+        
+        # intercept count option
         if self.output == 'count':
-            return make_response(r.headers['CMR-hits'])
+            return make_response(hits)
+            
+        results = parse_cmr_response(r)
+            
+        # fetch multiple pages of results if needed...don't bother if they want echo10 output
+        if hits > self.params['page_size'] and self.max_results > self.params['page_size'] and self.output != 'echo10':
+            while len(results) <= self.max_results:
+                r = requests.post(urls.cmr_api, data=self.params, headers={'CMR-Scroll-Id': sid})
+                results.extend(parse_cmr_response(r))
         
-        return make_response(translators.get(self.output, translators['metalink'])(r, self.max_results))
+        # trim the results if needed
+        if self.max_results is not None and len(results) >= self.max_results:
+            logging.debug('trimming results from {0} to {1}'.format(len(results), self.max_results))
+            results = results[0:self.max_results]
+        return make_response(translators.get(self.output, translators['metalink'])(results))
         
-        # some probably defunct paging support but I want to keep it handy for later
-        '''
-        if output == 'echo10':
-            results = r.text
-        else:
-            results = parse_cmr_xml(r.text)
-        if hits > params['page_size']:
-            for n in range(hits // params['page_size'] - 1): # parallelize this!!
-                if n * params['page_size'] >= max_results:
-                    break
-                if output == 'echo10':
-                    results += r.text
-                else:
-                    results.extend(parse_cmr_xml(requests.post(urls.cmr_api, data=params, headers={'CMR-Scroll-Id': session_id}).text))
-                logging.debug('scrolled results downloaded for session {0}: {1}/{2}'.format(session_id, len(results), max_results))
-        if output != 'echo10': # don't bother trimming if the output is echo10, it's close enough
-            logging.debug('pulled {0} results for session {1}, trimming'.format(len(results), session_id))
-            results = results[0:max_results] # trim off any excess from the last page
-        text = translators.get(output, translators['metalink'])(results)
-        return make_response(text)'''

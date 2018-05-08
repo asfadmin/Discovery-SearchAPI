@@ -17,8 +17,7 @@ class APIProxyQuery:
             'granule_list',
             'polygon',
             #'platform'
-            'maxresults',
-            'count'
+            'maxresults'
         ]
         
     def can_use_cmr(self):
@@ -58,7 +57,7 @@ class APIProxyQuery:
         params = {
             'provider': 'ASF',
             'page_size': 2000, # max page size by default
-            #'scroll': 'true'
+            'scroll': 'true'
         }
         
         max_results = None

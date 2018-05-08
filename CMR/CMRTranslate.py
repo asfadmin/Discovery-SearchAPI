@@ -24,7 +24,7 @@ def wkt_from_gpolygon(gpoly):
 def attr(name):
     return "./AdditionalAttributes/AdditionalAttribute/[Name='" + name + "']/Values/Value"
 
-def parse_cmr_response(r, max_results=None):
+def parse_cmr_response(r):
     logging.debug('parsing results to list')
     root = ET.fromstring(r.text)
     results = []
@@ -102,10 +102,7 @@ def parse_cmr_response(r, max_results=None):
                 'collectionName': granule.findtext(attr('MISSION_NAME')),
                 'sceneDateString': None # always None in API
             })
-            # short circuit if the downloaded results exceed max_results
-            if max_results is not None and len(results) >= max_results:
-                logging.debug('max_results reach, terminating parse possibly early')
-                break
+
     # some additional attributes are specified as "NULL", make it real null
     for r in results:
         for k in r.keys():
@@ -113,27 +110,27 @@ def parse_cmr_response(r, max_results=None):
                 r[k] = None
     return results
 
-def cmr_to_metalink(r, max_results=None):
+def cmr_to_metalink(rlist):
     logging.debug('translating: metalink')
-    products = {'results': parse_cmr_response(r, max_results)}
+    products = {'results': rlist}
     template = templateEnv.get_template('metalink.tmpl')
     return template.render(products)
 
-def cmr_to_csv(r, max_results=None):
+def cmr_to_csv(rlist):
     logging.debug('translating: csv')
-    products = {'results': parse_cmr_response(r, max_results)}
+    products = {'results': rlist}
     template = templateEnv.get_template('csv.tmpl')
     return template.render(products)
 
-def cmr_to_kml(r, max_results=None):
+def cmr_to_kml(rlist):
     logging.debug('translating: kml')
-    products = {'results': parse_cmr_response(r, max_results)}
+    products = {'results': rlist}
     template = templateEnv.get_template('kml.tmpl')
     return template.render(products, search_time=datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC'))
 
-def cmr_to_json(r, max_results=None):
+def cmr_to_json(rlist):
     logging.debug('translating: json')
-    products = {'results': parse_cmr_response(r, max_results)}
+    products = {'results': rlist}
     legacy_json_keys = [
         'sceneSize',
         'absoluteOrbit',
@@ -211,14 +208,15 @@ def cmr_to_json(r, max_results=None):
         json_data[0].append(dict((k, p[k]) for k in legacy_json_keys if k in p))
     return json.dumps(json_data, sort_keys=True, indent=4, separators=(',', ':'))
 
-def cmr_to_download(r, max_results=None):
+def cmr_to_download(rlist):
     logging.debug('translating: bulk download script')
-    bd_res = requests.post(urls.bulk_download_api, data={'products': ','.join([p['downloadUrl'] for p in parse_cmr_response(r, max_results)])})
+    bd_res = requests.post(urls.bulk_download_api, data={'products': ','.join([p['downloadUrl'] for p in rlist])})
     return (bd_res.text)
 
-def finalize_echo10(r, max_results=None):
+def finalize_echo10(response):
     logging.debug('translating: echo10 passthrough')
-    return r.text
+    # eventually this will consolidate multiple echo10 files
+    return response.text
 
 translators = {
     'metalink':     cmr_to_metalink,
