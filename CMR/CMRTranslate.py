@@ -6,8 +6,6 @@ import json
 import requests
 import urls
 
-logging.getLogger(__name__).addHandler(logging.NullHandler())
-
 templateEnv = Environment(
     loader=PackageLoader('CMR', 'templates'),
     autoescape=select_autoescape(['html', 'xml'])
@@ -19,6 +17,7 @@ def wkt_from_gpolygon(gpoly):
     for point in gpoly.iter('Point'):
         shape.append({'lon': point.findtext('PointLongitude'), 'lat': point.findtext('PointLatitude')})
     wkt = 'POLYGON(({0}))'.format(','.join(list(map(lambda x: '{0} {1}'.format(x['lon'], x['lat']), shape))))
+    logging.debug('Translated to WKT: {0}'.format(wkt))
     return shape, wkt
 
 # convenience method for handling echo10 additional attributes
@@ -26,6 +25,7 @@ def attr(name):
     return "./AdditionalAttributes/AdditionalAttribute/[Name='" + name + "']/Values/Value"
 
 def parse_cmr_response(r, max_results=None):
+    logging.debug('parsing results to list')
     root = ET.fromstring(r.text)
     results = []
     for result in root.iter('result'):
@@ -104,6 +104,7 @@ def parse_cmr_response(r, max_results=None):
             })
             # short circuit if the downloaded results exceed max_results
             if max_results is not None and len(results) >= max_results:
+                logging.debug('max_results reach, terminating parse possibly early')
                 break
     # some additional attributes are specified as "NULL", make it real null
     for r in results:
@@ -113,21 +114,25 @@ def parse_cmr_response(r, max_results=None):
     return results
 
 def cmr_to_metalink(r, max_results=None):
+    logging.debug('translating: metalink')
     products = {'results': parse_cmr_response(r, max_results)}
     template = templateEnv.get_template('metalink.tmpl')
     return template.render(products)
 
 def cmr_to_csv(r, max_results=None):
+    logging.debug('translating: csv')
     products = {'results': parse_cmr_response(r, max_results)}
     template = templateEnv.get_template('csv.tmpl')
     return template.render(products)
 
 def cmr_to_kml(r, max_results=None):
+    logging.debug('translating: kml')
     products = {'results': parse_cmr_response(r, max_results)}
     template = templateEnv.get_template('kml.tmpl')
     return template.render(products, search_time=datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC'))
 
 def cmr_to_json(r, max_results=None):
+    logging.debug('translating: json')
     products = {'results': parse_cmr_response(r, max_results)}
     legacy_json_keys = [
         'sceneSize',
@@ -207,10 +212,12 @@ def cmr_to_json(r, max_results=None):
     return json.dumps(json_data, sort_keys=True, indent=4, separators=(',', ':'))
 
 def cmr_to_download(r, max_results=None):
+    logging.debug('translating: bulk download script')
     bd_res = requests.post(urls.bulk_download_api, data={'products': ','.join([p['downloadUrl'] for p in parse_cmr_response(r, max_results)])})
     return (bd_res.text)
 
 def finalize_echo10(r, max_results=None):
+    logging.debug('translating: echo10 passthrough')
     return r.text
 
 translators = {
