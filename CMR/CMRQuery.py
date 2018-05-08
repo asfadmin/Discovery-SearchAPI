@@ -18,7 +18,8 @@ class CMRQuery:
         if r.status_code != 200:
             return Response(r.text, r.status_code, r.header_items())
         
-        hits = int(r.headers['CMR-hits'])
+        if self.output == 'count':
+            return make_response(r.headers['CMR-hits'])
         
         return make_response(translators.get(self.output, translators['metalink'])(r))
         

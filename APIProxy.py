@@ -17,7 +17,8 @@ class APIProxyQuery:
             'granule_list',
             'polygon',
             #'platform'
-            'maxresults'
+            'maxresults',
+            'count'
         ]
         
     def can_use_cmr(self):
@@ -59,6 +60,9 @@ class APIProxyQuery:
             'page_size': 2000,
             'scroll': 'true'
         }
+        
+        if 'count' in self.request.values:
+            params['page_size'] = 1
         
         # use specified output format or default metalink
         output = 'metalink'
