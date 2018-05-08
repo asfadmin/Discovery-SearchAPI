@@ -6,11 +6,11 @@
 #
 #    With embedded urls: ( download the hardcoded list of files in the 'files =' block below)
 #
-#       python ./download-all-2018-05-06_14-36-52.py
+#       python ./download-all-2018-05-07_05-31-14.py
 #
 #    Download all files in a Metalink/CSV: (downloaded from ASF Vertex)
 #
-#       python ./download-all-2018-05-06_14-36-52.py /path/to/downloads.metalink localmetalink.metalink localcsv.csv
+#       python ./download-all-2018-05-07_05-31-14.py /path/to/downloads.metalink localmetalink.metalink localcsv.csv
 #
 #    Compatibility: python >= 2.6.5, 2.7.5, 3.0
 #
@@ -73,7 +73,9 @@ class bulk_downloader:
                        "https://datapool.asf.alaska.edu/L1.5/A3/ALPSRP273251280-L1.5.zip",
                        "https://datapool.asf.alaska.edu/L1.0/A3/ALPSRP273251280-L1.0.zip",
                        "https://datapool.asf.alaska.edu/L1/E2/E2_84697_STD_F293.zip",
-                       "https://datapool.asf.alaska.edu/L0/E2/E2_84697_STD_L0_F293.zip" ]
+                       "https://datapool.asf.alaska.edu/L0/E2/E2_84697_STD_L0_F293.zip",
+                       "https://datapool.asf.alaska.edu/SLC/SB/S1B_IW_SLC__1SDV_20161218T045537_20161218T045607_003446_005E2D_AEFC.zip",
+                       "https://datapool.asf.alaska.edu/METADATA_SLC/SB/S1B_IW_SLC__1SDV_20161218T045537_20161218T045607_003446_005E2D_AEFC.iso.xml" ]
 
         # Local stash of cookies so we don't always have to ask
         self.cookie_jar_path = os.path.join( os.path.expanduser('~'), ".bulk_download_cookiejar.txt")

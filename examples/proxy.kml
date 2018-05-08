@@ -2,7 +2,7 @@
 <kml xmlns="http://www.opengis.net/kml/2.2">
   <Document>
     <name>ASF Datapool Search Results</name>
-    <description>Search Performed: 2018-05-06 00:40:26 UTC</description>
+    <description>Search Performed: 2018-05-07 05:16:50 UTC</description>
     <Style id="yellowLineGreenPoly">
       <LineStyle>
         <color>30ff8800</color>
@@ -45,6 +45,101 @@
               -148.553558,62.374049,2000
               -146.582047,62.518378,2000
               -146.218082,61.55348,2000
+            </coordinates>
+          </LinearRing>
+        </outerBoundaryIs>
+      </Polygon>
+    </Placemark>
+    <Placemark>
+      <name>ALPSRP273251280</name>
+      <description> &lt;![CDATA[  <h1>ALOS (ALOS PALSAR sensor: High Resolution Observation Mode (single polarization)), acquired 2011-03-12T07:43:24Z</h1><h2>https://datapool.asf.alaska.edu/RTC_HI_RES/A3/AP_27325_FBS_F1280_RT1.zip</h2><div style="position:absolute;left:20px;top:200px"><h3>Metadata</h3><ul><li>Processing type: Hi-Res Terrain Corrected</li><li>Frame: 1284</li><li>Path: 252</li><li>Orbit: 27325</li><li>Start time: 2011-03-12T07:43:16Z</li><li>End time: 2011-03-12T07:43:24Z</li><li>Faraday Rotation: 2.046658</li><li>Ascending/Descending: ASCENDING</li><li>Off Nadir Angle: 34.3</li></ul></div><div style="position:absolute;left:300px;top:250px"><a href="https://datapool.asf.alaska.edu/BROWSE/A3/AP_27325_FBS_F1280.jpg"><img src="https://datapool.asf.alaska.edu/THUMBNAIL/A3/AP_27325_FBS_F1280_THUMBNAIL.jpg"/></a></div></description>
+      <styleUrl>#yellowLineGreenPoly</styleUrl>
+      <Polygon>
+        <extrude>1</extrude>
+        <altitudeMode>relativeToGround</altitudeMode>
+        <outerBoundaryIs>
+          <LinearRing>
+            <coordinates>
+              -146.496,63.876,2000
+              -146.73,64.373,2000
+              -145.391,64.488,2000
+              -145.181,63.99,2000
+            </coordinates>
+          </LinearRing>
+        </outerBoundaryIs>
+      </Polygon>
+    </Placemark>
+    <Placemark>
+      <name>ALPSRP273251280</name>
+      <description> &lt;![CDATA[  <h1>ALOS (ALOS PALSAR sensor: High Resolution Observation Mode (single polarization)), acquired 2011-03-12T07:43:24Z</h1><h2>https://datapool.asf.alaska.edu/RTC_LOW_RES/A3/AP_27325_FBS_F1280_RT2.zip</h2><div style="position:absolute;left:20px;top:200px"><h3>Metadata</h3><ul><li>Processing type: Low-Res Terrain Corrected</li><li>Frame: 1284</li><li>Path: 252</li><li>Orbit: 27325</li><li>Start time: 2011-03-12T07:43:16Z</li><li>End time: 2011-03-12T07:43:24Z</li><li>Faraday Rotation: 2.046658</li><li>Ascending/Descending: ASCENDING</li><li>Off Nadir Angle: 34.3</li></ul></div><div style="position:absolute;left:300px;top:250px"><a href="https://datapool.asf.alaska.edu/BROWSE/A3/AP_27325_FBS_F1280.jpg"><img src="https://datapool.asf.alaska.edu/THUMBNAIL/A3/AP_27325_FBS_F1280_THUMBNAIL.jpg"/></a></div></description>
+      <styleUrl>#yellowLineGreenPoly</styleUrl>
+      <Polygon>
+        <extrude>1</extrude>
+        <altitudeMode>relativeToGround</altitudeMode>
+        <outerBoundaryIs>
+          <LinearRing>
+            <coordinates>
+              -146.496,63.876,2000
+              -146.73,64.373,2000
+              -145.391,64.488,2000
+              -145.181,63.99,2000
+            </coordinates>
+          </LinearRing>
+        </outerBoundaryIs>
+      </Polygon>
+    </Placemark>
+    <Placemark>
+      <name>ALPSRP273251280</name>
+      <description> &lt;![CDATA[  <h1>ALOS (ALOS PALSAR sensor: High Resolution Observation Mode (single polarization)), acquired 2011-03-12T07:43:24Z</h1><h2>https://datapool.asf.alaska.edu/KMZ/A3/AP_27325_FBS_F1280.kmz</h2><div style="position:absolute;left:20px;top:200px"><h3>Metadata</h3><ul><li>Processing type: GoogleEarth KMZ</li><li>Frame: 1284</li><li>Path: 252</li><li>Orbit: 27325</li><li>Start time: 2011-03-12T07:43:16Z</li><li>End time: 2011-03-12T07:43:24Z</li><li>Faraday Rotation: 2.046658</li><li>Ascending/Descending: ASCENDING</li><li>Off Nadir Angle: 34.3</li></ul></div><div style="position:absolute;left:300px;top:250px"><a href="https://datapool.asf.alaska.edu/BROWSE/A3/ALPSRP273251280.jpg"><img src="https://datapool.asf.alaska.edu/THUMBNAIL/A3/AP_27325_FBS_F1280_THUMBNAIL.jpg"/></a></div></description>
+      <styleUrl>#yellowLineGreenPoly</styleUrl>
+      <Polygon>
+        <extrude>1</extrude>
+        <altitudeMode>relativeToGround</altitudeMode>
+        <outerBoundaryIs>
+          <LinearRing>
+            <coordinates>
+              -146.496,63.876,2000
+              -146.73,64.373,2000
+              -145.391,64.488,2000
+              -145.181,63.99,2000
+            </coordinates>
+          </LinearRing>
+        </outerBoundaryIs>
+      </Polygon>
+    </Placemark>
+    <Placemark>
+      <name>ALPSRP273251280</name>
+      <description> &lt;![CDATA[  <h1>ALOS (ALOS PALSAR sensor: High Resolution Observation Mode (single polarization)), acquired 2011-03-12T07:43:24Z</h1><h2>https://datapool.asf.alaska.edu/L1.5/A3/ALPSRP273251280-L1.5.zip</h2><div style="position:absolute;left:20px;top:200px"><h3>Metadata</h3><ul><li>Processing type: Level 1.5 Image</li><li>Frame: 1284</li><li>Path: 252</li><li>Orbit: 27325</li><li>Start time: 2011-03-12T07:43:16Z</li><li>End time: 2011-03-12T07:43:24Z</li><li>Faraday Rotation: 2.046658</li><li>Ascending/Descending: ASCENDING</li><li>Off Nadir Angle: 34.3</li></ul></div><div style="position:absolute;left:300px;top:250px"><a href="https://datapool.asf.alaska.edu/BROWSE/A3/AP_27325_FBS_F1280.jpg"><img src="https://datapool.asf.alaska.edu/THUMBNAIL/A3/AP_27325_FBS_F1280_THUMBNAIL.jpg"/></a></div></description>
+      <styleUrl>#yellowLineGreenPoly</styleUrl>
+      <Polygon>
+        <extrude>1</extrude>
+        <altitudeMode>relativeToGround</altitudeMode>
+        <outerBoundaryIs>
+          <LinearRing>
+            <coordinates>
+              -146.496,63.876,2000
+              -146.73,64.373,2000
+              -145.391,64.488,2000
+              -145.181,63.99,2000
+            </coordinates>
+          </LinearRing>
+        </outerBoundaryIs>
+      </Polygon>
+    </Placemark>
+    <Placemark>
+      <name>ALPSRP273251280</name>
+      <description> &lt;![CDATA[  <h1>ALOS (ALOS PALSAR sensor: High Resolution Observation Mode (single polarization)), acquired 2011-03-12T07:43:24Z</h1><h2>https://datapool.asf.alaska.edu/L1.0/A3/ALPSRP273251280-L1.0.zip</h2><div style="position:absolute;left:20px;top:200px"><h3>Metadata</h3><ul><li>Processing type: Level 1.0</li><li>Frame: 1284</li><li>Path: 252</li><li>Orbit: 27325</li><li>Start time: 2011-03-12T07:43:16Z</li><li>End time: 2011-03-12T07:43:24Z</li><li>Faraday Rotation: 2.046658</li><li>Ascending/Descending: ASCENDING</li><li>Off Nadir Angle: 34.3</li></ul></div><div style="position:absolute;left:300px;top:250px"><a href="https://datapool.asf.alaska.edu/BROWSE/A3/ALPSRP273251280.jpg"><img src="https://datapool.asf.alaska.edu/THUMBNAIL/A3/AP_27325_FBS_F1280_THUMBNAIL.jpg"/></a></div></description>
+      <styleUrl>#yellowLineGreenPoly</styleUrl>
+      <Polygon>
+        <extrude>1</extrude>
+        <altitudeMode>relativeToGround</altitudeMode>
+        <outerBoundaryIs>
+          <LinearRing>
+            <coordinates>
+              -146.496,63.876,2000
+              -146.73,64.373,2000
+              -145.391,64.488,2000
+              -145.181,63.99,2000
             </coordinates>
           </LinearRing>
         </outerBoundaryIs>
