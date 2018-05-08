@@ -1,18 +1,85 @@
 from flask import Response
 import requests
 import logging
-from flask.logging import default_handler
+from CMR.CMRQuery import CMRQuery
+import urls
 
-class APIProxy(object):
+logging.getLogger(__name__).addHandler(logging.NullHandler())
+
+class APIProxyQuery:
     
     def __init__(self, request):
-        self.log = logging.getLogger()
-        self.log.addHandler(default_handler)
-        self.request = request
-
+        self.request = request  # store the incoming request
+        
+        # currently supported input params
+        self.cmr_params = [
+            'output',
+            'granule_list',
+            'polygon',
+            #'platform'
+            'maxresults',
+            'count'
+        ]
+        
+    def can_use_cmr(self):
+        # make sure the provided params are a subset of the CMR-supported params
+        if set(self.request.values.keys()) <= set(self.cmr_params):
+            return True
+        return False
+    
     def get_response(self):
-        self.log.debug('API passthrough from {0} with params {1}'.format(self.request.access_route[-1], self.request.query_string))
-        r = requests.get('https://api.daac.asf.alaska.edu/services/search/param?api_proxy=1&{0}'.format(self.request.query_string))
+        # pick a backend and go!
+        if self.can_use_cmr():
+            logging.debug('get_response(): using CMR backend')
+            return self.query_cmr()
+        logging.debug('get_response(): using ASF backend')
+        return self.query_asf()
+        
+    # ASF API backend query
+    def query_asf(self):
+        # preserve GET/POST approach when querying ASF API
+        logging.info('API passthrough from {0}'.format(self.request.access_route[-1]))
+        if self.request.method == 'GET':
+            param_string = 'api_proxy=1&{0}'.format(self.request.query_string.decode('utf-8'))
+            r = requests.get('{0}?{1}'.format(urls.asf_api, param_string))
+        elif self.request.method == 'POST':
+            params = self.request.form
+            params['api_proxy'] = 1
+            param_string = '&'.join(list(map(lambda p: '{0}={1}'.format(p, params[p]), params)))
+            r = requests.post(urls.asf_api, data=self.request.form)
         if r.status_code != 200:
-            self.log.warning('Received status_code {0} from ASF API with params {1}'.format(r.status_code, self.request.query_string))
+            logging.warning('Received status_code {0} from ASF API with params {1}'.format(r.status_code, param_string))
         return Response(r.text, r.status_code, r.headers.items())
+        
+    # CMR backend query
+    def query_cmr(self):
+        logging.info('CMR translation from {0}'.format(self.request.access_route[-1]))
+        # always limit the results to ASF as the provider
+        params = {
+            'provider': 'ASF',
+            'page_size': 2000,
+            'scroll': 'true'
+        }
+        
+        if 'count' in self.request.values:
+            params['page_size'] = 1
+        
+        # use specified output format or default metalink
+        output = 'metalink'
+        if 'output' in self.request.values:
+            output = self.request.values['output'].lower()
+        
+        max_results = None
+        if 'maxresults' in self.request.values:
+            max_results = self.request.values['maxresults']
+        
+        # translate supported params into CMR params
+        if 'granule_list' in self.request.values:
+            params['readable_granule_name[]'] = self.request.values['granule_list'].split(',')
+        if 'polygon' in self.request.values:
+            params['polygon'] = self.request.values['polygon']
+        
+        q = CMRQuery(params=params, output=output, max_results=max_results)
+        r = q.get_results()
+        
+        return r

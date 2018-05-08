@@ -36,6 +36,16 @@ To get started with a local instance for development:
 (api-proxy-env) ~$ python application.py
 ```
 
+6. After making changes, pylint your code:
+```
+(api-proxy-env) ~$ pylint --rcfile=pylintrc <changed files>
+```
+
+7. If you install new modules with pip, update requirements.txt:
+```
+(api-proxy-env) ~$ pip freeze > requirements.txt
+```
+
 # Testing
 To deploy to test, merge changes to the test branch.
 
