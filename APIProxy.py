@@ -27,10 +27,10 @@ class APIProxyQuery:
         logging.debug(self.can_use_cmr())
         if self.can_use_cmr():
             logging.debug('get_response(): using CMR backend')
-            post_analytics(self.request, 'proxy', 'CMR')
+            post_analytics(self.request, 'Proxy Search', 'CMR')
             return self.query_cmr()
         logging.debug('get_response(): using ASF backend')
-        post_analytics(self.request, 'proxy', 'Legacy')
+        post_analytics(self.request, 'Proxy Search', 'Legacy')
         return self.query_asf()
         
     # ASF API backend query
@@ -46,7 +46,7 @@ class APIProxyQuery:
             param_string = '&'.join(list(map(lambda p: '{0}={1}'.format(p, params[p]), params)))
             r = requests.post(urls.asf_api, data=self.request.form)
         if r.status_code != 200:
-            post_analytics(self.request, 'error', 'ASF API {0}'.format(r.status_code))
+            post_analytics(self.request, 'Proxy Error', 'ASF API {0}'.format(r.status_code))
             logging.warning('Received status_code {0} from ASF API with params {1}'.format(r.status_code, param_string))
         return Response(r.text, r.status_code, r.headers.items())
         
