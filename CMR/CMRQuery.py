@@ -1,6 +1,7 @@
 import urls
 import requests
 from flask import Response, make_response
+import logging
 from CMR.CMRTranslate import translators
 
 class CMRQuery:
@@ -10,12 +11,19 @@ class CMRQuery:
         self.params = params
         self.max_results = max_results
         self.output = output
+        logging.debug('new CMRQuery object ready to go')
     
     def get_results(self):
+        logging.debug('fetching query results')
+        
+        if self.output == 'count':
+            self.params['page_size'] = 1
+        
         r = requests.post(urls.cmr_api, data=self.params)
         
         # forward anything other than a 200
         if r.status_code != 200:
+            logging.warning('Non-200 response from CMR, forwarding to client')
             return Response(r.text, r.status_code, r.header_items())
         
         if self.output == 'count':

@@ -67,10 +67,6 @@ class APIProxyQuery:
             if max_results < params['page_size']: # minimize data transfer
                 params['page_size'] = max_results
         
-        # limit the transfer if we just want the hits header; this overrides max_results
-        if 'count' in self.request.values:
-            params['page_size'] = 1
-        
         # use specified output format or default metalink
         output = 'metalink'
         if 'output' in self.request.values:
