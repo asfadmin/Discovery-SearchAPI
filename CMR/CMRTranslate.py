@@ -11,6 +11,28 @@ templateEnv = Environment(
     autoescape=select_autoescape(['html', 'xml'])
 )
 
+def translate_params(p):
+    # translate supported params into CMR params
+    params = {}
+    for k in p.keys():
+        if k == 'output':
+            pass
+        elif k == 'maxresults':
+            pass
+        elif k == 'granule_list':
+            params['readable_granule_name[]'] = p[k].split(',')
+        elif k == 'polygon':
+            polygon = p[k].replace(' ', '').split(',')
+            # if the polygon doesn't wrap, fix that
+            if polygon[0] != polygon[-2] or polygon[1] != polygon[-1]:
+                polygon.extend(polygon[0:2])
+            params['polygon'] = ','.join(polygon)
+        elif k == 'granule_list':
+            params['readable_granule_name[]'] = params['granule_list'].split(',')
+        else:
+            raise ValueError('Unsupported CMR parameter', k)
+    return params
+
 # for kml generation
 def wkt_from_gpolygon(gpoly):
     shape = []
