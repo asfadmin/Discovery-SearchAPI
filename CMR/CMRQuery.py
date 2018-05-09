@@ -78,8 +78,6 @@ class CMRSubQuery:
             result_pages.extend(p.map(self.get_page, extra_pages))
         for p in result_pages:
             self.results.extend(p)
-#        for _ in extra_pages:
-#            self.get_page()
         logging.debug('done fetching results: {0}'.format(len(self.results)))
         
         # trim the results if needed
