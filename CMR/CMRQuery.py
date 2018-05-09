@@ -75,7 +75,7 @@ class CMRSubQuery:
         
         # enumerate additional pages out to hit count or max_results, whichever is fewer (excluding first page)
         extra_pages = []
-        extra_pages.extend(range(min(ceil(self.hits / self.params['page_size']), ceil(self.max_results / self.params['page_size'])) - 1))
+        extra_pages.extend(range(1, min(ceil(self.hits / self.params['page_size']), ceil(self.max_results / self.params['page_size']))))
         
         # fetch multiple pages of results if needed
         result_pages = []
@@ -95,10 +95,12 @@ class CMRSubQuery:
     def get_page(self, p):
         if p < self.mp_pool_size:
             sleep(p)
-        logging.debug('fetching page {0}'.format(p + 1))
+        logging.debug('fetching page {0}'.format(p))
         r = requests.post(urls.cmr_api, data=self.params, headers={'CMR-Scroll-Id': self.sid, 'Client-Id': 'vertex_asf'})
         if r.status_code != 200:
             logging.error('Bad news bears! CMR said {0} on session {1}'.format(r.status_code, self.sid))
-            
-        return parse_cmr_response(r)
+        
+        results = parse_cmr_response(r)
+        logging.debug('fetched page {0}, {1} results'.format(p + 1, len(results)))
+        return results
         
