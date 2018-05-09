@@ -1,6 +1,7 @@
 import urls
 import requests
 from flask import Response, make_response
+from math import ceil
 import logging
 from CMR.CMRTranslate import translators, parse_cmr_response
 from Analytics import post_analytics
@@ -61,17 +62,18 @@ class CMRSubQuery:
         hits = int(r.headers['CMR-hits'])
         sid = r.headers['CMR-Scroll-Id']
         
-        segment = parse_cmr_response(r)
-        results = []
-            
+        results = parse_cmr_response(r)
+        logging.debug('fetched {0}/{1}'.format(len(results), min(hits, self.max_results)))
+        
+        # enumerate additional pages out to hit count or max_results, whichever is fewer (excluding first page)
+        extra_pages = []
+        extra_pages.extend(range(min(ceil(hits / self.params['page_size']), ceil(self.max_results / self.params['page_size'])) - 1))
+        
         # fetch multiple pages of results if needed
-        while True:
-            results.extend(segment)
-            logging.debug('fetched {0}/{1}'.format(len(results), min(hits, self.max_results)))
-            if len(segment) <= 0 or (self.max_results is not None and len(results) >= self.max_results):
-                break
+        for _ in extra_pages:
             r = requests.post(urls.cmr_api, data=self.params, headers={'CMR-Scroll-Id': sid})
-            segment = parse_cmr_response(r)
+            results.extend(parse_cmr_response(r))
+            logging.debug('fetched {0}/{1}'.format(len(results), min(hits, self.max_results)))
         
         # trim the results if needed
         if self.max_results is not None and len(results) > self.max_results:
