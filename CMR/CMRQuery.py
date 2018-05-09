@@ -2,6 +2,7 @@ import urls
 import requests
 from flask import Response, make_response
 from math import ceil
+from multiprocessing import Pool
 import logging
 from CMR.CMRTranslate import translators, parse_cmr_response
 from Analytics import post_analytics
@@ -48,6 +49,9 @@ class CMRSubQuery:
     def __init__(self, params, max_results=None):
         self.params = params
         self.max_results = max_results
+        self.sid = None
+        self.hits = 0
+        self.results = []
         logging.debug('new CMRSubQuery object ready to go')
     
     def get_results(self):
@@ -59,25 +63,36 @@ class CMRSubQuery:
         if r.status_code != 200:
             return [] # do something wiser here
             
-        hits = int(r.headers['CMR-hits'])
-        sid = r.headers['CMR-Scroll-Id']
+        self.hits = int(r.headers['CMR-hits'])
+        self.sid = r.headers['CMR-Scroll-Id']
         
-        results = parse_cmr_response(r)
-        logging.debug('fetched {0}/{1}'.format(len(results), min(hits, self.max_results)))
+        self.results = parse_cmr_response(r)
         
         # enumerate additional pages out to hit count or max_results, whichever is fewer (excluding first page)
         extra_pages = []
-        extra_pages.extend(range(min(ceil(hits / self.params['page_size']), ceil(self.max_results / self.params['page_size'])) - 1))
+        extra_pages.extend(range(min(ceil(self.hits / self.params['page_size']), ceil(self.max_results / self.params['page_size'])) - 1))
         
         # fetch multiple pages of results if needed
-        for _ in extra_pages:
-            r = requests.post(urls.cmr_api, data=self.params, headers={'CMR-Scroll-Id': sid})
-            results.extend(parse_cmr_response(r))
-            logging.debug('fetched {0}/{1}'.format(len(results), min(hits, self.max_results)))
+        result_pages = []
+        with Pool(10) as p:
+            result_pages.extend(p.map(self.get_page, extra_pages))
+        for p in result_pages:
+            self.results.extend(p)
+#        for _ in extra_pages:
+#            self.get_page()
+        logging.debug('done fetching results: {0}'.format(len(self.results)))
         
         # trim the results if needed
-        if self.max_results is not None and len(results) > self.max_results:
-            logging.debug('trimming subquery results from {0} to {1}'.format(len(results), self.max_results))
-            results = results[0:self.max_results]
+        if self.max_results is not None and len(self.results) > self.max_results:
+            logging.debug('trimming subquery results from {0} to {1}'.format(len(self.results), self.max_results))
+            self.results = self.results[0:self.max_results]
         
-        return results
+        return self.results
+    
+    def get_page(self, _):
+        r = requests.post(urls.cmr_api, data=self.params, headers={'CMR-Scroll-Id': self.sid})
+        if r.status_code != 200:
+            logging.error('Bad news bears! CMR said {0}'.format(r.status_code))
+            post_analytics(r, 'Proxy Error', 'CMR API {0}'.format(r.status_code))
+        return parse_cmr_response(r)
+        
