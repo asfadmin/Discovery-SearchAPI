@@ -27,7 +27,7 @@ class CMRQuery:
             # forward anything other than a 200
             if r.status_code != 200:
                 logging.warning('Non-200 response from CMR, forwarding to client')
-                post_analytics(r, 'Proxy Error', 'CMR API {0}'.format(r.status_code))
+                post_analytics(ec='Proxy Error', ea='CMR API {0}'.format(r.status_code))
                 return Response(r.text, r.status_code, r.header_items())
         
             hits = int(r.headers['CMR-hits'])
