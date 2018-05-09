@@ -36,13 +36,19 @@ class CMRQuery:
         if self.output == 'count':
             return make_response(hits)
             
-        results = parse_cmr_response(r)
+        segment = parse_cmr_response(r)
+        results = []
             
-        # fetch multiple pages of results if needed...don't bother if they want echo10 output
-        if hits > self.params['page_size'] and self.max_results > self.params['page_size'] and self.output != 'echo10':
-            while len(results) <= self.max_results:
-                r = requests.post(urls.cmr_api, data=self.params, headers={'CMR-Scroll-Id': sid})
-                results.extend(parse_cmr_response(r))
+        # fetch multiple pages of results if needed, unless it's echo10 output, then stop after 1 page
+        while True:
+            results.extend(segment)
+            logging.debug('fetched {0}/{1}'.format(len(results), min(hits, self.max_results)))
+            if len(segment) <= 0 \
+               or (self.max_results is not None and len(results) >= self.max_results) \
+               or self.output == 'echo10':
+                break
+            r = requests.post(urls.cmr_api, data=self.params, headers={'CMR-Scroll-Id': sid})
+            segment = parse_cmr_response(r)
         
         # trim the results if needed
         if self.max_results is not None and len(results) >= self.max_results:
