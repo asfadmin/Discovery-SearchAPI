@@ -60,7 +60,7 @@ class APIProxyQuery:
             'scroll': 'true'
         }
         
-        # handle a few special parameters that we support but won't be going to CMR
+        # max_results and output are special parameters that won't be forwarded to CMR
         max_results = None
         if 'maxresults' in self.request.values:
             max_results = int(self.request.values['maxresults'])
