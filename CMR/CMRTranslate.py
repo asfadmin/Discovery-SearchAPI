@@ -14,24 +14,27 @@ templateEnv = Environment(
 def translate_params(p):
     # translate supported params into CMR params
     params = {}
+    output = 'metalink'
+    max_results = None
     for k in p.keys():
-        if k == 'output':
-            pass
-        elif k == 'maxresults':
-            pass
-        elif k == 'granule_list':
+        if k.lower() == 'output':
+            output = p[k].lower()
+        elif k.lower() == 'maxresults':
+            max_results = int(p[k])
+        elif k.lower() == 'granule_list':
             params['readable_granule_name[]'] = p[k].split(',')
-        elif k == 'polygon':
+        elif k.lower() == 'polygon':
             polygon = p[k].replace(' ', '').split(',')
             # if the polygon doesn't wrap, fix that
             if polygon[0] != polygon[-2] or polygon[1] != polygon[-1]:
                 polygon.extend(polygon[0:2])
             params['polygon'] = ','.join(polygon)
-        elif k == 'granule_list':
+        elif k.lower() == 'granule_list':
             params['readable_granule_name[]'] = params['granule_list'].split(',')
         else:
             raise ValueError('Unsupported CMR parameter', k)
-    return params
+    logging.debug('output, max_results: {0}, {1}'.format(output, max_results))
+    return params, output, max_results
 
 # for kml generation
 def wkt_from_gpolygon(gpoly):
@@ -48,7 +51,11 @@ def attr(name):
 
 def parse_cmr_response(r):
     logging.debug('parsing results to list')
-    root = ET.fromstring(r.text)
+    try:
+        root = ET.fromstring(r.text)
+    except ET.ParseError as e:
+        logging.error('CMR parsing error: {0} when parsing: {1}'.format(e, r.text))
+        return []
     results = []
     for result in root.iter('result'):
         for granule in result.iter('Granule'):
