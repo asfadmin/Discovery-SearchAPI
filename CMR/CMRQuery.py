@@ -76,7 +76,7 @@ class CMRSubQuery:
         # enumerate additional pages out to hit count or max_results, whichever is fewer (excluding first page)
         extra_pages = []
         extra_pages.extend(range(1, min(ceil(self.hits / self.params['page_size']), ceil(self.max_results / self.params['page_size']))))
-        
+        logging.debug('preparing to fetch {0} pages'.format(len(extra_pages)))
         # fetch multiple pages of results if needed
         result_pages = []
         with Pool(self.mp_pool_size) as p:
