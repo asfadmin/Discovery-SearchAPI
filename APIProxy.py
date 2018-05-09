@@ -11,12 +11,14 @@ class APIProxyQuery:
     def __init__(self, request):
         self.request = request  # store the incoming request
         self.cmr_params = {}
+        self.output = 'metalink'
+        self.max_results = None
         
     def can_use_cmr(self):
         # make sure the provided params are a subset of the CMR-supported params
         supported = False
         try:
-            self.cmr_params = translate_params(self.request.values)
+            self.cmr_params, self.output, self.max_results = translate_params(self.request.values)
             supported = True
         except ValueError:
             pass
@@ -54,25 +56,14 @@ class APIProxyQuery:
     def query_cmr(self):
         logging.info('CMR translation from {0}'.format(self.request.access_route[-1]))
         # always limit the results to ASF as the provider
-        params = {
-            'provider': 'ASF',
-            'page_size': 2000, # max page size by default
-            'scroll': 'true'
-        }
+        self.cmr_params['provider'] = 'ASF'
+        self.cmr_params['page_size'] = 2000 # max page size by default
+        self.cmr_params['scroll'] = 'true'
         
-        # max_results and output are special parameters that won't be forwarded to CMR
-        max_results = None
-        if 'maxresults' in self.request.values:
-            max_results = int(self.request.values['maxresults'])
-            if max_results < params['page_size']: # minimize data transfer
-                params['page_size'] = max_results
+        if self.max_results is not None and self.max_results < self.cmr_params['page_size']: # minimize data transfer on small max_results
+            self.cmr_params['page_size'] = self.max_results
         
-        # use specified output format or default metalink
-        output = 'metalink'
-        if 'output' in self.request.values:
-            output = self.request.values['output'].lower()
-        
-        q = CMRQuery(params=params, output=output, max_results=max_results)
+        q = CMRQuery(params=self.cmr_params, output=self.output, max_results=self.max_results)
         r = q.get_results()
         
         return r
