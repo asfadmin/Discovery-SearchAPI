@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, make_response
 from flask import request
 from APIProxy import APIProxyQuery
 import sys
@@ -11,6 +11,11 @@ application = Flask(__name__)
 @application.route('/services/search/param', methods = ['GET', 'POST'])
 def proxy_search():
     return APIProxyQuery(request).get_response()
+
+# Health check endpoint
+@application.route('/health')
+def health_check():
+    return make_response("I am putting myself to the fullest possible use, which is all I think that any conscious entity can ever hope to do.")
 
 # Run a dev server
 if __name__ == '__main__':
