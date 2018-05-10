@@ -57,9 +57,10 @@ class CMRSubQuery:
         logging.debug('new CMRSubQuery object ready to go')
     
     def get_results(self):
+        s = requests.Session()
         
         logging.debug('fetching page 0')
-        r = requests.post(urls.cmr_api, data=self.params, headers={'Client-Id': 'vertex_asf'})
+        r = s.post(urls.cmr_api, data=self.params, headers={'Client-Id': 'vertex_asf'})
         
         # forward anything other than a 200
         if r.status_code != 200:
@@ -69,6 +70,7 @@ class CMRSubQuery:
         if self.max_results > self.hits:
             self.max_results = self.hits
         self.sid = r.headers['CMR-Scroll-Id']
+        s.headers.update({'CMR-Scroll-Id': self.sid})
         logging.debug('CMR reported {0} hits for session {1}'.format(self.hits, self.sid))
         
         self.results = parse_cmr_response(r)
@@ -76,11 +78,11 @@ class CMRSubQuery:
         # enumerate additional pages out to hit count or max_results, whichever is fewer (excluding first page)
         extra_pages = []
         extra_pages.extend(range(1, int(min(ceil(float(self.hits) / float(self.params['page_size'])), ceil(float(self.max_results) / float(self.params['page_size']))))))
-        logging.debug('preparing to fetch {0} pages'.format(len(extra_pages)))
+        logging.debug('preparing to fetch {0} additional pages'.format(len(extra_pages)))
         
         # fetch multiple pages of results if needed
         for p in extra_pages:
-            self.results.extend(self.get_page(p))
+            self.results.extend(self.get_page(p, s))
         logging.debug('done fetching results: got {0}/{1}'.format(len(self.results), self.hits))
         
         # trim the results if needed
@@ -90,11 +92,9 @@ class CMRSubQuery:
         
         return self.results
     
-    def get_page(self, p):
-        if p < self.mp_pool_size:
-            sleep(p)
+    def get_page(self, p, s):
         logging.debug('fetching page {0}'.format(p))
-        r = requests.post(urls.cmr_api, data=self.params, headers={'CMR-Scroll-Id': self.sid, 'Client-Id': 'vertex_asf'})
+        r = s.post(urls.cmr_api, data=self.params, headers={'CMR-Scroll-Id': self.sid, 'Client-Id': 'vertex_asf'})
         if r.status_code != 200:
             logging.error('Bad news bears! CMR said {0} on session {1}'.format(r.status_code, self.sid))
         
