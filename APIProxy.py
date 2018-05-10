@@ -27,12 +27,15 @@ class APIProxyQuery:
     def get_response(self):
         # pick a backend and go!
         logging.debug(self.can_use_cmr())
+        events = [{'ec': 'Param', 'ea': v} for v in self.request.values.keys()]
         if self.can_use_cmr():
             logging.debug('get_response(): using CMR backend')
-            post_analytics(ec='Proxy Search', ea='CMR')
+            events.append({'ec': 'Proxy Search', 'ea': 'Legacy'})
+            post_analytics(pageview=True, events=events)
             return self.query_cmr()
         logging.debug('get_response(): using ASF backend')
-        post_analytics(ec='Proxy Search', ea='Legacy')
+        events.append({'ec': 'Proxy Search', 'ea': 'Legacy'})
+        post_analytics(pageview=True, events=events)
         return self.query_asf()
         
     # ASF API backend query
@@ -47,8 +50,8 @@ class APIProxyQuery:
             params['api_proxy'] = 1
             param_string = '&'.join(list(map(lambda p: '{0}={1}'.format(p, params[p]), params)))
             r = requests.post(urls.asf_api, data=self.request.form)
+        post_analytics(pageview=False, events=[{'ec': 'ASF API Status', 'ea': r.status_code}])
         if r.status_code != 200:
-            post_analytics(ec='Proxy Error', ea='ASF API {0}'.format(r.status_code))
             logging.warning('Received status_code {0} from ASF API with params {1}'.format(r.status_code, param_string))
             return Response(r.text, r.status_code, r.headers.items())
         return make_response(r.text)
