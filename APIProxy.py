@@ -1,4 +1,4 @@
-from flask import Response
+from flask import Response, make_response
 import requests
 import logging
 from CMR.CMRQuery import CMRQuery
@@ -50,7 +50,8 @@ class APIProxyQuery:
         if r.status_code != 200:
             post_analytics(ec='Proxy Error', ea='ASF API {0}'.format(r.status_code))
             logging.warning('Received status_code {0} from ASF API with params {1}'.format(r.status_code, param_string))
-        return Response(r.text, r.status_code, r.headers.items())
+            return Response(r.text, r.status_code, r.headers.items())
+        return make_response(r.text)
         
     # CMR backend query
     def query_cmr(self):
