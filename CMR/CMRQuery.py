@@ -2,7 +2,7 @@ import urls
 import requests
 from flask import Response, make_response
 from math import ceil
-from multiprocessing import Pool
+#from multiprocessing import Pool
 from time import sleep
 import logging
 from CMR.CMRTranslate import translators, parse_cmr_response
@@ -75,14 +75,12 @@ class CMRSubQuery:
         
         # enumerate additional pages out to hit count or max_results, whichever is fewer (excluding first page)
         extra_pages = []
-        extra_pages.extend(range(1, min(ceil(self.hits / self.params['page_size']), ceil(self.max_results / self.params['page_size']))))
+        extra_pages.extend(range(1, int(min(ceil(float(self.hits) / float(self.params['page_size'])), ceil(float(self.max_results) / float(self.params['page_size']))))))
         logging.debug('preparing to fetch {0} pages'.format(len(extra_pages)))
+        
         # fetch multiple pages of results if needed
-        result_pages = []
-        with Pool(self.mp_pool_size) as p:
-            result_pages.extend(p.map(self.get_page, extra_pages))
-        for p in result_pages:
-            self.results.extend(p)
+        for p in extra_pages:
+            self.results.extend(self.get_page(p))
         logging.debug('done fetching results: got {0}/{1}'.format(len(self.results), self.hits))
         
         # trim the results if needed
