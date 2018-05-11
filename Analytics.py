@@ -1,13 +1,14 @@
 import requests
 import logging
 from flask import request
+from md5 import md5
 
 def post_analytics(events=None, pageview=False):
     url = "http://www.google-analytics.com/collect"
     params = {
         "v":    "1",
         "tid":  "UA-118881300-1",
-        "cid":  "555"
+        "cid":  md5(request.access_route[-1]).hexdigest()
         }
     try:
         s = requests.Session()
