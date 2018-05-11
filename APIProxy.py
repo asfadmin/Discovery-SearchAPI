@@ -30,7 +30,7 @@ class APIProxyQuery:
         events = [{'ec': 'Param', 'ea': v} for v in self.request.values.keys()]
         if self.can_use_cmr():
             logging.debug('get_response(): using CMR backend')
-            events.append({'ec': 'Proxy Search', 'ea': 'Legacy'})
+            events.append({'ec': 'Proxy Search', 'ea': 'CMR'})
             post_analytics(pageview=True, events=events)
             return self.query_cmr()
         logging.debug('get_response(): using ASF backend')
