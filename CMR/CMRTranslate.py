@@ -4,6 +4,7 @@ from jinja2 import Environment, PackageLoader, select_autoescape
 import logging
 import json
 import requests
+import re
 from asf_env import get_config
 
 templateEnv = Environment(
@@ -64,35 +65,91 @@ def translate_params(p):
         del params['maxresults']
     return params, output, max_results
 
+# Parse and validate a string: "abc"
 def parse_string(v):
     return '{0}'.format(v)
 
-def parse_string_list(v):
-    return ['{0}'.format(a) for a in v.split(',')]
-
+# Parse and validate an int: "10"
 def parse_int(v):
     try:
         return int(v)
     except ValueError:
         raise ValueError('Invalid int: {0}'.format(v))
 
+# Parse and validate a float: "1.2"
 def parse_float(v):
     try:
         return float(v)
     except ValueError:
         raise ValueError('Invalid number: {0}'.format(v))
 
+# Parse and validate a numeric value range, using h() to validate each value: "3-5", "1.1-12.3"
+def parse_range(v, h):
+    v = v.replace(' ', '')
+    m = re.search(r'^(-?\d+(\.\d*)?)-(-?\d+(\.\d*)?)$', v)
+    try:
+        a = [h(m.group(1)), h(m.group(3))]
+        if a[0] > a[1]:
+            raise ValueError()
+    except ValueError:
+        raise ValueError('Invalid range: {0}'.format(v))
+    return a
+
+# Parse and validate an integer range: "3-5"
+def parse_int_range(v):
+    return parse_range(v, parse_int)
+
+# Parse and validate a float range: "1.1-12.3"
+def parse_float_range(v):
+    return parse_range(v, parse_float)
+
+# Parse and validate a list of values, using h() to validate each value: "a,b,c", "1,2,3", "1.1,2.3"
+def parse_list(v, h):
+    return [h(a) for a in v.split(',')]
+
+# Parse and validate a list of strings: "foo,bar,baz"
+def parse_string_list(v):
+    return parse_list(v, '{0}'.format)
+
+# Parse and validate a list of integers: "1,2,3"
+def parse_int_list(v):
+    return parse_list(v, parse_int)
+
+# Parse and validate a list of floats: "1.1,2.3,4.5"
+def parse_float_list(v):
+    return parse_list(v, parse_float)
+
+# Parse and validate a number or a range, using h() to validate each value: "1", "4.5", "3-5", "10.1-13.4"
+def parse_number_or_range(v, h):
+    m = re.search(r'^(-?\d+(\.\d*)?)$', v)
+    if m is not None:
+        return h(v)
+    return parse_range(v, h)
+    
+# Parse and validate a list of numbers or number ranges, using h() to validate each value: "1,2,3-5", "1.1,1.4,5.1-6.7"
+def parse_number_or_range_list(v, h):
+    v = v.replace(' ', '')
+    return [parse_number_or_range(x, h) for x in v.split(',')]
+
+# Parse and validate a list of integers or integer ranges: "1,2,3-5"
+def parse_int_or_range_list(v):
+    return parse_number_or_range_list(v, parse_int)
+
+# Parse and validate a list of integers or integer ranges: "1,2,3-5"
+def parse_float_or_range_list(v):
+    return parse_number_or_range_list(v, parse_float)
+
 def parse_coord_string(v):
-    coords = v.replace(' ', '').split(',')
+    v = v.replace(' ', '').split(',')
     # if the polygon doesn't wrap, fix that
-    if coords[0] != coords[-2] or coords[1] != coords[-1]:
-        coords.extend(coords[0:2])
-    for c in coords:
+    if v[0] != v[-2] or v[1] != v[-1]:
+        v.extend(v[0:2])
+    for c in v:
         try:
             float(c)
         except ValueError:
             raise ValueError('Invalid polygon: {0}'.format(v))
-    return ','.join(coords)
+    return ','.join(v)
 
 # for kml generation
 def wkt_from_gpolygon(gpoly):
