@@ -1,5 +1,6 @@
 import xml.etree.ElementTree as ET
 from datetime import datetime
+import dateparser
 from jinja2 import Environment, PackageLoader, select_autoescape
 import logging
 import json
@@ -15,19 +16,52 @@ templateEnv = Environment(
 # Parsers/validators
 def input_parsers():
     return {
-        'output': parse_string,
-        'maxresults': parse_int,
+        'absoluteorbit': parse_int_or_range_list,
+        'asfframe': parse_int_or_range_list,
+        'maxbaselineperp': parse_float,
+        'minbaselineperp': parse_float,
+        'beammode': parse_string_list,
+#        'beamswath':                                   # might deprecate
+        'collectionname': parse_string,
+        'maxdoppler': parse_float,
+        'mindoppler': parse_float,
+        'maxfaradayrotation': parse_float,
+        'minfaradayrotation': parse_float,
+        'flightdirection': parse_string,
+        'flightline': parse_string,
+        'frame': parse_int_or_range_list,
         'granule_list': parse_string_list,
-        'polygon': parse_coord_string
+        'maxinsarstacksize': parse_int,
+        'mininsarstacksize': parse_int,
+#        'intersectswith':                              # need a parser
+        'lookdirection': parse_string,
+#        'offnadirangle': parse_float_or_range_list,    # not used in six months
+        'output': parse_string,
+#        'minpercentcoherence': parse_float,            # not used in six months
+#        'minpercenttroposphere': parse_float,          # not used in six months
+#        'minpercentunwrapped': parse_float,            # not used in six months
+        'platform': parse_string_list,
+        'polarization': parse_string_list,
+        'polygon': parse_coord_string,
+        'processinglevel': parse_string_list,
+        'relativeorbit': parse_int_or_range_list,
+        'maxresults': parse_int,
+        'processingdate': parse_date,
+        'start': parse_date,
+        'end': parse_date,
+#        'slavestart': parse_date,                      # not used in six months
+#        'slaveend': parse_date                         # not used in six months
+        
     }
 
-# Supported input parameters
+# Supported input parameters and their associated CMR parameters
 def input_map():
     return {
         'output': 'output',
         'maxresults': 'maxresults',
         'granule_list': 'readable_granule_name[]',
-        'polygon': 'polygon'
+        'polygon': 'polygon',
+        'absoluteorbit': 'orbit_number'
     }
 
 # Supported output formats
@@ -82,6 +116,10 @@ def parse_float(v):
         return float(v)
     except ValueError:
         raise ValueError('Invalid number: {0}'.format(v))
+
+# Parse and validate a data: "1991-10-01T00:00:00Z"
+def parse_date(v):
+    return dateparser.parse(v).strftime('%Y-%m-%dT%H:%M:%SZ')
 
 # Parse and validate a numeric value range, using h() to validate each value: "3-5", "1.1-12.3"
 def parse_range(v, h):
