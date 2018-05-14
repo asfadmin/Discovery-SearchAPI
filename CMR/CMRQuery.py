@@ -5,7 +5,7 @@ from math import ceil
 #from multiprocessing import Pool
 from time import sleep
 import logging
-from CMR.CMRTranslate import translators, parse_cmr_response
+from CMR.CMRTranslate import output_translators, parse_cmr_response
 from Analytics import post_analytics
 
 class CMRQuery:
@@ -17,12 +17,11 @@ class CMRQuery:
         logging.debug('new CMRQuery object ready to go')
     
     def get_results(self):
-        logging.debug('fetching query results')
-        
         # minimize data transfer if all we need is the hits header
         if self.output == 'count':
+            logging.debug('Count query, doing this the quick way')
             self.params['page_size'] = 1
-            r = requests.post(urls.cmr_api, data=self.params)
+            r = requests.head(urls.cmr_api, data=self.params)
         
             post_analytics(pageview=False, events=[{'ec': 'CMR API Status', 'ea': r.status_code}])
             # forward anything other than a 200
@@ -34,16 +33,19 @@ class CMRQuery:
             return make_response('{0}'.format(hits))
         
         if self.output == 'echo10': #truncate echo10 output to 1 page
+            logging.debug('echo10 output, truncating to page 1')
             self.max_results = min(self.max_results, self.params['page_size'])
             
+        logging.debug('Building subqueries')
         subq = CMRSubQuery(params=self.params, max_results=self.max_results)
         results = subq.get_results()
+        logging.debug('Result length: {0}'.format(len(results)))
         
         # trim the results if needed
         if self.max_results is not None and len(results) > self.max_results:
-            logging.debug('trimming total results from {0} to {1}'.format(len(results), self.max_results))
+            logging.debug('Trimming total results from {0} to {1}'.format(len(results), self.max_results))
             results = results[0:self.max_results]
-        return make_response(translators.get(self.output, translators['metalink'])(results))
+        return make_response(output_translators().get(self.output, output_translators()['metalink'])(results))
 
 class CMRSubQuery:
     
@@ -59,8 +61,8 @@ class CMRSubQuery:
     def get_results(self):
         s = requests.Session()
         
-        logging.debug('fetching page 0')
-        r = s.post(urls.cmr_api, data=self.params, headers={'Client-Id': 'vertex_asf'})
+        logging.debug('Fetching head')
+        r = s.head(urls.cmr_api, data=self.params, headers={'Client-Id': 'vertex_asf'})
         
         post_analytics(pageview=False, events=[{'ec': 'CMR API Status', 'ea': r.status_code}])
         # forward anything other than a 200
@@ -74,15 +76,15 @@ class CMRSubQuery:
         s.headers.update({'CMR-Scroll-Id': self.sid})
         logging.debug('CMR reported {0} hits for session {1}'.format(self.hits, self.sid))
         
-        self.results = parse_cmr_response(r)
+        #self.results = parse_cmr_response(r)
         
         # enumerate additional pages out to hit count or max_results, whichever is fewer (excluding first page)
-        extra_pages = []
-        extra_pages.extend(range(1, int(min(ceil(float(self.hits) / float(self.params['page_size'])), ceil(float(self.max_results) / float(self.params['page_size']))))))
-        logging.debug('preparing to fetch {0} additional pages'.format(len(extra_pages)))
+        pages = []
+        pages.extend(range(0, int(min(ceil(float(self.hits) / float(self.params['page_size'])), ceil(float(self.max_results) / float(self.params['page_size']))))))
+        logging.debug('preparing to fetch {0} additional pages'.format(len(pages)))
         
         # fetch multiple pages of results if needed
-        for p in extra_pages:
+        for p in pages:
             self.results.extend(self.get_page(p, s))
         logging.debug('done fetching results: got {0}/{1}'.format(len(self.results), self.hits))
         
@@ -94,13 +96,13 @@ class CMRSubQuery:
         return self.results
     
     def get_page(self, p, s):
-        logging.debug('fetching page {0}'.format(p))
+        logging.debug('Fetching page {0}'.format(p+1))
         r = s.post(urls.cmr_api, data=self.params, headers={'CMR-Scroll-Id': self.sid, 'Client-Id': 'vertex_asf'})
         post_analytics(pageview=False, events=[{'ec': 'CMR API Status', 'ea': r.status_code}])
         if r.status_code != 200:
             logging.error('Bad news bears! CMR said {0} on session {1}'.format(r.status_code, self.sid))
         
         results = parse_cmr_response(r)
-        logging.debug('fetched page {0}, {1} results'.format(p + 1, len(results)))
+        logging.debug('Fetched page {0}, {1} results'.format(p + 1, len(results)))
         return results
         

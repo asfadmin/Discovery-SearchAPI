@@ -11,30 +11,88 @@ templateEnv = Environment(
     autoescape=select_autoescape(['html', 'xml'])
 )
 
+# Parsers/validators
+def input_parsers():
+    return {
+        'output': parse_string,
+        'maxresults': parse_int,
+        'granule_list': parse_string_list,
+        'polygon': parse_coord_string
+    }
+
+# Supported input parameters
+def input_map():
+    return {
+        'output': 'output',
+        'maxresults': 'maxresults',
+        'granule_list': 'readable_granule_name[]',
+        'polygon': 'polygon'
+    }
+
+# Supported output formats
+def output_translators():
+    return {
+        'metalink':     cmr_to_metalink,
+        'csv':          cmr_to_csv,
+        'kml':          cmr_to_kml,
+        'json':         cmr_to_json,
+        'count':        None, # No translator, just here for input validation
+        'echo10':       finalize_echo10,
+        'download':     cmr_to_download
+    }
+    
+# translate supported params into CMR params
 def translate_params(p):
-    # translate supported params into CMR params
     params = {}
-    output = 'metalink'
-    max_results = None
+    
     for k in p.keys():
-        if k.lower() == 'output':
-            output = p[k].lower()
-        elif k.lower() == 'maxresults':
-            max_results = int(p[k])
-        elif k.lower() == 'granule_list':
-            params['readable_granule_name[]'] = p[k].split(',')
-        elif k.lower() == 'polygon':
-            polygon = p[k].replace(' ', '').split(',')
-            # if the polygon doesn't wrap, fix that
-            if polygon[0] != polygon[-2] or polygon[1] != polygon[-1]:
-                polygon.extend(polygon[0:2])
-            params['polygon'] = ','.join(polygon)
-        elif k.lower() == 'granule_list':
-            params['readable_granule_name[]'] = params['granule_list'].split(',')
-        else:
+        if k.lower() not in input_map().keys():
             raise ValueError('Unsupported CMR parameter', k)
-    logging.debug('output, max_results: {0}, {1}'.format(output, max_results))
+        try:
+            params[input_map()[k.lower()]] = input_parsers()[k.lower()](p[k])
+        except ValueError as e:
+            raise e
+    
+    # be nice to make this not a special case
+    output = 'metalink'
+    if 'output' in params and params['output'] in output_translators().keys():
+        output = params['output']
+        del params['output']
+    max_results = None
+    if 'maxresults' in params:
+        max_results = params['maxresults']
+        del params['maxresults']
     return params, output, max_results
+
+def parse_string(v):
+    return '{0}'.format(v)
+
+def parse_string_list(v):
+    return ['{0}'.format(a) for a in v.split(',')]
+
+def parse_int(v):
+    try:
+        return int(v)
+    except ValueError:
+        raise ValueError('Invalid int: {0}'.format(v))
+
+def parse_float(v):
+    try:
+        return float(v)
+    except ValueError:
+        raise ValueError('Invalid number: {0}'.format(v))
+
+def parse_coord_string(v):
+    coords = v.replace(' ', '').split(',')
+    # if the polygon doesn't wrap, fix that
+    if coords[0] != coords[-2] or coords[1] != coords[-1]:
+        coords.extend(coords[0:2])
+    for c in coords:
+        try:
+            float(c)
+        except ValueError:
+            raise ValueError('Invalid polygon: {0}'.format(v))
+    return ','.join(coords)
 
 # for kml generation
 def wkt_from_gpolygon(gpoly):
@@ -49,6 +107,7 @@ def wkt_from_gpolygon(gpoly):
 def attr(name):
     return "./AdditionalAttributes/AdditionalAttribute/[Name='" + name + "']/Values/Value"
 
+# Convert echo10 xml to results list used by output translators
 def parse_cmr_response(r):
     logging.debug('parsing results to list')
     try:
@@ -246,12 +305,3 @@ def finalize_echo10(response):
     logging.debug('translating: echo10 passthrough')
     # eventually this will consolidate multiple echo10 files
     return response.text
-
-translators = {
-    'metalink':     cmr_to_metalink,
-    'csv':          cmr_to_csv,
-    'kml':          cmr_to_kml,
-    'json':         cmr_to_json,
-    'echo10':       finalize_echo10,
-    'download':     cmr_to_download
-}

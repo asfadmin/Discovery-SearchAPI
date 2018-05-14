@@ -20,13 +20,12 @@ class APIProxyQuery:
         try:
             self.cmr_params, self.output, self.max_results = translate_params(self.request.values)
             supported = True
-        except ValueError:
+        except ValueError: # didn't parse, pass it to the legacy API for now
             pass
         return supported
     
     def get_response(self):
         # pick a backend and go!
-        logging.debug(self.can_use_cmr())
         events = [{'ec': 'Param', 'ea': v} for v in self.request.values.keys()]
         if self.can_use_cmr():
             logging.debug('get_response(): using CMR backend')

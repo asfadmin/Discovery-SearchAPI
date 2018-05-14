@@ -2,8 +2,11 @@ import requests
 import logging
 from flask import request
 from md5 import md5
+import os
 
 def post_analytics(events=None, pageview=False):
+    #logging.error('==========')
+    #logging.error(os.environ)
     url = "http://www.google-analytics.com/collect"
     params = {
         "v":    "1",
