@@ -3,8 +3,8 @@ import requests
 import logging
 from CMR.CMRQuery import CMRQuery
 from CMR.CMRTranslate import translate_params
-import urls
 from Analytics import post_analytics
+from asf_env import get_config
 
 class APIProxyQuery:
     
@@ -43,12 +43,12 @@ class APIProxyQuery:
         logging.info('API passthrough from {0}'.format(self.request.access_route[-1]))
         if self.request.method == 'GET':
             param_string = 'api_proxy=1&{0}'.format(self.request.query_string.decode('utf-8'))
-            r = requests.get('{0}?{1}'.format(urls.asf_api, param_string))
+            r = requests.get('{0}?{1}'.format(get_config()['asf_api'], param_string))
         else: # self.request.method == 'POST':
             params = self.request.form
             params['api_proxy'] = 1
             param_string = '&'.join(list(map(lambda p: '{0}={1}'.format(p, params[p]), params)))
-            r = requests.post(urls.asf_api, data=self.request.form)
+            r = requests.post(get_config()['asf_api'], data=self.request.form)
         post_analytics(pageview=False, events=[{'ec': 'ASF API Status', 'ea': r.status_code}])
         if r.status_code != 200:
             logging.warning('Received status_code {0} from ASF API with params {1}'.format(r.status_code, param_string))

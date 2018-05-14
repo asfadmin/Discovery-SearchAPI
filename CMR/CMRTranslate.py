@@ -4,7 +4,7 @@ from jinja2 import Environment, PackageLoader, select_autoescape
 import logging
 import json
 import requests
-import urls
+from asf_env import get_config
 
 templateEnv = Environment(
     loader=PackageLoader('CMR', 'templates'),
@@ -298,7 +298,7 @@ def cmr_to_json(rlist):
 
 def cmr_to_download(rlist):
     logging.debug('translating: bulk download script')
-    bd_res = requests.post(urls.bulk_download_api, data={'products': ','.join([p['downloadUrl'] for p in rlist])})
+    bd_res = requests.post(get_config()['bulk_download_api'], data={'products': ','.join([p['downloadUrl'] for p in rlist])})
     return (bd_res.text)
 
 def finalize_echo10(response):
