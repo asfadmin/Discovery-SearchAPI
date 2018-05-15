@@ -13,7 +13,7 @@ def post_analytics(events=None, pageview=False):
     params = {
         "v":    "1",
         "tid":  get_config()['analytics_id'],
-        "cid":  md5(request.access_route[-1]).hexdigest()
+        "cid":  '{0}'.format(request.access_route[-1])
         }
     try:
         s = requests.Session()
