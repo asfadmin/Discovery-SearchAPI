@@ -1,19 +1,18 @@
 import requests
 import logging
 from flask import request
-from md5 import md5
 from asf_env import get_config
 
 def post_analytics(events=None, pageview=False):
     if get_config()['analytics_id'] is None:
         logging.debug('Skipping analytics: analytics_id not set')
         return
-    logging.debug('Posting analytics')
+    logging.debug('Posting analytics to {0}'.format(get_config()['analytics_id']))
     url = "http://www.google-analytics.com/collect"
     params = {
         "v":    "1",
         "tid":  get_config()['analytics_id'],
-        "cid":  md5(request.access_route[-1]).hexdigest()
+        "cid":  '{0}'.format(request.access_route[-1])
         }
     try:
         s = requests.Session()

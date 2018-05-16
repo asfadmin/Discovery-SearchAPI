@@ -1,44 +1,96 @@
 import requests
-from flask import Response, make_response
+from flask import make_response
 from math import ceil
-#from multiprocessing import Pool
-from time import sleep
+from itertools import product
 import logging
-from CMR.CMRTranslate import output_translators, parse_cmr_response
+from CMR.CMRTranslate import output_translators, parse_cmr_response, input_map, input_fixer
 from Analytics import post_analytics
 from asf_env import get_config
+from pprint import pprint
 
 class CMRQuery:
     
     def __init__(self, params=None, max_results=None, output='metalink'):
-        self.params = params
+        self.extra_params = {'provider': 'ASF', # always limit the results to ASF as the provider
+                             'page_size': 2000, # max page size by default
+                             'scroll': 'true',  # used for fetching multiple page_size
+                             'options[temporal][and]': 'true', # Makes handling date ranges easier
+                             #'options[attribute][pattern]': 'true' # Handy for flight direction & look direction
+                             }
+        
+        self.params = input_fixer(params)
         self.max_results = max_results
         self.output = output
+
+        if self.max_results is not None and self.max_results < self.extra_params['page_size']: # minimize data transfer on small max_results
+            self.extra_params['page_size'] = self.max_results
+        
+        logging.debug('Building subqueries')
+        self.query_list = self.get_query_list(self.params)
+        self.sub_queries = [CMRSubQuery(params=q, max_results=self.max_results, count=True if self.output == 'count' else False) for q in self.query_list]
+        logging.debug('{0} subqueries ready to go'.format(len(self.sub_queries)))
+        
         logging.debug('new CMRQuery object ready to go')
     
+    def run_sub_query(self, n):
+        logging.debug('Dispatching subquery {0}'.format(n))
+        return self.sub_queries[n].get_results()
+        
+    # Use the cartesian product of all the list parameters to determine subqueries
+    def get_query_list(self, params):
+        # First we have to get the params into a form itertools.product() understands
+        listed_params = []
+        for k in params.keys():
+            plist = []
+            if isinstance(params[k], list):
+                for l in params[k]:
+                    if isinstance(l, list):
+                        plist.append({input_map()[k][0]: input_map()[k][1].format(','.join(['{0}'.format(t) for t in l]))})
+                    else:
+                        plist.append({input_map()[k][0]: input_map()[k][1].format(l)})
+                listed_params.append(plist)
+            else:
+                listed_params.append([{input_map()[k][0]: input_map()[k][1].format(params[k])}])
+        # Get the actual cartesian product
+        query_list = list(product(*listed_params))
+        # Clean up the query list so CMRSubQuery understands it
+        final_query_list = []
+        for q in query_list:
+            params = {}
+            for p in q:
+                for k in p.keys():
+                    params[k] = p[k]
+            params.update(self.extra_params)
+            final_query_list.append(params)
+        logging.debug('=======')
+        pprint(final_query_list)
+        return final_query_list
+    
     def get_results(self):
+        
         # minimize data transfer if all we need is the hits header
         if self.output == 'count':
             logging.debug('Count query, doing this the quick way')
-            self.params['page_size'] = 1
-            r = requests.head(get_config()['cmr_api'], data=self.params)
-        
-            post_analytics(pageview=False, events=[{'ec': 'CMR API Status', 'ea': r.status_code}])
-            # forward anything other than a 200
-            if r.status_code != 200:
-                logging.warning('Non-200 response from CMR, forwarding to client')
-                return Response(r.text, r.status_code, r.header_items())
-        
-            hits = int(r.headers['CMR-hits'])
-            return make_response('{0}'.format(hits))
-        
-        if self.output == 'echo10': #truncate echo10 output to 1 page
-            logging.debug('echo10 output, truncating to page 1')
-            self.max_results = min(self.max_results, self.params['page_size'])
+            total_hits = 0
+            for sq in self.sub_queries:
+                res = sq.get_results()
+                if isinstance(res, int):
+                    total_hits += res
+                else:
+                    logging.warning('Non-200 response from CMR, forwarding to client')
+                    return make_response(res)
+            return make_response('{0}'.format(total_hits))
             
-        logging.debug('Building subqueries')
-        subq = CMRSubQuery(params=self.params, max_results=self.max_results)
-        results = subq.get_results()
+        if self.output == 'echo10': #truncate echo10 output to 1st page of 1st subquery
+            logging.debug('echo10 output, truncating to page 1 of query 1')
+            self.max_results = min(self.max_results, self.extra_params['page_size'])
+            self.query_list = [self.query_list[0]]
+        
+        results = []
+        for subq in self.sub_queries:
+            results.extend(subq.get_results())
+            if len(results) >= self.max_results:
+                break
         logging.debug('Result length: {0}'.format(len(results)))
         
         # trim the results if needed
@@ -49,14 +101,16 @@ class CMRQuery:
 
 class CMRSubQuery:
     
-    def __init__(self, params, max_results=1000000, mp_pool_size=1):
+    def __init__(self, params, max_results=1000000, mp_pool_size=1, count=False):
         self.params = params
         self.max_results = max_results if max_results is not None else 1000000
         self.sid = None
         self.hits = 0
         self.results = []
         self.mp_pool_size = mp_pool_size
+        self.count = count
         logging.debug('new CMRSubQuery object ready to go')
+        logging.debug(self.params)
     
     def get_results(self):
         s = requests.Session()
@@ -67,7 +121,10 @@ class CMRSubQuery:
         post_analytics(pageview=False, events=[{'ec': 'CMR API Status', 'ea': r.status_code}])
         # forward anything other than a 200
         if r.status_code != 200:
-            return [] # do something wiser here
+            return r
+        
+        if self.count:
+            return int(r.headers['CMR-hits'])
             
         self.hits = int(r.headers['CMR-hits'])
         if self.max_results > self.hits:
@@ -81,7 +138,7 @@ class CMRSubQuery:
         # enumerate additional pages out to hit count or max_results, whichever is fewer (excluding first page)
         pages = []
         pages.extend(range(0, int(min(ceil(float(self.hits) / float(self.params['page_size'])), ceil(float(self.max_results) / float(self.params['page_size']))))))
-        logging.debug('preparing to fetch {0} additional pages'.format(len(pages)))
+        logging.debug('preparing to fetch {0} pages'.format(len(pages)))
         
         # fetch multiple pages of results if needed
         for p in pages:
@@ -96,8 +153,8 @@ class CMRSubQuery:
         return self.results
     
     def get_page(self, p, s):
-        logging.debug('Fetching page {0}'.format(p+1))
-        r = s.post(get_config()['cmr_api'], data=self.params, headers={'CMR-Scroll-Id': self.sid, 'Client-Id': 'vertex_asf'})
+        logging.debug('Fetching page {0}'.format(p))
+        r = s.get(get_config()['cmr_api'], data=self.params, headers={'CMR-Scroll-Id': self.sid, 'Client-Id': 'vertex_asf'})
         post_analytics(pageview=False, events=[{'ec': 'CMR API Status', 'ea': r.status_code}])
         if r.status_code != 200:
             logging.error('Bad news bears! CMR said {0} on session {1}'.format(r.status_code, self.sid))

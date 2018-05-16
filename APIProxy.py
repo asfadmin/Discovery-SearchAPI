@@ -58,13 +58,6 @@ class APIProxyQuery:
     # CMR backend query
     def query_cmr(self):
         logging.info('CMR translation from {0}'.format(self.request.access_route[-1]))
-        # always limit the results to ASF as the provider
-        self.cmr_params['provider'] = 'ASF'
-        self.cmr_params['page_size'] = 2000 # max page size by default
-        self.cmr_params['scroll'] = 'true'
-        
-        if self.max_results is not None and self.max_results < self.cmr_params['page_size']: # minimize data transfer on small max_results
-            self.cmr_params['page_size'] = self.max_results
         
         q = CMRQuery(params=self.cmr_params, output=self.output, max_results=self.max_results)
         r = q.get_results()
