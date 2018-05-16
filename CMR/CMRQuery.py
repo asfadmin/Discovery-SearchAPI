@@ -121,6 +121,8 @@ class CMRSubQuery:
         post_analytics(pageview=False, events=[{'ec': 'CMR API Status', 'ea': r.status_code}])
         # forward anything other than a 200
         if r.status_code != 200:
+            logging.debug('Non-200 response from CMR')
+            logging.debug(r.text)
             return r
         
         if self.count:
