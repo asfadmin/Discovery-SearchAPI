@@ -62,8 +62,6 @@ class CMRQuery:
                     params[k] = p[k]
             params.update(self.extra_params)
             final_query_list.append(params)
-        logging.debug('=======')
-        pprint(final_query_list)
         return final_query_list
     
     def get_results(self):
@@ -121,6 +119,8 @@ class CMRSubQuery:
         post_analytics(pageview=False, events=[{'ec': 'CMR API Status', 'ea': r.status_code}])
         # forward anything other than a 200
         if r.status_code != 200:
+            logging.debug('Non-200 response from CMR')
+            logging.debug(r.text)
             return r
         
         if self.count:

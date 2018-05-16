@@ -20,8 +20,8 @@ class APIProxyQuery:
         try:
             self.cmr_params, self.output, self.max_results = translate_params(self.request.values)
             supported = True
-        except ValueError: # didn't parse, pass it to the legacy API for now
-            pass
+        except ValueError as e: # didn't parse, pass it to the legacy API for now
+            logging.debug('ValueError: {0}'.format(e))
         return supported
     
     def get_response(self):
