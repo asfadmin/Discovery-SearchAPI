@@ -6,7 +6,6 @@ import logging
 from CMR.CMRTranslate import output_translators, parse_cmr_response, input_map, input_fixer
 from Analytics import post_analytics
 from asf_env import get_config
-from pprint import pprint
 
 class CMRQuery:
     
