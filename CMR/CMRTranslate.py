@@ -13,6 +13,30 @@ templateEnv = Environment(
     autoescape=select_autoescape(['html', 'xml'])
 )
 
+# A few inputs need to be specially handled to make the flexible input the legacy
+# API allowed match what's at CMR, since we can't use wildcards on additional attributes
+def input_fixer(params):
+    for k in params.keys():
+        if k == 'flightdirection' or k == 'lookdirection':
+            params[k] = params[k][0]
+        if k == 'platform':
+            platmap = {
+                'R1': 'RADARSAT-1',
+                'E1': 'ERS-1',
+                'E2': 'ERS-2',
+                'J1': 'JERS-1',
+                'A3': 'ALOS',
+                'AS': 'AIRSAR',
+                'SS': 'SEASAT',
+                'SA': 'Sentinel-1A',
+                'SB': 'Sentinel-1B',
+                'SP': 'SMAP',
+                'UA': 'UAVSAR'
+            }
+            if params[k] in platmap.keys():
+                params[k] = platmap[params[k]]
+    return params
+
 # Parsers/validators
 def input_parsers():
     return {
@@ -21,7 +45,6 @@ def input_parsers():
         'maxbaselineperp': parse_float,
         'minbaselineperp': parse_float,
         'beammode': parse_string_list,
-#        'beamswath':                                   # might deprecate
         'collectionname': parse_string,
         'maxdoppler': parse_float,
         'mindoppler': parse_float,
@@ -35,11 +58,8 @@ def input_parsers():
         'mininsarstacksize': parse_int,
 #        'intersectswith':                              # need a parser
         'lookdirection': parse_string,
-#        'offnadirangle': parse_float_or_range_list,    # not used in six months
+        'offnadirangle': parse_float_or_range_list,
         'output': parse_string,
-#        'minpercentcoherence': parse_float,            # not used in six months
-#        'minpercenttroposphere': parse_float,          # not used in six months
-#        'minpercentunwrapped': parse_float,            # not used in six months
         'platform': parse_string_list,
         'polarization': parse_string_list,
         'polygon': parse_coord_string,
@@ -48,20 +68,40 @@ def input_parsers():
         'maxresults': parse_int,
         'processingdate': parse_date,
         'start': parse_date,
-        'end': parse_date,
-#        'slavestart': parse_date,                      # not used in six months
-#        'slaveend': parse_date                         # not used in six months
+        'end': parse_date
         
     }
 
 # Supported input parameters and their associated CMR parameters
 def input_map():
     return {
-        'output': 'output',
-        'maxresults': 'maxresults',
-        'granule_list': 'readable_granule_name[]',
-        'polygon': 'polygon',
-        'absoluteorbit': 'orbit_number'
+        'output': ['output', '{0}'], # Special case, does not actually forward to CMR
+        'maxresults': ['maxresults', '{0}'], # Special case, does not actually forward to CMR
+        'absoluteorbit': ['orbit_number', '{0}'],
+        'asfframe': ['attribute[]', 'int,FRAME_NUMBER,{0}'],
+        'maxbaselineperp': ['attribute[]', 'float,INSAR_BASELINE,,{0}'],
+        'minbaselineperp': ['attribute[]', 'float,INSAR_BASELINE,{0},'],
+        'beammode': ['attribute[]', 'string,BEAM_MODE_TYPE,{0}'],
+        'collectionname': ['attribute[]', 'string,MISSION_NAME,{0}'],
+        'maxdoppler': ['attribute[]', 'float,DOPPLER,,{0}'],
+        'mindoppler': ['attribute[]', 'float,DOPPLER,{0},'],
+        'maxfaradayrotation': ['attribute[]', 'float,FARADAY_ROTATION,,{0}'],
+        'minfaradayrotation': ['attribute[]', 'float,FARADAY_ROTATION,{0},'],
+        'flightdirection': ['attribute[]', 'string,ASCENDING_DESCENDING,{0}*'],
+        'flightline': ['attribute[]', 'string,FLIGHT_LINE,{0}'],
+        'frame': ['attribute[]', 'int,CENTER_ESA_FRAME,{0}'],
+        'granule_list': ['readable_granule_name[]', '{0}'],
+        'maxinsarstacksize': ['attribute[]', 'int,INSAR_STACK_SIZE,{0},'],
+        'mininsarstacksize': ['attribute[]', 'int,INSAR_STACK_SIZE,,{0}'],
+        'lookdirection': ['attribute[]', 'string,LOOK_DIRECTION,{0}'],
+        'platform': ['attribute[]', 'string,ASF_PLATFORM,{0}'],
+        'polarization': ['attribute[]', 'string,POLARIZATION,{0}'],
+        'polygon': ['polygon', '{0}'],
+        'processinglevel': ['attribute[]', 'string,PROCESSING_TYPE,{0}'],
+        'relativeorbit': ['attribute[]', 'int,PATH_NUMBER,{0}'],
+#        'processingdate': parse_date,
+        'start': ['temporal[]', '{0},'],
+        'end': ['temporal[]', ',{0}']
     }
 
 # Supported output formats
@@ -84,7 +124,7 @@ def translate_params(p):
         if k.lower() not in input_map().keys():
             raise ValueError('Unsupported CMR parameter', k)
         try:
-            params[input_map()[k.lower()]] = input_parsers()[k.lower()](p[k])
+            params[k.lower()] = input_parsers()[k.lower()](p[k])
         except ValueError as e:
             raise e
     
