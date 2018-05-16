@@ -62,8 +62,6 @@ class CMRQuery:
                     params[k] = p[k]
             params.update(self.extra_params)
             final_query_list.append(params)
-        logging.debug('=======')
-        pprint(final_query_list)
         return final_query_list
     
     def get_results(self):
