@@ -9,7 +9,7 @@ import os
 application = Flask(__name__)
 
 if 'DEBUG_OUTPUT' in os.environ.keys():
-    logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(filename='/opt/python/log/api-proxy.log',level=logging.DEBUG)
 
 # Either get the results from CMR, or pass the query through to the legacy API
 @application.route('/services/search/param', methods = ['GET', 'POST'])
