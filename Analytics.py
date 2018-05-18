@@ -22,6 +22,7 @@ def post_analytics(events=None, pageview=False):
             p['uip'] = request.access_route[-1]
             p['dr'] = request.referrer
             p['dl'] = request.url
+            p['ua'] = request.headers.get('User-Agent')
             s.post(url, data=p)
         for e in events:
             p = dict(params)
