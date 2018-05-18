@@ -16,6 +16,7 @@ class tester:
         parser.add_argument('-s', '--save', action='store', required=True, help='CSV file to store results in')
         parser.add_argument('-c', '--cache', action='store_true', help='Save actual API results')
         parser.add_argument('-v', '--verbose', action='store_true', help='Verbose debugging output')
+        parser.add_argument('-r', '--replace', action='store', help='Replace everything prior to the querystring')
 
         self.args = parser.parse_args()
         
@@ -72,8 +73,13 @@ class tester:
             self.save_file = open(self.args.save, 'w')
             self.save_file.write('params, http_status, total_time, download_speed, size_bytes, command\n')
         for q in self.queries:
+            q = q.strip()
+            if len(q) <= 0 or q[0] == '#':
+                continue
             m = re.search(r'\?(.+)', q)
             p = m.group(1)
+            if self.args.replace:
+                q = '{0}?{1}'.format(self.args.replace, p)
             cache = ''
             if self.args.cache:
                 try:
