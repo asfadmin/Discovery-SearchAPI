@@ -76,7 +76,10 @@ class tester:
             p = m.group(1)
             cache = ''
             if self.args.cache:
-                os.remove('cache/{0}'.format(p))
+                try:
+                    os.remove('cache/{0}'.format(p))
+                except OSError:
+                    pass
                 cache = "-o 'cache/{0}'".format(p)
             else:
                 cache = "-o /dev/null"
