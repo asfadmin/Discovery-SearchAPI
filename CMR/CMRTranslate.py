@@ -20,8 +20,10 @@ def input_fixer(params):
     for k in params.keys():
         v = params[k]
         k = k.lower()
-        if k == 'flightdirection' or k == 'lookdirection':
+        if k == 'lookdirection':
             fixed_params[k] = v[0].upper()
+        elif k == 'flightdirection':
+            fixed_params[k] = {'A': 'ASCENDING', 'D': 'DESCENDING'}[v[0].upper()]
         elif k == 'platform':
             platmap = {
                 'R1': 'RADARSAT-1',
@@ -44,35 +46,35 @@ def input_fixer(params):
 # Parsers/validators
 def input_parsers():
     return {
-#        'absoluteorbit': parse_int_or_range_list,
-#        'asfframe': parse_int_or_range_list,
-#        'maxbaselineperp': parse_float,
-#        'minbaselineperp': parse_float,
-#        'beammode': parse_string_list,
-#        'collectionname': parse_string,
-#        'maxdoppler': parse_float,
-#        'mindoppler': parse_float,
-#        'maxfaradayrotation': parse_float,
-#        'minfaradayrotation': parse_float,
-#        'flightdirection': parse_string,
-#        'flightline': parse_string,
-#        'frame': parse_int_or_range_list,
+        'absoluteorbit': parse_int_or_range_list,
+        'asfframe': parse_int_or_range_list,
+        'maxbaselineperp': parse_float,
+        'minbaselineperp': parse_float,
+        'beammode': parse_string_list,
+        'collectionname': parse_string,
+        'maxdoppler': parse_float,
+        'mindoppler': parse_float,
+        'maxfaradayrotation': parse_float,
+        'minfaradayrotation': parse_float,
+        'flightdirection': parse_string,
+        'flightline': parse_string,
+        'frame': parse_int_or_range_list,
         'granule_list': parse_string_list,
-#        'maxinsarstacksize': parse_int,
-#        'mininsarstacksize': parse_int,
+        'maxinsarstacksize': parse_int,
+        'mininsarstacksize': parse_int,
 #        'intersectswith':                              # need a parser
-#        'lookdirection': parse_string,
-#        'offnadirangle': parse_float_or_range_list,
+        'lookdirection': parse_string,
+        'offnadirangle': parse_float_or_range_list,
         'output': parse_string,
         'platform': parse_string_list,
-#        'polarization': parse_string_list,
+        'polarization': parse_string_list,
         'polygon': parse_coord_string,
         'processinglevel': parse_string_list,
-#        'relativeorbit': parse_int_or_range_list,
+        'relativeorbit': parse_int_or_range_list,
         'maxresults': parse_int,
-#        'processingdate': parse_date,
-#        'start': parse_date,
-#        'end': parse_date
+        'processingdate': parse_date,
+        'start': parse_date,
+        'end': parse_date
         
     }
 
@@ -85,19 +87,19 @@ def input_map():
 #        'asfframe': ['attribute[]', 'int,FRAME_NUMBER,{0}'],
 #        'maxbaselineperp': ['attribute[]', 'float,INSAR_BASELINE,,{0}'],
 #        'minbaselineperp': ['attribute[]', 'float,INSAR_BASELINE,{0},'],
-#        'beammode': ['attribute[]', 'string,BEAM_MODE_TYPE,{0}'],
-#        'collectionname': ['attribute[]', 'string,MISSION_NAME,{0}'],
+        'beammode': ['attribute[]', 'string,BEAM_MODE_TYPE,{0}'],
+#        'collectionname': ['attribute[]', 'string,MISSION_NAME,{0}'], # double check this source
 #        'maxdoppler': ['attribute[]', 'float,DOPPLER,,{0}'],
 #        'mindoppler': ['attribute[]', 'float,DOPPLER,{0},'],
 #        'maxfaradayrotation': ['attribute[]', 'float,FARADAY_ROTATION,,{0}'],
 #        'minfaradayrotation': ['attribute[]', 'float,FARADAY_ROTATION,{0},'],
-#        'flightdirection': ['attribute[]', 'string,ASCENDING_DESCENDING,{0}*'],
-#        'flightline': ['attribute[]', 'string,FLIGHT_LINE,{0}'],
+        'flightdirection': ['attribute[]', 'string,ASCENDING_DESCENDING,{0}'],
+        'flightline': ['attribute[]', 'string,FLIGHT_LINE,{0}'],
 #        'frame': ['attribute[]', 'int,CENTER_ESA_FRAME,{0}'],
         'granule_list': ['readable_granule_name[]', '{0}'],
 #        'maxinsarstacksize': ['attribute[]', 'int,INSAR_STACK_SIZE,{0},'],
 #        'mininsarstacksize': ['attribute[]', 'int,INSAR_STACK_SIZE,,{0}'],
-#        'lookdirection': ['attribute[]', 'string,LOOK_DIRECTION,{0}'],
+        'lookdirection': ['attribute[]', 'string,LOOK_DIRECTION,{0}'],
         'platform': ['attribute[]', 'string,ASF_PLATFORM,{0}'],
 #        'polarization': ['attribute[]', 'string,POLARIZATION,{0}'],
         'polygon': ['polygon', '{0}'],
