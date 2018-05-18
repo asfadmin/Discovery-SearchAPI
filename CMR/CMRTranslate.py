@@ -16,10 +16,13 @@ templateEnv = Environment(
 # A few inputs need to be specially handled to make the flexible input the legacy
 # API allowed match what's at CMR, since we can't use wildcards on additional attributes
 def input_fixer(params):
+    fixed_params = {}
     for k in params.keys():
-        if k.lower() == 'flightdirection' or k.lower() == 'lookdirection':
-            params[k] = params[k][0]
-        if k == 'platform':
+        v = params[k]
+        k = k.lower()
+        if k == 'flightdirection' or k == 'lookdirection':
+            fixed_params[k] = v[0].upper()
+        elif k == 'platform':
             platmap = {
                 'R1': 'RADARSAT-1',
                 'E1': 'ERS-1',
@@ -33,9 +36,10 @@ def input_fixer(params):
                 'SP': 'SMAP',
                 'UA': 'UAVSAR'
             }
-            if params[k].upper() in platmap.keys():
-                params[k] = platmap[params[k.upper()]]
-    return params
+            fixed_params[k] = platmap[v.upper()] if v.upper() in platmap.keys() else v
+        else:
+            fixed_params[k] = v
+    return fixed_params
 
 # Parsers/validators
 def input_parsers():
