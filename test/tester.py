@@ -69,13 +69,14 @@ class tester:
     
     def run_queries(self):
         if self.args.save:
-            self.save_file = open(self.args.save, 'w+')
+            self.save_file = open(self.args.save, 'w')
             self.save_file.write('params, http_status, total_time, download_speed, size_bytes, command\n')
         for q in self.queries:
             m = re.search(r'\?(.+)', q)
             p = m.group(1)
             cache = ''
             if self.args.cache:
+                os.remove('cache/{0}'.format(p))
                 cache = "-o 'cache/{0}'".format(p)
             else:
                 cache = "-o /dev/null"

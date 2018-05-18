@@ -36,7 +36,7 @@ def input_fixer(params):
                 'SP': 'SMAP',
                 'UA': 'UAVSAR'
             }
-            fixed_params[k] = platmap[v.upper()] if v.upper() in platmap.keys() else v
+            fixed_params[k] = [platmap[a.upper()] if a.upper() in platmap.keys() else a for a in v]
         else:
             fixed_params[k] = v
     return fixed_params
