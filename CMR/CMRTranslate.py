@@ -136,11 +136,11 @@ def translate_params(p):
     output = 'metalink'
     if 'output' in params and params['output'].lower() in output_translators().keys():
         output = params['output'].lower()
-    del params['output']
+        del params['output']
     max_results = None
     if 'maxresults' in params:
         max_results = params['maxresults']
-    del params['maxresults']
+        del params['maxresults']
     return params, output, max_results
 
 # Parse and validate a string: "abc"
