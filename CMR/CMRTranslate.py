@@ -17,7 +17,7 @@ templateEnv = Environment(
 # API allowed match what's at CMR, since we can't use wildcards on additional attributes
 def input_fixer(params):
     for k in params.keys():
-        if k == 'flightdirection' or k == 'lookdirection':
+        if k.lower() == 'flightdirection' or k.lower() == 'lookdirection':
             params[k] = params[k][0]
         if k == 'platform':
             platmap = {
@@ -33,8 +33,8 @@ def input_fixer(params):
                 'SP': 'SMAP',
                 'UA': 'UAVSAR'
             }
-            if params[k] in platmap.keys():
-                params[k] = platmap[params[k]]
+            if params[k].upper() in platmap.keys():
+                params[k] = platmap[params[k.upper()]]
     return params
 
 # Parsers/validators
