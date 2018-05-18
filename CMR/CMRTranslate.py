@@ -67,8 +67,8 @@ def input_parsers():
 #        'relativeorbit': parse_int_or_range_list,
         'maxresults': parse_int,
 #        'processingdate': parse_date,
-        'start': parse_date,
-        'end': parse_date
+#        'start': parse_date,
+#        'end': parse_date
         
     }
 
