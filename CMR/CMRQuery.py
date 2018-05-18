@@ -14,6 +14,7 @@ class CMRQuery:
                              'page_size': 2000, # max page size by default
                              'scroll': 'true',  # used for fetching multiple page_size
                              'options[temporal][and]': 'true', # Makes handling date ranges easier
+                             'sort_key[]': '-end_date', # Sort CMR results, but we also need to post-sort
                              #'options[attribute][pattern]': 'true' # Handy for flight direction & look direction
                              }
         
