@@ -8,5 +8,6 @@
 *.pyc
 __pycache__/
 
-# dev files
+# dev/test files
 test.txt
+test/cache/*

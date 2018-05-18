@@ -3,6 +3,7 @@ from flask import request
 from APIProxy import APIProxyQuery
 import sys
 import logging
+import os
 
 # EB looks for an 'application' callable by default.
 application = Flask(__name__)
@@ -19,6 +20,8 @@ def health_check():
 
 # Run a dev server
 if __name__ == '__main__':
+    if 'MATURITY' not in os.environ.keys():
+        os.environ['MATURITY'] = 'dev'
     sys.dont_write_bytecode = True  # prevent clutter
     application.debug = True        # enable debugging mode
     logging.basicConfig(level=logging.DEBUG) # enable debugging output
