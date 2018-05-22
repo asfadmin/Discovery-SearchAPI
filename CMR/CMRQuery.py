@@ -26,11 +26,11 @@ class CMRQuery:
             self.extra_params['page_size'] = self.max_results
         
         logging.debug('Building subqueries using params:')
-        logging.debug(params)
+        logging.debug(self.params)
         logging.debug('output: {0}'.format(self.output))
         logging.debug('maxresults: {0}'.format(self.max_results))
         self.query_list = self.get_query_list(self.params)
-        self.sub_queries = [CMRSubQuery(params=q, max_results=self.max_results, count=True if self.output == 'count' else False) for q in self.query_list]
+        self.sub_queries = [CMRSubQuery(params=list(q), extra_params=self.extra_params, max_results=self.max_results, count=True if self.output == 'count' else False) for q in self.query_list]
         logging.debug('{0} subqueries ready to go'.format(len(self.sub_queries)))
         
         logging.debug('new CMRQuery object ready to go')
@@ -41,6 +41,7 @@ class CMRQuery:
         
     # Use the cartesian product of all the list parameters to determine subqueries
     def get_query_list(self, params):
+        logging.debug(params)
         # First we have to get the params into a form itertools.product() understands
         listed_params = []
         for k in params:
@@ -57,15 +58,15 @@ class CMRQuery:
         # Get the actual cartesian product
         query_list = list(product(*listed_params))
         # Clean up the query list so CMRSubQuery understands it
-        final_query_list = []
-        for q in query_list:
-            params = {}
-            for p in q:
-                for k in p:
-                    params[k] = p[k]
-            params.update(self.extra_params)
-            final_query_list.append(params)
-        return final_query_list
+        #final_query_list = []
+        #for q in query_list:
+        #    params = []
+        #    for p in q:
+        #        for k in p:
+        #            params[k] = p[k]
+        #    params.extend(self.extra_params)
+        #    final_query_list.append(params)
+        return query_list
     
     def get_results(self):
         
@@ -106,14 +107,23 @@ class CMRQuery:
 
 class CMRSubQuery:
     
-    def __init__(self, params, max_results=1000000, count=False):
+    def __init__(self, params, extra_params, max_results=1000000, count=False):
         self.params = params
+        self.extra_params = extra_params
         self.max_results = max_results if max_results is not None else 1000000
         self.sid = None
         self.hits = 0
         self.results = []
         self.count = count
+        
+        fixed = []
+        for p in self.params:
+            fixed.extend(p.items())
+        
+        self.params = fixed
+        
         logging.debug('new CMRSubQuery object ready to go')
+        self.params.extend(self.extra_params.items())
     
     def get_results(self):
         s = requests.Session()
@@ -139,7 +149,7 @@ class CMRSubQuery:
         self.results = parse_cmr_response(r)
         
         # enumerate additional pages out to hit count or max_results, whichever is fewer (excluding first page)
-        pages = list(range(1, int(min(ceil(float(self.hits) / float(self.params['page_size'])), ceil(float(self.max_results) / float(self.params['page_size']))))))
+        pages = list(range(1, int(min(ceil(float(self.hits) / float(self.extra_params['page_size'])), ceil(float(self.max_results) / float(self.extra_params['page_size']))))))
         logging.debug('Preparing to fetch {0} additional pages'.format(len(pages)))
         
         # fetch multiple pages of results if needed
@@ -160,7 +170,7 @@ class CMRSubQuery:
             r = s.post(get_config()['cmr_api'], data=self.params)
             if 'CMR-hits' not in r.headers:
                 if 'Please check the order of your points.' in r.text:
-                    logging.error('Probable backwards winding order on polygon: {0}'.format(self.params['polygon']))
+                    logging.error('Probable backwards winding order on polygon')
                     return r
                 else:
                     logging.error('No CMR-hits in header: {0}'.format(r.text))

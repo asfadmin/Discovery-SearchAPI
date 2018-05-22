@@ -89,7 +89,7 @@ class tester:
                 cache = "-o 'cache/{0}'".format(p)
             else:
                 cache = "-o /dev/null"
-            c = "curl --silent --write-out '%{{http_code}}, %{{time_total}}, %{{speed_download}}, %{{size_download}}' {0} '{1}'".format(cache, q)
+            c = "curl --silent --write-out '\"%{{http_code}}\",\"%{{time_total}}\",\"%{{speed_download}}\",\"%{{size_download}}\"' {0} '{1}'".format(cache, q)
             self.log.info('Executing {0}'.format(p))
             (_, output) = commands.getstatusoutput(c)
             if self.args.save:

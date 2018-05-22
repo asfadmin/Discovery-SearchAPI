@@ -56,7 +56,6 @@ def input_fixer(params):
     del fixed_params['start']
     del fixed_params['end']
     
-    
     return fixed_params
 
 # Parsers/validators
@@ -99,7 +98,7 @@ def input_map():
     return {
         'output': ['output', '{0}'], # Special case, does not actually forward to CMR
         'maxresults': ['maxresults', '{0}'], # Special case, does not actually forward to CMR
-        'absoluteorbit': ['orbit_number', '{0}'],
+#        'absoluteorbit': ['orbit_number', '{0}'],
 #        'asfframe': ['attribute[]', 'int,FRAME_NUMBER,{0}'],
 #        'maxbaselineperp': ['attribute[]', 'float,INSAR_BASELINE,,{0}'],
 #        'minbaselineperp': ['attribute[]', 'float,INSAR_BASELINE,{0},'],
@@ -119,12 +118,12 @@ def input_map():
         'platform': ['attribute[]', 'string,ASF_PLATFORM,{0}'],
 #        'polarization': ['attribute[]', 'string,POLARIZATION,{0}'],
         'polygon': ['polygon', '{0}'],
-#        'processinglevel': ['attribute[]', 'string,PROCESSING_TYPE,{0}'],
+        'processinglevel': ['attribute[]', 'string,PROCESSING_TYPE,{0}'],
 #        'relativeorbit': ['attribute[]', 'int,PATH_NUMBER,{0}'],
 #        'processingdate': parse_date,
-#        'start': ['end', '{0}'], # Isn't actually used for querying CMR, just checking inputs
-#        'end': ['start', '{0}'], # Isn't actually used for querying CMR, just checking inputs
-        'temporal': ['temporal', '{0}']
+        'start': ['end', '{0}'], # Isn't actually used for querying CMR, just checking inputs
+        'end': ['start', '{0}'], # Isn't actually used for querying CMR, just checking inputs
+        'temporal': ['temporal', '{0}'] # start/end end up here
     }
 
 # Supported output formats
