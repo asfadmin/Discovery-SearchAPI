@@ -99,7 +99,7 @@ def input_map():
     return {
         'output': ['output', '{0}'], # Special case, does not actually forward to CMR
         'maxresults': ['maxresults', '{0}'], # Special case, does not actually forward to CMR
-#        'absoluteorbit': ['orbit_number', '{0}'],
+        'absoluteorbit': ['orbit_number', '{0}'],
 #        'asfframe': ['attribute[]', 'int,FRAME_NUMBER,{0}'],
 #        'maxbaselineperp': ['attribute[]', 'float,INSAR_BASELINE,,{0}'],
 #        'minbaselineperp': ['attribute[]', 'float,INSAR_BASELINE,{0},'],

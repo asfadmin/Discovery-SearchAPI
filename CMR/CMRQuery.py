@@ -156,7 +156,10 @@ class CMRSubQuery:
     def get_page(self, p, s):
         logging.debug('Fetching page {0}'.format(p+1))
         if self.sid is None:
-            r = s.post(get_config()['cmr_api'], data=self.params)
+            r = s.get(get_config()['cmr_api'], data=self.params)
+            if 'CMR-hits' not in r.headers:
+                logging.error('Did not get a CMR-hits header for query {0}'.format(r.url))
+                return r
             self.hits = int(r.headers['CMR-hits'])
             self.sid = r.headers['CMR-Scroll-Id']
             s.headers.update({'CMR-Scroll-Id': self.sid})
