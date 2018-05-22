@@ -98,7 +98,7 @@ def input_map():
     return {
         'output': ['output', '{0}'], # Special case, does not actually forward to CMR
         'maxresults': ['maxresults', '{0}'], # Special case, does not actually forward to CMR
-        'absoluteorbit': ['orbit_number', '{0}'],
+#        'absoluteorbit': ['orbit_number', '{0}'],
 #        'asfframe': ['attribute[]', 'int,FRAME_NUMBER,{0}'],
 #        'maxbaselineperp': ['attribute[]', 'float,INSAR_BASELINE,,{0}'],
 #        'minbaselineperp': ['attribute[]', 'float,INSAR_BASELINE,{0},'],
@@ -123,7 +123,7 @@ def input_map():
 #        'processingdate': parse_date,
         'start': ['end', '{0}'], # Isn't actually used for querying CMR, just checking inputs
         'end': ['start', '{0}'], # Isn't actually used for querying CMR, just checking inputs
-        'temporal': ['temporal', '{0}']
+        'temporal': ['temporal', '{0}'] # start/end end up here
     }
 
 # Supported output formats
