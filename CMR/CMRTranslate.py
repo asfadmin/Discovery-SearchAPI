@@ -17,14 +17,14 @@ templateEnv = Environment(
 # API allowed match what's at CMR, since we can't use wildcards on additional attributes
 def input_fixer(params):
     fixed_params = {}
-    for k in params.keys():
+    for k in params:
         v = params[k]
         k = k.lower()
-        if k == 'lookdirection':
+        if k == 'lookdirection': # Vaguely wildcard-like behavior
             fixed_params[k] = v[0].upper()
-        elif k == 'flightdirection':
+        elif k == 'flightdirection': # Vaguely wildcard-like behavior
             fixed_params[k] = {'A': 'ASCENDING', 'D': 'DESCENDING'}[v[0].upper()]
-        elif k == 'platform':
+        elif k == 'platform': # Legacy API allowed a few synonyms. If they're using one, translate it
             platmap = {
                 'R1': 'RADARSAT-1',
                 'E1': 'ERS-1',
@@ -38,9 +38,25 @@ def input_fixer(params):
                 'SP': 'SMAP',
                 'UA': 'UAVSAR'
             }
-            fixed_params[k] = [platmap[a.upper()] if a.upper() in platmap.keys() else a for a in v]
+            fixed_params[k] = [platmap[a.upper()] if a.upper() in platmap else a for a in v]
         else:
             fixed_params[k] = v
+    
+    # set default start and end dates if needed, and then make sure they're formatted correctly
+    # whether using the default or not
+    if 'start' not in fixed_params:
+        fixed_params['start'] = '1978-01-01T00:00:00Z'
+    fixed_params['start'] = dateparser.parse(fixed_params['start']).strftime('%Y-%m-%dT%H:%M:%SZ')
+    if 'end' not in fixed_params:
+        fixed_params['end'] = 'now'
+    fixed_params['end'] = dateparser.parse(fixed_params['end']).strftime('%Y-%m-%dT%H:%M:%SZ')
+    # Final temporal string that will actually be used
+    fixed_params['temporal'] = '{0},{1}'.format(fixed_params['start'], fixed_params['end'])
+    # And a little cleanup
+    del fixed_params['start']
+    del fixed_params['end']
+    
+    
     return fixed_params
 
 # Parsers/validators
@@ -106,8 +122,9 @@ def input_map():
         'processinglevel': ['attribute[]', 'string,PROCESSING_TYPE,{0}'],
 #        'relativeorbit': ['attribute[]', 'int,PATH_NUMBER,{0}'],
 #        'processingdate': parse_date,
-#        'start': ['temporal[]', '{0},'],
-#        'end': ['temporal[]', ',{0}']
+        'start': ['end', '{0}'], # Isn't actually used for querying CMR, just checking inputs
+        'end': ['start', '{0}'], # Isn't actually used for querying CMR, just checking inputs
+        'temporal': ['temporal', '{0}']
     }
 
 # Supported output formats
@@ -126,8 +143,8 @@ def output_translators():
 def translate_params(p):
     params = {}
     
-    for k in p.keys():
-        if k.lower() not in input_map().keys():
+    for k in p:
+        if k.lower() not in input_map():
             raise ValueError('Unsupported CMR parameter', k)
         try:
             params[k.lower()] = input_parsers()[k.lower()](p[k])
@@ -136,7 +153,7 @@ def translate_params(p):
     
     # be nice to make this not a special case
     output = 'metalink'
-    if 'output' in params and params['output'].lower() in output_translators().keys():
+    if 'output' in params and params['output'].lower() in output_translators():
         output = params['output'].lower()
         del params['output']
     max_results = None
@@ -334,7 +351,7 @@ def parse_cmr_response(r):
 
     # some additional attributes are specified as "NULL", make it real null
     for r in results:
-        for k in r.keys():
+        for k in r:
             if r[k] == 'NULL':
                 r[k] = None
     return results
