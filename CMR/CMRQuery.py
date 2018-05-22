@@ -121,17 +121,9 @@ class CMRSubQuery:
             fixed.extend(p.items())
         
         self.params = fixed
-        # ugly hack for a special case because sentinel has to be ~*~different~*~
-        #if 'platform' in self.params and self.params['platform'] in ['Sentinel-1A', 'Sentinel-1B'] and 'processinglevel' in self.params:
-        #    self.params['processinglevel'].replace('PROCESSING_TYPE', 'PROCESSING_LEVEL')
         
         logging.debug('new CMRSubQuery object ready to go')
-        logging.debug('==================')
-        logging.debug(self.params)
-        logging.debug(self.extra_params.items())
         self.params.extend(self.extra_params.items())
-        logging.debug(self.params)
-        logging.debug('==================')
     
     def get_results(self):
         s = requests.Session()
