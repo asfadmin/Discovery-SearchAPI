@@ -118,7 +118,7 @@ def input_map():
         'lookdirection': ['attribute[]', 'string,LOOK_DIRECTION,{0}'],
         'platform': ['attribute[]', 'string,ASF_PLATFORM,{0}'],
         'polarization': ['attribute[]', 'string,POLARIZATION,{0}'],
-        'polygon': ['polygon', '{0}'],
+        #'polygon': ['polygon', '{0}'],
         'processinglevel': ['attribute[]', 'string,PROCESSING_TYPE,{0}'],
         'relativeorbit': ['attribute[]', 'int,PATH_NUMBER,{0}'],
 #        'processingdate': parse_date,

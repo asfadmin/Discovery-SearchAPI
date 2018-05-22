@@ -41,7 +41,6 @@ class CMRQuery:
         
     # Use the cartesian product of all the list parameters to determine subqueries
     def get_query_list(self, params):
-        logging.debug(params)
         # First we have to get the params into a form itertools.product() understands
         listed_params = []
         for k in params:
