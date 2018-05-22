@@ -56,7 +56,6 @@ def input_fixer(params):
     del fixed_params['start']
     del fixed_params['end']
     
-    
     return fixed_params
 
 # Parsers/validators
@@ -119,11 +118,11 @@ def input_map():
         'platform': ['attribute[]', 'string,ASF_PLATFORM,{0}'],
 #        'polarization': ['attribute[]', 'string,POLARIZATION,{0}'],
         'polygon': ['polygon', '{0}'],
-#        'processinglevel': ['attribute[]', 'string,PROCESSING_TYPE,{0}'],
+        'processinglevel': ['attribute[]', 'string,PROCESSING_TYPE,{0}'],
 #        'relativeorbit': ['attribute[]', 'int,PATH_NUMBER,{0}'],
 #        'processingdate': parse_date,
-#        'start': ['end', '{0}'], # Isn't actually used for querying CMR, just checking inputs
-#        'end': ['start', '{0}'], # Isn't actually used for querying CMR, just checking inputs
+        'start': ['end', '{0}'], # Isn't actually used for querying CMR, just checking inputs
+        'end': ['start', '{0}'], # Isn't actually used for querying CMR, just checking inputs
         'temporal': ['temporal', '{0}']
     }
 
