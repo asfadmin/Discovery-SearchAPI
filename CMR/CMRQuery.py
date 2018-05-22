@@ -101,7 +101,8 @@ class CMRQuery:
         if self.max_results is not None and len(results) > self.max_results:
             logging.debug('Trimming total results from {0} to {1}'.format(len(results), self.max_results))
             results = results[0:self.max_results]
-        return make_response(output_translators().get(self.output, output_translators()['metalink'])(results))
+        response = make_response(output_translators().get(self.output, output_translators()['metalink'])(results))
+        return response
 
 class CMRSubQuery:
     
@@ -158,9 +159,12 @@ class CMRSubQuery:
         if self.sid is None:
             r = s.post(get_config()['cmr_api'], data=self.params)
             if 'CMR-hits' not in r.headers:
-                logging.error('Did not get a CMR-hits header for params:')
-                logging.error(self.params)
-                return r
+                if 'Please check the order of your points.' in r.text:
+                    logging.error('Probable backwards winding order on polygon: {0}'.format(self.params['polygon']))
+                    return r
+                else:
+                    logging.error('No CMR-hits in header: {0}'.format(r.text))
+                    return r
             self.hits = int(r.headers['CMR-hits'])
             self.sid = r.headers['CMR-Scroll-Id']
             s.headers.update({'CMR-Scroll-Id': self.sid})
