@@ -17,7 +17,7 @@ templateEnv = Environment(
 # API allowed match what's at CMR, since we can't use wildcards on additional attributes
 def input_fixer(params):
     fixed_params = {}
-    for k in params.keys():
+    for k in params:
         v = params[k]
         k = k.lower()
         if k == 'lookdirection':
@@ -38,7 +38,7 @@ def input_fixer(params):
                 'SP': 'SMAP',
                 'UA': 'UAVSAR'
             }
-            fixed_params[k] = [platmap[a.upper()] if a.upper() in platmap.keys() else a for a in v]
+            fixed_params[k] = [platmap[a.upper()] if a.upper() in platmap else a for a in v]
         else:
             fixed_params[k] = v
     return fixed_params
@@ -126,8 +126,8 @@ def output_translators():
 def translate_params(p):
     params = {}
     
-    for k in p.keys():
-        if k.lower() not in input_map().keys():
+    for k in p:
+        if k.lower() not in input_map():
             raise ValueError('Unsupported CMR parameter', k)
         try:
             params[k.lower()] = input_parsers()[k.lower()](p[k])
@@ -136,7 +136,7 @@ def translate_params(p):
     
     # be nice to make this not a special case
     output = 'metalink'
-    if 'output' in params and params['output'].lower() in output_translators().keys():
+    if 'output' in params and params['output'].lower() in output_translators():
         output = params['output'].lower()
         del params['output']
     max_results = None
@@ -334,7 +334,7 @@ def parse_cmr_response(r):
 
     # some additional attributes are specified as "NULL", make it real null
     for r in results:
-        for k in r.keys():
+        for k in r:
             if r[k] == 'NULL':
                 r[k] = None
     return results

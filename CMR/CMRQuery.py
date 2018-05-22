@@ -43,7 +43,7 @@ class CMRQuery:
     def get_query_list(self, params):
         # First we have to get the params into a form itertools.product() understands
         listed_params = []
-        for k in params.keys():
+        for k in params:
             plist = []
             if isinstance(params[k], list):
                 for l in params[k]:
@@ -61,7 +61,7 @@ class CMRQuery:
         for q in query_list:
             params = {}
             for p in q:
-                for k in p.keys():
+                for k in p:
                     params[k] = p[k]
             params.update(self.extra_params)
             final_query_list.append(params)

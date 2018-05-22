@@ -20,7 +20,7 @@ def health_check():
 
 # Run a dev server
 if __name__ == '__main__':
-    if 'MATURITY' not in os.environ.keys():
+    if 'MATURITY' not in os.environ:
         os.environ['MATURITY'] = 'dev'
     sys.dont_write_bytecode = True  # prevent clutter
     application.debug = True        # enable debugging mode

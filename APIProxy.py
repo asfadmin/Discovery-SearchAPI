@@ -26,8 +26,8 @@ class APIProxyQuery:
     
     def get_response(self):
         # pick a backend and go!
-        events = [{'ec': 'Param', 'ea': v} for v in self.request.values.keys()]
-        events.append({'ec': 'Param List', 'ea': ', '.join(sorted([p.lower() for p in self.request.values.keys()]))})
+        events = [{'ec': 'Param', 'ea': v} for v in self.request.values]
+        events.append({'ec': 'Param List', 'ea': ', '.join(sorted([p.lower() for p in self.request.values]))})
         if self.can_use_cmr():
             logging.debug('get_response(): using CMR backend')
             events.append({'ec': 'Proxy Search', 'ea': 'CMR'})
