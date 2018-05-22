@@ -13,10 +13,6 @@ https://api-test.asf.alaska.edu/services/search/param?granule_list=S1A_IW_GRDH_1
 https://api-test.asf.alaska.edu/services/search/param?granule_list=S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80&output=kml
 https://api-test.asf.alaska.edu/services/search/param?granule_list=S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80&output=json
 https://api-test.asf.alaska.edu/services/search/param?granule_list=S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80&output=count
-#https://api-test.asf.alaska.edu/services/search/param?absoluteorbit=5000&maxresults=10&output=csv
-#https://api-test.asf.alaska.edu/services/search/param?absoluteorbit=5000-6000&maxresults=10&output=csv
-#https://api-test.asf.alaska.edu/services/search/param?absoluteorbit=5000,5001,5002&maxresults=10&output=csv
-#https://api-test.asf.alaska.edu/services/search/param?absoluteorbit=5000,5100-5200maxresults=100&output=csv
 https://api-test.asf.alaska.edu/services/search/param?beamMode=FBD,FBS,Standard&maxresults=100&output=csv
 https://api-test.asf.alaska.edu/services/search/param?beamMode=Standard&maxresults=10&output=csv
 https://api-test.asf.alaska.edu/services/search/param?lookDirection=LEFT&maxresults=10&output=csv
@@ -30,11 +26,17 @@ https://api-test.asf.alaska.edu/services/search/param?flightDirection=D&maxresul
 https://api-test.asf.alaska.edu/services/search/param?flightDirection=DESC&maxresults=10&output=csv
 https://api-test.asf.alaska.edu/services/search/param?flightDirection=DESCENDING&maxresults=10&output=csv
 https://api-test.asf.alaska.edu/services/search/param?flightDirection=asCEndInG&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?flightDirection=dEsCeN&maxresults=10&output=csv
 https://api-test.asf.alaska.edu/services/search/param?flightLine=15302&maxresults=10&output=csv
 https://api-test.asf.alaska.edu/services/search/param?end=2005-01-01T00:00:00Z&output=count
 https://api-test.asf.alaska.edu/services/search/param?start=2005-01-01T00:00:00Z&output=count
 https://api-test.asf.alaska.edu/services/search/param?start=2005-01-01T00:00:00Z&end=2005-01-01T01:00:00Z&output=csv
 https://api-test.asf.alaska.edu/services/search/param?platform=SA&start=2016-01-01T00:00:00Z&end=2016-01-02T00:00:00Z&output=csv
+https://api-test.asf.alaska.edu/services/search/param?platform=SB&start=1+week+ago&end=now&maxresults=2000&output=csv
+#https://api-test.asf.alaska.edu/services/search/param?absoluteorbit=5000&maxresults=10&output=csv
+#https://api-test.asf.alaska.edu/services/search/param?absoluteorbit=5000-6000&maxresults=10&output=csv
+#https://api-test.asf.alaska.edu/services/search/param?absoluteorbit=5000,5001,5002&maxresults=10&output=csv
+#https://api-test.asf.alaska.edu/services/search/param?absoluteorbit=5000,5100-5200maxresults=100&output=csv
 
 # queries taken from real-world usage
 #https://api-test.asf.alaska.edu/services/search/param?intersectsWith=point(-168.0380672+53.9279675)&platform=Sentinel-1A,Sentinel-1B&processingLevel=GRD_HS,GRD_HD&beamMode=IW&output=count
