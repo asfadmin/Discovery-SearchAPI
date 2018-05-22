@@ -41,7 +41,6 @@ class CMRQuery:
         
     # Use the cartesian product of all the list parameters to determine subqueries
     def get_query_list(self, params):
-        logging.debug(params)
         # First we have to get the params into a form itertools.product() understands
         listed_params = []
         for k in params:
@@ -91,7 +90,6 @@ class CMRQuery:
         results = []
         for n, subq in enumerate(self.sub_queries):
             logging.debug('Running subquery {0}'.format(n+1))
-            logging.debug(subq.params)
             results.extend(subq.get_results())
             if self.max_results is not None and len(results) >= self.max_results:
                 logging.debug('len(results) > self.max_results, breaking out: {0}/{1}'.format(len(results), self.max_results))
@@ -122,8 +120,9 @@ class CMRSubQuery:
         
         self.params = fixed
         
-        logging.debug('new CMRSubQuery object ready to go')
         self.params.extend(self.extra_params.items())
+        
+        logging.debug('new CMRSubQuery object ready to go')
     
     def get_results(self):
         s = requests.Session()
