@@ -61,10 +61,10 @@ def input_fixer(params):
                     rv = [i for sub in rev for i in sub]
                     r = requests.post(get_config()['cmr_api'], data={'polygon': ','.join(rv), 'provider': 'ASF', 'page_size': 1, 'attribute[]': 'string,ASF_PLATFORM,FAKEPLATFORM'})
                     if r.status_code == 200:
-                        logging.debug('Polygon repaired')
+                        logging.error('Polygon repaired')
                         v = rv
                     else:
-                        logging.debug('Could not repair polygon, using original')
+                        logging.error('Could not repair polygon, using original')
             fixed_params[k] = ','.join(v)        
         else:
             fixed_params[k] = v

@@ -1,8 +1,0 @@
-https://api.daac.asf.alaska.edu/services/search/param?granule_list=R1_65207_ST5_F155,E2_84697_STD_F293&output=metalink
-https://api.daac.asf.alaska.edu/services/search/param?granule_list=R1_65207_ST5_F155,E2_84697_STD_F293&output=csv
-https://api.daac.asf.alaska.edu/services/search/param?granule_list=R1_65207_ST5_F155,E2_84697_STD_F293&output=kml
-https://api.daac.asf.alaska.edu/services/search/param?granule_list=R1_65207_ST5_F155,E2_84697_STD_F293&output=json
-http://127.0.0.1:5000/services/search/param?granule_list=R1_65207_ST5_F155,E2_84697_STD_F293&output=metalink
-http://127.0.0.1:5000/services/search/param?granule_list=R1_65207_ST5_F155,E2_84697_STD_F293&output=csv
-http://127.0.0.1:5000/services/search/param?granule_list=R1_65207_ST5_F155,E2_84697_STD_F293&output=kml
-http://127.0.0.1:5000/services/search/param?granule_list=R1_65207_ST5_F155,E2_84697_STD_F293&output=json
