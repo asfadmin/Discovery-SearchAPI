@@ -1,6 +1,7 @@
 import xml.etree.ElementTree as ET
 from datetime import datetime
 import dateparser
+import requests
 from jinja2 import Environment, PackageLoader, select_autoescape
 import logging
 import json
@@ -39,6 +40,32 @@ def input_fixer(params):
                 'UA': 'UAVSAR'
             }
             fixed_params[k] = [platmap[a.upper()] if a.upper() in platmap else a for a in v]
+        elif k == 'polygon': # Do what we can to fix polygons up
+            # Trim whitespace and split it up
+            v = v.replace(' ', '').split(',')
+            
+            # If the polygon doesn't wrap, fix that
+            if v[0] != v[-2] or v[1] != v[-1]:
+                v.extend(v[0:2])
+            
+            # Do a quick CMR query to see if the shape is wound correctly
+            logging.debug('Checking winding order')
+            r = requests.post(get_config()['cmr_api'], data={'polygon': ','.join(v), 'provider': 'ASF', 'page_size': 1})
+            if r.status_code == 200:
+                logging.debug('Winding order looks good')
+            else:
+                if 'Please check the order of your points.' in r.text:
+                    logging.error('Probable backwards winding order on polygon, attempting to repair')
+                    it = iter(v)
+                    rev = reversed(zip(it, it))
+                    rv = [i for sub in rev for i in sub]
+                    r = requests.post(get_config()['cmr_api'], data={'polygon': ','.join(rv), 'provider': 'ASF', 'page_size': 1, 'attribute[]': 'string,ASF_PLATFORM,FAKEPLATFORM'})
+                    if r.status_code == 200:
+                        logging.debug('Polygon repaired')
+                        v = rv
+                    else:
+                        logging.debug('Could not repair polygon, using original')
+            fixed_params[k] = ','.join(v)        
         else:
             fixed_params[k] = v
     
@@ -118,7 +145,7 @@ def input_map():
         'lookdirection': ['attribute[]', 'string,LOOK_DIRECTION,{0}'],
         'platform': ['attribute[]', 'string,ASF_PLATFORM,{0}'],
         'polarization': ['attribute[]', 'string,POLARIZATION,{0}'],
-        #'polygon': ['polygon', '{0}'],
+        'polygon': ['polygon', '{0}'],
         'processinglevel': ['attribute[]', 'string,PROCESSING_TYPE,{0}'],
         'relativeorbit': ['attribute[]', 'int,PATH_NUMBER,{0}'],
 #        'processingdate': parse_date,
@@ -241,10 +268,7 @@ def parse_float_or_range_list(v):
     return parse_number_or_range_list(v, parse_float)
 
 def parse_coord_string(v):
-    v = v.replace(' ', '').split(',')
-    # if the polygon doesn't wrap, fix that
-    if v[0] != v[-2] or v[1] != v[-1]:
-        v.extend(v[0:2])
+    v = v.split(',')
     for c in v:
         try:
             float(c)
