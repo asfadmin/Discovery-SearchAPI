@@ -58,7 +58,7 @@ class APIProxyQuery:
         
     # CMR backend query
     def query_cmr(self):
-        logging.warning('Using CMR as backend, from {0}'.format(self.request.access_route[-1]))
+        logging.debug('Using CMR as backend, from {0}'.format(self.request.access_route[-1]))
         
         q = CMRQuery(params=self.cmr_params, output=self.output, max_results=self.max_results)
         r = q.get_results()
