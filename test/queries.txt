@@ -70,5 +70,11 @@ https://api-test.asf.alaska.edu/services/search/param?mininsarstacksize=50&maxre
 https://api-test.asf.alaska.edu/services/search/param?maxinsarstacksize=50&maxresults=10&output=csv
 https://api-test.asf.alaska.edu/services/search/param?mininsarstacksize=80&maxinsarstacksize=100&maxresults=10&output=csv
 
+# polygon closure/winding order fixer test
+https://api-test.asf.alaska.edu/services/search/param?polygon=12.13,41.74,13.4,41.74,13.4,42.75,12.13,42.75&platform=Sentinel-1A,Sentinel-1B&processingLevel=SLC&start=2018-05-01T00:00:00UTC&output=csv
+https://api-test.asf.alaska.edu/services/search/param?polygon=12.13,41.74,13.4,41.74,13.4,42.75,12.13,42.75,12.13,41.74&platform=Sentinel-1A,Sentinel-1B&processingLevel=SLC&start=2018-05-01T00:00:00UTC&output=csv
+https://api-test.asf.alaska.edu/services/search/param?polygon=12.13,41.74,12.13,42.75,13.4,42.75,13.4,41.74,12.13,41.74&platform=Sentinel-1A,Sentinel-1B&processingLevel=SLC&start=2018-05-01T00:00:00UTC&output=csv
+
+
 # queries taken from real-world usage
 #https://api-test.asf.alaska.edu/services/search/param?intersectsWith=point(-168.0380672+53.9279675)&platform=Sentinel-1A,Sentinel-1B&processingLevel=GRD_HS,GRD_HD&beamMode=IW&output=count
