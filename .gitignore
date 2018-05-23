@@ -9,5 +9,5 @@
 __pycache__/
 
 # dev/test files
-test.txt
 test/cache/*
+test/results.csv
