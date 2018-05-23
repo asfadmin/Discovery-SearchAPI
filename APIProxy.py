@@ -41,7 +41,7 @@ class APIProxyQuery:
     # ASF API backend query
     def query_asf(self):
         # preserve GET/POST approach when querying ASF API
-        logging.info('API passthrough from {0}'.format(self.request.access_route[-1]))
+        logging.warning('Using Legacy as backend, from {0}'.format(self.request.access_route[-1]))
         if self.request.method == 'GET':
             param_string = 'api_proxy=1&{0}'.format(self.request.query_string.decode('utf-8'))
             r = requests.get('{0}?{1}'.format(get_config()['asf_api'], param_string))
@@ -58,7 +58,7 @@ class APIProxyQuery:
         
     # CMR backend query
     def query_cmr(self):
-        logging.info('CMR translation from {0}'.format(self.request.access_route[-1]))
+        logging.warning('Using CMR as backend, from {0}'.format(self.request.access_route[-1]))
         
         q = CMRQuery(params=self.cmr_params, output=self.output, max_results=self.max_results)
         r = q.get_results()
