@@ -55,16 +55,16 @@ def input_fixer(params):
                 logging.debug('Winding order looks good')
             else:
                 if 'Please check the order of your points.' in r.text:
-                    logging.error('Probable backwards winding order on polygon, attempting to repair')
+                    logging.warning('Backwards polygon, attempting to repair')
                     it = iter(v)
                     rev = reversed(zip(it, it))
                     rv = [i for sub in rev for i in sub]
                     r = requests.post(get_config()['cmr_api'], data={'polygon': ','.join(rv), 'provider': 'ASF', 'page_size': 1, 'attribute[]': 'string,ASF_PLATFORM,FAKEPLATFORM'})
                     if r.status_code == 200:
-                        logging.error('Polygon repaired')
+                        logging.warning('Polygon repaired')
                         v = rv
                     else:
-                        logging.error('Could not repair polygon, using original')
+                        logging.warning('Could not repair polygon, using original')
             fixed_params[k] = ','.join(v)        
         else:
             fixed_params[k] = v
