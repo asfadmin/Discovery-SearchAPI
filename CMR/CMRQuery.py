@@ -128,10 +128,11 @@ class CMRSubQuery:
         # that don't suffer this issue.
         plat = None
         for p in self.params:
-            m = re.search(r'ASF_PLATFORM,(.+)', p[1])
-            if m is not None:
-                plat = m.group(1)
-                break
+            if isinstance(p[1], str):
+                m = re.search(r'ASF_PLATFORM,(.+)', p[1])
+                if m is not None:
+                    plat = m.group(1)
+                    break
         if plat in ['ALOS', 'SENTINEL-1A', 'SENTINEL-1B']:
             for n, p in enumerate(self.params):
                 if isinstance(p[1], str):
