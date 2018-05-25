@@ -3,6 +3,7 @@ from flask import make_response
 from math import ceil
 from itertools import product
 import logging
+import re
 from CMR.CMRTranslate import output_translators, parse_cmr_response, input_map, input_fixer
 from Analytics import post_analytics
 from asf_env import get_config
@@ -121,6 +122,24 @@ class CMRSubQuery:
         self.params = fixed
         
         self.params.extend(self.extra_params.items())
+        
+        # Sentinel/ALOS-specific hack to always use asf frame instead of esa frame
+        # We do it at the subquery level in case the main query crosses platforms
+        # that don't suffer this issue.
+        plat = None
+        for p in self.params:
+            if isinstance(p[1], str):
+                m = re.search(r'ASF_PLATFORM,(.+)', p[1])
+                if m is not None:
+                    plat = m.group(1)
+                    break
+        if plat in ['ALOS', 'SENTINEL-1A', 'SENTINEL-1B']:
+            for n, p in enumerate(self.params):
+                if isinstance(p[1], str):
+                    m = re.search(r'CENTER_ESA_FRAME', p[1])
+                    if m is not None:
+                        logging.debug('Sentinel/ALOS subquery, using ESA frame instead of ASF frame')
+                        self.params[n] = (p[0], p[1].replace(',CENTER_ESA_FRAME,', ',FRAME_NUMBER,'))
         
         logging.debug('new CMRSubQuery object ready to go')
     
