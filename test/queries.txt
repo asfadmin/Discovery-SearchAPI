@@ -78,3 +78,5 @@ https://api-test.asf.alaska.edu/services/search/param?polygon=12.13,41.74,12.13,
 
 # queries taken from real-world usage
 #https://api-test.asf.alaska.edu/services/search/param?intersectsWith=point(-168.0380672+53.9279675)&platform=Sentinel-1A,Sentinel-1B&processingLevel=GRD_HS,GRD_HD&beamMode=IW&output=count
+https://api-test.asf.alaska.edu/services/search/param?output=count&frame=587%2C588%2C589%2C590%2C591%2C592%2C593&processingLevel=L0%2CL1.0%2CSLC&platform=SENTINEL-1A%2CSENTINEL-1B&maxResults=1000&relativeOrbit=128
+https://api-test.asf.alaska.edu/services/search/param?output=count&asfframe=587%2C588%2C589%2C590%2C591%2C592%2C593&processingLevel=L0%2CL1.0%2CSLC&platform=SENTINEL-1A%2CSENTINEL-1B&maxResults=1000&relativeOrbit=128
