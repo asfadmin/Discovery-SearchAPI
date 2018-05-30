@@ -142,7 +142,7 @@ def input_map():
         'granule_list': ['readable_granule_name[]', '{0}'],
         'maxinsarstacksize': ['attribute[]', 'int,INSAR_STACK_SIZE,{0},'],
         'mininsarstacksize': ['attribute[]', 'int,INSAR_STACK_SIZE,,{0}'],
-        #'intersectswith': [???],
+#       'intersectswith': [???],
         'lookdirection': ['attribute[]', 'string,LOOK_DIRECTION,{0}'],
         'platform': ['attribute[]', 'string,ASF_PLATFORM,{0}'],
         'polarization': ['attribute[]', 'string,POLARIZATION,{0}'],
