@@ -133,7 +133,7 @@ class CMRSubQuery:
                 if m is not None:
                     plat = m.group(1)
                     break
-        if plat in ['ALOS', 'SENTINEL-1A', 'SENTINEL-1B']:
+        if plat is not None and plat.upper() in ['ALOS', 'SENTINEL-1A', 'SENTINEL-1B']:
             for n, p in enumerate(self.params):
                 if isinstance(p[1], str):
                     m = re.search(r'CENTER_ESA_FRAME', p[1])
