@@ -5,8 +5,8 @@ import requests
 from jinja2 import Environment, PackageLoader, select_autoescape
 import logging
 import json
-import requests
 import re
+from geomet import wkt
 from asf_env import get_config
 
 templateEnv = Environment(
@@ -56,6 +56,7 @@ def input_fixer(params):
             else:
                 if 'Please check the order of your points.' in r.text:
                     logging.warning('Backwards polygon, attempting to repair')
+                    logging.warning(r.text)
                     it = iter(v)
                     rev = reversed(zip(it, it))
                     rv = [i for sub in rev for i in sub]
@@ -104,7 +105,7 @@ def input_parsers():
         'granule_list': parse_string_list,
         'maxinsarstacksize': parse_int,
         'mininsarstacksize': parse_int,
-#        'intersectswith':                              # need a parser
+        'intersectswith': parse_wkt,
         'lookdirection': parse_string,
         'offnadirangle': parse_float_or_range_list,
         'output': parse_string,
@@ -141,7 +142,7 @@ def input_map():
         'granule_list': ['readable_granule_name[]', '{0}'],
         'maxinsarstacksize': ['attribute[]', 'int,INSAR_STACK_SIZE,{0},'],
         'mininsarstacksize': ['attribute[]', 'int,INSAR_STACK_SIZE,,{0}'],
-        #'intersectswith': [???],
+#       'intersectswith': [???],
         'lookdirection': ['attribute[]', 'string,LOOK_DIRECTION,{0}'],
         'platform': ['attribute[]', 'string,ASF_PLATFORM,{0}'],
         'polarization': ['attribute[]', 'string,POLARIZATION,{0}'],
@@ -267,6 +268,7 @@ def parse_int_or_range_list(v):
 def parse_float_or_range_list(v):
     return parse_number_or_range_list(v, parse_float)
 
+# Parse and validate a coordinate string
 def parse_coord_string(v):
     v = v.split(',')
     for c in v:
@@ -276,14 +278,21 @@ def parse_coord_string(v):
             raise ValueError('Invalid polygon: {0}'.format(v))
     return ','.join(v)
 
+# Parse a WKT and convert it to a coordinate string
+def parse_wkt(v):
+    if re.match(r'line|point|polygon', v.lower()) is None:
+        raise ValueError('Unsupported WKT: {0}'.format(v))
+    p = wkt.loads(v.upper())['coordinates'][0] # ignore any subsequent parts like holes, they aren't supported by CMR
+    return ','.join([i for sub in p['coordinates'] for i in sub])
+
 # for kml generation
 def wkt_from_gpolygon(gpoly):
     shape = []
     for point in gpoly.iter('Point'):
         shape.append({'lon': point.findtext('PointLongitude'), 'lat': point.findtext('PointLatitude')})
-    wkt = 'POLYGON(({0}))'.format(','.join(list(map(lambda x: '{0} {1}'.format(x['lon'], x['lat']), shape))))
+    wkt_shape = 'POLYGON(({0}))'.format(','.join(list(map(lambda x: '{0} {1}'.format(x['lon'], x['lat']), shape))))
     #logging.debug('Translated to WKT: {0}'.format(wkt))
-    return shape, wkt
+    return shape, wkt_shape
 
 # convenience method for handling echo10 additional attributes
 def attr(name):
@@ -300,7 +309,7 @@ def parse_cmr_response(r):
     results = []
     for result in root.iter('result'):
         for granule in result.iter('Granule'):
-            (shape, wkt) = wkt_from_gpolygon(granule.find('./Spatial/HorizontalSpatialDomain/Geometry/GPolygon'))
+            (shape, wkt_shape) = wkt_from_gpolygon(granule.find('./Spatial/HorizontalSpatialDomain/Geometry/GPolygon'))
             results.append({
                 'granuleName': granule.findtext("./DataGranule/ProducerGranuleId"),
                 'sizeMB': granule.findtext("./DataGranule/SizeMBDataGranule"),
@@ -308,69 +317,69 @@ def parse_cmr_response(r):
                 'startTime':  granule.findtext("./Temporal/RangeDateTime/BeginningDateTime"),
                 'stopTime':  granule.findtext("./Temporal/RangeDateTime/EndingDateTime"),
                 'absoluteOrbit': granule.findtext("./OrbitCalculatedSpatialDomains/OrbitCalculatedSpatialDomain/OrbitNumber"),
-                'platform': granule.findtext(attr('ASF_PLATFORM')),
-                'md5': granule.findtext(attr('MD5SUM')),
-                'beamMode': granule.findtext(attr('BEAM_MODE_TYPE')),
-                'configurationName': granule.findtext(attr('BEAM_MODE_DESC')),
-                'bytes': granule.findtext(attr("BYTES")),
-                'granuleType':  granule.findtext(attr('GRANULE_TYPE')),
-                'sceneDate': granule.findtext(attr('ACQUISITION_DATE')),
-                'flightDirection': granule.findtext(attr('ASCENDING_DESCENDING')),
-                'thumbnailUrl': granule.findtext(attr('THUMBNAIL_URL')),
-                'farEndLat':  granule.findtext(attr('FAR_END_LAT')),
-                'farStartLat':  granule.findtext(attr('FAR_START_LAT')),
-                'nearStartLat':  granule.findtext(attr('NEAR_START_LAT')),
-                'nearEndLat':  granule.findtext(attr('NEAR_END_LAT')),
-                'farEndLon':  granule.findtext(attr('FAR_END_LON')),
-                'farStartLon':  granule.findtext(attr('FAR_START_LON')),
-                'nearStartLon':  granule.findtext(attr('NEAR_START_LON')),
-                'nearEndLon':  granule.findtext(attr('NEAR_END_LON')),
-                'processingType':  granule.findtext(attr('PROCESSING_LEVEL')),
-                'finalFrame':  granule.findtext(attr('CENTER_ESA_FRAME')),
-                'centerLat':  granule.findtext(attr('CENTER_LAT')),
-                'centerLon':  granule.findtext(attr('CENTER_LON')),
-                'polarization':  granule.findtext(attr('POLARIZATION')),
-                'faradayRotation':  granule.findtext(attr('FARADAY_ROTATION')),
-                'stringFootprint': wkt,
-                'doppler': granule.findtext(attr('DOPPLER')),
-                'baselinePerp': granule.findtext(attr('INSAR_BASELINE')),
-                'insarStackSize': granule.findtext(attr('INSAR_STACK_SIZE')),
-                'processingDescription': granule.findtext(attr('PROCESSING_DESCRIPTION')),
-                'percentTroposphere': None, # not in CMR
-                'frameNumber': granule.findtext(attr('FRAME_NUMBER')),
-                'percentCoherence': None, # not in CMR
+                'platform': granule.findtext(attr('ASF_PLATFORM'), default='NA'),
+                'md5': granule.findtext(attr('MD5SUM'), default='NA'),
+                'beamMode': granule.findtext(attr('BEAM_MODE_TYPE'), default='NA'),
+                'configurationName': granule.findtext(attr('BEAM_MODE_DESC'), default='NA'),
+                'bytes': granule.findtext(attr("BYTES"), default='NA'),
+                'granuleType':  granule.findtext(attr('GRANULE_TYPE'), default='NA'),
+                'sceneDate': granule.findtext(attr('ACQUISITION_DATE'), default='NA'),
+                'flightDirection': granule.findtext(attr('ASCENDING_DESCENDING'), default='NA'),
+                'thumbnailUrl': granule.findtext(attr('THUMBNAIL_URL'), default='NA'),
+                'farEndLat':  granule.findtext(attr('FAR_END_LAT'), default='NA'),
+                'farStartLat':  granule.findtext(attr('FAR_START_LAT'), default='NA'),
+                'nearStartLat':  granule.findtext(attr('NEAR_START_LAT'), default='NA'),
+                'nearEndLat':  granule.findtext(attr('NEAR_END_LAT'), default='NA'),
+                'farEndLon':  granule.findtext(attr('FAR_END_LON'), default='NA'),
+                'farStartLon':  granule.findtext(attr('FAR_START_LON'), default='NA'),
+                'nearStartLon':  granule.findtext(attr('NEAR_START_LON'), default='NA'),
+                'nearEndLon':  granule.findtext(attr('NEAR_END_LON'), default='NA'),
+                'processingType':  granule.findtext(attr('PROCESSING_LEVEL'), default='NA'),
+                'finalFrame':  granule.findtext(attr('CENTER_ESA_FRAME'), default='NA'),
+                'centerLat':  granule.findtext(attr('CENTER_LAT'), default='NA'),
+                'centerLon':  granule.findtext(attr('CENTER_LON'), default='NA'),
+                'polarization':  granule.findtext(attr('POLARIZATION'), default='NA'),
+                'faradayRotation':  granule.findtext(attr('FARADAY_ROTATION'), default='NA'),
+                'stringFootprint': wkt_shape,
+                'doppler': granule.findtext(attr('DOPPLER'), default='NA'),
+                'baselinePerp': granule.findtext(attr('INSAR_BASELINE'), default='NA'),
+                'insarStackSize': granule.findtext(attr('INSAR_STACK_SIZE'), default='NA'),
+                'processingDescription': granule.findtext(attr('PROCESSING_DESCRIPTION'), default='NA'),
+                'percentTroposphere': 'NA', # not in CMR
+                'frameNumber': granule.findtext(attr('FRAME_NUMBER'), default='NA'),
+                'percentCoherence': 'NA', # not in CMR
                 'productName': granule.findtext("./DataGranule/ProducerGranuleId"),
-                'masterGranule': None, # almost always None in API
-                'percentUnwrapped': None, # not in CMR
-                'beamSwath': None, # .......complicated
-                'insarGrouping': granule.findtext(attr('INSAR_STACK_ID')),
-                'offNadirAngle': granule.findtext(attr('OFF_NADIR_ANGLE')),
-                'missionName': granule.findtext(attr('MISSION_NAME')),
-                'relativeOrbit': granule.findtext(attr('PATH_NUMBER')),
-                'flightLine': granule.findtext(attr('FLIGHT_LINE')),
-                'processingTypeDisplay': granule.findtext(attr('PROCESSING_TYPE_DISPLAY')),
-                'track': granule.findtext(attr('PATH_NUMBER')),
-                'beamModeType': granule.findtext(attr('BEAM_MODE_TYPE')),
-                'processingLevel': granule.findtext(attr('PROCESSING_TYPE')),
-                'lookDirection': granule.findtext(attr('LOOK_DIRECTION')),
-                'varianceTroposphere': None, # not in CMR
-                'slaveGranule': None, # almost always None in API
+                'masterGranule': 'NA', # almost always None in API
+                'percentUnwrapped': 'NA', # not in CMR
+                'beamSwath': 'NA', # .......complicated
+                'insarGrouping': granule.findtext(attr('INSAR_STACK_ID'), default='NA'),
+                'offNadirAngle': granule.findtext(attr('OFF_NADIR_ANGLE'), default='NA'),
+                'missionName': granule.findtext(attr('MISSION_NAME'), default='NA'),
+                'relativeOrbit': granule.findtext(attr('PATH_NUMBER'), default='NA'),
+                'flightLine': granule.findtext(attr('FLIGHT_LINE'), default='NA'),
+                'processingTypeDisplay': granule.findtext(attr('PROCESSING_TYPE_DISPLAY'), default='NA'),
+                'track': granule.findtext(attr('PATH_NUMBER'), default='NA'),
+                'beamModeType': granule.findtext(attr('BEAM_MODE_TYPE'), default='NA'),
+                'processingLevel': granule.findtext(attr('PROCESSING_TYPE'), default='NA'),
+                'lookDirection': granule.findtext(attr('LOOK_DIRECTION'), default='NA'),
+                'varianceTroposphere': 'NA', # not in CMR
+                'slaveGranule': 'NA', # almost always None in API
                 'sensor': granule.findtext('./Platforms/Platform/Instruments/Instrument/ShortName'),
                 'fileName': granule.findtext("./OnlineAccessURLs/OnlineAccessURL/URL").split('/')[-1],
                 'downloadUrl': granule.findtext("./OnlineAccessURLs/OnlineAccessURL/URL"),
                 'browse': granule.findtext("./AssociatedBrowseImageUrls/ProviderBrowseUrl/URL"),
                 'shape': shape,
-                'sarSceneId': None, # always None in API
+                'sarSceneId': 'NA', # always None in API
                 'product_file_id': '{0}_{1}'.format(granule.findtext("./DataGranule/ProducerGranuleId"), granule.findtext(attr('PROCESSING_TYPE'))),
                 'sceneId': granule.findtext("./DataGranule/ProducerGranuleId"),
-                'firstFrame': granule.findtext(attr('CENTER_ESA_FRAME')),
-                'frequency': None, # always None in API
-                'catSceneId': None, # always None in API
-                'status': None, # always None in API
-                'formatName': None, # always None in API
-                'incidenceAngle': None, # always None in API
-                'collectionName': granule.findtext(attr('MISSION_NAME')),
-                'sceneDateString': None # always None in API
+                'firstFrame': granule.findtext(attr('CENTER_ESA_FRAME'), default='NA'),
+                'frequency': 'NA', # always None in API
+                'catSceneId': 'NA', # always None in API
+                'status': 'NA', # always None in API
+                'formatName': 'NA', # always None in API
+                'incidenceAngle': 'NA', # always None in API
+                'collectionName': granule.findtext(attr('MISSION_NAME'), default='NA'),
+                'sceneDateString': 'NA' # always None in API
             })
 
     # some additional attributes are specified as "NULL", make it real null
