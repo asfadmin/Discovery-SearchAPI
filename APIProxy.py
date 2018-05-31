@@ -48,7 +48,7 @@ class APIProxyQuery:
         else: # self.request.method == 'POST':
             params = self.request.form
             params['api_proxy'] = 1
-            param_string = '&'.join(list(map(lambda p: '{0}={1}'.format(p, params[p]), params)))
+            param_string = '&'.join(['{0}={1}'.format(p, params[p]) for p in params])
             r = requests.post(get_config()['asf_api'], data=self.request.form)
         post_analytics(pageview=False, events=[{'ec': 'ASF API Status', 'ea': r.status_code}])
         if r.status_code != 200:
