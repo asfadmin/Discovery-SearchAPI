@@ -2,7 +2,7 @@ import xml.etree.ElementTree as ET
 from datetime import datetime
 import dateparser
 import requests
-from jinja2 import Environment, PackageLoader, select_autoescape
+from jinja2 import Environment, PackageLoader
 import logging
 import json
 import re
