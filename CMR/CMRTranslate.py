@@ -11,7 +11,7 @@ from asf_env import get_config
 
 templateEnv = Environment(
     loader=PackageLoader('CMR', 'templates'),
-    autoescape=select_autoescape(['html', 'xml'])
+    autoescape=True
 )
 
 # A few inputs need to be specially handled to make the flexible input the legacy
