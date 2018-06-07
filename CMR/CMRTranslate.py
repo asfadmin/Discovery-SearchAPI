@@ -290,6 +290,8 @@ def wkt_from_gpolygon(gpoly):
     shape = []
     for point in gpoly.iter('Point'):
         shape.append({'lon': point.findtext('PointLongitude'), 'lat': point.findtext('PointLatitude')})
+    if shape[0]['lat'] != shape[-1]['lat'] or shape[0]['lon'] != shape[-1]['lon']:
+        shape.append(shape[0]) # Close the shape if needed
     wkt_shape = 'POLYGON(({0}))'.format(','.join(['{0} {1}'.format(x['lon'], x['lat']) for x in shape]))
     #logging.debug('Translated to WKT: {0}'.format(wkt))
     return shape, wkt_shape
