@@ -1,8 +1,8 @@
-import xml.etree.ElementTree as ET
+import defusedxml.ElementTree as ET
 from datetime import datetime
 import dateparser
 import requests
-from jinja2 import Environment, PackageLoader, select_autoescape
+from jinja2 import Environment, PackageLoader
 import logging
 import json
 import re
@@ -11,7 +11,7 @@ from asf_env import get_config
 
 templateEnv = Environment(
     loader=PackageLoader('CMR', 'templates'),
-    autoescape=select_autoescape(['html', 'xml'])
+    autoescape=True
 )
 
 # A few inputs need to be specially handled to make the flexible input the legacy
@@ -290,7 +290,9 @@ def wkt_from_gpolygon(gpoly):
     shape = []
     for point in gpoly.iter('Point'):
         shape.append({'lon': point.findtext('PointLongitude'), 'lat': point.findtext('PointLatitude')})
-    wkt_shape = 'POLYGON(({0}))'.format(','.join(list(map(lambda x: '{0} {1}'.format(x['lon'], x['lat']), shape))))
+    if shape[0]['lat'] != shape[-1]['lat'] or shape[0]['lon'] != shape[-1]['lon']:
+        shape.append(shape[0]) # Close the shape if needed
+    wkt_shape = 'POLYGON(({0}))'.format(','.join(['{0} {1}'.format(x['lon'], x['lat']) for x in shape]))
     #logging.debug('Translated to WKT: {0}'.format(wkt))
     return shape, wkt_shape
 

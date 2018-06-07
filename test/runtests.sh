@@ -17,6 +17,6 @@ else
 fi
 echo "Testing maturity $1"
 echo "API URL $api"
-n="$(egrep '^\s*http' queries.txt | wc -l | egrep -o '\d+')"
+n="$(grep -E '^\s*http' queries.txt | wc -l | grep -E -o '\d+')"
 echo "Running $n tests"
 python tester.py -f queries.txt -s results.csv -c -r "$api"

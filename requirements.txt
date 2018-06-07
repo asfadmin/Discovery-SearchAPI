@@ -5,6 +5,7 @@ chardet==3.0.4
 click==6.7
 configparser==3.5.0
 dateparser==0.7.0
+defusedxml==0.5.0
 Dumper==1.0.4
 enum34==1.1.6
 Flask==1.0.2
