@@ -481,7 +481,8 @@ def cmr_to_json(rlist):
         'processingLevel',
         'lookDirection',
         'varianceTroposphere',
-        'slaveGranule'
+        'slaveGranule',
+        'sizeMB'
     ]
     json_data = [[]]
     # just grab the parts of the data we want to match legacy API json output
