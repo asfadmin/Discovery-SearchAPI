@@ -69,6 +69,7 @@ https://api-test.asf.alaska.edu/services/search/param?relativeorbit=20,23,25&pla
 https://api-test.asf.alaska.edu/services/search/param?mininsarstacksize=50&maxresults=10&output=csv
 https://api-test.asf.alaska.edu/services/search/param?maxinsarstacksize=50&maxresults=10&output=csv
 https://api-test.asf.alaska.edu/services/search/param?mininsarstacksize=80&maxinsarstacksize=100&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?processingDate=2018-01-01T00:00:00Z&maxresults=10&output=csv
 
 # polygon closure/winding order fixer test
 https://api-test.asf.alaska.edu/services/search/param?polygon=12.13,41.74,13.4,41.74,13.4,42.75,12.13,42.75&platform=Sentinel-1A,Sentinel-1B&processingLevel=SLC&start=2018-05-01T00:00:00UTC&output=csv
