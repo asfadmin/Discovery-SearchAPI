@@ -149,7 +149,7 @@ def input_map():
         'polygon': ['polygon', '{0}'],
         'processinglevel': ['attribute[]', 'string,PROCESSING_TYPE,{0}'],
         'relativeorbit': ['attribute[]', 'int,PATH_NUMBER,{0}'],
-#        'processingdate': parse_date,
+        'processingdate': ['attribute[]', 'date,PROCESSING_DATE,{0},'],
         'start': ['end', '{0}'], # Isn't actually used for querying CMR, just checking inputs
         'end': ['start', '{0}'], # Isn't actually used for querying CMR, just checking inputs
         'temporal': ['temporal', '{0}'] # start/end end up here
