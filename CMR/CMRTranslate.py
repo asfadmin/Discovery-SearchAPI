@@ -14,6 +14,34 @@ templateEnv = Environment(
     autoescape=True
 )
 
+def fix_polygon(v):
+    # Trim whitespace and split it up
+    v = v.replace(' ', '').split(',')
+    
+    # If the polygon doesn't wrap, fix that
+    if v[0] != v[-2] or v[1] != v[-1]:
+        v.extend(v[0:2])
+    
+    # Do a quick CMR query to see if the shape is wound correctly
+    logging.debug('Checking winding order')
+    r = requests.post(get_config()['cmr_api'], data={'polygon': ','.join(v), 'provider': 'ASF', 'page_size': 1})
+    if r.status_code == 200:
+        logging.debug('Winding order looks good')
+    else:
+        if 'Please check the order of your points.' in r.text:
+            logging.warning('Backwards polygon, attempting to repair')
+            logging.warning(r.text)
+            it = iter(v)
+            rev = reversed(zip(it, it))
+            rv = [i for sub in rev for i in sub]
+            r = requests.post(get_config()['cmr_api'], data={'polygon': ','.join(rv), 'provider': 'ASF', 'page_size': 1, 'attribute[]': 'string,ASF_PLATFORM,FAKEPLATFORM'})
+            if r.status_code == 200:
+                logging.warning('Polygon repaired')
+                v = rv
+            else:
+                logging.warning('Could not repair polygon, using original')
+    return ','.join(v)
+
 # A few inputs need to be specially handled to make the flexible input the legacy
 # API allowed match what's at CMR, since we can't use wildcards on additional attributes
 def input_fixer(params):
@@ -40,33 +68,23 @@ def input_fixer(params):
                 'UA': 'UAVSAR'
             }
             fixed_params[k] = [platmap[a.upper()] if a.upper() in platmap else a for a in v]
+        elif k == 'beammode':
+            beammap = {
+                'STD': 'Standard'
+            }
+            fixed_params[k] = [beammap[a.upper()] if a.upper() in beammap else a for a in v]
+        elif k == 'beamswath':
+            beammap = {
+                'Standard': 'STD'
+            }
+            fixed_params[k] = [beammap[a.upper()] if a.upper() in beammap else a for a in v]
         elif k == 'polygon': # Do what we can to fix polygons up
-            # Trim whitespace and split it up
-            v = v.replace(' ', '').split(',')
-            
-            # If the polygon doesn't wrap, fix that
-            if v[0] != v[-2] or v[1] != v[-1]:
-                v.extend(v[0:2])
-            
-            # Do a quick CMR query to see if the shape is wound correctly
-            logging.debug('Checking winding order')
-            r = requests.post(get_config()['cmr_api'], data={'polygon': ','.join(v), 'provider': 'ASF', 'page_size': 1})
-            if r.status_code == 200:
-                logging.debug('Winding order looks good')
-            else:
-                if 'Please check the order of your points.' in r.text:
-                    logging.warning('Backwards polygon, attempting to repair')
-                    logging.warning(r.text)
-                    it = iter(v)
-                    rev = reversed(zip(it, it))
-                    rv = [i for sub in rev for i in sub]
-                    r = requests.post(get_config()['cmr_api'], data={'polygon': ','.join(rv), 'provider': 'ASF', 'page_size': 1, 'attribute[]': 'string,ASF_PLATFORM,FAKEPLATFORM'})
-                    if r.status_code == 200:
-                        logging.warning('Polygon repaired')
-                        v = rv
-                    else:
-                        logging.warning('Could not repair polygon, using original')
-            fixed_params[k] = ','.join(v)        
+            fixed_params[k] = fix_polygon(v)
+        elif k == 'intersectswith': # Need to take the parsed value here and send it to one of polygon=, line=, point=
+            (t, p) = v.split(':')
+            if t == 'polygon':
+                p = fix_polygon(p)
+            fixed_params[t] = p
         else:
             fixed_params[k] = v
     
@@ -94,6 +112,7 @@ def input_parsers():
         'maxbaselineperp': parse_float,
         'minbaselineperp': parse_float,
         'beammode': parse_string_list,
+        'beamswath': parse_string_list,
         'collectionname': parse_string,
         'maxdoppler': parse_float,
         'mindoppler': parse_float,
@@ -112,6 +131,8 @@ def input_parsers():
         'platform': parse_string_list,
         'polarization': parse_string_list,
         'polygon': parse_coord_string,
+        'line': parse_coord_string,
+        'point': parse_coord_string,
         'processinglevel': parse_string_list,
         'relativeorbit': parse_int_or_range_list,
         'maxresults': parse_int,
@@ -124,14 +145,15 @@ def input_parsers():
 # Supported input parameters and their associated CMR parameters
 def input_map():
     return {
-        'output': ['output', '{0}'], # Special case, does not actually forward to CMR
-        'maxresults': ['maxresults', '{0}'], # Special case, does not actually forward to CMR
+        'output': [None, '{0}'], # Special case, does not actually forward to CMR
+        'maxresults': [None, '{0}'], # Special case, does not actually forward to CMR
         'absoluteorbit': ['orbit_number', '{0}'],
         'asfframe': ['attribute[]', 'int,FRAME_NUMBER,{0}'],
         'maxbaselineperp': ['attribute[]', 'float,INSAR_BASELINE,,{0}'],
         'minbaselineperp': ['attribute[]', 'float,INSAR_BASELINE,{0},'],
-        'beammode': ['attribute[]', 'string,BEAM_MODE_TYPE,{0}'],
-#        'collectionname': ['attribute[]', 'string,MISSION_NAME,{0}'], # double check this source
+        'beammode': ['attribute[]', 'string,BEAM_MODE,{0}'],
+        #'beamswath': ['attribute[]', 'string,BEAM_MODE_TYPE,{0}'],
+        'collectionname': ['attribute[]', 'string,MISSION_NAME,{0}'], # double check this source
         'maxdoppler': ['attribute[]', 'float,DOPPLER,,{0}'],
         'mindoppler': ['attribute[]', 'float,DOPPLER,{0},'],
         'maxfaradayrotation': ['attribute[]', 'float,FARADAY_ROTATION,,{0}'],
@@ -142,16 +164,18 @@ def input_map():
         'granule_list': ['readable_granule_name[]', '{0}'],
         'maxinsarstacksize': ['attribute[]', 'int,INSAR_STACK_SIZE,{0},'],
         'mininsarstacksize': ['attribute[]', 'int,INSAR_STACK_SIZE,,{0}'],
-#       'intersectswith': [???],
+        'intersectswith': ['intersectsWith', '{0}'],
         'lookdirection': ['attribute[]', 'string,LOOK_DIRECTION,{0}'],
         'platform': ['attribute[]', 'string,ASF_PLATFORM,{0}'],
         'polarization': ['attribute[]', 'string,POLARIZATION,{0}'],
         'polygon': ['polygon', '{0}'],
+        'line': ['line', '{0}'],
+        'point': ['point', '{0}'],
         'processinglevel': ['attribute[]', 'string,PROCESSING_TYPE,{0}'],
         'relativeorbit': ['attribute[]', 'int,PATH_NUMBER,{0}'],
-#        'processingdate': parse_date,
-        'start': ['end', '{0}'], # Isn't actually used for querying CMR, just checking inputs
-        'end': ['start', '{0}'], # Isn't actually used for querying CMR, just checking inputs
+        'processingdate': ['attribute[]', 'date,PROCESSING_DATE,{0},'],
+        'start': [None, '{0}'], # Isn't actually used for querying CMR, just checking inputs
+        'end': [None, '{0}'], # Isn't actually used for querying CMR, just checking inputs
         'temporal': ['temporal', '{0}'] # start/end end up here
     }
 
@@ -280,10 +304,21 @@ def parse_coord_string(v):
 
 # Parse a WKT and convert it to a coordinate string
 def parse_wkt(v):
-    if re.match(r'line|point|polygon', v.lower()) is None:
+    # take note of the WKT type
+    t = re.match(r'linestring|point|polygon', v.lower())
+    if t is None:
         raise ValueError('Unsupported WKT: {0}'.format(v))
-    p = wkt.loads(v.upper())['coordinates'][0] # ignore any subsequent parts like holes, they aren't supported by CMR
-    return ','.join([i for sub in p['coordinates'] for i in sub])
+    if t.group(0) == 'linestring': # cmr calls a linestring a line
+        t = 'line'
+    else:
+        t = t.group(0)
+    p = wkt.loads(v.upper())['coordinates']
+    if t in ['polygon']:
+        p = p[0] # ignore any subsequent parts like holes, they aren't supported by CMR
+    if t in ['polygon', 'line']: # de-nest the coord list if needed
+        p = [x for x in sum(p, [])]
+    p = [str(x) for x in p]
+    return '{0}:{1}'.format(t, ','.join(p))
 
 # for kml generation
 def wkt_from_gpolygon(gpoly):
