@@ -123,9 +123,9 @@ class CMRSubQuery:
         
         self.params.extend(self.extra_params.items())
         
-        # Sentinel/ALOS-specific hack to always use asf frame instead of esa frame
-        # We do it at the subquery level in case the main query crosses platforms
-        # that don't suffer this issue.
+        # Platform-specific hacks
+        # We do them at the subquery level in case the main query crosses platforms
+        # that don't suffer these issue.
         plat = None
         for p in self.params:
             if isinstance(p[1], str):
@@ -133,13 +133,24 @@ class CMRSubQuery:
                 if m is not None:
                     plat = m.group(1)
                     break
-        if plat is not None and plat.upper() in ['ALOS', 'SENTINEL-1A', 'SENTINEL-1B']:
-            for n, p in enumerate(self.params):
-                if isinstance(p[1], str):
-                    m = re.search(r'CENTER_ESA_FRAME', p[1])
-                    if m is not None:
-                        logging.debug('Sentinel/ALOS subquery, using ESA frame instead of ASF frame')
-                        self.params[n] = (p[0], p[1].replace(',CENTER_ESA_FRAME,', ',FRAME_NUMBER,'))
+        if plat is not None:
+            # Sentinel/ALOS: always use asf frame instead of esa frame
+            if plat.upper() in ['ALOS', 'SENTINEL-1A', 'SENTINEL-1B']:
+                for n, p in enumerate(self.params):
+                    if isinstance(p[1], str):
+                        m = re.search(r'CENTER_ESA_FRAME', p[1])
+                        if m is not None:
+                            logging.debug('Sentinel/ALOS subquery, using ESA frame instead of ASF frame')
+                            self.params[n] = (p[0], p[1].replace(',CENTER_ESA_FRAME,', ',FRAME_NUMBER,'))
+            
+            # ALOS: translate beamswath values to beammode/offnadirangle
+            if plat.upper() in ['ALOS']:
+                for n, p in enumerate(self.params):
+                    if isinstance(p[1], str):
+                        m = re.search(r'BEAM_MODE_TYPE', p[1])
+                        if m is not None:
+                            logging.debug('ALOS subquery, converting beamswath to beammode/offnadirangle')
+                            logging.debug('n: {0}, p: {1}'.format(n, p))
         
         logging.debug('new CMRSubQuery object ready to go')
     
