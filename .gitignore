@@ -11,3 +11,6 @@ __pycache__/
 # dev/test files
 test/cache/*
 test/results.csv
+
+# misc OS files
+.DS_Store
