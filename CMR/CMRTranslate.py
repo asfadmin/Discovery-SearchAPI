@@ -40,6 +40,16 @@ def input_fixer(params):
                 'UA': 'UAVSAR'
             }
             fixed_params[k] = [platmap[a.upper()] if a.upper() in platmap else a for a in v]
+        elif k == 'beammode':
+            beammap = {
+                'STD': 'Standard'
+            }
+            fixed_params[k] = [beammap[a.upper()] if a.upper() in beammap else a for a in v]
+        elif k == 'beamswath':
+            beammap = {
+                'Standard': 'STD'
+            }
+            fixed_params[k] = [beammap[a.upper()] if a.upper() in beammap else a for a in v]
         elif k == 'polygon': # Do what we can to fix polygons up
             # Trim whitespace and split it up
             v = v.replace(' ', '').split(',')
@@ -94,6 +104,7 @@ def input_parsers():
         'maxbaselineperp': parse_float,
         'minbaselineperp': parse_float,
         'beammode': parse_string_list,
+        'beamswath': parse_string_list,
         'collectionname': parse_string,
         'maxdoppler': parse_float,
         'mindoppler': parse_float,
@@ -130,7 +141,8 @@ def input_map():
         'asfframe': ['attribute[]', 'int,FRAME_NUMBER,{0}'],
         'maxbaselineperp': ['attribute[]', 'float,INSAR_BASELINE,,{0}'],
         'minbaselineperp': ['attribute[]', 'float,INSAR_BASELINE,{0},'],
-        'beammode': ['attribute[]', 'string,BEAM_MODE_TYPE,{0}'],
+        'beammode': ['attribute[]', 'string,BEAM_MODE,{0}'],
+        'beamswath': ['attribute[]', 'string,BEAM_MODE_TYPE,{0}'],
 #        'collectionname': ['attribute[]', 'string,MISSION_NAME,{0}'], # double check this source
         'maxdoppler': ['attribute[]', 'float,DOPPLER,,{0}'],
         'mindoppler': ['attribute[]', 'float,DOPPLER,{0},'],
