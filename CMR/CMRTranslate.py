@@ -104,79 +104,41 @@ def input_fixer(params):
     
     return fixed_params
 
-# Parsers/validators
-def input_parsers():
-    return {
-        'absoluteorbit': parse_int_or_range_list,
-        'asfframe': parse_int_or_range_list,
-        'maxbaselineperp': parse_float,
-        'minbaselineperp': parse_float,
-        'beammode': parse_string_list,
-        'beamswath': parse_string_list,
-        'collectionname': parse_string,
-        'maxdoppler': parse_float,
-        'mindoppler': parse_float,
-        'maxfaradayrotation': parse_float,
-        'minfaradayrotation': parse_float,
-        'flightdirection': parse_string,
-        'flightline': parse_string,
-        'frame': parse_int_or_range_list,
-        'granule_list': parse_string_list,
-        'maxinsarstacksize': parse_int,
-        'mininsarstacksize': parse_int,
-        'intersectswith': parse_wkt,
-        'lookdirection': parse_string,
-        'offnadirangle': parse_float_or_range_list,
-        'output': parse_string,
-        'platform': parse_string_list,
-        'polarization': parse_string_list,
-        'polygon': parse_coord_string,
-        'line': parse_coord_string,
-        'point': parse_coord_string,
-        'processinglevel': parse_string_list,
-        'relativeorbit': parse_int_or_range_list,
-        'maxresults': parse_int,
-        'processingdate': parse_date,
-        'start': parse_date,
-        'end': parse_date
-        
-    }
-
 # Supported input parameters and their associated CMR parameters
 def input_map():
     return {
-        'output': [None, '{0}'], # Special case, does not actually forward to CMR
-        'maxresults': [None, '{0}'], # Special case, does not actually forward to CMR
-        'absoluteorbit': ['orbit_number', '{0}'],
-        'asfframe': ['attribute[]', 'int,FRAME_NUMBER,{0}'],
-        'maxbaselineperp': ['attribute[]', 'float,INSAR_BASELINE,,{0}'],
-        'minbaselineperp': ['attribute[]', 'float,INSAR_BASELINE,{0},'],
-        'beammode': ['attribute[]', 'string,BEAM_MODE,{0}'],
-        #'beamswath': ['attribute[]', 'string,BEAM_MODE_TYPE,{0}'],
-        'collectionname': ['attribute[]', 'string,MISSION_NAME,{0}'], # double check this source
-        'maxdoppler': ['attribute[]', 'float,DOPPLER,,{0}'],
-        'mindoppler': ['attribute[]', 'float,DOPPLER,{0},'],
-        'maxfaradayrotation': ['attribute[]', 'float,FARADAY_ROTATION,,{0}'],
-        'minfaradayrotation': ['attribute[]', 'float,FARADAY_ROTATION,{0},'],
-        'flightdirection': ['attribute[]', 'string,ASCENDING_DESCENDING,{0}'],
-        'flightline': ['attribute[]', 'string,FLIGHT_LINE,{0}'],
-        'frame': ['attribute[]', 'int,CENTER_ESA_FRAME,{0}'],
-        'granule_list': ['readable_granule_name[]', '{0}'],
-        'maxinsarstacksize': ['attribute[]', 'int,INSAR_STACK_SIZE,{0},'],
-        'mininsarstacksize': ['attribute[]', 'int,INSAR_STACK_SIZE,,{0}'],
-        'intersectswith': ['intersectsWith', '{0}'],
-        'lookdirection': ['attribute[]', 'string,LOOK_DIRECTION,{0}'],
-        'platform': ['attribute[]', 'string,ASF_PLATFORM,{0}'],
-        'polarization': ['attribute[]', 'string,POLARIZATION,{0}'],
-        'polygon': ['polygon', '{0}'],
-        'line': ['line', '{0}'],
-        'point': ['point', '{0}'],
-        'processinglevel': ['attribute[]', 'string,PROCESSING_TYPE,{0}'],
-        'relativeorbit': ['attribute[]', 'int,PATH_NUMBER,{0}'],
-        'processingdate': ['attribute[]', 'date,PROCESSING_DATE,{0},'],
-        'start': [None, '{0}'], # Isn't actually used for querying CMR, just checking inputs
-        'end': [None, '{0}'], # Isn't actually used for querying CMR, just checking inputs
-        'temporal': ['temporal', '{0}'] # start/end end up here
+        'output':               [None,                      '{0}',                              parse_string], # Special case, does not actually forward to CMR
+        'maxresults':           [None,                      '{0}',                              parse_int], # Special case, does not actually forward to CMR
+        'absoluteorbit':        ['orbit_number',            '{0}',                              parse_int_or_range_list],
+        'asfframe':             ['attribute[]',             'int,FRAME_NUMBER,{0}',             parse_int_or_range_list],
+        'maxbaselineperp':      ['attribute[]',             'float,INSAR_BASELINE,,{0}',        parse_float],
+        'minbaselineperp':      ['attribute[]',             'float,INSAR_BASELINE,{0},',        parse_float],
+        'beammode':             ['attribute[]',             'string,BEAM_MODE,{0}',             parse_string_list],
+#        'beamswath':            ['attribute[]',             'string,BEAM_MODE_TYPE,{0}',        parse_string_list],
+        'collectionname':       ['attribute[]',             'string,MISSION_NAME,{0}',          parse_string], # double check this source
+        'maxdoppler':           ['attribute[]',             'float,DOPPLER,,{0}',               parse_float],
+        'mindoppler':           ['attribute[]',             'float,DOPPLER,{0},',               parse_float],
+        'maxfaradayrotation':   ['attribute[]',             'float,FARADAY_ROTATION,,{0}',      parse_float],
+        'minfaradayrotation':   ['attribute[]',             'float,FARADAY_ROTATION,{0},',      parse_float],
+        'flightdirection':      ['attribute[]',             'string,ASCENDING_DESCENDING,{0}',  parse_string],
+        'flightline':           ['attribute[]',             'string,FLIGHT_LINE,{0}',           parse_string],
+        'frame':                ['attribute[]',             'int,CENTER_ESA_FRAME,{0}',         parse_int_or_range_list],
+        'granule_list':         ['readable_granule_name[]', '{0}',                              parse_string_list],
+        'maxinsarstacksize':    ['attribute[]',             'int,INSAR_STACK_SIZE,{0},',        parse_int],
+        'mininsarstacksize':    ['attribute[]',             'int,INSAR_STACK_SIZE,,{0}',        parse_int],
+        'intersectswith':       [None,                      '{0}',                              parse_wkt],
+        'lookdirection':        ['attribute[]',             'string,LOOK_DIRECTION,{0}',        parse_string],
+        'platform':             ['attribute[]',             'string,ASF_PLATFORM,{0}',          parse_string_list],
+        'polarization':         ['attribute[]',             'string,POLARIZATION,{0}',          parse_string_list],
+        'polygon':              ['polygon',                 '{0}',                              parse_coord_string],
+        'line':                 ['line',                    '{0}',                              parse_coord_string],
+        'point':                ['point',                   '{0}',                              parse_coord_string],
+        'processinglevel':      ['attribute[]',             'string,PROCESSING_TYPE,{0}',       parse_string_list],
+        'relativeorbit':        ['attribute[]',             'int,PATH_NUMBER,{0}',              parse_int_or_range_list],
+        'processingdate':       ['attribute[]',             'date,PROCESSING_DATE,{0},',        parse_date],
+        'start':                [None,                      '{0}',                              parse_date], # Isn't actually used for querying CMR, just checking inputs
+        'end':                  [None,                      '{0}',                              parse_date], # Isn't actually used for querying CMR, just checking inputs
+        'temporal':             ['temporal',                '{0}',                              None] # start/end end up here
     }
 
 # Supported output formats
@@ -199,7 +161,7 @@ def translate_params(p):
         if k.lower() not in input_map():
             raise ValueError('Unsupported CMR parameter', k)
         try:
-            params[k.lower()] = input_parsers()[k.lower()](p[k])
+            params[k.lower()] = input_map()[k.lower()][2](p[k])
         except ValueError as e:
             raise e
     
@@ -232,9 +194,16 @@ def parse_float(v):
     except ValueError:
         raise ValueError('Invalid number: {0}'.format(v))
 
-# Parse and validate a data: "1991-10-01T00:00:00Z"
+# Parse and validate a date: "1991-10-01T00:00:00Z"
 def parse_date(v):
     return dateparser.parse(v).strftime('%Y-%m-%dT%H:%M:%SZ')
+
+# Parse and validate a date range: "1991-10-01T00:00:00Z,1991-10-02T00:00:00Z"
+def parse_date_range(v):
+    dates = v.split(',')
+    if len(dates) != 2:
+        raise ValueError('Invalid date range: must be two comma-separated dates')
+    return '{0},{1}'.format(parse_date(dates[0]), parse_date(dates[1]))
 
 # Parse and validate a numeric value range, using h() to validate each value: "3-5", "1.1-12.3"
 def parse_range(v, h):
