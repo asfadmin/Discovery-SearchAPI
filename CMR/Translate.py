@@ -101,15 +101,15 @@ def input_fixer(params):
 def input_map():
     return {
 #       API parameter           CMR parameter               CMR format strings                  Parser
-        'output':               [None,                      '{0}',                              parse_string], # Special case, does not actually forward to CMR
-        'maxresults':           [None,                      '{0}',                              parse_int], # Special case, does not actually forward to CMR
+        'output':               [None,                      '{0}',                              parse_string],
+        'maxresults':           [None,                      '{0}',                              parse_int],
         'absoluteorbit':        ['orbit_number',            '{0}',                              parse_int_or_range_list],
         'asfframe':             ['attribute[]',             'int,FRAME_NUMBER,{0}',             parse_int_or_range_list],
         'maxbaselineperp':      ['attribute[]',             'float,INSAR_BASELINE,,{0}',        parse_float],
         'minbaselineperp':      ['attribute[]',             'float,INSAR_BASELINE,{0},',        parse_float],
         'beammode':             ['attribute[]',             'string,BEAM_MODE,{0}',             parse_string_list],
 #        'beamswath':            ['attribute[]',             'string,BEAM_MODE_TYPE,{0}',        parse_string_list],
-        'collectionname':       ['attribute[]',             'string,MISSION_NAME,{0}',          parse_string], # double check this source
+        'collectionname':       ['attribute[]',             'string,MISSION_NAME,{0}',          parse_string],
         'maxdoppler':           ['attribute[]',             'float,DOPPLER,,{0}',               parse_float],
         'mindoppler':           ['attribute[]',             'float,DOPPLER,{0},',               parse_float],
         'maxfaradayrotation':   ['attribute[]',             'float,FARADAY_ROTATION,,{0}',      parse_float],
@@ -124,14 +124,14 @@ def input_map():
         'lookdirection':        ['attribute[]',             'string,LOOK_DIRECTION,{0}',        parse_string],
         'platform':             ['attribute[]',             'string,ASF_PLATFORM,{0}',          parse_string_list],
         'polarization':         ['attribute[]',             'string,POLARIZATION,{0}',          parse_string_list],
-        'polygon':              ['polygon',                 '{0}',                              parse_coord_string],
-        'line':                 ['line',                    '{0}',                              parse_coord_string],
-        'point':                ['point',                   '{0}',                              parse_coord_string],
+        'polygon':              ['polygon',                 '{0}',                              parse_coord_string], # intersectsWith ends up here
+        'line':                 ['line',                    '{0}',                              parse_coord_string], # or here
+        'point':                ['point',                   '{0}',                              parse_coord_string], # or here
         'processinglevel':      ['attribute[]',             'string,PROCESSING_TYPE,{0}',       parse_string_list],
         'relativeorbit':        ['attribute[]',             'int,PATH_NUMBER,{0}',              parse_int_or_range_list],
         'processingdate':       ['attribute[]',             'date,PROCESSING_DATE,{0},',        parse_date],
-        'start':                [None,                      '{0}',                              parse_date], # Isn't actually used for querying CMR, just checking inputs
-        'end':                  [None,                      '{0}',                              parse_date], # Isn't actually used for querying CMR, just checking inputs
+        'start':                [None,                      '{0}',                              parse_date],
+        'end':                  [None,                      '{0}',                              parse_date],
         'temporal':             ['temporal',                '{0}',                              None] # start/end end up here
     }
     
