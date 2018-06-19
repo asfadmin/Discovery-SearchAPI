@@ -1,18 +1,12 @@
 import defusedxml.ElementTree as ET
-from datetime import datetime
 import dateparser
 import requests
-from jinja2 import Environment, PackageLoader
 import logging
-import json
-import re
 from geomet import wkt
 from asf_env import get_config
-
-templateEnv = Environment(
-    loader=PackageLoader('CMR', 'templates'),
-    autoescape=True
-)
+from CMR.Input import parse_int, parse_float, parse_string, parse_wkt, parse_date
+from CMR.Input import parse_string_list, parse_int_or_range_list, parse_coord_string
+from CMR.Output import output_translators
 
 def fix_polygon(v):
     # Trim whitespace and split it up
@@ -107,6 +101,7 @@ def input_fixer(params):
 # Supported input parameters and their associated CMR parameters
 def input_map():
     return {
+#       API parameter           CMR parameter               CMR format strings                  Parser
         'output':               [None,                      '{0}',                              parse_string], # Special case, does not actually forward to CMR
         'maxresults':           [None,                      '{0}',                              parse_int], # Special case, does not actually forward to CMR
         'absoluteorbit':        ['orbit_number',            '{0}',                              parse_int_or_range_list],
@@ -140,18 +135,6 @@ def input_map():
         'end':                  [None,                      '{0}',                              parse_date], # Isn't actually used for querying CMR, just checking inputs
         'temporal':             ['temporal',                '{0}',                              None] # start/end end up here
     }
-
-# Supported output formats
-def output_translators():
-    return {
-        'metalink':     cmr_to_metalink,
-        'csv':          cmr_to_csv,
-        'kml':          cmr_to_kml,
-        'json':         cmr_to_json,
-        'count':        None, # No translator, just here for input validation
-        'echo10':       finalize_echo10,
-        'download':     cmr_to_download
-    }
     
 # translate supported params into CMR params
 def translate_params(p):
@@ -176,118 +159,9 @@ def translate_params(p):
         del params['maxresults']
     return params, output, max_results
 
-# Parse and validate a string: "abc"
-def parse_string(v):
-    return '{0}'.format(v)
-
-# Parse and validate an int: "10"
-def parse_int(v):
-    try:
-        return int(v)
-    except ValueError:
-        raise ValueError('Invalid int: {0}'.format(v))
-
-# Parse and validate a float: "1.2"
-def parse_float(v):
-    try:
-        return float(v)
-    except ValueError:
-        raise ValueError('Invalid number: {0}'.format(v))
-
-# Parse and validate a date: "1991-10-01T00:00:00Z"
-def parse_date(v):
-    return dateparser.parse(v).strftime('%Y-%m-%dT%H:%M:%SZ')
-
-# Parse and validate a date range: "1991-10-01T00:00:00Z,1991-10-02T00:00:00Z"
-def parse_date_range(v):
-    dates = v.split(',')
-    if len(dates) != 2:
-        raise ValueError('Invalid date range: must be two comma-separated dates')
-    return '{0},{1}'.format(parse_date(dates[0]), parse_date(dates[1]))
-
-# Parse and validate a numeric value range, using h() to validate each value: "3-5", "1.1-12.3"
-def parse_range(v, h):
-    v = v.replace(' ', '')
-    m = re.search(r'^(-?\d+(\.\d*)?)-(-?\d+(\.\d*)?)$', v)
-    try:
-        a = [h(m.group(1)), h(m.group(3))]
-        if a[0] > a[1]:
-            raise ValueError()
-    except ValueError:
-        raise ValueError('Invalid range: {0}'.format(v))
-    return a
-
-# Parse and validate an integer range: "3-5"
-def parse_int_range(v):
-    return parse_range(v, parse_int)
-
-# Parse and validate a float range: "1.1-12.3"
-def parse_float_range(v):
-    return parse_range(v, parse_float)
-
-# Parse and validate a list of values, using h() to validate each value: "a,b,c", "1,2,3", "1.1,2.3"
-def parse_list(v, h):
-    return [h(a) for a in v.split(',')]
-
-# Parse and validate a list of strings: "foo,bar,baz"
-def parse_string_list(v):
-    return parse_list(v, '{0}'.format)
-
-# Parse and validate a list of integers: "1,2,3"
-def parse_int_list(v):
-    return parse_list(v, parse_int)
-
-# Parse and validate a list of floats: "1.1,2.3,4.5"
-def parse_float_list(v):
-    return parse_list(v, parse_float)
-
-# Parse and validate a number or a range, using h() to validate each value: "1", "4.5", "3-5", "10.1-13.4"
-def parse_number_or_range(v, h):
-    m = re.search(r'^(-?\d+(\.\d*)?)$', v)
-    if m is not None:
-        return h(v)
-    return parse_range(v, h)
-    
-# Parse and validate a list of numbers or number ranges, using h() to validate each value: "1,2,3-5", "1.1,1.4,5.1-6.7"
-def parse_number_or_range_list(v, h):
-    v = v.replace(' ', '')
-    return [parse_number_or_range(x, h) for x in v.split(',')]
-
-# Parse and validate a list of integers or integer ranges: "1,2,3-5"
-def parse_int_or_range_list(v):
-    return parse_number_or_range_list(v, parse_int)
-
-# Parse and validate a list of integers or integer ranges: "1,2,3-5"
-def parse_float_or_range_list(v):
-    return parse_number_or_range_list(v, parse_float)
-
-# Parse and validate a coordinate string
-def parse_coord_string(v):
-    v = v.split(',')
-    for c in v:
-        try:
-            float(c)
-        except ValueError:
-            raise ValueError('Invalid polygon: {0}'.format(v))
-    return ','.join(v)
-
-# Parse a WKT and convert it to a coordinate string
-def parse_wkt(v):
-    # take note of the WKT type
-    t = re.match(r'linestring|point|polygon', v.lower())
-    if t is None:
-        raise ValueError('Unsupported WKT: {0}'.format(v))
-    if t.group(0) == 'linestring': # cmr calls a linestring a line
-        t = 'line'
-    else:
-        t = t.group(0)
-    p = wkt.loads(v.upper())['coordinates']
-    if t in ['polygon']:
-        p = p[0] # ignore any subsequent parts like holes, they aren't supported by CMR
-    if t in ['polygon', 'line']: # de-nest the coord list if needed
-        p = [x for x in sum(p, [])]
-    p = [str(x) for x in p]
-    return '{0}:{1}'.format(t, ','.join(p))
+# convenience method for handling echo10 additional attributes
+def attr(name):
+    return "./AdditionalAttributes/AdditionalAttribute/[Name='" + name + "']/Values/Value"
 
 # for kml generation
 def wkt_from_gpolygon(gpoly):
@@ -299,10 +173,6 @@ def wkt_from_gpolygon(gpoly):
     wkt_shape = 'POLYGON(({0}))'.format(','.join(['{0} {1}'.format(x['lon'], x['lat']) for x in shape]))
     #logging.debug('Translated to WKT: {0}'.format(wkt))
     return shape, wkt_shape
-
-# convenience method for handling echo10 additional attributes
-def attr(name):
-    return "./AdditionalAttributes/AdditionalAttribute/[Name='" + name + "']/Values/Value"
 
 # Convert echo10 xml to results list used by output translators
 def parse_cmr_response(r):
@@ -394,112 +264,3 @@ def parse_cmr_response(r):
             if r[k] == 'NULL':
                 r[k] = None
     return results
-
-def cmr_to_metalink(rlist):
-    logging.debug('translating: metalink')
-    products = {'results': rlist}
-    template = templateEnv.get_template('metalink.tmpl')
-    return template.render(products)
-
-def cmr_to_csv(rlist):
-    logging.debug('translating: csv')
-    products = {'results': rlist}
-    template = templateEnv.get_template('csv.tmpl')
-    return template.render(products)
-
-def cmr_to_kml(rlist):
-    logging.debug('translating: kml')
-    products = {'results': rlist}
-    template = templateEnv.get_template('kml.tmpl')
-    return template.render(products, search_time=datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC'))
-
-def cmr_to_json(rlist):
-    logging.debug('translating: json')
-    products = {'results': rlist}
-    legacy_json_keys = [
-        'sceneSize',
-        'absoluteOrbit',
-        'farEndLat',
-        'sensor',
-        'farStartLat',
-        'processingTypeName',
-        'finalFrame',
-        'lookAngle',
-        'processingType',
-        'startTime',
-        'stringFootprint',
-        'doppler',
-        'baselinePerp',
-        'sarSceneId',
-        'insarStackSize',
-        'centerLat',
-        'processingDescription',
-        'product_file_id',
-        'nearEndLon',
-        'farEndLon',
-        'percentTroposphere',
-        'frameNumber',
-        'percentCoherence',
-        'nearStartLon',
-        'sceneDate',
-        'sceneId',
-        'productName',
-        'platform',
-        'masterGranule',
-        'thumbnailUrl',
-        'percentUnwrapped',
-        'beamSwath',
-        'firstFrame',
-        'insarGrouping',
-        'centerLon',
-        'faradayRotation',
-        'fileName',
-        'offNadirAngle',
-        'granuleName',
-        'frequency',
-        'catSceneId',
-        'farStartLon',
-        'processingDate',
-        'missionName',
-        'relativeOrbit',
-        'flightDirection',
-        'granuleType',
-        'configurationName',
-        'polarization',
-        'stopTime',
-        'browse',
-        'nearStartLat',
-        'flightLine',
-        'status',
-        'formatName',
-        'nearEndLat',
-        'downloadUrl',
-        'incidenceAngle',
-        'processingTypeDisplay',
-        'thumbnail',
-        'track',
-        'collectionName',
-        'sceneDateString',
-        'beamMode',
-        'beamModeType',
-        'processingLevel',
-        'lookDirection',
-        'varianceTroposphere',
-        'slaveGranule',
-        'sizeMB'
-    ]
-    json_data = [[]]
-    # just grab the parts of the data we want to match legacy API json output
-    for p in products['results']:
-        json_data[0].append(dict((k, p[k]) for k in legacy_json_keys if k in p))
-    return json.dumps(json_data, sort_keys=True, indent=4, separators=(',', ':'))
-
-def cmr_to_download(rlist):
-    logging.debug('translating: bulk download script')
-    bd_res = requests.post(get_config()['bulk_download_api'], data={'products': ','.join([p['downloadUrl'] for p in rlist])})
-    return (bd_res.text)
-
-def finalize_echo10(response):
-    logging.debug('translating: echo10 passthrough')
-    # eventually this will consolidate multiple echo10 files
-    return response.text
