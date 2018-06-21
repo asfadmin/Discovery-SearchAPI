@@ -1,8 +1,8 @@
 from flask import Response, make_response
 import requests
 import logging
-from CMR.CMRQuery import CMRQuery
-from CMR.CMRTranslate import translate_params
+from CMR.Query import CMRQuery
+from CMR.Translate import translate_params
 from Analytics import post_analytics
 from asf_env import get_config
 
