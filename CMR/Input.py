@@ -103,14 +103,11 @@ def parse_wkt(v):
     t = re.match(r'linestring|point|polygon', v.lower())
     if t is None:
         raise ValueError('Unsupported WKT: {0}'.format(v))
-    if t.group(0) == 'linestring': # cmr calls a linestring a line
-        t = 'line'
-    else:
-        t = t.group(0)
+    t = t.group(0)
     p = wkt.loads(v.upper())['coordinates']
     if t in ['polygon']:
         p = p[0] # ignore any subsequent parts like holes, they aren't supported by CMR
-    if t in ['polygon', 'line']: # de-nest the coord list if needed
+    if t in ['polygon', 'linestring']: # de-nest the coord list if needed
         p = [x for x in sum(p, [])]
     p = [str(x) for x in p]
     return '{0}:{1}'.format(t, ','.join(p))

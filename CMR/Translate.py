@@ -4,7 +4,7 @@ import requests
 import logging
 from asf_env import get_config
 from CMR.Input import parse_int, parse_float, parse_string, parse_wkt, parse_date
-from CMR.Input import parse_string_list, parse_int_or_range_list, parse_coord_string
+from CMR.Input import parse_string_list, parse_int_or_range_list, parse_float_or_range_list, parse_coord_string
 from CMR.Output import output_translators
 
 def fix_polygon(v):
@@ -122,11 +122,13 @@ def input_map():
         'mininsarstacksize':    ['attribute[]',             'int,INSAR_STACK_SIZE,,{0}',        parse_int],
         'intersectswith':       [None,                      '{0}',                              parse_wkt],
         'lookdirection':        ['attribute[]',             'string,LOOK_DIRECTION,{0}',        parse_string],
+        'offnadirangle':        ['attribute[]',             'float,OFF_NADIR_ANGLE,{0}',        parse_float_or_range_list],
         'platform':             ['attribute[]',             'string,ASF_PLATFORM,{0}',          parse_string_list],
         'polarization':         ['attribute[]',             'string,POLARIZATION,{0}',          parse_string_list],
         'polygon':              ['polygon',                 '{0}',                              parse_coord_string], # intersectsWith ends up here
-        'line':                 ['line',                    '{0}',                              parse_coord_string], # or here
+        'linestring':           ['line',                    '{0}',                              parse_coord_string], # or here
         'point':                ['point',                   '{0}',                              parse_coord_string], # or here
+        'bbox':                 ['bounding_box',            '{0}',                              parse_coord_string],
         'processinglevel':      ['attribute[]',             'string,PROCESSING_TYPE,{0}',       parse_string_list],
         'relativeorbit':        ['attribute[]',             'int,PATH_NUMBER,{0}',              parse_int_or_range_list],
         'processingdate':       ['attribute[]',             'date,PROCESSING_DATE,{0},',        parse_date],
