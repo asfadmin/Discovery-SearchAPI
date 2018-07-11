@@ -22,17 +22,17 @@ def fix_polygon(v):
         logging.debug('Winding order looks good')
     else:
         if 'Please check the order of your points.' in r.text:
-            logging.warning('Backwards polygon, attempting to repair')
-            logging.warning(r.text)
+            logging.debug('Backwards polygon, attempting to repair')
+            logging.debug(r.text)
             it = iter(v)
             rev = reversed(zip(it, it))
             rv = [i for sub in rev for i in sub]
             r = requests.post(get_config()['cmr_api'], data={'polygon': ','.join(rv), 'provider': 'ASF', 'page_size': 1, 'attribute[]': 'string,ASF_PLATFORM,FAKEPLATFORM'})
             if r.status_code == 200:
-                logging.warning('Polygon repaired')
+                logging.debug('Polygon repaired')
                 v = rv
             else:
-                logging.warning('Could not repair polygon, using original')
+                logging.warning('Polygon repair needed but reversing the points did not help, query will fail')
     return ','.join(v)
 
 # A few inputs need to be specially handled to make the flexible input the legacy
