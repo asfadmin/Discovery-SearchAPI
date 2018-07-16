@@ -1,18 +1,11 @@
 import defusedxml.ElementTree as ET
-from datetime import datetime
 import dateparser
 import requests
-from jinja2 import Environment, PackageLoader
 import logging
-import json
-import re
-from geomet import wkt
 from asf_env import get_config
-
-templateEnv = Environment(
-    loader=PackageLoader('CMR', 'templates'),
-    autoescape=True
-)
+from CMR.Input import parse_int, parse_float, parse_string, parse_wkt, parse_date
+from CMR.Input import parse_string_list, parse_int_or_range_list, parse_float_or_range_list, parse_coord_string
+from CMR.Output import output_translators
 
 def fix_polygon(v):
     # Trim whitespace and split it up
@@ -29,17 +22,17 @@ def fix_polygon(v):
         logging.debug('Winding order looks good')
     else:
         if 'Please check the order of your points.' in r.text:
-            logging.warning('Backwards polygon, attempting to repair')
-            logging.warning(r.text)
+            logging.debug('Backwards polygon, attempting to repair')
+            logging.debug(r.text)
             it = iter(v)
             rev = reversed(zip(it, it))
             rv = [i for sub in rev for i in sub]
             r = requests.post(get_config()['cmr_api'], data={'polygon': ','.join(rv), 'provider': 'ASF', 'page_size': 1, 'attribute[]': 'string,ASF_PLATFORM,FAKEPLATFORM'})
             if r.status_code == 200:
-                logging.warning('Polygon repaired')
+                logging.debug('Polygon repaired')
                 v = rv
             else:
-                logging.warning('Could not repair polygon, using original')
+                logging.warning('Polygon repair needed but reversing the points did not help, query will fail')
     return ','.join(v)
 
 # A few inputs need to be specially handled to make the flexible input the legacy
@@ -104,91 +97,44 @@ def input_fixer(params):
     
     return fixed_params
 
-# Parsers/validators
-def input_parsers():
-    return {
-        'absoluteorbit': parse_int_or_range_list,
-        'asfframe': parse_int_or_range_list,
-        'maxbaselineperp': parse_float,
-        'minbaselineperp': parse_float,
-        'beammode': parse_string_list,
-        'beamswath': parse_string_list,
-        'collectionname': parse_string,
-        'maxdoppler': parse_float,
-        'mindoppler': parse_float,
-        'maxfaradayrotation': parse_float,
-        'minfaradayrotation': parse_float,
-        'flightdirection': parse_string,
-        'flightline': parse_string,
-        'frame': parse_int_or_range_list,
-        'granule_list': parse_string_list,
-        'maxinsarstacksize': parse_int,
-        'mininsarstacksize': parse_int,
-        'intersectswith': parse_wkt,
-        'lookdirection': parse_string,
-        'offnadirangle': parse_float_or_range_list,
-        'output': parse_string,
-        'platform': parse_string_list,
-        'polarization': parse_string_list,
-        'polygon': parse_coord_string,
-        'line': parse_coord_string,
-        'point': parse_coord_string,
-        'processinglevel': parse_string_list,
-        'relativeorbit': parse_int_or_range_list,
-        'maxresults': parse_int,
-        'processingdate': parse_date,
-        'start': parse_date,
-        'end': parse_date
-        
-    }
-
 # Supported input parameters and their associated CMR parameters
 def input_map():
     return {
-        'output': [None, '{0}'], # Special case, does not actually forward to CMR
-        'maxresults': [None, '{0}'], # Special case, does not actually forward to CMR
-        'absoluteorbit': ['orbit_number', '{0}'],
-        'asfframe': ['attribute[]', 'int,FRAME_NUMBER,{0}'],
-        'maxbaselineperp': ['attribute[]', 'float,INSAR_BASELINE,,{0}'],
-        'minbaselineperp': ['attribute[]', 'float,INSAR_BASELINE,{0},'],
-        'beammode': ['attribute[]', 'string,BEAM_MODE,{0}'],
-        #'beamswath': ['attribute[]', 'string,BEAM_MODE_TYPE,{0}'],
-        'collectionname': ['attribute[]', 'string,MISSION_NAME,{0}'], # double check this source
-        'maxdoppler': ['attribute[]', 'float,DOPPLER,,{0}'],
-        'mindoppler': ['attribute[]', 'float,DOPPLER,{0},'],
-        'maxfaradayrotation': ['attribute[]', 'float,FARADAY_ROTATION,,{0}'],
-        'minfaradayrotation': ['attribute[]', 'float,FARADAY_ROTATION,{0},'],
-        'flightdirection': ['attribute[]', 'string,ASCENDING_DESCENDING,{0}'],
-        'flightline': ['attribute[]', 'string,FLIGHT_LINE,{0}'],
-        'frame': ['attribute[]', 'int,CENTER_ESA_FRAME,{0}'],
-        'granule_list': ['readable_granule_name[]', '{0}'],
-        'maxinsarstacksize': ['attribute[]', 'int,INSAR_STACK_SIZE,{0},'],
-        'mininsarstacksize': ['attribute[]', 'int,INSAR_STACK_SIZE,,{0}'],
-        'intersectswith': ['intersectsWith', '{0}'],
-        'lookdirection': ['attribute[]', 'string,LOOK_DIRECTION,{0}'],
-        'platform': ['attribute[]', 'string,ASF_PLATFORM,{0}'],
-        'polarization': ['attribute[]', 'string,POLARIZATION,{0}'],
-        'polygon': ['polygon', '{0}'],
-        'line': ['line', '{0}'],
-        'point': ['point', '{0}'],
-        'processinglevel': ['attribute[]', 'string,PROCESSING_TYPE,{0}'],
-        'relativeorbit': ['attribute[]', 'int,PATH_NUMBER,{0}'],
-        'processingdate': ['attribute[]', 'date,PROCESSING_DATE,{0},'],
-        'start': [None, '{0}'], # Isn't actually used for querying CMR, just checking inputs
-        'end': [None, '{0}'], # Isn't actually used for querying CMR, just checking inputs
-        'temporal': ['temporal', '{0}'] # start/end end up here
-    }
-
-# Supported output formats
-def output_translators():
-    return {
-        'metalink':     cmr_to_metalink,
-        'csv':          cmr_to_csv,
-        'kml':          cmr_to_kml,
-        'json':         cmr_to_json,
-        'count':        None, # No translator, just here for input validation
-        'echo10':       finalize_echo10,
-        'download':     cmr_to_download
+#       API parameter           CMR parameter               CMR format strings                  Parser
+        'output':               [None,                      '{0}',                              parse_string],
+        'maxresults':           [None,                      '{0}',                              parse_int],
+        'absoluteorbit':        ['orbit_number',            '{0}',                              parse_int_or_range_list],
+        'asfframe':             ['attribute[]',             'int,FRAME_NUMBER,{0}',             parse_int_or_range_list],
+        'maxbaselineperp':      ['attribute[]',             'float,INSAR_BASELINE,,{0}',        parse_float],
+        'minbaselineperp':      ['attribute[]',             'float,INSAR_BASELINE,{0},',        parse_float],
+        'beammode':             ['attribute[]',             'string,BEAM_MODE,{0}',             parse_string_list],
+#        'beamswath':            ['attribute[]',             'string,BEAM_MODE_TYPE,{0}',        parse_string_list],
+        'collectionname':       ['attribute[]',             'string,MISSION_NAME,{0}',          parse_string],
+        'maxdoppler':           ['attribute[]',             'float,DOPPLER,,{0}',               parse_float],
+        'mindoppler':           ['attribute[]',             'float,DOPPLER,{0},',               parse_float],
+        'maxfaradayrotation':   ['attribute[]',             'float,FARADAY_ROTATION,,{0}',      parse_float],
+        'minfaradayrotation':   ['attribute[]',             'float,FARADAY_ROTATION,{0},',      parse_float],
+        'flightdirection':      ['attribute[]',             'string,ASCENDING_DESCENDING,{0}',  parse_string],
+        'flightline':           ['attribute[]',             'string,FLIGHT_LINE,{0}',           parse_string],
+        'frame':                ['attribute[]',             'int,CENTER_ESA_FRAME,{0}',         parse_int_or_range_list],
+        'granule_list':         ['readable_granule_name[]', '{0}',                              parse_string_list],
+        'maxinsarstacksize':    ['attribute[]',             'int,INSAR_STACK_SIZE,{0},',        parse_int],
+        'mininsarstacksize':    ['attribute[]',             'int,INSAR_STACK_SIZE,,{0}',        parse_int],
+        'intersectswith':       [None,                      '{0}',                              parse_wkt],
+        'lookdirection':        ['attribute[]',             'string,LOOK_DIRECTION,{0}',        parse_string],
+        'offnadirangle':        ['attribute[]',             'float,OFF_NADIR_ANGLE,{0}',        parse_float_or_range_list],
+        'platform':             ['attribute[]',             'string,ASF_PLATFORM,{0}',          parse_string_list],
+        'polarization':         ['attribute[]',             'string,POLARIZATION,{0}',          parse_string_list],
+        'polygon':              ['polygon',                 '{0}',                              parse_coord_string], # intersectsWith ends up here
+        'linestring':           ['line',                    '{0}',                              parse_coord_string], # or here
+        'point':                ['point',                   '{0}',                              parse_coord_string], # or here
+        'bbox':                 ['bounding_box',            '{0}',                              parse_coord_string],
+        'processinglevel':      ['attribute[]',             'string,PROCESSING_TYPE,{0}',       parse_string_list],
+        'relativeorbit':        ['attribute[]',             'int,PATH_NUMBER,{0}',              parse_int_or_range_list],
+        'processingdate':       ['attribute[]',             'date,PROCESSING_DATE,{0},',        parse_date],
+        'start':                [None,                      '{0}',                              parse_date],
+        'end':                  [None,                      '{0}',                              parse_date],
+        'temporal':             ['temporal',                '{0}',                              None] # start/end end up here
     }
     
 # translate supported params into CMR params
@@ -199,7 +145,7 @@ def translate_params(p):
         if k.lower() not in input_map():
             raise ValueError('Unsupported CMR parameter', k)
         try:
-            params[k.lower()] = input_parsers()[k.lower()](p[k])
+            params[k.lower()] = input_map()[k.lower()][2](p[k])
         except ValueError as e:
             raise e
     
@@ -214,111 +160,9 @@ def translate_params(p):
         del params['maxresults']
     return params, output, max_results
 
-# Parse and validate a string: "abc"
-def parse_string(v):
-    return '{0}'.format(v)
-
-# Parse and validate an int: "10"
-def parse_int(v):
-    try:
-        return int(v)
-    except ValueError:
-        raise ValueError('Invalid int: {0}'.format(v))
-
-# Parse and validate a float: "1.2"
-def parse_float(v):
-    try:
-        return float(v)
-    except ValueError:
-        raise ValueError('Invalid number: {0}'.format(v))
-
-# Parse and validate a data: "1991-10-01T00:00:00Z"
-def parse_date(v):
-    return dateparser.parse(v).strftime('%Y-%m-%dT%H:%M:%SZ')
-
-# Parse and validate a numeric value range, using h() to validate each value: "3-5", "1.1-12.3"
-def parse_range(v, h):
-    v = v.replace(' ', '')
-    m = re.search(r'^(-?\d+(\.\d*)?)-(-?\d+(\.\d*)?)$', v)
-    try:
-        a = [h(m.group(1)), h(m.group(3))]
-        if a[0] > a[1]:
-            raise ValueError()
-    except ValueError:
-        raise ValueError('Invalid range: {0}'.format(v))
-    return a
-
-# Parse and validate an integer range: "3-5"
-def parse_int_range(v):
-    return parse_range(v, parse_int)
-
-# Parse and validate a float range: "1.1-12.3"
-def parse_float_range(v):
-    return parse_range(v, parse_float)
-
-# Parse and validate a list of values, using h() to validate each value: "a,b,c", "1,2,3", "1.1,2.3"
-def parse_list(v, h):
-    return [h(a) for a in v.split(',')]
-
-# Parse and validate a list of strings: "foo,bar,baz"
-def parse_string_list(v):
-    return parse_list(v, '{0}'.format)
-
-# Parse and validate a list of integers: "1,2,3"
-def parse_int_list(v):
-    return parse_list(v, parse_int)
-
-# Parse and validate a list of floats: "1.1,2.3,4.5"
-def parse_float_list(v):
-    return parse_list(v, parse_float)
-
-# Parse and validate a number or a range, using h() to validate each value: "1", "4.5", "3-5", "10.1-13.4"
-def parse_number_or_range(v, h):
-    m = re.search(r'^(-?\d+(\.\d*)?)$', v)
-    if m is not None:
-        return h(v)
-    return parse_range(v, h)
-    
-# Parse and validate a list of numbers or number ranges, using h() to validate each value: "1,2,3-5", "1.1,1.4,5.1-6.7"
-def parse_number_or_range_list(v, h):
-    v = v.replace(' ', '')
-    return [parse_number_or_range(x, h) for x in v.split(',')]
-
-# Parse and validate a list of integers or integer ranges: "1,2,3-5"
-def parse_int_or_range_list(v):
-    return parse_number_or_range_list(v, parse_int)
-
-# Parse and validate a list of integers or integer ranges: "1,2,3-5"
-def parse_float_or_range_list(v):
-    return parse_number_or_range_list(v, parse_float)
-
-# Parse and validate a coordinate string
-def parse_coord_string(v):
-    v = v.split(',')
-    for c in v:
-        try:
-            float(c)
-        except ValueError:
-            raise ValueError('Invalid polygon: {0}'.format(v))
-    return ','.join(v)
-
-# Parse a WKT and convert it to a coordinate string
-def parse_wkt(v):
-    # take note of the WKT type
-    t = re.match(r'linestring|point|polygon', v.lower())
-    if t is None:
-        raise ValueError('Unsupported WKT: {0}'.format(v))
-    if t.group(0) == 'linestring': # cmr calls a linestring a line
-        t = 'line'
-    else:
-        t = t.group(0)
-    p = wkt.loads(v.upper())['coordinates']
-    if t in ['polygon']:
-        p = p[0] # ignore any subsequent parts like holes, they aren't supported by CMR
-    if t in ['polygon', 'line']: # de-nest the coord list if needed
-        p = [x for x in sum(p, [])]
-    p = [str(x) for x in p]
-    return '{0}:{1}'.format(t, ','.join(p))
+# convenience method for handling echo10 additional attributes
+def attr(name):
+    return "./AdditionalAttributes/AdditionalAttribute/[Name='" + name + "']/Values/Value"
 
 # for kml generation
 def wkt_from_gpolygon(gpoly):
@@ -330,10 +174,6 @@ def wkt_from_gpolygon(gpoly):
     wkt_shape = 'POLYGON(({0}))'.format(','.join(['{0} {1}'.format(x['lon'], x['lat']) for x in shape]))
     #logging.debug('Translated to WKT: {0}'.format(wkt))
     return shape, wkt_shape
-
-# convenience method for handling echo10 additional attributes
-def attr(name):
-    return "./AdditionalAttributes/AdditionalAttribute/[Name='" + name + "']/Values/Value"
 
 # Convert echo10 xml to results list used by output translators
 def parse_cmr_response(r):
@@ -425,112 +265,3 @@ def parse_cmr_response(r):
             if r[k] == 'NULL':
                 r[k] = None
     return results
-
-def cmr_to_metalink(rlist):
-    logging.debug('translating: metalink')
-    products = {'results': rlist}
-    template = templateEnv.get_template('metalink.tmpl')
-    return template.render(products)
-
-def cmr_to_csv(rlist):
-    logging.debug('translating: csv')
-    products = {'results': rlist}
-    template = templateEnv.get_template('csv.tmpl')
-    return template.render(products)
-
-def cmr_to_kml(rlist):
-    logging.debug('translating: kml')
-    products = {'results': rlist}
-    template = templateEnv.get_template('kml.tmpl')
-    return template.render(products, search_time=datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC'))
-
-def cmr_to_json(rlist):
-    logging.debug('translating: json')
-    products = {'results': rlist}
-    legacy_json_keys = [
-        'sceneSize',
-        'absoluteOrbit',
-        'farEndLat',
-        'sensor',
-        'farStartLat',
-        'processingTypeName',
-        'finalFrame',
-        'lookAngle',
-        'processingType',
-        'startTime',
-        'stringFootprint',
-        'doppler',
-        'baselinePerp',
-        'sarSceneId',
-        'insarStackSize',
-        'centerLat',
-        'processingDescription',
-        'product_file_id',
-        'nearEndLon',
-        'farEndLon',
-        'percentTroposphere',
-        'frameNumber',
-        'percentCoherence',
-        'nearStartLon',
-        'sceneDate',
-        'sceneId',
-        'productName',
-        'platform',
-        'masterGranule',
-        'thumbnailUrl',
-        'percentUnwrapped',
-        'beamSwath',
-        'firstFrame',
-        'insarGrouping',
-        'centerLon',
-        'faradayRotation',
-        'fileName',
-        'offNadirAngle',
-        'granuleName',
-        'frequency',
-        'catSceneId',
-        'farStartLon',
-        'processingDate',
-        'missionName',
-        'relativeOrbit',
-        'flightDirection',
-        'granuleType',
-        'configurationName',
-        'polarization',
-        'stopTime',
-        'browse',
-        'nearStartLat',
-        'flightLine',
-        'status',
-        'formatName',
-        'nearEndLat',
-        'downloadUrl',
-        'incidenceAngle',
-        'processingTypeDisplay',
-        'thumbnail',
-        'track',
-        'collectionName',
-        'sceneDateString',
-        'beamMode',
-        'beamModeType',
-        'processingLevel',
-        'lookDirection',
-        'varianceTroposphere',
-        'slaveGranule',
-        'sizeMB'
-    ]
-    json_data = [[]]
-    # just grab the parts of the data we want to match legacy API json output
-    for p in products['results']:
-        json_data[0].append(dict((k, p[k]) for k in legacy_json_keys if k in p))
-    return json.dumps(json_data, sort_keys=True, indent=4, separators=(',', ':'))
-
-def cmr_to_download(rlist):
-    logging.debug('translating: bulk download script')
-    bd_res = requests.post(get_config()['bulk_download_api'], data={'products': ','.join([p['downloadUrl'] for p in rlist])})
-    return (bd_res.text)
-
-def finalize_echo10(response):
-    logging.debug('translating: echo10 passthrough')
-    # eventually this will consolidate multiple echo10 files
-    return response.text
