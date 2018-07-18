@@ -4,7 +4,10 @@ from geomet import wkt
 
 # Parse and validate a string: "abc"
 def parse_string(v):
-    return '{0}'.format(v)
+    try:
+        return '{0}'.format(v)
+    except ValueError: # Can this even happen? And if it does, I'm pretty sure the following line would fail as well...
+        raise ValueError('Invalid string: {0}'.format(v))
 
 # Parse and validate an int: "10"
 def parse_int(v):
@@ -33,9 +36,11 @@ def parse_date_range(v):
 
 # Parse and validate a numeric value range, using h() to validate each value: "3-5", "1.1-12.3"
 def parse_range(v, h):
-    v = v.replace(' ', '')
-    m = re.search(r'^(-?\d+(\.\d*)?)-(-?\d+(\.\d*)?)$', v)
     try:
+        v = v.replace(' ', '')
+        m = re.search(r'^(-?\d+(\.\d*)?)-(-?\d+(\.\d*)?)$', v)
+        if m is None:
+            raise ValueError('Invalid range: {0}'.format(v))
         a = [h(m.group(1)), h(m.group(3))]
         if a[0] > a[1]:
             raise ValueError()
@@ -45,47 +50,77 @@ def parse_range(v, h):
 
 # Parse and validate an integer range: "3-5"
 def parse_int_range(v):
-    return parse_range(v, parse_int)
+    try:
+        return parse_range(v, parse_int)
+    except ValueError:
+        raise ValueError('Invalid int range: {0}'.format(v))
 
 # Parse and validate a float range: "1.1-12.3"
 def parse_float_range(v):
-    return parse_range(v, parse_float)
+    try:
+        return parse_range(v, parse_float)
+    except ValueError:
+        raise ValueError('Invalid float range: {0}'.format(v))
 
 # Parse and validate a list of values, using h() to validate each value: "a,b,c", "1,2,3", "1.1,2.3"
 def parse_list(v, h):
-    return [h(a) for a in v.split(',')]
+    try:
+        return [h(a) for a in v.split(',')]
+    except ValueError:
+        raise ValueError('Invalid list: {0}'.format(v))
 
 # Parse and validate a list of strings: "foo,bar,baz"
 def parse_string_list(v):
-    return parse_list(v, '{0}'.format)
+    try:
+        return parse_list(v, '{0}'.format)
+    except ValueError:
+        raise ValueError('Invalid string list: {0}'.format(v))
 
 # Parse and validate a list of integers: "1,2,3"
 def parse_int_list(v):
-    return parse_list(v, parse_int)
+    try:
+        return parse_list(v, parse_int)
+    except ValueError:
+        raise ValueError('Invalid int list: {0}'.format(v))
 
 # Parse and validate a list of floats: "1.1,2.3,4.5"
 def parse_float_list(v):
-    return parse_list(v, parse_float)
+    try:
+        return parse_list(v, parse_float)
+    except ValueError:
+        raise ValueError('Invalid float list: {0}'.format(v))
 
 # Parse and validate a number or a range, using h() to validate each value: "1", "4.5", "3-5", "10.1-13.4"
 def parse_number_or_range(v, h):
-    m = re.search(r'^(-?\d+(\.\d*)?)$', v)
-    if m is not None:
-        return h(v)
-    return parse_range(v, h)
+    try:
+        m = re.search(r'^(-?\d+(\.\d*)?)$', v)
+        if m is not None:
+            return h(v)
+        return parse_range(v, h)
+    except ValueError:
+        raise ValueError('Invalid number or range: {0}'.format(v))
     
 # Parse and validate a list of numbers or number ranges, using h() to validate each value: "1,2,3-5", "1.1,1.4,5.1-6.7"
 def parse_number_or_range_list(v, h):
-    v = v.replace(' ', '')
-    return [parse_number_or_range(x, h) for x in v.split(',')]
+    try:
+        v = v.replace(' ', '')
+        return [parse_number_or_range(x, h) for x in v.split(',')]
+    except ValueError:
+        raise ValueError('Invalid number or range list: {0}'.format(v))
 
 # Parse and validate a list of integers or integer ranges: "1,2,3-5"
 def parse_int_or_range_list(v):
-    return parse_number_or_range_list(v, parse_int)
+    try:
+        return parse_number_or_range_list(v, parse_int)
+    except ValueError:
+        raise ValueError('Invalid int or range list: {0}'.format(v))
 
 # Parse and validate a list of integers or integer ranges: "1,2,3-5"
 def parse_float_or_range_list(v):
-    return parse_number_or_range_list(v, parse_float)
+    try:
+        return parse_number_or_range_list(v, parse_float)
+    except ValueError:
+        raise ValueError('Invalid float or range list: {0}'.format(v))
 
 # Parse and validate a coordinate string
 def parse_coord_string(v):
