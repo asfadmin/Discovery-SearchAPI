@@ -68,11 +68,9 @@ def input_fixer(params):
             fixed_params[k] = [beammap[a.upper()] if a.upper() in beammap else a for a in v]
         elif k == 'beamswath':
             beammap = {
-                'Standard': 'STD'
+                'STANDARD': 'STD'
             }
-            alos_beam_swath = [a for a in v if a.isdigit()]
-            other_beam_swath = [a for a in v if not a.isdigit()]
-            fixed_params[k] = [beammap[a.upper()] if a.upper() in beammap else a for a in other_beam_swath]
+            fixed_params[k] = [beammap[a.upper()] if a.upper() in beammap else a for a in v]
         elif k == 'polygon': # Do what we can to fix polygons up
             fixed_params[k] = fix_polygon(v)
         elif k == 'intersectswith': # Need to take the parsed value here and send it to one of polygon=, line=, point=
