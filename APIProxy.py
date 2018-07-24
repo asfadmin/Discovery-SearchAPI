@@ -2,7 +2,7 @@ from flask import Response, make_response
 import requests
 import logging
 from CMR.Query import CMRQuery
-from CMR.Translate import translate_params
+from CMR.Translate import translate_params, input_fixer
 from Analytics import post_analytics
 from asf_env import get_config
 
@@ -15,14 +15,14 @@ class APIProxyQuery:
         self.max_results = None
         
     def can_use_cmr(self):
-        # make sure the provided params are a subset of the CMR-supported params
-        supported = False
+        # make sure the provided params are a subset of the CMR-supported params and have compatible values
         try:
             self.cmr_params, self.output, self.max_results = translate_params(self.request.values)
-            supported = True
+            self.cmr_params = input_fixer(self.cmr_params)
         except ValueError as e: # didn't parse, pass it to the legacy API for now
             logging.debug('ValueError: {0}'.format(e))
-        return supported
+            return False
+        return True
     
     def get_response(self):
         # pick a backend and go!
