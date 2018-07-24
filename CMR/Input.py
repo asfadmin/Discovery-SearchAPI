@@ -133,6 +133,8 @@ def parse_coord_string(v):
             float(c)
         except ValueError:
             raise ValueError('Invalid polygon: {0}'.format(v))
+    if len(v) % 2 != 0:
+        raise ValueError('Invalid polygon, odd number of values provided: {0}'.format(v))
     return ','.join(v)
 
 # Parse and validate a bbox coordinate string
