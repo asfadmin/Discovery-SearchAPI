@@ -46,6 +46,8 @@ def input_fixer(params):
         if k == 'lookdirection': # Vaguely wildcard-like behavior
             fixed_params[k] = v[0].upper()
         elif k == 'flightdirection': # Vaguely wildcard-like behavior
+            if v[0].upper() not in ['A', 'D']:
+                raise ValueError('Invalid flight direction: {0}'.format(v))
             fixed_params[k] = {'A': 'ASCENDING', 'D': 'DESCENDING'}[v[0].upper()]
         elif k == 'platform': # Legacy API allowed a few synonyms. If they're using one, translate it
             platmap = {
