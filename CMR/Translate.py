@@ -158,6 +158,7 @@ def translate_params(p):
     output = 'metalink'
     if 'output' in params and params['output'].lower() in output_translators():
         output = params['output'].lower()
+    if 'output' in params:
         del params['output']
     max_results = None
     if 'maxresults' in params:
