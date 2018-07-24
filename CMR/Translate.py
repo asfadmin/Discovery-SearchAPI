@@ -44,6 +44,8 @@ def input_fixer(params):
         v = params[k]
         k = k.lower()
         if k == 'lookdirection': # Vaguely wildcard-like behavior
+            if v[0].upper() not in ['L', 'R']:
+                raise ValueError('Invalid look direction: {0}'.format(v))
             fixed_params[k] = v[0].upper()
         elif k == 'flightdirection': # Vaguely wildcard-like behavior
             if v[0].upper() not in ['A', 'D']:
