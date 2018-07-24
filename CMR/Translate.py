@@ -163,6 +163,8 @@ def translate_params(p):
     max_results = None
     if 'maxresults' in params:
         max_results = params['maxresults']
+        if max_results < 1:
+            raise ValueError('Invalid maxResults, must be > 0: {0}'.format(max_results))
         del params['maxresults']
     return params, output, max_results
 
