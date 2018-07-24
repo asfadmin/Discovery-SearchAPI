@@ -132,6 +132,25 @@ def parse_coord_string(v):
             raise ValueError('Invalid polygon: {0}'.format(v))
     return ','.join(v)
 
+# Parse and validate a bbox coordinate string
+def parse_bbox_string(v):
+    try:
+        v = parse_coord_string(v)
+    except ValueError:
+        raise ValueError('Invalid bbox: {0}'.format(v))
+    if len(v.split(',')) != 4:
+        raise ValueError('Invalid bbox, must be 4 values: {0}'.format(v))
+    return v
+
+# Parse and validate a point coordinate string
+def parse_point_string(v):
+    try:
+        v = parse_coord_string(v)
+    except ValueError:
+        raise ValueError('Invalid point: {0}'.format(v))
+    if len(v.split(',')) != 2:
+        raise ValueError('Invalid point, must be 2 values: {0}'.format(v))
+
 # Parse a WKT and convert it to a coordinate string
 def parse_wkt(v):
     # take note of the WKT type
