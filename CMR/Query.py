@@ -1,8 +1,8 @@
-from flask import make_response
 from itertools import product
 import logging
-from CMR.Translate import output_translators, input_map
+from CMR.Translate import input_map
 from CMR.SubQuery import CMRSubQuery
+from CMR.Exceptions import CMRError
 
 class CMRQuery:
     
@@ -62,19 +62,13 @@ class CMRQuery:
             logging.debug('Count query, doing this the quick way')
             total_hits = 0
             for sq in self.sub_queries:
-                res = sq.get_results()
-                if isinstance(res, int):
-                    total_hits += res
+                r = sq.get_results()
+                if isinstance(r, int):
+                    total_hits += r
                 else:
-                    logging.warning('Unexpected response from CMR, forwarding to client')
-                    return make_response(res)
-            return make_response('{0}'.format(total_hits))
+                    raise CMRError(r.text)
+            return total_hits
             
-        if self.output == 'echo10': #truncate echo10 output to 1st page of 1st subquery
-            logging.debug('echo10 output, truncating to page 1 of query 1')
-            self.max_results = min(self.max_results, self.extra_params['page_size'])
-            self.query_list = [self.query_list[0]]
-        
         results = []
         for n, subq in enumerate(self.sub_queries):
             logging.debug('Running subquery {0}'.format(n+1))
@@ -88,7 +82,8 @@ class CMRQuery:
         if self.max_results is not None and len(results) > self.max_results:
             logging.debug('Trimming total results from {0} to {1}'.format(len(results), self.max_results))
             results = results[0:self.max_results]
-        response = make_response(output_translators().get(self.output, output_translators()['metalink'])(results))
-        return response
+        return results
+        #response = make_response(output_translators().get(self.output, output_translators()['metalink'])(results))
+        #return response
 
         

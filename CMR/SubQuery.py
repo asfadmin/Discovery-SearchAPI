@@ -3,6 +3,7 @@ from math import ceil
 import logging
 import re
 from CMR.Translate import parse_cmr_response
+from CMR.Exceptions import CMRError
 from Analytics import post_analytics
 from asf_env import get_config
 
@@ -66,9 +67,7 @@ class CMRSubQuery:
         #post_analytics(pageview=False, events=[{'ec': 'CMR API Status', 'ea': r.status_code}])
         # forward anything other than a 200
         if r.status_code != 200:
-            logging.debug('Non-200 response from CMR, forwarding to client')
-            logging.debug(r.text)
-            return r
+            raise CMRError(r.text)
         
         if self.count:
             return int(r.headers['CMR-hits'])
@@ -99,12 +98,7 @@ class CMRSubQuery:
         if self.sid is None:
             r = s.post(get_config()['cmr_api'], data=self.params)
             if 'CMR-hits' not in r.headers:
-                if 'Please check the order of your points.' in r.text:
-                    logging.error('Probable backwards winding order on polygon')
-                    return r
-                else:
-                    logging.error('No CMR-hits in header: {0}'.format(r.text))
-                    return r
+                raise CMRError(r.text)
             self.hits = int(r.headers['CMR-hits'])
             self.sid = r.headers['CMR-Scroll-Id']
             s.headers.update({'CMR-Scroll-Id': self.sid})

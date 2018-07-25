@@ -13,14 +13,17 @@ templateEnv = Environment(
 # Supported output formats
 def output_translators():
     return {
-        'metalink':     cmr_to_metalink,
-        'csv':          cmr_to_csv,
-        'kml':          cmr_to_kml,
-        'json':         cmr_to_json,
-        'count':        None, # No translator, just here for input validation
-        'echo10':       finalize_echo10,
-        'download':     cmr_to_download
+        'metalink':     [cmr_to_metalink, 'application/metalink+xml; charset=utf-8', 'metalink'],
+        'csv':          [cmr_to_csv, 'text/csv; charset=utf-8', 'csv'],
+        'kml':          [cmr_to_kml, 'application/vnd.google-earth.kml+xml; charset=utf-8', 'kmz'],
+        'json':         [cmr_to_json, 'application/json; charset=utf-8', 'json'],
+        'count':        [count, 'text/plain; charset=utf-8', 'txt'],
+        'download':     [cmr_to_download, 'text/plain; charset=utf-8', 'py']
     }
+
+def count(r):
+    logging.debug('translating: count')
+    return str(r)
 
 def cmr_to_metalink(rlist):
     logging.debug('translating: metalink')
@@ -125,8 +128,3 @@ def cmr_to_download(rlist):
     logging.debug('translating: bulk download script')
     bd_res = requests.post(get_config()['bulk_download_api'], data={'products': ','.join([p['downloadUrl'] for p in rlist])})
     return (bd_res.text)
-
-def finalize_echo10(response):
-    logging.debug('translating: echo10 passthrough')
-    # eventually this will consolidate multiple echo10 files
-    return response.text
