@@ -4,7 +4,8 @@ import requests
 import logging
 from asf_env import get_config
 from CMR.Input import parse_int, parse_float, parse_string, parse_wkt, parse_date
-from CMR.Input import parse_string_list, parse_int_or_range_list, parse_float_or_range_list, parse_coord_string
+from CMR.Input import parse_string_list, parse_int_or_range_list, parse_float_or_range_list
+from CMR.Input import parse_coord_string, parse_bbox_string, parse_point_string
 from CMR.Output import output_translators
 
 def fix_polygon(v):
@@ -43,8 +44,12 @@ def input_fixer(params):
         v = params[k]
         k = k.lower()
         if k == 'lookdirection': # Vaguely wildcard-like behavior
+            if v[0].upper() not in ['L', 'R']:
+                raise ValueError('Invalid look direction: {0}'.format(v))
             fixed_params[k] = v[0].upper()
         elif k == 'flightdirection': # Vaguely wildcard-like behavior
+            if v[0].upper() not in ['A', 'D']:
+                raise ValueError('Invalid flight direction: {0}'.format(v))
             fixed_params[k] = {'A': 'ASCENDING', 'D': 'DESCENDING'}[v[0].upper()]
         elif k == 'platform': # Legacy API allowed a few synonyms. If they're using one, translate it
             platmap = {
@@ -68,7 +73,7 @@ def input_fixer(params):
             fixed_params[k] = [beammap[a.upper()] if a.upper() in beammap else a for a in v]
         elif k == 'beamswath':
             beammap = {
-                'Standard': 'STD'
+                'STANDARD': 'STD'
             }
             fixed_params[k] = [beammap[a.upper()] if a.upper() in beammap else a for a in v]
         elif k == 'polygon': # Do what we can to fix polygons up
@@ -127,8 +132,8 @@ def input_map():
         'polarization':         ['attribute[]',             'string,POLARIZATION,{0}',          parse_string_list],
         'polygon':              ['polygon',                 '{0}',                              parse_coord_string], # intersectsWith ends up here
         'linestring':           ['line',                    '{0}',                              parse_coord_string], # or here
-        'point':                ['point',                   '{0}',                              parse_coord_string], # or here
-        'bbox':                 ['bounding_box',            '{0}',                              parse_coord_string],
+        'point':                ['point',                   '{0}',                              parse_point_string], # or here
+        'bbox':                 ['bounding_box',            '{0}',                              parse_bbox_string],
         'processinglevel':      ['attribute[]',             'string,PROCESSING_TYPE,{0}',       parse_string_list],
         'relativeorbit':        ['attribute[]',             'int,PATH_NUMBER,{0}',              parse_int_or_range_list],
         'processingdate':       ['attribute[]',             'date,PROCESSING_DATE,{0},',        parse_date],
@@ -153,10 +158,13 @@ def translate_params(p):
     output = 'metalink'
     if 'output' in params and params['output'].lower() in output_translators():
         output = params['output'].lower()
+    if 'output' in params:
         del params['output']
     max_results = None
     if 'maxresults' in params:
         max_results = params['maxresults']
+        if max_results < 1:
+            raise ValueError('Invalid maxResults, must be > 0: {0}'.format(max_results))
         del params['maxresults']
     return params, output, max_results
 

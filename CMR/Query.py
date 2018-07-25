@@ -1,7 +1,7 @@
 from flask import make_response
 from itertools import product
 import logging
-from CMR.Translate import output_translators, input_map, input_fixer
+from CMR.Translate import output_translators, input_map
 from CMR.SubQuery import CMRSubQuery
 
 class CMRQuery:
@@ -15,7 +15,7 @@ class CMRQuery:
                              #'options[attribute][pattern]': 'true' # Handy for flight direction & look direction
                              }
         
-        self.params = input_fixer(params)
+        self.params = params
         self.max_results = max_results
         self.output = output
 
