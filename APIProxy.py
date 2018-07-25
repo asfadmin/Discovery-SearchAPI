@@ -1,8 +1,10 @@
 from flask import Response, make_response
 import requests
 import logging
+from datetime import datetime
 from CMR.Query import CMRQuery
-from CMR.Translate import translate_params, input_fixer
+from CMR.Translate import translate_params, input_fixer, output_translators
+from CMR.Exceptions import CMRError
 from Analytics import post_analytics
 from asf_env import get_config
 
@@ -32,11 +34,21 @@ class APIProxyQuery:
             logging.debug('get_response(): using CMR backend')
             events.append({'ec': 'Proxy Search', 'ea': 'CMR'})
             post_analytics(pageview=True, events=events)
-            return self.query_cmr()
-        logging.debug('get_response(): using ASF backend')
-        events.append({'ec': 'Proxy Search', 'ea': 'Legacy'})
-        post_analytics(pageview=True, events=events)
-        return self.query_asf()
+            try:
+                results = self.query_cmr()
+                (translator, mimetype, suffix) = output_translators().get(self.output, output_translators()['metalink'])
+                filename = 'asf-datapool-results-{0}.{1}'.format(datetime.now().strftime('%Y-%m-%d_%H-%M-%S'), suffix)
+                response = make_response(translator(results))
+                response.headers.set('Content-Type', mimetype)
+                response.headers.set('Content-Disposition', 'attachment', filename=filename)
+                return response
+            except CMRError as e:
+                return make_response('A CMR error has occured: {0}'.format(e))
+        else:
+            logging.debug('get_response(): using ASF backend')
+            events.append({'ec': 'Proxy Search', 'ea': 'Legacy'})
+            post_analytics(pageview=True, events=events)
+            return self.query_asf()
         
     # ASF API backend query
     def query_asf(self):
@@ -59,7 +71,6 @@ class APIProxyQuery:
     # CMR backend query
     def query_cmr(self):
         logging.debug('Using CMR as backend, from {0}'.format(self.request.access_route[-1]))
-        
         q = CMRQuery(params=self.cmr_params, output=self.output, max_results=self.max_results)
         r = q.get_results()
         
