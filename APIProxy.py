@@ -1,12 +1,10 @@
 from flask import Response, make_response
-import requests
 import logging
 from datetime import datetime
 from CMR.Query import CMRQuery
 from CMR.Translate import translate_params, input_fixer, output_translators
 from CMR.Exceptions import CMRError
 from Analytics import post_analytics
-from asf_env import get_config
 
 class APIProxyQuery:
     
