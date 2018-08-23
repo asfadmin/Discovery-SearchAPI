@@ -236,7 +236,7 @@ def parse_cmr_response(r):
                 'insarStackSize': granule.findtext(attr('INSAR_STACK_SIZE'), default='NA'),
                 'processingDescription': granule.findtext(attr('PROCESSING_DESCRIPTION'), default='NA'),
                 'percentTroposphere': 'NA', # not in CMR
-                'frameNumber': granule.findtext(attr('FRAME_NUMBER'), default='NA'),
+                'frameNumber': (granule.findtext(attr('FRAME_NUMBER'), default='NA') if granule.findtext(attr('ASF_PLATFORM'), default='NA') in ['Sentinel-1A', 'Sentinel-1B', 'ALOS'] else granule.findtext(attr('CENTER_ESA_FRAME'), default='NA')),
                 'percentCoherence': 'NA', # not in CMR
                 'productName': granule.findtext("./DataGranule/ProducerGranuleId"),
                 'masterGranule': 'NA', # almost always None in API
