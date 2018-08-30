@@ -2,7 +2,6 @@ from itertools import product
 import logging
 from CMR.Translate import input_map
 from CMR.SubQuery import CMRSubQuery
-from CMR.Exceptions import CMRError
 
 class CMRQuery:
     
@@ -34,6 +33,7 @@ class CMRQuery:
         
         logging.debug('new CMRQuery object ready to go')
     
+    # Not currently used, intended to act as a dispatcher for threading
     def run_sub_query(self, n):
         logging.debug('Dispatching subquery {0}'.format(n))
         return self.sub_queries[n].get_results()
