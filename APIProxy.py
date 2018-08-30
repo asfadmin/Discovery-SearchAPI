@@ -35,7 +35,11 @@ class APIProxyQuery:
             try:
                 logging.debug('Using CMR as backend, from {0}'.format(self.request.access_route[-1]))
                 q = CMRQuery(params=self.cmr_params, output=self.output, max_results=self.max_results)
-                results = q.get_results()
+                if(self.output == 'count'):
+                    return(make_response(str(q.get_count())))
+                results = []
+                for r in q.get_results():
+                    results.extend(r)
                 (translator, mimetype, suffix) = output_translators().get(self.output, output_translators()['metalink'])
                 filename = 'asf-datapool-results-{0}.{1}'.format(datetime.now().strftime('%Y-%m-%d_%H-%M-%S'), suffix)
                 response = make_response(translator(results))

@@ -9,14 +9,12 @@ from asf_env import get_config
 
 class CMRSubQuery:
     
-    def __init__(self, params, extra_params, max_results=1000000, count=False):
+    def __init__(self, params, extra_params):
         self.params = params
         self.extra_params = extra_params
-        self.max_results = max_results if max_results is not None else 1000000
         self.sid = None
         self.hits = 0
         self.results = []
-        self.count = count
         
         fixed = []
         for p in self.params:
@@ -56,7 +54,15 @@ class CMRSubQuery:
                             logging.debug('n: {0}, p: {1}'.format(n, p))
         
         logging.debug('new CMRSubQuery object ready to go')
-    
+        
+    def get_count(self):
+        s = requests.Session()
+        s.headers.update({'Client-Id': 'vertex_asf'})
+        r = s.head(get_config()['cmr_api'], data=self.params)
+        if 'CMR-hits' not in r.headers:
+            raise CMRError(r.text)
+        return int(r.headers['CMR-hits'])
+        
     def get_results(self):
         s = requests.Session()
         s.headers.update({'Client-Id': 'vertex_asf'})
@@ -69,29 +75,20 @@ class CMRSubQuery:
         if r.status_code != 200:
             raise CMRError(r.text)
         
-        if self.count:
-            return int(r.headers['CMR-hits'])
-            
-        if self.max_results > self.hits:
-            self.max_results = self.hits
+        r = parse_cmr_response(r)
+        yield r
         
-        self.results = parse_cmr_response(r)
-        
-        # enumerate additional pages out to hit count or max_results, whichever is fewer (excluding first page)
-        pages = list(range(1, int(min(ceil(float(self.hits) / float(self.extra_params['page_size'])), ceil(float(self.max_results) / float(self.extra_params['page_size']))))))
+        # enumerate additional pages out to hit count
+        pages = list(range(1, int(ceil(float(self.hits) / float(self.extra_params['page_size'])))))
         logging.debug('Preparing to fetch {0} additional pages'.format(len(pages)))
         
         # fetch multiple pages of results if needed
         for p in pages:
-            self.results.extend(parse_cmr_response(self.get_page(p, s)))
+            r = parse_cmr_response(self.get_page(p, s))
+            yield r
+            #self.results.extend(parse_cmr_response(self.get_page(p, s)))
         logging.debug('Done fetching results: got {0}/{1}'.format(len(self.results), self.hits))
-        
-        # trim the results if needed
-        if self.max_results is not None and len(self.results) > self.max_results:
-            logging.debug('Trimming subquery results from {0} to {1}'.format(len(self.results), self.max_results))
-            self.results = self.results[0:self.max_results]
-        
-        return self.results
+        return
     
     def get_page(self, p, s):
         logging.debug('Fetching page {0}'.format(p+1))
