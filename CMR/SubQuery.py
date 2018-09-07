@@ -82,7 +82,7 @@ class CMRSubQuery:
         pages = list(range(1, int(ceil(float(self.hits) / float(self.extra_params['page_size'])))))
         logging.debug('Preparing to fetch {0} additional pages'.format(len(pages)))
         
-        # fetch multiple pages of results if needed
+        # fetch multiple pages of results if needed, yield a page at a time
         for p in pages:
             r = parse_cmr_response(self.get_page(p, s))
             yield r

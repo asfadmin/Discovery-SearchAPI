@@ -25,23 +25,23 @@ def count(r):
     logging.debug('translating: count')
     return str(r)
 
-def cmr_to_metalink(rlist):
+def cmr_to_metalink(rgen):
     logging.debug('translating: metalink')
-    products = {'results': rlist}
     template = templateEnv.get_template('metalink.tmpl')
-    return template.render(products)
+    for l in template.stream(results=rgen()):
+        yield l
 
-def cmr_to_csv(rlist):
+def cmr_to_csv(rgen):
     logging.debug('translating: csv')
-    products = {'results': rlist}
     template = templateEnv.get_template('csv.tmpl')
-    return template.render(products)
+    for l in template.stream(results=rgen()):
+        yield l
 
-def cmr_to_kml(rlist):
+def cmr_to_kml(rgen):
     logging.debug('translating: kml')
-    products = {'results': rlist}
     template = templateEnv.get_template('kml.tmpl')
-    return template.render(products, search_time=datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC'))
+    for l in template.stream(results=rgen()):
+        yield l
 
 def cmr_to_json(rlist):
     logging.debug('translating: json')
