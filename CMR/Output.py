@@ -36,94 +36,111 @@ def cmr_to_csv(rgen):
     for l in template.stream(results=rgen()):
         yield l
 
+def cmr_to_download(rlist):
+    logging.debug('translating: bulk download script')
+    bd_res = requests.post(get_config()['bulk_download_api'], data={'products': ','.join([p['downloadUrl'] for p in rlist])})
+    return (bd_res.text)
+
 def cmr_to_kml(rgen):
     logging.debug('translating: kml')
     template = templateEnv.get_template('kml.tmpl')
     for l in template.stream(results=rgen()):
         yield l
 
-def cmr_to_json(rlist):
+def cmr_to_json(rgen):
     logging.debug('translating: json')
-    products = {'results': rlist}
-    legacy_json_keys = [
-        'sceneSize',
-        'absoluteOrbit',
-        'farEndLat',
-        'sensor',
-        'farStartLat',
-        'processingTypeName',
-        'finalFrame',
-        'lookAngle',
-        'processingType',
-        'startTime',
-        'stringFootprint',
-        'doppler',
-        'baselinePerp',
-        'sarSceneId',
-        'insarStackSize',
-        'centerLat',
-        'processingDescription',
-        'product_file_id',
-        'nearEndLon',
-        'farEndLon',
-        'percentTroposphere',
-        'frameNumber',
-        'percentCoherence',
-        'nearStartLon',
-        'sceneDate',
-        'sceneId',
-        'productName',
-        'platform',
-        'masterGranule',
-        'thumbnailUrl',
-        'percentUnwrapped',
-        'beamSwath',
-        'firstFrame',
-        'insarGrouping',
-        'centerLon',
-        'faradayRotation',
-        'fileName',
-        'offNadirAngle',
-        'granuleName',
-        'frequency',
-        'catSceneId',
-        'farStartLon',
-        'processingDate',
-        'missionName',
-        'relativeOrbit',
-        'flightDirection',
-        'granuleType',
-        'configurationName',
-        'polarization',
-        'stopTime',
-        'browse',
-        'nearStartLat',
-        'flightLine',
-        'status',
-        'formatName',
-        'nearEndLat',
-        'downloadUrl',
-        'incidenceAngle',
-        'processingTypeDisplay',
-        'thumbnail',
-        'track',
-        'collectionName',
-        'sceneDateString',
-        'beamMode',
-        'beamModeType',
-        'processingLevel',
-        'lookDirection',
-        'varianceTroposphere',
-        'slaveGranule',
-        'sizeMB'
-    ]
-    json_data = [[]]
-    # just grab the parts of the data we want to match legacy API json output
-    for p in products['results']:
-        json_data[0].append(dict((k, p[k]) for k in legacy_json_keys if k in p))
-    return json.dumps(json_data, sort_keys=True, indent=4, separators=(',', ':'))
 
-def cmr_to_download(rlist):
-    logging.debug('translating: bulk download script')
-    bd_res = requests.post(get_config()['bulk_download_api'], data={'products': ','.join([p['downloadUrl'] for p in rlist])})
-    return (bd_res.text)
+    streamer = JSONStreamArray(rgen)
+    
+    for p in json.JSONEncoder().iterencode([streamer]):
+        yield p
+    # just grab the parts of the data we want to match legacy API json output
+#    for p in products['results']:
+#        json_data[0].append(dict((k, p[k]) for k in legacy_json_keys if k in p))
+#    return json.dumps(json_data, sort_keys=True, indent=4, separators=(',', ':'))
+
+class JSONStreamArray(list):
+    def __init__(self, gen):
+        self.gen = gen
+        
+    def __iter__(self):
+        return self.gen()
+
+    def __len__(self):
+        return 1
+    
+    def streamDicts(self):
+        legacy_json_keys = [
+            'sceneSize',
+            'absoluteOrbit',
+            'farEndLat',
+            'sensor',
+            'farStartLat',
+            'processingTypeName',
+            'finalFrame',
+            'lookAngle',
+            'processingType',
+            'startTime',
+            'stringFootprint',
+            'doppler',
+            'baselinePerp',
+            'sarSceneId',
+            'insarStackSize',
+            'centerLat',
+            'processingDescription',
+            'product_file_id',
+            'nearEndLon',
+            'farEndLon',
+            'percentTroposphere',
+            'frameNumber',
+            'percentCoherence',
+            'nearStartLon',
+            'sceneDate',
+            'sceneId',
+            'productName',
+            'platform',
+            'masterGranule',
+            'thumbnailUrl',
+            'percentUnwrapped',
+            'beamSwath',
+            'firstFrame',
+            'insarGrouping',
+            'centerLon',
+            'faradayRotation',
+            'fileName',
+            'offNadirAngle',
+            'granuleName',
+            'frequency',
+            'catSceneId',
+            'farStartLon',
+            'processingDate',
+            'missionName',
+            'relativeOrbit',
+            'flightDirection',
+            'granuleType',
+            'configurationName',
+            'polarization',
+            'stopTime',
+            'browse',
+            'nearStartLat',
+            'flightLine',
+            'status',
+            'formatName',
+            'nearEndLat',
+            'downloadUrl',
+            'incidenceAngle',
+            'processingTypeDisplay',
+            'thumbnail',
+            'track',
+            'collectionName',
+            'sceneDateString',
+            'beamMode',
+            'beamModeType',
+            'processingLevel',
+            'lookDirection',
+            'varianceTroposphere',
+            'slaveGranule',
+            'sizeMB'
+        ]
+        for p in self.gen():
+            yield dict((k, p[k]) for k in legacy_json_keys if k in p)
