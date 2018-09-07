@@ -16,6 +16,7 @@ def output_translators():
         'csv':          [cmr_to_csv, 'text/csv; charset=utf-8', 'csv'],
         'kml':          [cmr_to_kml, 'application/vnd.google-earth.kml+xml; charset=utf-8', 'kmz'],
         'json':         [cmr_to_json, 'application/json; charset=utf-8', 'json'],
+        'geojson':      [cmr_to_geojson, 'application/json; charset=utf-8', 'geojson'],
         'count':        [count, 'text/plain; charset=utf-8', 'txt'],
         'download':     [cmr_to_download, 'text/plain; charset=utf-8', 'py']
     }
@@ -56,12 +57,22 @@ def cmr_to_json(rgen):
     for p in json.JSONEncoder().iterencode([streamer]):
         yield p
 
+def cmr_to_geojson(rgen):
+    logging.debug('translating: geojson')
+
+    streamer = GeoJSONStreamArray(rgen)
+    
+    for p in json.JSONEncoder().iterencode([streamer]):
+        yield p
+
+# Some trickery is required to make JSONEncoder().iterencode take any ol' generator,
+# this approach works without slurping the list into memory
 class JSONStreamArray(list):
     def __init__(self, gen):
         self.gen = gen
         
     def __iter__(self):
-        return self.gen()
+        return self.streamDicts()
 
     def __len__(self):
         return 1
@@ -136,8 +147,50 @@ class JSONStreamArray(list):
             'processingLevel',
             'lookDirection',
             'varianceTroposphere',
-            'slaveGranule',
-            'sizeMB'
+            'slaveGranule'
         ]
         for p in self.gen():
             yield dict((k, p[k]) for k in legacy_json_keys if k in p)
+
+class GeoJSONStreamArray(JSONStreamArray):
+    def streamDicts(self):
+        for p in self.gen():
+            logging.debug(p)
+            yield {
+                'type': 'Feature',
+                'geometry': {
+                    'type': 'Polygon',
+                    'coordinates': [
+                        [[c['lon'], c['lat']] for c in p['shape']]
+                    ]
+                },
+                'properties': {
+                    'granuleName': p['granuleName'],
+                    'platform': p['platform'],
+                    'sensor': p['sensor'],
+                    'absoluteOrbit': p['absoluteOrbit'], # or just "orbit"?
+                    'offNadirAngle': p['offNadirAngle'],
+                    'startTime': p['startTime'],
+                    'stopTime': p['stopTime'], # or endtime?
+                    'flightDirection': p['flightDirection'],
+                    'missionName': p['missionName'],
+                    'granuleType': p['granuleType'],
+                    'polarization': p['polarization'],
+                    'browse': p['browse'],
+                    'frameNumber': p['frameNumber'],
+                    'pathNumber': p['relativeOrbit'],
+                    'flightLine': p['flightLine'],
+                    'thumbnail': p['thumbnailUrl'],
+                    'beamModeType': p['beamModeType'],
+                    'faradayRotation': p['faradayRotation'],
+                    'bytes': p['bytes'],
+                    'fileName': p['fileName'],
+                    'md5sum': p['md5'],
+                    'processingDate': p['processingDate'],
+                    'processingDescription': p['processingDescription'],
+                    'processingLevel': p['processingType'], # these two here may need
+                    'processingType': p['processingLevel'], # swapping
+                    'processingTypeDisplay': '',
+                    'url': p['downloadUrl']
+                }
+            }
