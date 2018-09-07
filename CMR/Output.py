@@ -54,10 +54,6 @@ def cmr_to_json(rgen):
     
     for p in json.JSONEncoder().iterencode([streamer]):
         yield p
-    # just grab the parts of the data we want to match legacy API json output
-#    for p in products['results']:
-#        json_data[0].append(dict((k, p[k]) for k in legacy_json_keys if k in p))
-#    return json.dumps(json_data, sort_keys=True, indent=4, separators=(',', ':'))
 
 class JSONStreamArray(list):
     def __init__(self, gen):
