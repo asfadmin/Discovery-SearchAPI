@@ -128,6 +128,7 @@ def input_map():
         'flightline':           ['attribute[]',             'string,FLIGHT_LINE,{0}',           parse_string],
         'frame':                ['attribute[]',             'int,CENTER_ESA_FRAME,{0}',         parse_int_or_range_list],
         'granule_list':         ['readable_granule_name[]', '{0}',                              parse_string_list],
+        'product_list':         ['granule_ur[]',            '{0}',                              parse_string_list],
         'maxinsarstacksize':    ['attribute[]',             'int,INSAR_STACK_SIZE,{0},',        parse_int],
         'mininsarstacksize':    ['attribute[]',             'int,INSAR_STACK_SIZE,,{0}',        parse_int],
         'intersectswith':       [None,                      '{0}',                              parse_wkt],
