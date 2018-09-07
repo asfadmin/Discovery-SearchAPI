@@ -7,7 +7,7 @@ class CMRQuery:
     
     def __init__(self, params=None, max_results=None, output='metalink'):
         self.extra_params = {'provider': 'ASF', # always limit the results to ASF as the provider
-                             'page_size': 2000, # max page size by default
+                             'page_size': 100, # max page size by default
                              'scroll': 'true',  # used for fetching multiple page_size
                              'options[temporal][and]': 'true', # Makes handling date ranges easier
                              'sort_key[]': '-end_date', # Sort CMR results, but we also need to post-sort
@@ -66,15 +66,18 @@ class CMRQuery:
     def get_results(self):
         for n, subq in enumerate(self.sub_queries):
             logging.debug('Running subquery {0}'.format(n+1))
+            # taking a page at a time from each subquery, yield one result at a time until we max out
             for r in subq.get_results():
                 self.result_counter += len(r)
                 if self.max_results is not None and self.result_counter > self.max_results:
                     logging.debug('Trimming total results from {0} to {1}'.format(self.result_counter, self.max_results))
                     r = r[0:-(self.result_counter - self.max_results)]
-                    yield r
+                    for i in r:
+                        yield i
                     return
                 else:
-                    yield r
+                    for i in r:
+                        yield i
 
         logging.debug('Result length: {0}'.format(self.result_counter))
         return
