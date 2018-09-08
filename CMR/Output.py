@@ -16,7 +16,7 @@ def output_translators():
         'csv':          [cmr_to_csv, 'text/csv; charset=utf-8', 'csv'],
         'kml':          [cmr_to_kml, 'application/vnd.google-earth.kml+xml; charset=utf-8', 'kmz'],
         'json':         [cmr_to_json, 'application/json; charset=utf-8', 'json'],
-        'geojson':      [cmr_to_geojson, 'application/json; charset=utf-8', 'geojson'],
+        'geojson':      [cmr_to_geojson, 'application/geojson; charset=utf-8', 'geojson'],
         'count':        [count, 'text/plain; charset=utf-8', 'txt'],
         'download':     [cmr_to_download, 'text/plain; charset=utf-8', 'py']
     }
@@ -54,7 +54,7 @@ def cmr_to_json(rgen):
 
     streamer = JSONStreamArray(rgen)
     
-    for p in json.JSONEncoder().iterencode([streamer]):
+    for p in json.JSONEncoder(indent=2, sort_keys=True).iterencode([streamer]):
         yield p
 
 def cmr_to_geojson(rgen):
@@ -62,7 +62,7 @@ def cmr_to_geojson(rgen):
 
     streamer = GeoJSONStreamArray(rgen)
     
-    for p in json.JSONEncoder().iterencode([streamer]):
+    for p in json.JSONEncoder(indent=2, sort_keys=True).iterencode([streamer]):
         yield p
 
 # Some trickery is required to make JSONEncoder().iterencode take any ol' generator,
@@ -172,25 +172,25 @@ class GeoJSONStreamArray(JSONStreamArray):
                     'offNadirAngle': p['offNadirAngle'],
                     'startTime': p['startTime'],
                     'stopTime': p['stopTime'], # or endtime?
-                    'flightDirection': p['flightDirection'],
-                    'missionName': p['missionName'],
+                    'flightDirection': p['flightDirection'], # "ascendingdescending"?
+                    'missionName': p['missionName'], # not used by most platforms I think
                     'granuleType': p['granuleType'],
                     'polarization': p['polarization'],
-                    'browse': p['browse'],
-                    'frameNumber': p['frameNumber'],
+                    'browse': p['browse'], # need to source this info
+                    'frameNumber': p['frameNumber'], # make sure we're using the right one for S1/A3
                     'pathNumber': p['relativeOrbit'],
-                    'flightLine': p['flightLine'],
+                    'flightLine': p['flightLine'], # skip?
                     'thumbnail': p['thumbnailUrl'],
                     'beamModeType': p['beamModeType'],
                     'faradayRotation': p['faradayRotation'],
                     'bytes': p['bytes'],
                     'fileName': p['fileName'],
                     'md5sum': p['md5'],
-                    'processingDate': p['processingDate'],
+                    'processingDate': p['processingDate'], # skip?
                     'processingDescription': p['processingDescription'],
                     'processingLevel': p['processingType'], # these two here may need
-                    'processingType': p['processingLevel'], # swapping
-                    'processingTypeDisplay': '',
+                    'processingType': p['processingLevel'], # swapping, and their displays
+                    'processingTypeDisplay': p['processingTypeDisplay'],
                     'url': p['downloadUrl']
                 }
             }
