@@ -155,6 +155,7 @@ def parse_point_string(v):
         raise ValueError('Invalid point: {0}'.format(v))
     if len(v.split(',')) != 2:
         raise ValueError('Invalid point, must be 2 values: {0}'.format(v))
+    return v
 
 # Parse a WKT and convert it to a coordinate string
 def parse_wkt(v):
