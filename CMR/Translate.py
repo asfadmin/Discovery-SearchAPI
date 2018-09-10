@@ -118,7 +118,7 @@ def input_map():
         'maxbaselineperp':      ['attribute[]',             'float,INSAR_BASELINE,,{0}',        parse_float],
         'minbaselineperp':      ['attribute[]',             'float,INSAR_BASELINE,{0},',        parse_float],
         'beammode':             ['attribute[]',             'string,BEAM_MODE,{0}',             parse_string_list],
-#        'beamswath':            ['attribute[]',             'string,BEAM_MODE_TYPE,{0}',        parse_string_list],
+        'beamswath':            ['attribute[]',             'string,BEAM_MODE_TYPE,{0}',        parse_string_list],
         'collectionname':       ['attribute[]',             'string,MISSION_NAME,{0}',          parse_string],
         'maxdoppler':           ['attribute[]',             'float,DOPPLER,,{0}',               parse_float],
         'mindoppler':           ['attribute[]',             'float,DOPPLER,{0},',               parse_float],
