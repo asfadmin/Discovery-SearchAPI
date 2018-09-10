@@ -10,8 +10,6 @@ from CMR.Input import parse_string_list, parse_int_or_range_list, parse_float_or
 from CMR.Input import parse_coord_string, parse_bbox_string, parse_point_string
 from CMR.Output import output_translators
 
-import time
-
 def fix_polygon(v):
     # Trim whitespace and split it up
     v = v.replace(' ', '').split(',')
