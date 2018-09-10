@@ -66,18 +66,18 @@ class CMRSubQuery:
         if r.status_code != 200:
             raise CMRError(r.text)
         
-        r = parse_cmr_response(r)
-        yield r
+        for p in parse_cmr_response(r):
+            yield p
         
         # enumerate additional pages out to hit count
         pages = list(range(1, int(ceil(float(self.hits) / float(self.extra_params['page_size'])))))
         logging.debug('Preparing to fetch {0} additional pages'.format(len(pages)))
         
-        # fetch multiple pages of results if needed, yield a page at a time
-        for p in pages:
-            r = parse_cmr_response(self.get_page(p, s))
-            yield r
-            #self.results.extend(parse_cmr_response(self.get_page(p, s)))
+        # fetch multiple pages of results if needed, yield a product at a time
+        for page in pages:
+            for p in parse_cmr_response(self.get_page(page,s)):
+                yield p
+        
         logging.debug('Done fetching results: got {0}/{1}'.format(len(self.results), self.hits))
         return
     
