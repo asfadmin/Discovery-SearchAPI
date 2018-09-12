@@ -1,5 +1,4 @@
 import logging
-from datetime import datetime
 from jinja2 import Environment, PackageLoader
 import json
 import requests
@@ -17,6 +16,7 @@ def output_translators():
         'csv':          [cmr_to_csv, 'text/csv; charset=utf-8', 'csv'],
         'kml':          [cmr_to_kml, 'application/vnd.google-earth.kml+xml; charset=utf-8', 'kmz'],
         'json':         [cmr_to_json, 'application/json; charset=utf-8', 'json'],
+        'geojson':      [cmr_to_geojson, 'application/geojson; charset=utf-8', 'geojson'],
         'count':        [count, 'text/plain; charset=utf-8', 'txt'],
         'download':     [cmr_to_download, 'text/plain; charset=utf-8', 'py']
     }
@@ -25,106 +25,172 @@ def count(r):
     logging.debug('translating: count')
     return str(r)
 
-def cmr_to_metalink(rlist):
+def cmr_to_metalink(rgen):
     logging.debug('translating: metalink')
-    products = {'results': rlist}
     template = templateEnv.get_template('metalink.tmpl')
-    return template.render(products)
+    for l in template.stream(results=rgen()):
+        yield l
 
-def cmr_to_csv(rlist):
+def cmr_to_csv(rgen):
     logging.debug('translating: csv')
-    products = {'results': rlist}
     template = templateEnv.get_template('csv.tmpl')
-    return template.render(products)
+    for l in template.stream(results=rgen()):
+        yield l
 
-def cmr_to_kml(rlist):
-    logging.debug('translating: kml')
-    products = {'results': rlist}
-    template = templateEnv.get_template('kml.tmpl')
-    return template.render(products, search_time=datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC'))
-
-def cmr_to_json(rlist):
-    logging.debug('translating: json')
-    products = {'results': rlist}
-    legacy_json_keys = [
-        'sceneSize',
-        'absoluteOrbit',
-        'farEndLat',
-        'sensor',
-        'farStartLat',
-        'processingTypeName',
-        'finalFrame',
-        'lookAngle',
-        'processingType',
-        'startTime',
-        'stringFootprint',
-        'doppler',
-        'baselinePerp',
-        'sarSceneId',
-        'insarStackSize',
-        'centerLat',
-        'processingDescription',
-        'product_file_id',
-        'nearEndLon',
-        'farEndLon',
-        'percentTroposphere',
-        'frameNumber',
-        'percentCoherence',
-        'nearStartLon',
-        'sceneDate',
-        'sceneId',
-        'productName',
-        'platform',
-        'masterGranule',
-        'thumbnailUrl',
-        'percentUnwrapped',
-        'beamSwath',
-        'firstFrame',
-        'insarGrouping',
-        'centerLon',
-        'faradayRotation',
-        'fileName',
-        'offNadirAngle',
-        'granuleName',
-        'frequency',
-        'catSceneId',
-        'farStartLon',
-        'processingDate',
-        'missionName',
-        'relativeOrbit',
-        'flightDirection',
-        'granuleType',
-        'configurationName',
-        'polarization',
-        'stopTime',
-        'browse',
-        'nearStartLat',
-        'flightLine',
-        'status',
-        'formatName',
-        'nearEndLat',
-        'downloadUrl',
-        'incidenceAngle',
-        'processingTypeDisplay',
-        'thumbnail',
-        'track',
-        'collectionName',
-        'sceneDateString',
-        'beamMode',
-        'beamModeType',
-        'processingLevel',
-        'lookDirection',
-        'varianceTroposphere',
-        'slaveGranule',
-        'sizeMB'
-    ]
-    json_data = [[]]
-    # just grab the parts of the data we want to match legacy API json output
-    for p in products['results']:
-        json_data[0].append(dict((k, p[k]) for k in legacy_json_keys if k in p))
-    return json.dumps(json_data, sort_keys=True, indent=4, separators=(',', ':'))
-
-def cmr_to_download(rlist):
+def cmr_to_download(rgen):
     logging.debug('translating: bulk download script')
-    bd_res = requests.post(get_config()['bulk_download_api'], data={'products': ','.join([p['downloadUrl'] for p in rlist])})
-    return (bd_res.text)
+    plist = [p['downloadUrl'] for p in rgen()]
+    bd_res = requests.post(get_config()['bulk_download_api'], data={'products': ','.join(plist)})
+    yield (bd_res.text)
+
+def cmr_to_kml(rgen):
+    logging.debug('translating: kml')
+    template = templateEnv.get_template('kml.tmpl')
+    for l in template.stream(results=rgen()):
+        yield l
+
+def cmr_to_json(rgen):
+    logging.debug('translating: json')
+
+    streamer = JSONStreamArray(rgen)
+    
+    for p in json.JSONEncoder(indent=2, sort_keys=True).iterencode([streamer]):
+        yield p
+
+def cmr_to_geojson(rgen):
+    logging.debug('translating: geojson')
+
+    streamer = GeoJSONStreamArray(rgen)
+    
+    for p in json.JSONEncoder(indent=2, sort_keys=True).iterencode([streamer]):
+        yield p
+
+# Some trickery is required to make JSONEncoder().iterencode take any ol' generator,
+# this approach works without slurping the list into memory
+class JSONStreamArray(list):
+    def __init__(self, gen):
+        self.gen = gen
+        
+    def __iter__(self):
+        return self.streamDicts()
+
+    def __len__(self):
+        return 1
+    
+    def streamDicts(self):
+        legacy_json_keys = [
+            'sceneSize',
+            'absoluteOrbit',
+            'farEndLat',
+            'sensor',
+            'farStartLat',
+            'processingTypeName',
+            'finalFrame',
+            'lookAngle',
+            'processingType',
+            'startTime',
+            'stringFootprint',
+            'doppler',
+            'baselinePerp',
+            'sarSceneId',
+            'insarStackSize',
+            'centerLat',
+            'processingDescription',
+            'product_file_id',
+            'nearEndLon',
+            'farEndLon',
+            'percentTroposphere',
+            'frameNumber',
+            'percentCoherence',
+            'nearStartLon',
+            'sceneDate',
+            'sceneId',
+            'productName',
+            'platform',
+            'masterGranule',
+            'thumbnailUrl',
+            'percentUnwrapped',
+            'beamSwath',
+            'firstFrame',
+            'insarGrouping',
+            'centerLon',
+            'faradayRotation',
+            'fileName',
+            'offNadirAngle',
+            'granuleName',
+            'frequency',
+            'catSceneId',
+            'farStartLon',
+            'processingDate',
+            'missionName',
+            'relativeOrbit',
+            'flightDirection',
+            'granuleType',
+            'configurationName',
+            'polarization',
+            'stopTime',
+            'browse',
+            'nearStartLat',
+            'flightLine',
+            'status',
+            'formatName',
+            'nearEndLat',
+            'downloadUrl',
+            'incidenceAngle',
+            'processingTypeDisplay',
+            'thumbnail',
+            'track',
+            'collectionName',
+            'sceneDateString',
+            'beamMode',
+            'beamModeType',
+            'processingLevel',
+            'lookDirection',
+            'varianceTroposphere',
+            'slaveGranule'
+        ]
+        for p in self.gen():
+            yield dict((k, p[k]) for k in legacy_json_keys if k in p)
+
+class GeoJSONStreamArray(JSONStreamArray):
+    def streamDicts(self):
+        for p in self.gen():
+            logging.debug(p)
+            yield {
+                'type': 'Feature',
+                'geometry': {
+                    'type': 'Polygon',
+                    'coordinates': [
+                        [[c['lon'], c['lat']] for c in p['shape']]
+                    ]
+                },
+                'properties': {
+                    'granuleName': p['granuleName'],
+                    'platform': p['platform'],
+                    'sensor': p['sensor'],
+                    'absoluteOrbit': p['absoluteOrbit'], # or just "orbit"?
+                    'offNadirAngle': p['offNadirAngle'],
+                    'startTime': p['startTime'],
+                    'stopTime': p['stopTime'], # or endtime?
+                    'flightDirection': p['flightDirection'], # "ascendingdescending"?
+                    'missionName': p['missionName'], # not used by most platforms I think
+                    'granuleType': p['granuleType'],
+                    'polarization': p['polarization'],
+                    'browse': p['browse'], # need to source this info
+                    'frameNumber': p['frameNumber'], # make sure we're using the right one for S1/A3
+                    'pathNumber': p['relativeOrbit'],
+                    'flightLine': p['flightLine'], # skip?
+                    'thumbnail': p['thumbnailUrl'],
+                    'beamModeType': p['beamModeType'],
+                    'faradayRotation': p['faradayRotation'],
+                    'bytes': p['bytes'],
+                    'fileName': p['fileName'],
+                    'md5sum': p['md5'],
+                    'processingDate': p['processingDate'], # skip?
+                    'processingDescription': p['processingDescription'],
+                    'processingLevel': p['processingType'], # these two here may need
+                    'processingType': p['processingLevel'], # swapping, and their displays
+                    'processingTypeDisplay': p['processingTypeDisplay'],
+                    'url': p['downloadUrl']
+                }
+            }
