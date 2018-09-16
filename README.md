@@ -6,24 +6,24 @@ To get started with a local instance for development:
 
 1. Clone a local copy of this repo:
 ```
-~$ git clone git@github.com:asfadmin/Proxy-API.git
-~$ cd Proxy-API
+~$ git clone git@github.com:asfadmin/ProxyAPI.git
+~$ cd ProxyAPI
 ```
 
 2. Create a virtual environment:
 ```
-~$ virtualenv --python=python3 ~/proxy-api-env
+~$ virtualenv --python=python3 ~/ProxyAPI-env
 ```
 
 3. Activate the virtual environment:
 ```
-~$ source ~/proxy-api-env/bin/activate
-(proxy-api-env) ~$
+~$ source ~/ProxyAPI-env/bin/activate
+(ProxyAPI-env) ~$
 ```
 
 4. Use pip to install requirements:
 ```
-(proxy-api-env) ~$ pip install -r requirements.txt
+(ProxyAPI-env) ~$ pip install -r requirements.txt
 ```
 
   - At the time of this writing, in some situations you may encounter an SSL certificate error. If that happens, re-install pip using the following command and try step 4 again:
@@ -33,17 +33,17 @@ To get started with a local instance for development:
 
 5. Run the dev server
 ```
-(proxy-api-env) ~$ python application.py
+(ProxyAPI-env) ~$ python application.py
 ```
 
 6. After making changes, pylint your code:
 ```
-(proxy-api-env) ~$ pylint --rcfile=pylintrc <changed files>
+(ProxyAPI-env) ~$ pylint --rcfile=pylintrc <changed files>
 ```
 
 7. If you install new modules with pip, update requirements.txt:
 ```
-(proxy-api-env) ~$ pip freeze > requirements.txt
+(ProxyAPI-env) ~$ pip freeze > requirements.txt
 ```
 
 # Testing
