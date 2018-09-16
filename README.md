@@ -1,29 +1,29 @@
-# api-proxy
-Switching proxy API for CMR and legacy ASF API. The proxy converts queries to CMR queries where possible and translates the results to ASF API style results. If a query can't be translated, the proxy acts as a passthrough to the legacy ASF API.
+# ProxyAPI
+Proxy API for CMR. The proxy converts ASF API style queries to CMR queries and translates the results to back ASF API style results. For complex API queries that CMR can not directly support, multiple sub-queries are performed, and the results combined.
 
 # Development
 To get started with a local instance for development:
 
 1. Clone a local copy of this repo:
 ```
-~$ git clone git@github.com:asfadmin/api-proxy.git
-~$ cd api-proxy
+~$ git clone git@github.com:asfadmin/ProxyAPI.git
+~$ cd ProxyAPI
 ```
 
 2. Create a virtual environment:
 ```
-~$ virtualenv --python=python2.7 ~/api-proxy-env
+~$ virtualenv --python=python3 ~/ProxyAPI-env
 ```
 
 3. Activate the virtual environment:
 ```
-~$ source ~/api-proxy-env/bin/activate
-(api-proxy-env) ~$
+~$ source ~/ProxyAPI-env/bin/activate
+(ProxyAPI-env) ~$
 ```
 
 4. Use pip to install requirements:
 ```
-(api-proxy-env) ~$ pip install -r requirements.txt
+(ProxyAPI-env) ~$ pip install -r requirements.txt
 ```
 
   - At the time of this writing, in some situations you may encounter an SSL certificate error. If that happens, re-install pip using the following command and try step 4 again:
@@ -33,17 +33,17 @@ To get started with a local instance for development:
 
 5. Run the dev server
 ```
-(api-proxy-env) ~$ python application.py
+(ProxyAPI-env) ~$ python application.py
 ```
 
 6. After making changes, pylint your code:
 ```
-(api-proxy-env) ~$ pylint --rcfile=pylintrc <changed files>
+(ProxyAPI-env) ~$ pylint --rcfile=pylintrc <changed files>
 ```
 
 7. If you install new modules with pip, update requirements.txt:
 ```
-(api-proxy-env) ~$ pip freeze > requirements.txt
+(ProxyAPI-env) ~$ pip freeze > requirements.txt
 ```
 
 # Testing
