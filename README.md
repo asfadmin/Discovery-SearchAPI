@@ -12,7 +12,7 @@ To get started with a local instance for development:
 
 2. Create a virtual environment:
 ```
-~$ virtualenv --python=python2.7 ~/api-proxy-env
+~$ virtualenv --python=python3 ~/api-proxy-env
 ```
 
 3. Activate the virtual environment:
