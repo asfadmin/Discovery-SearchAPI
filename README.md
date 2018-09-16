@@ -1,5 +1,5 @@
-# api-proxy
-Switching proxy API for CMR and legacy ASF API. The proxy converts queries to CMR queries where possible and translates the results to ASF API style results. If a query can't be translated, the proxy acts as a passthrough to the legacy ASF API.
+# Proxy-API
+Proxy API for CMR. The proxy converts ASF API style queries to CMR queries and translates the results to back ASF API style results. For complex API queries that CMR can not directly support, multiple sub-queries are performed, and the results combined.
 
 # Development
 To get started with a local instance for development:
