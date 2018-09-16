@@ -62,7 +62,7 @@ def cmr_to_geojson(rgen):
 
     streamer = GeoJSONStreamArray(rgen)
     
-    for p in json.JSONEncoder(indent=2, sort_keys=True).iterencode([streamer]):
+    for p in json.JSONEncoder(indent=2, sort_keys=True).iterencode({'type': 'FeatureCollection','features':streamer}):
         yield p
 
 # Some trickery is required to make JSONEncoder().iterencode take any ol' generator,
@@ -155,7 +155,18 @@ class JSONStreamArray(list):
 class GeoJSONStreamArray(JSONStreamArray):
     def streamDicts(self):
         for p in self.gen():
-            logging.debug(p)
+            # Fix up some outputs
+            for i in p.keys():
+                if p[i] == 'NA':
+                    p[i] = None
+            try:
+                if float(p['offNadirAngle']) < 0:
+                    p['offNadirAngle'] = None
+                if float(p['relativeOrbit']) < 0:
+                    p['relativeOrbit'] = None
+            except TypeError:
+                pass
+            
             yield {
                 'type': 'Feature',
                 'geometry': {
@@ -168,29 +179,23 @@ class GeoJSONStreamArray(JSONStreamArray):
                     'granuleName': p['granuleName'],
                     'platform': p['platform'],
                     'sensor': p['sensor'],
-                    'absoluteOrbit': p['absoluteOrbit'], # or just "orbit"?
+                    'orbit': p['absoluteOrbit'],
                     'offNadirAngle': p['offNadirAngle'],
                     'startTime': p['startTime'],
-                    'stopTime': p['stopTime'], # or endtime?
-                    'flightDirection': p['flightDirection'], # "ascendingdescending"?
-                    'missionName': p['missionName'], # not used by most platforms I think
+                    'stopTime': p['stopTime'],
+                    'flightDirection': p['flightDirection'],
                     'granuleType': p['granuleType'],
                     'polarization': p['polarization'],
                     'browse': p['browse'], # need to source this info
                     'frameNumber': p['frameNumber'], # make sure we're using the right one for S1/A3
                     'pathNumber': p['relativeOrbit'],
-                    'flightLine': p['flightLine'], # skip?
-                    'thumbnail': p['thumbnailUrl'],
                     'beamModeType': p['beamModeType'],
                     'faradayRotation': p['faradayRotation'],
                     'bytes': p['bytes'],
                     'fileName': p['fileName'],
                     'md5sum': p['md5'],
-                    'processingDate': p['processingDate'], # skip?
-                    'processingDescription': p['processingDescription'],
-                    'processingLevel': p['processingType'], # these two here may need
-                    'processingType': p['processingLevel'], # swapping, and their displays
-                    'processingTypeDisplay': p['processingTypeDisplay'],
+                    'processingDate': p['processingDate'],
+                    'processingLevel': p['processingLevel'],
                     'url': p['downloadUrl']
                 }
             }

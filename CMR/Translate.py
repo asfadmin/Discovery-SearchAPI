@@ -121,7 +121,7 @@ def input_map():
         'minbaselineperp':      ['attribute[]',             'float,INSAR_BASELINE,{0},',        parse_float],
         'beammode':             ['attribute[]',             'string,BEAM_MODE,{0}',             parse_string_list],
         'beamswath':            ['attribute[]',             'string,BEAM_MODE_TYPE,{0}',        parse_string_list],
-        'collectionname':       ['attribute[]',             'string,MISSION_NAME,{0}',          parse_string],
+        'collectionname':       ['attribute[]',             'string,MISSION_NAME,{0}',          parse_string_list],
         'maxdoppler':           ['attribute[]',             'float,DOPPLER,,{0}',               parse_float],
         'mindoppler':           ['attribute[]',             'float,DOPPLER,{0},',               parse_float],
         'maxfaradayrotation':   ['attribute[]',             'float,FARADAY_ROTATION,,{0}',      parse_float],
@@ -182,14 +182,20 @@ def attr(name):
 
 # for kml generation
 def wkt_from_gpolygon(gpoly):
-    shape = []
-    for point in gpoly.iter('Point'):
-        shape.append({'lon': point.findtext('PointLongitude'), 'lat': point.findtext('PointLatitude')})
-    if shape[0]['lat'] != shape[-1]['lat'] or shape[0]['lon'] != shape[-1]['lon']:
-        shape.append(shape[0]) # Close the shape if needed
-    wkt_shape = 'POLYGON(({0}))'.format(','.join(['{0} {1}'.format(x['lon'], x['lat']) for x in shape]))
+    shapes = []
+    for g in gpoly:
+        shapes.append([])
+        for point in g.iter('Point'):
+            shapes[-1].append({'lon': point.findtext('PointLongitude'), 'lat': point.findtext('PointLatitude')})
+        if shapes[-1][0]['lat'] != shapes[-1][-1]['lat'] or shapes[-1][0]['lon'] != shapes[-1][-1]['lon']:
+            shapes[-1].append(shapes[-1][0]) # Close the shape if needed
+    longest = shapes[0]
+    for shape in shapes:
+        if len(shape) > len(longest):
+            longest = shape
+    wkt_shape = 'POLYGON(({0}))'.format(','.join(['{0} {1}'.format(x['lon'], x['lat']) for x in longest]))
     #logging.debug('Translated to WKT: {0}'.format(wkt))
-    return shape, wkt_shape
+    return longest, wkt_shape
 
 # Convert echo10 xml to results list used by output translators
 def parse_cmr_response(r):
@@ -200,7 +206,7 @@ def parse_cmr_response(r):
         logging.error('CMR parsing error: {0} when parsing: {1}'.format(e, r.text))
         return
     for granule in root.iterfind('./result/Granule'):
-        (shape, wkt_shape) = wkt_from_gpolygon(granule.find('./Spatial/HorizontalSpatialDomain/Geometry/GPolygon'))
+        (shape, wkt_shape) = wkt_from_gpolygon(granule.findall('./Spatial/HorizontalSpatialDomain/Geometry/GPolygon'))
         result = {
             'granuleName': granule.findtext("./DataGranule/ProducerGranuleId"),
             'sizeMB': granule.findtext("./DataGranule/SizeMBDataGranule"),

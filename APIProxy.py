@@ -3,7 +3,8 @@ from werkzeug.datastructures import Headers
 import logging
 from datetime import datetime
 from CMR.Query import CMRQuery
-from CMR.Translate import translate_params, input_fixer, output_translators
+from CMR.Translate import translate_params, input_fixer
+from CMR.Output import output_translators
 from CMR.Exceptions import CMRError
 from Analytics import post_analytics
 
