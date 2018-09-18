@@ -2,6 +2,7 @@
 #import xml.etree.cElementTree as ET
 from lxml import etree as ET
 import dateparser
+from datetime import datetime
 import requests
 import logging
 from asf_env import get_config
@@ -90,22 +91,19 @@ def input_fixer(params):
     
     # set default start and end dates if needed, and then make sure they're formatted correctly
     # whether using the default or not
-    if 'start' not in fixed_params:
-        fixed_params['start'] = '1978-01-01T00:00:00Z'
-    start = dateparser.parse(fixed_params['start'], settings={'RETURN_AS_TIMEZONE_AWARE': True})
-    if 'end' not in fixed_params:
-        fixed_params['end'] = 'now'
-    end = dateparser.parse(fixed_params['end'], settings={'RETURN_AS_TIMEZONE_AWARE': True})
+    start_s = fixed_params['start'] if 'start' in fixed_params else '1978-01-01T00:00:00Z'
+    end_s = fixed_params['end'] if 'end' in fixed_params else datetime.utcnow().isoformat()
+    start = dateparser.parse(start_s, settings={'RETURN_AS_TIMEZONE_AWARE': True})
+    end = dateparser.parse(end_s, settings={'RETURN_AS_TIMEZONE_AWARE': True})
+    
     # Check/fix the order of start/end
     if start > end:
         start, end = end, start
     # Final temporal string that will actually be used
-    start = start.strftime('%Y-%m-%dT%H:%M:%SZ')
-    end = end.strftime('%Y-%m-%dT%H:%M:%SZ')
-    fixed_params['temporal'] = '{0},{1}'.format(start, end)
+    fixed_params['temporal'] = '{0},{1}'.format(start.strftime('%Y-%m-%dT%H:%M:%SZ'), end.strftime('%Y-%m-%dT%H:%M:%SZ'))
     # And a little cleanup
-    del fixed_params['start']
-    del fixed_params['end']
+    fixed_params.pop('start', None)
+    fixed_params.pop('end', None)
     
     return fixed_params
 
