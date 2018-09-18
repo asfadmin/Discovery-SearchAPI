@@ -28,7 +28,7 @@ def fix_polygon(v):
             logging.debug('Backwards polygon, attempting to repair')
             logging.debug(r.text)
             it = iter(v)
-            rev = reversed(zip(it, it))
+            rev = reversed(list(zip(it, it)))
             rv = [i for sub in rev for i in sub]
             r = requests.post(get_config()['cmr_api'], data={'polygon': ','.join(rv), 'provider': 'ASF', 'page_size': 1, 'attribute[]': 'string,ASF_PLATFORM,FAKEPLATFORM'})
             if r.status_code == 200:
