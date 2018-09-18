@@ -1,4 +1,4 @@
-# Proxy-API
+# ProxyAPI
 Proxy API for CMR. The proxy converts ASF API style queries to CMR queries and translates the results to back ASF API style results. For complex API queries that CMR can not directly support, multiple sub-queries are performed, and the results combined.
 
 # Development
