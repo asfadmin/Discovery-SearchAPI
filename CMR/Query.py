@@ -39,6 +39,10 @@ class CMRQuery:
         
     # Use the cartesian product of all the list parameters to determine subqueries
     def get_query_list(self, params):
+        # A couple params shouldn't get subqueried out:
+        granule_list = params.pop('granule_list', None)
+        product_list = params.pop('product_list', None)
+        
         # First we have to get the params into a form itertools.product() understands
         listed_params = []
         for k in params:
@@ -54,7 +58,14 @@ class CMRQuery:
                 listed_params.append([{input_map()[k][0]: input_map()[k][1].format(params[k])}])
         # Get the actual cartesian product
         query_list = list(product(*listed_params))
-        return query_list
+        final_list = []
+        for q in query_list:
+            if granule_list:
+                q = q + tuple([{input_map()['granule_list'][0]: input_map()['granule_list'][1].format('{0}'.format(t))} for t in granule_list])
+            if product_list:
+                q = q + tuple([{input_map()['product_list'][0]: input_map()['product_list'][1].format('{0}'.format(t))} for t in product_list])
+            final_list.append(q)
+        return final_list
     
     def get_count(self):
         total_hits = 0
