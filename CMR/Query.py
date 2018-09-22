@@ -80,8 +80,8 @@ class CMRQuery:
             for r in subq.get_results():
                 if r is not None:
                     if self.max_results is None or self.result_counter < self.max_results:
-                        yield r
                         self.result_counter += 1
+                        yield r
                     else:
                         logging.debug('Max results reached, terminating')
                         return
