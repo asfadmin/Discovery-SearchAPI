@@ -84,4 +84,6 @@ class CMRQuery:
                 else:
                     logging.debug('Max results reached, terminating')
                     return
+            if self.result_counter == 0:
+                yield []
             logging.debug('End of available results reached')
