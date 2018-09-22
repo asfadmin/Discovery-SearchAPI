@@ -78,7 +78,7 @@ class CMRQuery:
             logging.debug('Running subquery {0}'.format(n+1))
             # taking a page at a time from each subquery, yield one result at a time until we max out
             for r in subq.get_results():
-                if self.max_results is None or self.result_counter < self.max_results:
+                if r is not None and (self.max_results is None or self.result_counter < self.max_results):
                     yield r
                     self.result_counter += 1
                 else:
