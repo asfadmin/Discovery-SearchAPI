@@ -70,14 +70,31 @@ def cmr_to_geojson(rgen):
 class JSONStreamArray(list):
     def __init__(self, gen):
         self.gen = gen
+        # need to make sure we actually have results so we can intelligently set __len__, otherwise
+        # iterencode behaves strangely and will output invalid json
+        self.first_result = None
+        self.len = 0
+        for p in self.gen():
+            if p is not None:
+                self.first_result = p
+                self.len = 1
+                break
+        
         
     def __iter__(self):
         return self.streamDicts()
 
     def __len__(self):
-        return 1
+        return self.len
     
     def streamDicts(self):
+        yield self.getItem(self.first_result)
+        for p in self.gen():
+            if p is not None:
+                yield self.getItem(p)
+    
+    # Override this method for other json-based output formats (i.e. geojson)
+    def getItem(self, p):
         legacy_json_keys = [
             'sceneSize',
             'absoluteOrbit',
@@ -150,53 +167,52 @@ class JSONStreamArray(list):
             'slaveGranule',
             'sizeMB'
         ]
-        for p in self.gen():
-            yield dict((k, p[k]) for k in legacy_json_keys if k in p)
+        
+        return dict((k, p[k]) for k in legacy_json_keys if k in p)
 
 class GeoJSONStreamArray(JSONStreamArray):
-    def streamDicts(self):
-        for p in self.gen():
-            # Fix up some outputs
-            for i in p.keys():
-                if p[i] == 'NA':
-                    p[i] = None
-            try:
-                if float(p['offNadirAngle']) < 0:
-                    p['offNadirAngle'] = None
-                if float(p['relativeOrbit']) < 0:
-                    p['relativeOrbit'] = None
-            except TypeError:
-                pass
-            
-            yield {
-                'type': 'Feature',
-                'geometry': {
-                    'type': 'Polygon',
-                    'coordinates': [
-                        [[c['lon'], c['lat']] for c in p['shape']]
-                    ]
-                },
-                'properties': {
-                    'granuleName': p['granuleName'],
-                    'platform': p['platform'],
-                    'sensor': p['sensor'],
-                    'orbit': p['absoluteOrbit'],
-                    'offNadirAngle': p['offNadirAngle'],
-                    'startTime': p['startTime'],
-                    'stopTime': p['stopTime'],
-                    'flightDirection': p['flightDirection'],
-                    'granuleType': p['granuleType'],
-                    'polarization': p['polarization'],
-                    'browse': p['browse'], # need to source this info
-                    'frameNumber': p['frameNumber'], # make sure we're using the right one for S1/A3
-                    'pathNumber': p['relativeOrbit'],
-                    'beamModeType': p['beamModeType'],
-                    'faradayRotation': p['faradayRotation'],
-                    'bytes': p['bytes'],
-                    'fileName': p['fileName'],
-                    'md5sum': p['md5'],
-                    'processingDate': p['processingDate'],
-                    'processingLevel': p['processingLevel'],
-                    'url': p['downloadUrl']
-                }
+    
+    def getItem(self, p):
+        for i in p.keys():
+            if p[i] == 'NA':
+                p[i] = None
+        try:
+            if float(p['offNadirAngle']) < 0:
+                p['offNadirAngle'] = None
+            if float(p['relativeOrbit']) < 0:
+                p['relativeOrbit'] = None
+        except TypeError:
+            pass
+        
+        return {
+            'type': 'Feature',
+            'geometry': {
+                'type': 'Polygon',
+                'coordinates': [
+                    [[c['lon'], c['lat']] for c in p['shape']]
+                ]
+            },
+            'properties': {
+                'granuleName': p['granuleName'],
+                'platform': p['platform'],
+                'sensor': p['sensor'],
+                'orbit': p['absoluteOrbit'],
+                'offNadirAngle': p['offNadirAngle'],
+                'startTime': p['startTime'],
+                'stopTime': p['stopTime'],
+                'flightDirection': p['flightDirection'],
+                'granuleType': p['granuleType'],
+                'polarization': p['polarization'],
+                'browse': p['browse'], # need to source this info
+                'frameNumber': p['frameNumber'], # make sure we're using the right one for S1/A3
+                'pathNumber': p['relativeOrbit'],
+                'beamModeType': p['beamModeType'],
+                'faradayRotation': p['faradayRotation'],
+                'bytes': p['bytes'],
+                'fileName': p['fileName'],
+                'md5sum': p['md5'],
+                'processingDate': p['processingDate'],
+                'processingLevel': p['processingLevel'],
+                'url': p['downloadUrl']
             }
+        }
