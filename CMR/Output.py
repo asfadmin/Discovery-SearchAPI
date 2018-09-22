@@ -147,7 +147,8 @@ class JSONStreamArray(list):
             'processingLevel',
             'lookDirection',
             'varianceTroposphere',
-            'slaveGranule'
+            'slaveGranule',
+            'sizeMB'
         ]
         for p in self.gen():
             yield dict((k, p[k]) for k in legacy_json_keys if k in p)
