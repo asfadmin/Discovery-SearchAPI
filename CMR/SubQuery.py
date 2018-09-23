@@ -96,9 +96,9 @@ class CMRSubQuery:
         post_analytics(pageview=False, events=[{'ec': 'CMR API Status', 'ea': r.status_code}])
         if r.status_code != 200:
             logging.error('Bad news bears! CMR said {0} on session {1}'.format(r.status_code, self.sid))
-            logging.debug('Params that caused this error:')
-            logging.debug(self.params)
-            logging.debug('Error body: {0}'.format(r.text))
+            logging.error('Params that caused this error:')
+            logging.error(self.params)
+            logging.error('Error body: {0}'.format(r.text))
         else:
             logging.debug('Fetched page {0}'.format(p + 1))
         return r
