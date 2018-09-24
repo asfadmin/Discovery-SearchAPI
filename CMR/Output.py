@@ -165,7 +165,8 @@ class JSONStreamArray(list):
             'lookDirection',
             'varianceTroposphere',
             'slaveGranule',
-            'sizeMB'
+            'sizeMB',
+            'groupID'
         ]
         
         return dict((k, p[k]) for k in legacy_json_keys if k in p)
