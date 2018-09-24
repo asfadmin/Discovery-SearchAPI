@@ -145,7 +145,8 @@ def input_map():
         'processingdate':       ['attribute[]',             'date,PROCESSING_DATE,{0},',        parse_date],
         'start':                [None,                      '{0}',                              parse_date],
         'end':                  [None,                      '{0}',                              parse_date],
-        'temporal':             ['temporal',                '{0}',                              None] # start/end end up here
+        'temporal':             ['temporal',                '{0}',                              None], # start/end end up here
+        'groupid':              ['attribute[]',             'string,GROUP_ID,{0}',              parse_string_list]
     }
     
 # translate supported params into CMR params
@@ -274,7 +275,8 @@ def parse_cmr_response(r):
             'formatName': 'NA', # always None in API
             'incidenceAngle': 'NA', # always None in API
             'collectionName': granule.findtext(attr('MISSION_NAME'), default='NA'),
-            'sceneDateString': 'NA' # always None in API
+            'sceneDateString': 'NA', # always None in API
+            'groupID': granule.findtext(attr('GROUP_ID'), default='NA'),
         }
         for k in result:
             if result[k] == 'NULL':
