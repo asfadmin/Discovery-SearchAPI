@@ -6,6 +6,7 @@ from CMR.Translate import parse_cmr_response
 from CMR.Exceptions import CMRError
 from Analytics import post_analytics
 from asf_env import get_config
+from time import time
 
 class CMRSubQuery:
     
@@ -15,6 +16,7 @@ class CMRSubQuery:
         self.sid = None
         self.hits = 0
         self.results = []
+        self.last_page_time = time()
         
         fixed = []
         for p in self.params:
@@ -96,9 +98,15 @@ class CMRSubQuery:
         post_analytics(pageview=False, events=[{'ec': 'CMR API Status', 'ea': r.status_code}])
         if r.status_code != 200:
             logging.error('Bad news bears! CMR said {0} on session {1}'.format(r.status_code, self.sid))
+            logging.error('Currently on page {0}'.format(p+1))
+            if(p < 1):
+                logging.error('This was the first page! Subquery initialized {0} seconds ago'.format(time() - self.last_page_time))
+            else:
+                logging.error('Last page fetched {0} seconds ago'.format(time() - self.last_page_time))
             logging.error('Params that caused this error:')
             logging.error(self.params)
             logging.error('Error body: {0}'.format(r.text))
         else:
             logging.debug('Fetched page {0}'.format(p + 1))
+        self.last_page_time = time()
         return r
