@@ -16,6 +16,7 @@ class CMRSubQuery:
         self.sid = None
         self.hits = 0
         self.results = []
+        self.current_page = 0
         self.last_page_time = time()
         
         fixed = []
@@ -61,7 +62,7 @@ class CMRSubQuery:
         s.headers.update({'Client-Id': 'vertex_asf'})
         
         # Get the first page of results
-        r = self.get_page(0, s)
+        r = self.get_page(s)
         
         #post_analytics(pageview=False, events=[{'ec': 'CMR API Status', 'ea': r.status_code}])
         # forward anything other than a 200
@@ -77,14 +78,14 @@ class CMRSubQuery:
         
         # fetch multiple pages of results if needed, yield a product at a time
         for page in pages:
-            for p in parse_cmr_response(self.get_page(page,s)):
+            for p in parse_cmr_response(self.get_page(s)):
                 yield p
         
         logging.debug('Done fetching results: got {0}/{1}'.format(len(self.results), self.hits))
         return
     
-    def get_page(self, p, s):
-        logging.debug('Fetching page {0}'.format(p+1))
+    def get_page(self, s):
+        logging.debug('Fetching page {0}'.format(self.current_page + 1))
         if self.sid is None:
             r = s.post(get_config()['cmr_api'], data=self.params)
             if 'CMR-hits' not in r.headers:
@@ -98,8 +99,8 @@ class CMRSubQuery:
         post_analytics(pageview=False, events=[{'ec': 'CMR API Status', 'ea': r.status_code}])
         if r.status_code != 200:
             logging.error('Bad news bears! CMR said {0} on session {1}'.format(r.status_code, self.sid))
-            logging.error('Currently on page {0}'.format(p+1))
-            if(p < 1):
+            logging.error('Currently on page {0}'.format(self.current_page + 1))
+            if(self.current_page < 1):
                 logging.error('This was the first page! Subquery initialized {0} seconds ago'.format(time() - self.last_page_time))
             else:
                 logging.error('Last page fetched {0} seconds ago'.format(time() - self.last_page_time))
@@ -107,6 +108,7 @@ class CMRSubQuery:
             logging.error(self.params)
             logging.error('Error body: {0}'.format(r.text))
         else:
-            logging.debug('Fetched page {0}'.format(p + 1))
+            logging.debug('Fetched page {0}'.format(self.current_page + 1))
         self.last_page_time = time()
+        self.current_page += 1
         return r
