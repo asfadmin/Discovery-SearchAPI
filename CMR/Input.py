@@ -6,7 +6,7 @@ from geomet import wkt
 def parse_string(v):
     try:
         return '{0}'.format(v)
-    except ValueError: # Can this even happen? And if it does, I'm pretty sure the following line would fail as well...
+    except ValueError: # If this happens, the following line would fail as well...
         raise ValueError('Invalid string: {0}'.format(v))
 
 # Parse and validate an int: "10"
