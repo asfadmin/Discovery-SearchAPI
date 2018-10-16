@@ -27,13 +27,19 @@ def count(r):
 
 def cmr_to_metalink(rgen):
     logging.debug('translating: metalink')
-    template = templateEnv.get_template('metalink.tmpl')
+    template = templateEnv.get_template('template.metalink')
     for l in template.stream(results=rgen()):
         yield l
 
 def cmr_to_csv(rgen):
     logging.debug('translating: csv')
-    template = templateEnv.get_template('csv.tmpl')
+    template = templateEnv.get_template('template.csv')
+    for l in template.stream(results=rgen()):
+        yield l
+
+def cmr_to_kml(rgen):
+    logging.debug('translating: kml')
+    template = templateEnv.get_template('template.kml')
     for l in template.stream(results=rgen()):
         yield l
 
@@ -42,12 +48,6 @@ def cmr_to_download(rgen):
     plist = [p['downloadUrl'] for p in rgen()]
     bd_res = requests.post(get_config()['bulk_download_api'], data={'products': ','.join(plist)})
     yield (bd_res.text)
-
-def cmr_to_kml(rgen):
-    logging.debug('translating: kml')
-    template = templateEnv.get_template('kml.tmpl')
-    for l in template.stream(results=rgen()):
-        yield l
 
 def cmr_to_json(rgen):
     logging.debug('translating: json')
