@@ -9,13 +9,13 @@ from CMR.Exceptions import CMRError
 from Analytics import post_analytics
 
 class APIProxyQuery:
-    
+
     def __init__(self, request):
         self.request = request  # store the incoming request
         self.cmr_params = {}
         self.output = 'metalink'
         self.max_results = None
-        
+
     def can_use_cmr(self):
         # make sure the provided params are a subset of the CMR-supported params and have compatible values
         try:
@@ -25,7 +25,7 @@ class APIProxyQuery:
             logging.debug('ValueError: {0}'.format(e))
             return False
         return True
-    
+
     def get_response(self):
         # pick a backend and go!
         events = [{'ec': 'Param', 'ea': v} for v in self.request.values]
@@ -44,8 +44,9 @@ class APIProxyQuery:
                 d = Headers()
                 d.add('Content-type', mimetype)
                 d.add('Content-Disposition', 'attachment', filename=filename)
+                d.add('Access-Control-Allow-Origin', '*')
                 return Response(stream_with_context(translator(q.get_results)), headers=d)
-                
+
                 #response = make_response(translator(q.get_results))
                 #response.headers.set('Content-Type', mimetype)
                 #response.headers.set('Content-Disposition', 'attachment', filename=filename)
