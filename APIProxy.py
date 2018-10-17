@@ -49,5 +49,5 @@ class APIProxyQuery:
                 return make_response('A CMR error has occured: {0}'.format(e))
         else:
             logging.warning('Malformed query, returning HTTP 400')
-            logging.warning(self.request.values))
+            logging.warning(self.request.values)
             return Response('', 400)
