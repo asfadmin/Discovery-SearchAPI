@@ -266,7 +266,8 @@ def parse_cmr_response(r):
             'browse': granule.findtext("./AssociatedBrowseImageUrls/ProviderBrowseUrl/URL"),
             'shape': shape,
             'sarSceneId': 'NA', # always None in API
-            'product_file_id': '{0}_{1}'.format(granule.findtext("./DataGranule/ProducerGranuleId"), granule.findtext(attr('PROCESSING_TYPE'))),
+            #'product_file_id': '{0}_{1}'.format(granule.findtext("./DataGranule/ProducerGranuleId"), granule.findtext(attr('PROCESSING_TYPE'))),
+            'product_file_id': granule.findtext("./GranuleUR"),
             'sceneId': granule.findtext("./DataGranule/ProducerGranuleId"),
             'firstFrame': granule.findtext(attr('CENTER_ESA_FRAME'), default='NA'),
             'frequency': 'NA', # always None in API
