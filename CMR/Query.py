@@ -81,7 +81,7 @@ class CMRQuery:
             # taking a page at a time from each subquery, yield one result at a time until we max out
             for r in subq.get_results():
                 if time.time() > self.cutoff_time:
-                    logging.warning('Query ran too long, terminating gracefully')
+                    logging.warning('Query ran too long, terminating')
                     logging.warning(self.params)
                     return
                 if r is not None:
