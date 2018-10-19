@@ -9,13 +9,13 @@ from CMR.Exceptions import CMRError
 from Analytics import post_analytics
 
 class APIProxyQuery:
-    
+
     def __init__(self, request):
         self.request = request  # store the incoming request
         self.cmr_params = {}
         self.output = 'metalink'
         self.max_results = None
-        
+
     def can_use_cmr(self):
         # make sure the provided params are a subset of the CMR-supported params and have compatible values
         try:
@@ -25,17 +25,16 @@ class APIProxyQuery:
             logging.debug('ValueError: {0}'.format(e))
             return False
         return True
-    
+
     def get_response(self):
         # pick a backend and go!
         events = [{'ec': 'Param', 'ea': v} for v in self.request.values]
         events.append({'ec': 'Param List', 'ea': ', '.join(sorted([p.lower() for p in self.request.values]))})
         if self.can_use_cmr():
-            logging.debug('get_response(): using CMR backend')
             events.append({'ec': 'Proxy Search', 'ea': 'CMR'})
             post_analytics(pageview=True, events=events)
             try:
-                logging.debug('Using CMR as backend, from {0}'.format(self.request.access_route[-1]))
+                logging.debug('Handling query from {0}'.format(self.request.access_route[-1]))
                 q = CMRQuery(params=self.cmr_params, output=self.output, max_results=self.max_results)
                 if(self.output == 'count'):
                     return(make_response(str(q.get_count())))
@@ -44,14 +43,11 @@ class APIProxyQuery:
                 d = Headers()
                 d.add('Content-type', mimetype)
                 d.add('Content-Disposition', 'attachment', filename=filename)
+                d.add('Access-Control-Allow-Origin', '*')
                 return Response(stream_with_context(translator(q.get_results)), headers=d)
-                
-                #response = make_response(translator(q.get_results))
-                #response.headers.set('Content-Type', mimetype)
-                #response.headers.set('Content-Disposition', 'attachment', filename=filename)
-                #return response
             except CMRError as e:
                 return make_response('A CMR error has occured: {0}'.format(e))
         else:
-            logging.debug('Can not use CMR, returning HTTP 400')
+            logging.warning('Malformed query, returning HTTP 400')
+            logging.warning(self.request.values)
             return Response('', 400)

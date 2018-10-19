@@ -9,7 +9,7 @@ from asf_env import get_config
 from time import time
 
 class CMRSubQuery:
-    
+
     def __init__(self, params, extra_params):
         self.params = params
         self.extra_params = extra_params
@@ -18,15 +18,15 @@ class CMRSubQuery:
         self.results = []
         self.current_page = 0
         self.last_page_time = time()
-        
+
         fixed = []
         for p in self.params:
             fixed.extend(p.items())
-        
+
         self.params = fixed
-        
+
         self.params.extend(self.extra_params.items())
-        
+
         # Platform-specific hacks
         # We do them at the subquery level in case the main query crosses platforms
         # that don't suffer these issue.
@@ -46,9 +46,9 @@ class CMRSubQuery:
                         if m is not None:
                             logging.debug('Sentinel/ALOS subquery, using ESA frame instead of ASF frame')
                             self.params[n] = (p[0], p[1].replace(',CENTER_ESA_FRAME,', ',FRAME_NUMBER,'))
-        
+
         logging.debug('new CMRSubQuery object ready to go')
-        
+
     def get_count(self):
         s = requests.Session()
         s.headers.update({'Client-Id': 'vertex_asf'})
@@ -56,34 +56,36 @@ class CMRSubQuery:
         if 'CMR-hits' not in r.headers:
             raise CMRError(r.text)
         return int(r.headers['CMR-hits'])
-        
+
     def get_results(self):
         s = requests.Session()
         s.headers.update({'Client-Id': 'vertex_asf'})
-        
+
         # Get the first page of results
         r = self.get_page(s)
-        
+
         #post_analytics(pageview=False, events=[{'ec': 'CMR API Status', 'ea': r.status_code}])
         # forward anything other than a 200
         if r.status_code != 200:
             raise CMRError(r.text)
-        
+
         for p in parse_cmr_response(r):
             yield p
-        
+
         # enumerate additional pages out to hit count
+        # FIXME: this is ugly and we shouldn't even need to enumerate pages anymore
+        # since we're scrolling, we should just run until no results come back
         pages = list(range(1, int(ceil(float(self.hits) / float(self.extra_params['page_size'])))))
         logging.debug('Preparing to fetch {0} additional pages'.format(len(pages)))
-        
+
         # fetch multiple pages of results if needed, yield a product at a time
         for page in pages:
             for p in parse_cmr_response(self.get_page(s)):
                 yield p
-        
+
         logging.debug('Done fetching results: got {0}/{1}'.format(len(self.results), self.hits))
         return
-    
+
     def get_page(self, s):
         logging.debug('Fetching page {0}'.format(self.current_page + 1))
         if self.sid is None:

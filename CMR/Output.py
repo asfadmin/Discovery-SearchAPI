@@ -53,7 +53,7 @@ def cmr_to_json(rgen):
     logging.debug('translating: json')
 
     streamer = JSONStreamArray(rgen)
-    
+
     for p in json.JSONEncoder(indent=2, sort_keys=True).iterencode([streamer]):
         yield p
 
@@ -61,7 +61,7 @@ def cmr_to_geojson(rgen):
     logging.debug('translating: geojson')
 
     streamer = GeoJSONStreamArray(rgen)
-    
+
     for p in json.JSONEncoder(indent=2, sort_keys=True).iterencode({'type': 'FeatureCollection','features':streamer}):
         yield p
 
@@ -79,20 +79,19 @@ class JSONStreamArray(list):
                 self.first_result = p
                 self.len = 1
                 break
-        
-        
+
+
     def __iter__(self):
         return self.streamDicts()
 
     def __len__(self):
         return self.len
-    
+
     def streamDicts(self):
-        yield self.getItem(self.first_result)
         for p in self.gen():
             if p is not None:
                 yield self.getItem(p)
-    
+
     # Override this method for other json-based output formats (i.e. geojson)
     def getItem(self, p):
         legacy_json_keys = [
@@ -168,11 +167,11 @@ class JSONStreamArray(list):
             'sizeMB',
             'groupID'
         ]
-        
+
         return dict((k, p[k]) for k in legacy_json_keys if k in p)
 
 class GeoJSONStreamArray(JSONStreamArray):
-    
+
     def getItem(self, p):
         for i in p.keys():
             if p[i] == 'NA':
@@ -184,7 +183,7 @@ class GeoJSONStreamArray(JSONStreamArray):
                 p['relativeOrbit'] = None
         except TypeError:
             pass
-        
+
         return {
             'type': 'Feature',
             'geometry': {

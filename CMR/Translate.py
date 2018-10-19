@@ -14,11 +14,11 @@ from CMR.Output import output_translators
 def fix_polygon(v):
     # Trim whitespace and split it up
     v = v.replace(' ', '').split(',')
-    
+
     # If the polygon doesn't wrap, fix that
     if v[0] != v[-2] or v[1] != v[-1]:
         v.extend(v[0:2])
-    
+
     # Do a quick CMR query to see if the shape is wound correctly
     logging.debug('Checking winding order')
     r = requests.post(get_config()['cmr_api'], data={'polygon': ','.join(v), 'provider': 'ASF', 'page_size': 1})
@@ -88,14 +88,14 @@ def input_fixer(params):
             fixed_params[t] = p
         else:
             fixed_params[k] = v
-    
+
     # set default start and end dates if needed, and then make sure they're formatted correctly
     # whether using the default or not
     start_s = fixed_params['start'] if 'start' in fixed_params else '1978-01-01T00:00:00Z'
     end_s = fixed_params['end'] if 'end' in fixed_params else datetime.utcnow().isoformat()
     start = dateparser.parse(start_s, settings={'RETURN_AS_TIMEZONE_AWARE': True})
     end = dateparser.parse(end_s, settings={'RETURN_AS_TIMEZONE_AWARE': True})
-    
+
     # Check/fix the order of start/end
     if start > end:
         start, end = end, start
@@ -104,7 +104,7 @@ def input_fixer(params):
     # And a little cleanup
     fixed_params.pop('start', None)
     fixed_params.pop('end', None)
-    
+
     return fixed_params
 
 # Supported input parameters and their associated CMR parameters
@@ -148,11 +148,11 @@ def input_map():
         'temporal':             ['temporal',                '{0}',                              None], # start/end end up here
         'groupid':              ['attribute[]',             'string,GROUP_ID,{0}',              parse_string_list]
     }
-    
+
 # translate supported params into CMR params
 def translate_params(p):
     params = {}
-    
+
     for k in p:
         if k.lower() not in input_map():
             raise ValueError('Unsupported CMR parameter', k)
@@ -160,7 +160,7 @@ def translate_params(p):
             params[k.lower()] = input_map()[k.lower()][2](p[k])
         except ValueError as e:
             raise e
-    
+
     # be nice to make this not a special case
     output = 'metalink'
     if 'output' in params and params['output'].lower() in output_translators():
@@ -198,7 +198,7 @@ def wkt_from_gpolygon(gpoly):
 
 # Convert echo10 xml to results list used by output translators
 def parse_cmr_response(r):
-    logging.debug('parsing results to list')
+    logging.debug('parsing CMR results')
     try:
         root = ET.fromstring(r.text.encode('latin-1'))
     except ET.ParseError as e:
@@ -266,7 +266,8 @@ def parse_cmr_response(r):
             'browse': granule.findtext("./AssociatedBrowseImageUrls/ProviderBrowseUrl/URL"),
             'shape': shape,
             'sarSceneId': 'NA', # always None in API
-            'product_file_id': '{0}_{1}'.format(granule.findtext("./DataGranule/ProducerGranuleId"), granule.findtext(attr('PROCESSING_TYPE'))),
+            #'product_file_id': '{0}_{1}'.format(granule.findtext("./DataGranule/ProducerGranuleId"), granule.findtext(attr('PROCESSING_TYPE'))),
+            'product_file_id': granule.findtext("./GranuleUR"),
             'sceneId': granule.findtext("./DataGranule/ProducerGranuleId"),
             'firstFrame': granule.findtext(attr('CENTER_ESA_FRAME'), default='NA'),
             'frequency': 'NA', # always None in API
