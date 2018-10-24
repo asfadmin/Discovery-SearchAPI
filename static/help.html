@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  </head>
+  <body>
+    <br />
+    <div class="container-fluid">
+      <div class="jumbotron">
+        <h1>
+          ASF Bulk Download Service
+        </h1>
+      </div>
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3>About this service:</h3>
+        </div>
+        <div class="panel-body">
+          <p>
+            This service provides an easy way to give users a bulk download script that aids in downloading multiple products. The service will either embed a specified list of fully-qualified product URLs directly in the script, or provide a blank "dummy" script for use in downloading products using metalink or CSV files.
+          </p>
+          <p>
+            Because using this service requires nothing more than crafting a link or posting form data, it is easy to use and flexible. Links to the service can be used anywhere a typical link can be used: use it on your website, your data archive search app, post it on facebook and reddit, tweet it, run it through a URL-shortener and text it to your friend, put it in a QR-code and stick it to a lamp post.
+          </p>
+        </div>
+      </div>
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3>About the bulk download script:</h3>
+        </div>
+        <div class="panel-body">
+          <p>
+            For a full description and guide on using the bulk download script itself, please see <a href="https://www.asf.alaska.edu/data-tools/bulk-download/" target="_blank">https://www.asf.alaska.edu/data-tools/bulk-download/</a>
+          </p>
+          <p>
+            The bulk download script provided by this service uses Earthdata Login for authentication and is compatible with any provider that authenticates against the same, or does not require authentication. The script stores its Earthdata session information in ~/.bulk_download_cookiejar.txt. If that file does not exist, or the session is not valid, the user will be asked for credentials and a session will be established and stored for future re-use.
+          </p>
+          <p>
+            The bulk download script provided by this service is compatible with python >= 2.6.5, 2.7.5, 3.0.
+          </p>
+        </div>
+      </div>
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3>Available options:</h3>
+        </div>
+        <div class="panel-body">
+          <h4>products=</h4>
+          <p>
+            A comma-separated list of fully-qualified URLs of products to be embedded in the script. Each URL should reference a specific file. This parameter can be specified multiple times, each containing one or more product URLs to be included in the generated script.
+          </p>
+          <p>
+            Example 1: <small>(comma-separated list)</small> <code>https://bulk-download.asf.alaska.edu/?products=http%3A%2F%2Fhost.com%2Fproduct1.zip%2Chttp%3A%2F%2Fhost.com%2Fproduct2.zip</code>
+            <br />
+            Example 2: <small>(multiple products=)</small> <code>https://bulk-download.asf.alaska.edu/?products=http%3A%2F%2Fhost.com%2Fproduct1.zip&products=http%3A%2F%2Fhost.com%2Fproduct2.zip</code>
+            <br />
+            Example 3: <small>(combination of both)</small> <code>https://bulk-download.asf.alaska.edu/?products=http%3A%2F%2Fhost.com%2Fproduct1.zip%2Chttp%3A%2F%2Fhost.com%2Fproduct2.zip&products=http%3A%2F%2Fhost.com%2Fproduct3.zip%2Chttp%3A%2F%2Fhost.com%2Fproduct4.zip</code>
+          </p>
+          <hr />
+          <h4>filename=</h4>
+          <p>
+            A specific filename to be used when generating the script. By default, the filename will incorporate a timestamp and be of the form "download-all-YYYY-MM-DD_HH24-MI-SS.py" but this parameter will override that. The filename (whether specified or the default) will be used as the name of the file downloaded by the user, and is also embedded in the brief help block at the start of the script.
+          </p>
+          <p>
+            Example: <code>https://bulk-download.asf.alaska.edu/?filename=Notable_Event_Products.py</code>
+          </p>
+          <hr />
+          <h4>/view</h4>
+          <p>
+            Using this path prior to the query string will override the default Content-Disposition and wrap the script in html for display in the browser. Any specified parameters still apply, although <code>filename=</code> will only affect the descriptive block at the start of the script.
+          </p>
+          <p>
+            Example: <code>https://bulk-download.asf.alaska.edu/view</code>
+          </p>
+          <hr />
+          <h4>/help</h4>
+          <p>
+            View this document.
+          </p>
+          <p>
+            Example: <code>https://bulk-download.asf.alaska.edu/help</code>
+          </p>
+        </div>
+      </div>
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3>Example usage of this service:</h3>
+        </div>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-sm-2">
+              Empty Script:
+            </div>
+            <div class="col-sm-1">
+              <a href="https://bulk-download.asf.alaska.edu/view" target="_blank" type="button" class="btn btn-default btn-block btn-xs">View</a>
+            </div>
+            <div class="col-sm-1">
+              <a href="https://bulk-download.asf.alaska.edu/" type="button" class="btn btn-default btn-block btn-xs">Download</a>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-2">
+              1 product:
+            </div>
+            <div class="col-sm-1">
+              <a href="https://bulk-download.asf.alaska.edu/view?products=https%3A%2F%2Ftestdatapool.asf.alaska.edu%2FMETADATA_RAW%2FSB%2FS1B_IW_RAW__0SDV_20171120T003835_20171120T003907_008358_00ECBD_6504.iso.xml" target="_blank" type="button" class="btn btn-default btn-block btn-xs">View</a>
+            </div>
+            <div class="col-sm-1">
+              <a href="https://bulk-download.asf.alaska.edu/?products=https%3A%2F%2Ftestdatapool.asf.alaska.edu%2FMETADATA_RAW%2FSB%2FS1B_IW_RAW__0SDV_20171120T003835_20171120T003907_008358_00ECBD_6504.iso.xml" type="button" class="btn btn-default btn-block btn-xs">Download</a>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-2">
+              10 products:
+            </div>
+            <div class="col-sm-1">
+              <a href="https://bulk-download.asf.alaska.edu/view?products=https%3A%2F%2Ftestdatapool.asf.alaska.edu%2FMETADATA_RAW%2FSB%2FS1B_IW_RAW__0SDV_20171120T003835_20171120T003907_008358_00ECBD_6504.iso.xml%2Chttps%3A%2F%2Ftestdatapool.asf.alaska.edu%2FMETADATA_RAW%2FSB%2FS1B_IW_RAW__0SDV_20171120T003720_20171120T003752_008358_00ECBD_A11C.iso.xml%2Chttps%3A%2F%2Ftestdatapool.asf.alaska.edu%2FMETADATA_GRD_HD%2FSB%2FS1B_IW_GRDH_1SDV_20171120T003720_20171120T003749_008358_00ECBD_345B.iso.xml%2Chttps%3A%2F%2Ftestdatapool.asf.alaska.edu%2FMETADATA_SLC%2FSB%2FS1B_IW_SLC__1SDV_20171120T003720_20171120T003749_008358_00ECBD_82AB.iso.xml%2Chttps%3A%2F%2Ftestdatapool.asf.alaska.edu%2FMETADATA_GRD_HD%2FSA%2FS1A_IW_GRDH_1SDV_20171109T003006_20171109T003031_019181_020777_A0E7.iso.xml%2Chttps%3A%2F%2Ftestdatapool.asf.alaska.edu%2FMETADATA_SLC%2FSA%2FS1A_IW_SLC__1SDV_20171109T003005_20171109T003031_019181_020777_E5DC.iso.xml%2Chttps%3A%2F%2Ftestdatapool.asf.alaska.edu%2FMETADATA_GRD_HD%2FSA%2FS1A_IW_GRDH_1SDV_20171109T002941_20171109T003006_019181_020777_3D68.iso.xml%2Chttps%3A%2F%2Ftestdatapool.asf.alaska.edu%2FMETADATA_SLC%2FSA%2FS1A_IW_SLC__1SDV_20171109T002940_20171109T003007_019181_020777_ED9A.iso.xml%2Chttps%3A%2F%2Ftestdatapool.asf.alaska.edu%2FMETADATA_RAW%2FSA%2FS1A_IW_RAW__0SDV_20171109T002937_20171109T003010_019181_020777_A7E0.iso.xml%2Chttps%3A%2F%2Ftestdatapool.asf.alaska.edu%2FMETADATA_RAW%2FSB%2FS1B_IW_RAW__0SDV_20171108T003720_20171108T003752_008183_00E76D_9F58.iso.xml" target="_blank" type="button" class="btn btn-default btn-block btn-xs">View</a>
+            </div>
+            <div class="col-sm-1">
+              <a href="https://bulk-download.asf.alaska.edu/?products=https%3A%2F%2Ftestdatapool.asf.alaska.edu%2FMETADATA_RAW%2FSB%2FS1B_IW_RAW__0SDV_20171120T003835_20171120T003907_008358_00ECBD_6504.iso.xml%2Chttps%3A%2F%2Ftestdatapool.asf.alaska.edu%2FMETADATA_RAW%2FSB%2FS1B_IW_RAW__0SDV_20171120T003720_20171120T003752_008358_00ECBD_A11C.iso.xml%2Chttps%3A%2F%2Ftestdatapool.asf.alaska.edu%2FMETADATA_GRD_HD%2FSB%2FS1B_IW_GRDH_1SDV_20171120T003720_20171120T003749_008358_00ECBD_345B.iso.xml%2Chttps%3A%2F%2Ftestdatapool.asf.alaska.edu%2FMETADATA_SLC%2FSB%2FS1B_IW_SLC__1SDV_20171120T003720_20171120T003749_008358_00ECBD_82AB.iso.xml%2Chttps%3A%2F%2Ftestdatapool.asf.alaska.edu%2FMETADATA_GRD_HD%2FSA%2FS1A_IW_GRDH_1SDV_20171109T003006_20171109T003031_019181_020777_A0E7.iso.xml%2Chttps%3A%2F%2Ftestdatapool.asf.alaska.edu%2FMETADATA_SLC%2FSA%2FS1A_IW_SLC__1SDV_20171109T003005_20171109T003031_019181_020777_E5DC.iso.xml%2Chttps%3A%2F%2Ftestdatapool.asf.alaska.edu%2FMETADATA_GRD_HD%2FSA%2FS1A_IW_GRDH_1SDV_20171109T002941_20171109T003006_019181_020777_3D68.iso.xml%2Chttps%3A%2F%2Ftestdatapool.asf.alaska.edu%2FMETADATA_SLC%2FSA%2FS1A_IW_SLC__1SDV_20171109T002940_20171109T003007_019181_020777_ED9A.iso.xml%2Chttps%3A%2F%2Ftestdatapool.asf.alaska.edu%2FMETADATA_RAW%2FSA%2FS1A_IW_RAW__0SDV_20171109T002937_20171109T003010_019181_020777_A7E0.iso.xml%2Chttps%3A%2F%2Ftestdatapool.asf.alaska.edu%2FMETADATA_RAW%2FSB%2FS1B_IW_RAW__0SDV_20171108T003720_20171108T003752_008183_00E76D_9F58.iso.xml" type="button" class="btn btn-default btn-block btn-xs">Download</a>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-2">
+              Named script:
+            </div>
+            <div class="col-sm-1">
+              <a href="https://bulk-download.asf.alaska.edu/view?filename=Get_Nepal_Earthquake_Data.py&products=https%3A%2F%2Ftestdatapool.asf.alaska.edu%2FMETADATA_RAW%2FSB%2FS1B_IW_RAW__0SDV_20171120T003835_20171120T003907_008358_00ECBD_6504.iso.xml" target="_blank" type="button" class="btn btn-default btn-block btn-xs">View</a>
+            </div>
+            <div class="col-sm-1">
+              <a href="https://bulk-download.asf.alaska.edu/?filename=Get_Nepal_Earthquake_Data.py&products=https%3A%2F%2Ftestdatapool.asf.alaska.edu%2FMETADATA_RAW%2FSB%2FS1B_IW_RAW__0SDV_20171120T003835_20171120T003907_008358_00ECBD_6504.iso.xml" type="button" class="btn btn-default btn-block btn-xs">Download</a>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-2">
+              Provider smorgasbord:
+            </div>
+            <div class="col-sm-1">
+              <a href="https://bulk-download.asf.alaska.edu/view?products=https%3A%2F%2Fdatapool.asf.alaska.edu%2FMETADATA_RAW%2FSA%2FS1A_IW_RAW__0SDV_20180321T232808_20180321T232840_021120_0244B5_F26B.iso.xml%2Chttps%3A%2F%2Fegres-v2loa-15wcnoka2vnc4-382722699.us-east-1.elb.amazonaws.com%2FMETADATA_GRD_HD%2FSA%2FS1A_EW_GRDH_1SDH_20160203T124137_20160203T124152_009782_00E4E1_CD2A.iso.xml%2Chttps%3A%2F%2Fgrfn.asf.alaska.edu%2Fdoor%2Fdownload%2FS1-IFG_RM_M1S1_TN151_20170608T005944-20170515T005915_s3-poeorb-770b-v1.1.3-standard.full_res.zip%2Chttps%3A%2F%2Fn5eil01u.ecs.nsidc.org%2FDP5%2FMEASURES%2FNSIDC-0477.004%2F2016.12.31%2FAMSR_36V_AM_FT_2016_day366_v04.tif%2Chttps%3A%2F%2Flance.nsstc.nasa.gov%2Famsr2-science%2Fdata%2Flevel3%2Fdaysnow%2FR00%2Fhdfeos5%2FAMSR_2_L3_DailySnow_R00_20180319.he5%2Chttps%3A%2F%2Fpodaac-opendap.jpl.nasa.gov%3A443%2Fopendap%2FallData%2Fghrsst%2Fdata%2FL4%2FAUS%2FABOM%2FRAMSSA_09km%2F2018%2F078%2F20180319-ABOM-L4HRfnd-AUS-v01-fv01_0-RAMSSA_09km.nc.bz2%2Chttp%3A%2F%2Fsedac.ciesin.columbia.edu%2Fdownloads%2Fdata%2Fsdp%2Fsdp-downscaled-population-b2-1990-2100%2Fnatl-pop-proj-b2.xls%2Chttps%3A%2F%2Fdaac.ornl.gov%2Fdaacdata%2Fglobal_climate%2Fglobal_N_deposition_maps%2Fdata%2FNHx-deposition2050.txt%2Chttps%3A%2F%2Fdocs.python.org%2F3%2F_static%2Fpy.png
+" target="_blank" type="button" class="btn btn-default btn-block btn-xs">View</a>
+            </div>
+            <div class="col-sm-1">
+              <a href="https://bulk-download.asf.alaska.edu/?products=https%3A%2F%2Fdatapool.asf.alaska.edu%2FMETADATA_RAW%2FSA%2FS1A_IW_RAW__0SDV_20180321T232808_20180321T232840_021120_0244B5_F26B.iso.xml%2Chttps%3A%2F%2Fegres-v2loa-15wcnoka2vnc4-382722699.us-east-1.elb.amazonaws.com%2FMETADATA_GRD_HD%2FSA%2FS1A_EW_GRDH_1SDH_20160203T124137_20160203T124152_009782_00E4E1_CD2A.iso.xml%2Chttps%3A%2F%2Fgrfn.asf.alaska.edu%2Fdoor%2Fdownload%2FS1-IFG_RM_M1S1_TN151_20170608T005944-20170515T005915_s3-poeorb-770b-v1.1.3-standard.full_res.zip%2Chttps%3A%2F%2Fn5eil01u.ecs.nsidc.org%2FDP5%2FMEASURES%2FNSIDC-0477.004%2F2016.12.31%2FAMSR_36V_AM_FT_2016_day366_v04.tif%2Chttps%3A%2F%2Flance.nsstc.nasa.gov%2Famsr2-science%2Fdata%2Flevel3%2Fdaysnow%2FR00%2Fhdfeos5%2FAMSR_2_L3_DailySnow_R00_20180319.he5%2Chttps%3A%2F%2Fpodaac-opendap.jpl.nasa.gov%3A443%2Fopendap%2FallData%2Fghrsst%2Fdata%2FL4%2FAUS%2FABOM%2FRAMSSA_09km%2F2018%2F078%2F20180319-ABOM-L4HRfnd-AUS-v01-fv01_0-RAMSSA_09km.nc.bz2%2Chttp%3A%2F%2Fsedac.ciesin.columbia.edu%2Fdownloads%2Fdata%2Fsdp%2Fsdp-downscaled-population-b2-1990-2100%2Fnatl-pop-proj-b2.xls%2Chttps%3A%2F%2Fdaac.ornl.gov%2Fdaacdata%2Fglobal_climate%2Fglobal_N_deposition_maps%2Fdata%2FNHx-deposition2050.txt%2Chttps%3A%2F%2Fdocs.python.org%2F3%2F_static%2Fpy.png
+" type="button" class="btn btn-default btn-block btn-xs">Download</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
