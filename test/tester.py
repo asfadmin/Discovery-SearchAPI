@@ -2,7 +2,7 @@
 
 import argparse
 import re
-import commands
+import subprocess
 import os
 import logging
 import random
@@ -11,7 +11,7 @@ class tester:
     def __init__(self):
 
         parser = argparse.ArgumentParser(description='Read API query URLs from a file, test them, and gather statistics.')
-        
+
         parser.add_argument('-f', '--file', action='store', required=True, help='File to read query URLs from')
         parser.add_argument('-s', '--save', action='store', required=True, help='CSV file to store results in')
         parser.add_argument('-c', '--cache', action='store_true', help='Save actual API results')
@@ -19,7 +19,7 @@ class tester:
         parser.add_argument('-r', '--replace', action='store', help='Replace everything prior to the querystring')
 
         self.args = parser.parse_args()
-        
+
         self.log = logging.getLogger('.{0}'.format(random.randint(0, 100)))
 
         if self.args.verbose is True:
@@ -48,7 +48,7 @@ class tester:
 
         self.queries = None
         self.save_file = None
-        
+
         if self.args.cache:
             try:
                 os.mkdir('cache')
@@ -67,7 +67,7 @@ class tester:
             self.log.error(ioe)
             exit()
         return self.queries
-    
+
     def run_queries(self):
         if self.args.save:
             self.save_file = open(self.args.save, 'w')
@@ -91,7 +91,7 @@ class tester:
                 cache = "-o /dev/null"
             c = "curl --silent --write-out '\"%{{http_code}}\",\"%{{time_total}}\",\"%{{speed_download}}\",\"%{{size_download}}\"' {0} '{1}'".format(cache, q)
             self.log.info('Executing {0}'.format(p))
-            (_, output) = commands.getstatusoutput(c)
+            output = subprocess.check_output(c, shell=True)
             if self.args.save:
                 self.save_file.write('"{0}", {1}, "{2}"\n'.format(p, output, c))
         if self.save_file:
