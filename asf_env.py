@@ -11,7 +11,7 @@ def get_config():
             'analytics_id': 'UA-118881300-4'
         },
         'test': {
-            'cmr_api': 'https://cmr.earthdata.nasa.gov/search/granules.echo10',
+            'cmr_api': 'https://cmr.uat.earthdata.nasa.gov/search/granules.echo10',
             'bulk_download_api': 'https://bulk-download-test.asf.alaska.edu',
             'analytics_id': 'UA-118881300-3'
         },
