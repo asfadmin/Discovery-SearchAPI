@@ -7,6 +7,8 @@
 # python intermediate files
 *.pyc
 __pycache__/
+.mypy_cache
+.pytest_cache
 
 # dev/test files
 test/cache/*
