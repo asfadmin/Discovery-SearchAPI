@@ -35,6 +35,7 @@ import base64
 import time
 import getpass
 import ssl
+import signal
 
 import xml.etree.ElementTree as ET
 
@@ -59,6 +60,18 @@ except ImportError as e:
    from http.cookiejar import MozillaCookieJar
    from io import StringIO
 
+###
+# Global variables intended for cross-thread modification
+abort = False
+
+###
+# A routine that handles trapped signals
+def signal_handler(sig, frame):
+    global abort
+    sys.stderr.output("\n > Caught Signal. Exiting!\n")
+    abort = True # necessary to cause the program to stop
+    raise SystemExit  # this will only abort the thread that the ctrl+c was caught in
+
 class bulk_downloader:
     def __init__(self):
         # List of files to download
@@ -71,7 +84,7 @@ class bulk_downloader:
         self.asf_urs4 = { 'url': 'REPLACE_URS_URL',
                  'client': 'REPLACE_CLIENT_ID',
                  'redir': 'REPLACE_REDIR_URL'}
-
+                 
         # Make sure we can write it our current directory
         if os.access(os.getcwd(), os.W_OK) is False:
             print ("WARNING: Cannot write to current path! Check permissions for {0}".format(os.getcwd()))
@@ -94,7 +107,7 @@ class bulk_downloader:
                     except AttributeError:
                         # Python 2.6 won't complain about SSL Validation
                         pass
-
+                 
                 elif arg.endswith('.metalink') or arg.endswith('.csv'):
                     if os.path.isfile( arg ):
                         input_files.append( arg )
@@ -118,7 +131,7 @@ class bulk_downloader:
                     print (" > I see you asked me to download files from {0} input files, but they had no downloads!".format(len(input_files)))
                     print (" > I'm super confused and exiting.")
                     exit(-1)
-
+              
         # Make sure cookie_jar is good to go!
         self.get_cookie()
 
@@ -173,7 +186,7 @@ class bulk_downloader:
        request.get_method = lambda : 'HEAD'
        try:
           print (" > attempting to download {0}".format(file_check))
-          response = urlopen(request)
+          response = urlopen(request, timeout=30)
           resp_code = response.getcode()
           # Make sure we're logged in
           if not self.check_cookie_is_logged_in(self.cookie_jar):
@@ -272,7 +285,7 @@ class bulk_downloader:
           if cookie.name == 'urs_user_already_logged':
               # Only get this cookie if we logged in successfully!
               return True
-
+       
        return False
 
 
@@ -284,7 +297,7 @@ class bulk_downloader:
           try:
              request = Request(url)
              request.get_method = lambda : 'HEAD'
-             response = urlopen(request)
+             response = urlopen(request, timeout=30)
              remote_size = self.get_total_size(response)
              # Check that we were able to derive a size.
              if remote_size:
@@ -316,18 +329,18 @@ class bulk_downloader:
        # attempt https connection
        try:
           request = Request(url)
-          response = urlopen(request)
+          response = urlopen(request, timeout=30)
 
           # Watch for redirect
           if response.geturl() != url:
-
-             # See if we were redirect BACK to URS for re-auth.
+       
+             # See if we were redirect BACK to URS for re-auth. 
              if 'https://urs.earthdata.nasa.gov/oauth/authorize' in response.geturl():
 
                  if recursion:
                      print (" > Entering seemingly endless auth loop. Aborting. ")
                      return False, None
-
+     
                  # make this easier. If there is no app_type=401, add it
                  new_auth_url = response.geturl()
                  if "app_type" not in new_auth_url:
@@ -343,12 +356,12 @@ class bulk_downloader:
                      for cookie in self.cookie_jar:
                          if cookie.name not in old_cookies:
                               print (" > Saved new cookie: {0}".format(cookie.name))
-
+                          
                               # A little hack to save session cookies
                               if cookie.discard:
                                    cookie.expires = int(time.time()) + 60*60*24*30
                                    print (" > Saving session Cookie that should have been discarded! ")
-
+             
                      self.cookie_jar.save(self.cookie_jar_path, ignore_discard=True, ignore_expires=True)
                  except HTTPError as e:
                      print ("HTTP Error: {0}, {1}".format( e.code, url))
@@ -356,7 +369,7 @@ class bulk_downloader:
 
                  # Okay, now we have more cookies! Lets try again, recursively!
                  print (" > Attempting download again with new cookies!")
-                 return self.download_file_with_cookiejar(url, file_count, total, recursion=True)
+                 return self.download_file_with_cookiejar(url, file_count, total, recursion=True)       
 
              print (" > 'Temporary' Redirect download @ Remote archive:\n > {0}".format(response.geturl()))
 
@@ -366,7 +379,7 @@ class bulk_downloader:
           # Open our local file for writing and build status bar
           tf = tempfile.NamedTemporaryFile(mode='w+b', delete=False, dir='.')
           self.chunk_read(response, tf, report_hook=self.chunk_report)
-
+          
           # Reset download status
           sys.stdout.write('\n')
 
@@ -378,15 +391,8 @@ class bulk_downloader:
           print ("HTTP Error: {0}, {1}".format( e.code, url))
 
           if e.code == 401:
-             # Check for a human readable 401
-             with open(tempfile_name, 'r') as myfile:
-                 redir_html = myfile.read()
-             redirect_url = self.get_redirect_url_from_error(redir_html)
-             if redirect_url:
-                 print("Found: {0}".format(redirect_url.group(0)))
-                 exit(0)
              print (" > IMPORTANT: Your user does not have permission to download this type of data!")
-
+     
           if e.code == 403:
              print (" > Got a 403 Error trying to download this file.  ")
              print (" > You MAY need to log in this app and agree to a EULA. ")
@@ -421,9 +427,9 @@ class bulk_downloader:
        if redirect_url:
           print("Found: {0}".format(redirect_url.group(0)))
           return (redirect_url.group(0))
-
+     
        return None
-
+       
 
     #  chunk_report taken from http://stackoverflow.com/questions/2028517/python-urllib2-progress-hook
     def chunk_report(self, bytes_so_far, file_size):
@@ -442,7 +448,12 @@ class bulk_downloader:
        bytes_so_far = 0
 
        while 1:
-          chunk = response.read(chunk_size)
+          try:
+             chunk = response.read(chunk_size)
+          except:
+             sys.stdout.write("\n > There was an error reading data. \n")
+             break
+
           try:
              local_file.write(chunk)
           except TypeError:
@@ -461,12 +472,12 @@ class bulk_downloader:
        try:
           file_size = response.info().getheader('Content-Length').strip()
        except AttributeError:
-          try:
+          try: 
              file_size = response.getheader('Content-Length').strip()
           except AttributeError:
              print ("> Problem getting size")
              return None
-
+       
        return int(file_size)
 
 
@@ -513,10 +524,14 @@ class bulk_downloader:
           return dl_urls
        else:
           return None
-
+    
     # Download all the files in the list
     def download_files(self):
         for file_name in self.files:
+
+            # make sure we haven't ctrl+c'd or some other abort trap
+            if abort == True:
+              raise SystemExit
 
             # download counter
             self.cnt += 1
@@ -569,9 +584,12 @@ class bulk_downloader:
         if len(self.success) > 0:
            print ("  Average Rate: {0:.2f}MB/sec".format( (self.total_bytes/1024.0**2)/self.total_time))
         print ("--------------------------------------------------------------------------------")
-
+        
 
 if __name__ == "__main__":
+    # Setup a signal trap for SIGINT (Ctrl+C)
+    signal.signal(signal.SIGINT, signal_handler)
+
     downloader = bulk_downloader()
     downloader.download_files()
     downloader.print_summary()
