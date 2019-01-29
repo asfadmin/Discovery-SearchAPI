@@ -1,7 +1,6 @@
 from flask import Response
 import logging
 import json
-from CMR.Translate import fix_polygon
 from CMR.Input import parse_wkt
 from geomet import wkt
 import requests
@@ -18,7 +17,6 @@ class WKTValidator:
 
     def get_response(self):
         repairs = []
-        parsed = None
         # Check the syntax and type
         try:
             wkt_obj = wkt.loads(self.wkt)
@@ -94,7 +92,7 @@ class WKTValidator:
                     else:
                         result = { 'error': {'type': 'UNKNOWN', 'report': 'Tried to repair winding order but still getting CMR error: {0}'.format(r.text)} }
                         return Response(json.dumps(result), 200)
-                elif 'The polygon boundary intersected itself':
+                elif 'The polygon boundary intersected itself' in r.text:
                     result = { 'error': {'type': 'SELF_INTERSECT', 'report': 'Self-intersecting polygon'}}
                     return Response(json.dumps(result), 200)
                 else:
