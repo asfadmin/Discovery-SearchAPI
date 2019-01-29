@@ -43,14 +43,14 @@ class WKTValidator:
         # Round each coordinate
         rounded = 0
         for idx, itm in enumerate(coords):
-            if coords[idx][0] != round(itm[0], 3):
+            if coords[idx][0] != round(itm[0], 6):
                 rounded += 1
-            if coords[idx][1] != round(itm[1], 3):
+            if coords[idx][1] != round(itm[1], 6):
                 rounded += 1
-            coords[idx][0] = round(itm[0], 3)
-            coords[idx][1] = round(itm[1], 3)
+            coords[idx][0] = round(itm[0], 6)
+            coords[idx][1] = round(itm[1], 6)
         if rounded > 0:
-            repairs.append('Rounded {0} coordinate values'.format(rounded))
+            repairs.append({'type': 'ROUND', 'report': 'Rounded {0} coordinate values'.format(rounded)})
 
         # Check for duplicates
         new_coords = [coords[0]]
@@ -62,13 +62,13 @@ class WKTValidator:
                 trimmed += 1
         coords = new_coords
         if trimmed > 0:
-            repairs.append('Trimmed {0} duplicate coordinates'.format(trimmed))
+            repairs.append({'type': 'TRIM', 'report': 'Trimmed {0} duplicate coordinates'.format(trimmed)})
 
         # Check for polygon-specific issues
         if wkt_obj['type'] == 'Polygon':
             if coords[0][0] != coords[-1][0] or coords[0][1] != coords[-1][1]:
                 coords.append(coords[0])
-                repairs.append('Closed open polygon')
+                repairs.append({'type': 'CLOSURE', 'report': 'Closed open polygon'})
 
         # Re-assemble the repaired object
         if wkt_obj['type'] == 'Polygon':
@@ -81,8 +81,6 @@ class WKTValidator:
         if wkt_obj['type'] == 'Polygon':
             # Check polygons for winding order or any CMR-related issues
             cmr_coords = parse_wkt(wkt.dumps(wkt_obj)).split(':')[1].split(',')
-            logging.debug('===========')
-            logging.debug(cmr_coords)
             repair = False
             r = requests.post(get_config()['cmr_api'], data={'polygon': ','.join(cmr_coords), 'provider': 'ASF', 'page_size': 1})
             if r.status_code != 200:
@@ -103,14 +101,12 @@ class WKTValidator:
                     result = { 'error': 'Unknown CMR error: {0}'.format(r.text)}
                     return Response(json.dumps(result), 200)
             if repair:
-                repairs.append('Reversed winding order')
-                logging.debug(wkt_obj['coordinates'][0])
+                repairs.append({'type': 'REVERSED', 'report': 'Reversed polygon winding order'})
                 wkt_obj['coordinates'][0].reverse()
-                logging.debug(wkt_obj['coordinates'][0])
 
         # All done
         result = {
-            'wkt': wkt.dumps(wkt_obj, decimals=3),
+            'wkt': wkt.dumps(wkt_obj, decimals=6),
             'repairs': repairs
         }
         return Response(json.dumps(result), 200)
