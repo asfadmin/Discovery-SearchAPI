@@ -101,7 +101,7 @@ class WKTValidator:
                     result = { 'error': 'Unknown CMR error: {0}'.format(r.text)}
                     return Response(json.dumps(result), 200)
             if repair:
-                repairs.append({'type': 'REVERSED', 'report': 'Reversed polygon winding order'})
+                repairs.append({'type': 'REVERSE', 'report': 'Reversed polygon winding order'})
                 wkt_obj['coordinates'][0].reverse()
 
         # All done
