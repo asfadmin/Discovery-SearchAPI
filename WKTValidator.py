@@ -25,10 +25,10 @@ class WKTValidator:
             if wkt_obj['type'] not in ['Point', 'LineString', 'Polygon']:
                 raise TypeError('Invalid WKT type ({0}): must be Point, LineString, or Polygon'.format(wkt_obj['type']))
         except ValueError as e:
-            result = { 'error': 'Could not parse WKT: {0}'.format(str(e)) }
+            result = { 'error': {'type': 'SYNTAX', 'report': 'Could not parse WKT: {0}'.format(str(e))} }
             return Response(json.dumps(result), 200)
         except TypeError as e:
-            result = { 'error': str(e) }
+            result = { 'error': {'type': 'TYPE', 'report': str(e)} }
             return Response(json.dumps(result), 200)
 
 
@@ -92,13 +92,13 @@ class WKTValidator:
                     if r.status_code == 200:
                         repair = True
                     else:
-                        result = { 'error': 'Tried to repair winding order but still getting CMR error: {0}'.format(r.text) }
+                        result = { 'error': {'type': 'UNKNOWN', 'report': 'Tried to repair winding order but still getting CMR error: {0}'.format(r.text)} }
                         return Response(json.dumps(result), 200)
                 elif 'The polygon boundary intersected itself':
-                    result = { 'error': 'Self-intersecting polygon'}
+                    result = { 'error': {'type': 'SELF_INTERSECT', 'report': 'Self-intersecting polygon'}}
                     return Response(json.dumps(result), 200)
                 else:
-                    result = { 'error': 'Unknown CMR error: {0}'.format(r.text)}
+                    result = { 'error': {'type': 'UNKNOWN', 'report': 'Unknown CMR error: {0}'.format(r.text)}}
                     return Response(json.dumps(result), 200)
             if repair:
                 repairs.append({'type': 'REVERSE', 'report': 'Reversed polygon winding order'})
