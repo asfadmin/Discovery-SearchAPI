@@ -96,6 +96,9 @@ class WKTValidator:
                     else:
                         result = { 'error': 'Tried to repair winding order but still getting CMR error: {0}'.format(r.text) }
                         return Response(json.dumps(result), 200)
+                elif 'The polygon boundary intersected itself':
+                    result = { 'error': 'Self-intersecting polygon'}
+                    return Response(json.dumps(result), 200)
                 else:
                     result = { 'error': 'Unknown CMR error: {0}'.format(r.text)}
                     return Response(json.dumps(result), 200)
