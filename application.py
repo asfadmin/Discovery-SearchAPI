@@ -2,6 +2,7 @@ from flask import Flask, make_response
 from flask import request
 from flask import Response
 from APIProxy import APIProxyQuery
+from WKTValidator import WKTValidator
 from datetime import datetime
 from urllib import parse
 import sys
@@ -86,6 +87,11 @@ def get_script():
                                     'attachment;filename=' + filename})
 
 ########## Search API endpoints ##########
+
+# Validate and/or repair a WKT to ensure it meets CMR's requirements
+@application.route('/services/validate/wkt', methods = ['GET', 'POST'])
+def validate_wkt():
+    return WKTValidator(request).get_response()
 
 # Either get the results from CMR, or pass the query through to the legacy API
 @application.route('/services/search/param', methods = ['GET', 'POST'])
