@@ -1,5 +1,5 @@
 from flask import Response, make_response, stream_with_context
-from werkzeug.datastructures import Headers
+import api_headers
 import logging
 from datetime import datetime
 from CMR.Query import CMRQuery
@@ -40,10 +40,8 @@ class APIProxyQuery:
                     return(make_response(str(q.get_count())))
                 (translator, mimetype, suffix) = output_translators().get(self.output, output_translators()['metalink'])
                 filename = 'asf-datapool-results-{0}.{1}'.format(datetime.now().strftime('%Y-%m-%d_%H-%M-%S'), suffix)
-                d = Headers()
-                d.add('Content-type', mimetype)
+                d = api_headers.base(mimetype)
                 d.add('Content-Disposition', 'attachment', filename=filename)
-                d.add('Access-Control-Allow-Origin', '*')
                 return Response(stream_with_context(translator(q.get_results)), headers=d)
             except CMRError as e:
                 return make_response('A CMR error has occured: {0}'.format(e))
