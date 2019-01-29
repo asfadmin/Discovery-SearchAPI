@@ -68,7 +68,7 @@ class WKTValidator:
         if wkt_obj['type'] == 'Polygon':
             if coords[0][0] != coords[-1][0] or coords[0][1] != coords[-1][1]:
                 coords.append(coords[0])
-                repairs.append({'type': 'CLOSURE', 'report': 'Closed open polygon'})
+                repairs.append({'type': 'CLOSE', 'report': 'Closed open polygon'})
 
         # Re-assemble the repaired object
         if wkt_obj['type'] == 'Polygon':
