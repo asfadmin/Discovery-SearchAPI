@@ -77,10 +77,12 @@ class WKTValidator:
             wkt_obj['coordinates'] = coords[0]
         else:
             wkt_obj['coordinates'] = coords
-        '''
+
         if wkt_obj['type'] == 'Polygon':
             # Check polygons for winding order or any CMR-related issues
-            cmr_coords = parse_wkt(wkt.dumps(wkt_obj))
+            cmr_coords = parse_wkt(wkt.dumps(wkt_obj)).split(':')[1].split(',')
+            logging.debug('===========')
+            logging.debug(cmr_coords)
             repair = False
             r = requests.post(get_config()['cmr_api'], data={'polygon': ','.join(cmr_coords), 'provider': 'ASF', 'page_size': 1})
             if r.status_code != 200:
@@ -98,8 +100,11 @@ class WKTValidator:
                     result = { 'error': 'Unknown CMR error: {0}'.format(r.text)}
                     return Response(json.dumps(result), 200)
             if repair:
+                repairs.append('Reversed winding order')
+                logging.debug(wkt_obj['coordinates'][0])
                 wkt_obj['coordinates'][0].reverse()
-        '''
+                logging.debug(wkt_obj['coordinates'][0])
+
         # All done
         result = {
             'wkt': wkt.dumps(wkt_obj, decimals=3),
