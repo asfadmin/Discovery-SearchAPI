@@ -47,9 +47,11 @@ class WKTValidator:
                 new_coords.append(c)
             else:
                 trimmed += 1
+        coords = new_coords
         if trimmed > 0:
             repairs.append('Trimmed {0} duplicate coordinates'.format(trimmed))
 
+        wkt_obj['coordinates'] = coords
         # All done
         result = {
             'wkt': wkt.dumps(wkt_obj, decimals=3),
