@@ -1,7 +1,7 @@
 from flask import Response
 import logging
 import json
-from geomet import wkt
+from geomet import wkt, InvalidGeoJSONException
 import api_headers
 import os
 from APIUtils import repairWKT
@@ -37,8 +37,16 @@ class FilesToWKT:
         return 'cool'
 
 def parse_geojson(f):
-    geom = json.loads(f.read())['features'][0]['geometry']
-    wkt_str = wkt.dumps(geom)
+    try:
+        data = f.read()
+        geom = json.loads(data)['features'][0]['geometry']
+        wkt_str = wkt.dumps(geom)
+    except InvalidGeoJSONException as e:
+        return {'error': {'type': 'VALUE', 'report': 'Could not parse GeoJSON: {0}'.format(str(e))}}
+    except KeyError as e:
+        return {'error': {'type': 'VALUE', 'report': 'Missing expected key: {0}'.format(str(e))}}
+    except ValueError as e:
+        return {'error': {'type': 'VALUE', 'report': 'Could not parse GeoJSON: {0}'.format(str(e))}}
     return repairWKT(wkt_str)
 
 def parse_kml(f):

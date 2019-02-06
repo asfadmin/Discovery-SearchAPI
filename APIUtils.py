@@ -13,7 +13,7 @@ def repairWKT(wkt_str):
         if wkt_obj['type'] not in ['Point', 'LineString', 'Polygon']:
             raise TypeError('Invalid WKT type ({0}): must be Point, LineString, or Polygon'.format(wkt_obj['type']))
     except ValueError as e:
-        return { 'error': {'type': 'SYNTAX', 'report': 'Could not parse WKT: {0}'.format(str(e))} }
+        return { 'error': {'type': 'VALUE', 'report': 'Could not parse WKT: {0}'.format(str(e))} }
     except TypeError as e:
         return { 'error': {'type': 'TYPE', 'report': str(e)} }
 
