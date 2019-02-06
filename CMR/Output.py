@@ -255,7 +255,7 @@ class GeoJSONStreamArray(JSONStreamArray):
             'geometry': {
                 'type': 'Polygon',
                 'coordinates': [
-                    [[c['lon'], c['lat']] for c in p['shape']]
+                    [[float(c['lon']), float(c['lat'])] for c in p['shape']]
                 ]
             },
             'properties': {
