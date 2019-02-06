@@ -16,6 +16,7 @@ def output_translators():
         'csv':          [cmr_to_csv, 'text/csv; charset=utf-8', 'csv'],
         'kml':          [cmr_to_kml, 'application/vnd.google-earth.kml+xml; charset=utf-8', 'kmz'],
         'json':         [cmr_to_json, 'application/json; charset=utf-8', 'json'],
+        'jsonlite':     [cmr_to_jsonlite, 'application/json; charset=utf-8', 'json'],
         'geojson':      [cmr_to_geojson, 'application/geojson; charset=utf-8', 'geojson'],
         'count':        [count, 'text/plain; charset=utf-8', 'txt'],
         'download':     [cmr_to_download, 'text/plain; charset=utf-8', 'py']
@@ -55,6 +56,14 @@ def cmr_to_json(rgen):
     streamer = JSONStreamArray(rgen)
 
     for p in json.JSONEncoder(indent=2, sort_keys=True).iterencode([streamer]):
+        yield p
+
+def cmr_to_jsonlite(rgen):
+    logging.debug('translating: jsonlite')
+
+    streamer = JSONLiteStreamArray(rgen)
+
+    for p in json.JSONEncoder(indent=2, sort_keys=True).iterencode({'results': streamer}):
         yield p
 
 def cmr_to_geojson(rgen):
@@ -170,11 +179,68 @@ class JSONStreamArray(list):
 
         return dict((k, p[k]) for k in legacy_json_keys if k in p)
 
+class JSONLiteStreamArray(JSONStreamArray):
+
+    def getItem(self, p):
+        for i in p.keys():
+            if p[i] == 'NA' or p[i] == '':
+                p[i] = None
+        try:
+            if float(p['offNadirAngle']) < 0:
+                p['offNadirAngle'] = None
+            if float(p['relativeOrbit']) < 0:
+                p['relativeOrbit'] = None
+            if p['groupID'] is None:
+                p['groupID'] = p['granuleName']
+        except TypeError:
+            pass
+
+        try:
+            p['sizeMB'] = float(p['sizeMB'])
+        except TypeError:
+            pass
+
+        try:
+            p['relativeOrbit'] = int(p['relativeOrbit'])
+        except TypeError:
+            pass
+
+        try:
+            p['frameNumber'] = int(p['frameNumber'])
+        except TypeError:
+            pass
+
+        try:
+            p['absoluteOrbit'] = int(p['absoluteOrbit'])
+        except TypeError:
+            pass
+
+        return {
+            'granuleName': p['granuleName'],
+            'productID': p['product_file_id'],
+            'fileName': p['fileName'],
+            'downloadUrl': p['downloadUrl'],
+            'sizeMB': p['sizeMB'],
+            'platform': p['platform'],
+            'browse': p['browse'],
+            'groupID': p['groupID'],
+            'beamMode': p['beamMode'],
+            'polarization': p['polarization'],
+            'flightDirection': p['flightDirection'],
+            'frequency': p['frequency'],
+            'path': p['relativeOrbit'],
+            'frame': p['frameNumber'],
+            'orbit': p['absoluteOrbit'],
+            'startTime': p['startTime'],
+            'wkt': p['stringFootprint'],
+            'productType': p['processingLevel']
+        }
+
 class GeoJSONStreamArray(JSONStreamArray):
 
     def getItem(self, p):
         for i in p.keys():
-            if p[i] == 'NA':
+            if p[i] == 'NA' or p[i] == '':
                 p[i] = None
         try:
             if float(p['offNadirAngle']) < 0:
