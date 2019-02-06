@@ -2,9 +2,7 @@ from flask import Response
 import logging
 import json
 from geomet import wkt
-import requests
 import api_headers
-from asf_env import get_config
 import os
 from APIUtils import repairWKT
 
