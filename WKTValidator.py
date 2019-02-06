@@ -4,6 +4,7 @@ import json
 from CMR.Input import parse_wkt
 from geomet import wkt
 import requests
+import api_headers
 from asf_env import get_config
 
 class WKTValidator:
@@ -16,18 +17,24 @@ class WKTValidator:
             self.wkt = None
 
     def get_response(self):
+        d = api_headers.base(mimetype='application/json')
+
+        resp_dict = self.make_response()
+
+        return Response(json.dumps(resp_dict), 200, headers=d)
+
+    def make_response(self):
         repairs = []
+
         # Check the syntax and type
         try:
             wkt_obj = wkt.loads(self.wkt)
             if wkt_obj['type'] not in ['Point', 'LineString', 'Polygon']:
                 raise TypeError('Invalid WKT type ({0}): must be Point, LineString, or Polygon'.format(wkt_obj['type']))
         except ValueError as e:
-            result = { 'error': {'type': 'SYNTAX', 'report': 'Could not parse WKT: {0}'.format(str(e))} }
-            return Response(json.dumps(result), 200)
+            return { 'error': {'type': 'SYNTAX', 'report': 'Could not parse WKT: {0}'.format(str(e))} }
         except TypeError as e:
-            result = { 'error': {'type': 'TYPE', 'report': str(e)} }
-            return Response(json.dumps(result), 200)
+            return { 'error': {'type': 'TYPE', 'report': str(e)} }
 
 
         if wkt_obj['type'] == 'Polygon': # only use the outer perimeter
@@ -48,11 +55,14 @@ class WKTValidator:
             coords[idx][0] = round(itm[0], 6)
             coords[idx][1] = round(itm[1], 6)
         if rounded > 0:
-            repairs.append({'type': 'ROUND', 'report': 'Rounded {0} coordinate values'.format(rounded)})
+            repairs.append({
+                'type': 'ROUND',
+                'report': 'Rounded {0} coordinate values'.format(rounded)
+            })
 
         # Check for duplicates
         new_coords = [coords[0]]
-        trimmed = -1 # Because the first point is pre-populated
+        trimmed = -1  # Because the first point is pre-populated
         for c in coords:
             if c[0] != new_coords[-1][0] or c[1] != new_coords[-1][1]:
                 new_coords.append(c)
@@ -60,13 +70,19 @@ class WKTValidator:
                 trimmed += 1
         coords = new_coords
         if trimmed > 0:
-            repairs.append({'type': 'TRIM', 'report': 'Trimmed {0} duplicate coordinates'.format(trimmed)})
+            repairs.append({
+                'type': 'TRIM',
+                'report': 'Trimmed {0} duplicate coordinates'.format(trimmed)
+            })
 
         # Check for polygon-specific issues
         if wkt_obj['type'] == 'Polygon':
             if coords[0][0] != coords[-1][0] or coords[0][1] != coords[-1][1]:
                 coords.append(coords[0])
-                repairs.append({'type': 'CLOSE', 'report': 'Closed open polygon'})
+                repairs.append({
+                    'type': 'CLOSE',
+                    'report': 'Closed open polygon'
+                })
 
         # Re-assemble the repaired object
         if wkt_obj['type'] == 'Polygon':
@@ -90,21 +106,17 @@ class WKTValidator:
                     if r.status_code == 200:
                         repair = True
                     else:
-                        result = { 'error': {'type': 'UNKNOWN', 'report': 'Tried to repair winding order but still getting CMR error: {0}'.format(r.text)} }
-                        return Response(json.dumps(result), 200)
+                        return { 'error': {'type': 'UNKNOWN', 'report': 'Tried to repair winding order but still getting CMR error: {0}'.format(r.text)} }
                 elif 'The polygon boundary intersected itself' in r.text:
-                    result = { 'error': {'type': 'SELF_INTERSECT', 'report': 'Self-intersecting polygon'}}
-                    return Response(json.dumps(result), 200)
+                    return { 'error': {'type': 'SELF_INTERSECT', 'report': 'Self-intersecting polygon'}}
                 else:
-                    result = { 'error': {'type': 'UNKNOWN', 'report': 'Unknown CMR error: {0}'.format(r.text)}}
-                    return Response(json.dumps(result), 200)
+                    return { 'error': {'type': 'UNKNOWN', 'report': 'Unknown CMR error: {0}'.format(r.text)}}
             if repair:
                 repairs.append({'type': 'REVERSE', 'report': 'Reversed polygon winding order'})
                 wkt_obj['coordinates'][0].reverse()
 
         # All done
-        result = {
+        return {
             'wkt': wkt.dumps(wkt_obj, decimals=6),
             'repairs': repairs
         }
-        return Response(json.dumps(result), 200)
