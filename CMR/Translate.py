@@ -89,21 +89,22 @@ def input_fixer(params):
         else:
             fixed_params[k] = v
 
-    # set default start and end dates if needed, and then make sure they're formatted correctly
-    # whether using the default or not
-    start_s = fixed_params['start'] if 'start' in fixed_params else '1978-01-01T00:00:00Z'
-    end_s = fixed_params['end'] if 'end' in fixed_params else datetime.utcnow().isoformat()
-    start = dateparser.parse(start_s, settings={'RETURN_AS_TIMEZONE_AWARE': True})
-    end = dateparser.parse(end_s, settings={'RETURN_AS_TIMEZONE_AWARE': True})
+    if 'start' in fixed_params or 'end' in fixed_params:
+        # set default start and end dates if needed, and then make sure they're formatted correctly
+        # whether using the default or not
+        start_s = fixed_params['start'] if 'start' in fixed_params else '1978-01-01T00:00:00Z'
+        end_s = fixed_params['end'] if 'end' in fixed_params else datetime.utcnow().isoformat()
+        start = dateparser.parse(start_s, settings={'RETURN_AS_TIMEZONE_AWARE': True})
+        end = dateparser.parse(end_s, settings={'RETURN_AS_TIMEZONE_AWARE': True})
 
-    # Check/fix the order of start/end
-    if start > end:
-        start, end = end, start
-    # Final temporal string that will actually be used
-    fixed_params['temporal'] = '{0},{1}'.format(start.strftime('%Y-%m-%dT%H:%M:%SZ'), end.strftime('%Y-%m-%dT%H:%M:%SZ'))
-    # And a little cleanup
-    fixed_params.pop('start', None)
-    fixed_params.pop('end', None)
+        # Check/fix the order of start/end
+        if start > end:
+            start, end = end, start
+        # Final temporal string that will actually be used
+        fixed_params['temporal'] = '{0},{1}'.format(start.strftime('%Y-%m-%dT%H:%M:%SZ'), end.strftime('%Y-%m-%dT%H:%M:%SZ'))
+        # And a little cleanup
+        fixed_params.pop('start', None)
+        fixed_params.pop('end', None)
 
     return fixed_params
 
