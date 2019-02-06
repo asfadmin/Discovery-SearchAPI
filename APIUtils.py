@@ -1,8 +1,8 @@
 import logging
-import json
 from CMR.Input import parse_wkt
 from geomet import wkt
 from asf_env import get_config
+import requests
 
 def repairWKT(wkt_str):
     repairs = []

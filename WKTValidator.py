@@ -1,7 +1,5 @@
 from flask import Response
-import logging
 import json
-import requests
 import api_headers
 from APIUtils import repairWKT
 
