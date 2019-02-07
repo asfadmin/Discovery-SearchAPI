@@ -18,7 +18,7 @@ class FilesToWKT:
 
         resp_dict = self.make_response()
 
-        return Response(json.dumps(resp_dict), 200, headers=d)
+        return Response(json.dumps(resp_dict, sort_keys=True, indent=4), 200, headers=d)
 
     def make_response(self):
         if 'files' not in self.request.files:
