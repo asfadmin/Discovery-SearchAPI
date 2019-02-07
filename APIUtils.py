@@ -67,18 +67,28 @@ def repairWKT(wkt_str):
     else:
         wkt_obj['coordinates'] = coords
 
+    def shape_len(shp):
+        type = shp.geom_type.upper()
+        if type == 'POINT':
+            return 1
+        if type == 'LINESTRING':
+            return len(shp.coords)
+        if type == 'POLYGON':
+            return len(shp.exterior.coords)
+        return None
+
     # Do some shapely magic
     original_shape = shapely.wkt.loads(wkt.dumps(wkt_obj, decimals=6))
     tolerance = 0.00001
     shape = original_shape.simplify(tolerance, preserve_topology=True)
-    while len(shape.exterior.coords) > 300:
-        logging.debug('Shape length still {0}, simplifying further with tolerance {1}'.format(len(shape.exterior.coords), tolerance * 5))
+    while shape_len(shape) > 450:
+        logging.debug('Shape length still {0}, simplifying further with tolerance {1}'.format(shape_len(shape), tolerance * 5))
         tolerance *= 5
         shape = original_shape.simplify(tolerance, preserve_topology=True)
-    if len(original_shape.exterior.coords) != len(shape.exterior.coords):
+    if shape_len(original_shape) != shape_len(shape):
         repairs.append({
             'type': 'SIMPLIFY',
-            'report': 'Simplified shape from {0} points to {1} points'.format(len(original_shape.exterior.coords), len(shape.exterior.coords))
+            'report': 'Simplified shape from {0} points to {1} points'.format(shape_len(original_shape), shape_len(shape))
         })
         logging.debug(repairs[-1])
 
@@ -89,6 +99,7 @@ def repairWKT(wkt_str):
         cmr_coords = parse_wkt(wkt.dumps(wkt_obj, decimals=6)).split(':')[1].split(',')
         repair = False
         r = requests.post(get_config()['cmr_api'], data={'polygon': ','.join(cmr_coords), 'provider': 'ASF', 'page_size': 1})
+        logging.debug({'polygon': ','.join(cmr_coords), 'provider': 'ASF', 'page_size': 1, 'attribute[]': 'string,ASF_PLATFORM,FAKEPLATFORM'})
         if r.status_code != 200:
             if 'Please check the order of your points.' in r.text:
                 it = iter(cmr_coords)
