@@ -68,12 +68,12 @@ def repairWKT(wkt_str):
         wkt_obj['coordinates'] = coords
 
     def shape_len(shp):
-        type = shp.geom_type.upper()
-        if type == 'POINT':
+        shp_type = shp.geom_type.upper()
+        if shp_type == 'POINT':
             return 1
-        if type == 'LINESTRING':
+        if shp_type == 'LINESTRING':
             return len(shp.coords)
-        if type == 'POLYGON':
+        if shp_type == 'POLYGON':
             return len(shp.exterior.coords)
         return None
 
