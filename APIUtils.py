@@ -48,7 +48,7 @@ def repairWKT(wkt_str):
             'report': 'Clamped {0} values to +/-90 latitude'.format(wrapped)
         })
         logging.debug(repairs[-1])
-    
+
     # Check for polygon-specific issues
     if wkt_obj['type'] == 'Polygon':
         if coords[0][0] != coords[-1][0] or coords[0][1] != coords[-1][1]:
@@ -72,7 +72,7 @@ def repairWKT(wkt_str):
     tolerance = 0.00001
     shape = original_shape.simplify(tolerance, preserve_topology=True)
     while len(shape.exterior.coords) > 300:
-        logging.debug('Shape length still {0}, simplifying further'.format(len(shape.exterior.coords)))
+        logging.debug('Shape length still {0}, simplifying further with tolerance {1}'.format(len(shape.exterior.coords), tolerance * 5))
         tolerance *= 5
         shape = original_shape.simplify(tolerance, preserve_topology=True)
     if len(original_shape.exterior.coords) != len(shape.exterior.coords):
