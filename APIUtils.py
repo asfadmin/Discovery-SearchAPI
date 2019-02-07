@@ -3,6 +3,7 @@ from CMR.Input import parse_wkt
 from geomet import wkt
 from asf_env import get_config
 import requests
+import shapely.wkt
 
 def repairWKT(wkt_str):
     repairs = []
@@ -19,7 +20,6 @@ def repairWKT(wkt_str):
 
 
     if wkt_obj['type'] == 'Polygon': # only use the outer perimeter
-        logging.debug('doing this one')
         coords = wkt_obj['coordinates'][0]
     elif wkt_obj['type'] == 'Point':
         coords = [wkt_obj['coordinates']]
@@ -41,42 +41,14 @@ def repairWKT(wkt_str):
             'type': 'WRAP',
             'report': 'Wrapped {0} values to +/-180 longitude'.format(wrapped)
         })
+        logging.debug(repairs[-1])
     if clamped > 0:
         repairs.append({
             'type': 'CLAMP',
             'report': 'Clamped {0} values to +/-90 latitude'.format(wrapped)
         })
-
-    # Round each coordinate
-    rounded = 0
-    for idx, itm in enumerate(coords):
-        if coords[idx][0] != round(itm[0], 6):
-            rounded += 1
-        if coords[idx][1] != round(itm[1], 6):
-            rounded += 1
-        coords[idx][0] = round(itm[0], 6)
-        coords[idx][1] = round(itm[1], 6)
-    if rounded > 0:
-        repairs.append({
-            'type': 'ROUND',
-            'report': 'Rounded {0} coordinate values'.format(rounded)
-        })
-
-    # Check for duplicates
-    new_coords = [coords[0]]
-    trimmed = -1  # Because the first point is pre-populated
-    for c in coords:
-        if c[0] != new_coords[-1][0] or c[1] != new_coords[-1][1]:
-            new_coords.append(c)
-        else:
-            trimmed += 1
-    coords = new_coords
-    if trimmed > 0:
-        repairs.append({
-            'type': 'TRIM',
-            'report': 'Trimmed {0} duplicate coordinates'.format(trimmed)
-        })
-
+        logging.debug(repairs[-1])
+    
     # Check for polygon-specific issues
     if wkt_obj['type'] == 'Polygon':
         if coords[0][0] != coords[-1][0] or coords[0][1] != coords[-1][1]:
@@ -85,6 +57,7 @@ def repairWKT(wkt_str):
                 'type': 'CLOSE',
                 'report': 'Closed open polygon'
             })
+            logging.debug(repairs[-1])
 
     # Re-assemble the repaired object
     if wkt_obj['type'] == 'Polygon':
@@ -94,9 +67,26 @@ def repairWKT(wkt_str):
     else:
         wkt_obj['coordinates'] = coords
 
+    # Do some shapely magic
+    original_shape = shapely.wkt.loads(wkt.dumps(wkt_obj, decimals=6))
+    tolerance = 0.00001
+    shape = original_shape.simplify(tolerance, preserve_topology=True)
+    while len(shape.exterior.coords) > 300:
+        logging.debug('Shape length still {0}, simplifying further'.format(len(shape.exterior.coords)))
+        tolerance *= 5
+        shape = original_shape.simplify(tolerance, preserve_topology=True)
+    if len(original_shape.exterior.coords) != len(shape.exterior.coords):
+        repairs.append({
+            'type': 'SIMPLIFY',
+            'report': 'Simplified shape from {0} points to {1} points'.format(len(original_shape.exterior.coords), len(shape.exterior.coords))
+        })
+        logging.debug(repairs[-1])
+
+    wkt_obj = wkt.loads(shapely.wkt.dumps(shape))
+
     if wkt_obj['type'] == 'Polygon':
         # Check polygons for winding order or any CMR-related issues
-        cmr_coords = parse_wkt(wkt.dumps(wkt_obj)).split(':')[1].split(',')
+        cmr_coords = parse_wkt(wkt.dumps(wkt_obj, decimals=6)).split(':')[1].split(',')
         repair = False
         r = requests.post(get_config()['cmr_api'], data={'polygon': ','.join(cmr_coords), 'provider': 'ASF', 'page_size': 1})
         if r.status_code != 200:
@@ -115,6 +105,7 @@ def repairWKT(wkt_str):
                 return { 'error': {'type': 'UNKNOWN', 'report': 'Unknown CMR error: {0}'.format(r.text)}}
         if repair:
             repairs.append({'type': 'REVERSE', 'report': 'Reversed polygon winding order'})
+            logging.debug(repairs[-1])
             wkt_obj['coordinates'][0].reverse()
 
     # All done
