@@ -19,7 +19,6 @@ def repairWKT(wkt_str):
 
 
     if wkt_obj['type'] == 'Polygon': # only use the outer perimeter
-        logging.debug('doing this one')
         coords = wkt_obj['coordinates'][0]
     elif wkt_obj['type'] == 'Point':
         coords = [wkt_obj['coordinates']]
@@ -41,11 +40,13 @@ def repairWKT(wkt_str):
             'type': 'WRAP',
             'report': 'Wrapped {0} values to +/-180 longitude'.format(wrapped)
         })
+        logging.debug(repairs[-1])
     if clamped > 0:
         repairs.append({
             'type': 'CLAMP',
             'report': 'Clamped {0} values to +/-90 latitude'.format(wrapped)
         })
+        logging.debug(repairs[-1])
 
     # Round each coordinate
     rounded = 0
@@ -61,6 +62,7 @@ def repairWKT(wkt_str):
             'type': 'ROUND',
             'report': 'Rounded {0} coordinate values'.format(rounded)
         })
+        logging.debug(repairs[-1])
 
     # Check for duplicates
     new_coords = [coords[0]]
@@ -76,6 +78,7 @@ def repairWKT(wkt_str):
             'type': 'TRIM',
             'report': 'Trimmed {0} duplicate coordinates'.format(trimmed)
         })
+        logging.debug(repairs[-1])
 
     # Check for polygon-specific issues
     if wkt_obj['type'] == 'Polygon':
@@ -85,6 +88,7 @@ def repairWKT(wkt_str):
                 'type': 'CLOSE',
                 'report': 'Closed open polygon'
             })
+            logging.debug(repairs[-1])
 
     # Re-assemble the repaired object
     if wkt_obj['type'] == 'Polygon':
@@ -96,7 +100,7 @@ def repairWKT(wkt_str):
 
     if wkt_obj['type'] == 'Polygon':
         # Check polygons for winding order or any CMR-related issues
-        cmr_coords = parse_wkt(wkt.dumps(wkt_obj)).split(':')[1].split(',')
+        cmr_coords = parse_wkt(wkt.dumps(wkt_obj, decimals=6)).split(':')[1].split(',')
         repair = False
         r = requests.post(get_config()['cmr_api'], data={'polygon': ','.join(cmr_coords), 'provider': 'ASF', 'page_size': 1})
         if r.status_code != 200:
@@ -115,6 +119,7 @@ def repairWKT(wkt_str):
                 return { 'error': {'type': 'UNKNOWN', 'report': 'Unknown CMR error: {0}'.format(r.text)}}
         if repair:
             repairs.append({'type': 'REVERSE', 'report': 'Reversed polygon winding order'})
+            logging.debug(repairs[-1])
             wkt_obj['coordinates'][0].reverse()
 
     # All done
