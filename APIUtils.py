@@ -27,9 +27,25 @@ def repairWKT(wkt_str):
         coords = wkt_obj['coordinates']
 
     # Clamp coords to +/-90 and wrap to +/-180
+    wrapped = 0
+    clamped = 0
     for idx, itm in enumerate(coords):
-        coords[idx][0] = ((coords[idx][0] + 180) % 360 - 180)
-        coords[idx][1] = sorted((-90, coords[idx][1], 90))[1]
+        if coords[idx][0] != ((coords[idx][0] + 180) % 360 - 180):
+            coords[idx][0] = ((coords[idx][0] + 180) % 360 - 180)
+            wrapped += 1
+        if coords[idx][1] != sorted((-90, coords[idx][1], 90))[1]:
+            coords[idx][1] = sorted((-90, coords[idx][1], 90))[1]
+            clamped += 1
+    if wrapped > 0:
+        repairs.append({
+            'type': 'WRAP',
+            'report': 'Wrapped {0} values to +/-180 longitude'.format(wrapped)
+        })
+    if clamped > 0:
+        repairs.append({
+            'type': 'CLAMP',
+            'report': 'Clamped {0} values to +/-90 latitude'.format(wrapped)
+        })
 
     # Round each coordinate
     rounded = 0
