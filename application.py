@@ -84,8 +84,9 @@ def get_script():
                     for cell in row)
     return Response(generator,
                        mimetype = 'text/plain',
-                       headers = {'Content-Disposition':
-                                    'attachment;filename=' + filename})
+                       headers = {'Access-Control-Allow-Origin': '*',
+                                  'Content-Disposition':
+                                  'attachment;filename=' + filename})
 
 ########## Search API endpoints ##########
 

@@ -11,8 +11,16 @@ def repairWKT(wkt_str):
     # Check the syntax and type
     try:
         wkt_obj = wkt.loads(wkt_str)
-        if wkt_obj['type'] not in ['Point', 'LineString', 'Polygon']:
-            raise TypeError('Invalid WKT type ({0}): must be Point, LineString, or Polygon'.format(wkt_obj['type']))
+        if wkt_obj['type'].upper() not in ['POINT', 'LINESTRING', 'POLYGON']:
+            shape = shapely.wkt.loads(wkt.dumps(wkt_obj)).convex_hull
+            if shape.geom_type.upper() not in ['POINT', 'LINESTRING', 'POLYGON']:
+                raise TypeError('Invalid WKT type ({0}): must be Point, LineString, or Polygon'.format(wkt_obj['type']))
+            else:
+                wkt_obj = wkt.loads(shape.wkt)
+                repairs.append({
+                    'type': 'CONVEX_HULL',
+                    'report': 'WKT not a point, linestring, or polygon, using the convex hull instead.'
+                })
     except ValueError as e:
         return { 'error': {'type': 'VALUE', 'report': 'Could not parse WKT: {0}'.format(str(e))} }
     except TypeError as e:
