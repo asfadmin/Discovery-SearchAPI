@@ -19,7 +19,7 @@ def repairWKT(wkt_str):
                 wkt_obj = wkt.loads(shape.wkt)
                 repairs.append({
                     'type': 'CONVEX_HULL',
-                    'report': 'WKT not a point, linestring, or polygon, using the convex hull instead.'
+                    'report': 'Shape was not a point, linestring, or polygon; using the convex hull instead'
                 })
     except ValueError as e:
         return { 'error': {'type': 'VALUE', 'report': 'Could not parse WKT: {0}'.format(str(e))} }
@@ -38,7 +38,7 @@ def repairWKT(wkt_str):
     wrapped = 0
     clamped = 0
     for idx, itm in enumerate(coords):
-        if coords[idx][0] != ((coords[idx][0] + 180) % 360 - 180):
+        if abs(((coords[idx][0] + 180) % 360 - 180) - coords[idx][0]) > 0.000001:
             coords[idx][0] = ((coords[idx][0] + 180) % 360 - 180)
             wrapped += 1
         if coords[idx][1] != sorted((-90, coords[idx][1], 90))[1]:
@@ -86,7 +86,7 @@ def repairWKT(wkt_str):
         return None
 
     # Do some shapely magic
-    original_shape = shapely.wkt.loads(wkt.dumps(wkt_obj, decimals=6))
+    original_shape = shapely.wkt.loads(wkt.dumps(wkt_obj))
     tolerance = 0.00001
     shape = original_shape.simplify(tolerance, preserve_topology=True)
     while shape_len(shape) > 450:
@@ -104,7 +104,7 @@ def repairWKT(wkt_str):
 
     if wkt_obj['type'] == 'Polygon':
         # Check polygons for winding order or any CMR-related issues
-        cmr_coords = parse_wkt(wkt.dumps(wkt_obj, decimals=6)).split(':')[1].split(',')
+        cmr_coords = parse_wkt(wkt.dumps(wkt_obj)).split(':')[1].split(',')
         repair = False
         r = requests.post(get_config()['cmr_api'], data={'polygon': ','.join(cmr_coords), 'provider': 'ASF', 'page_size': 1})
         logging.debug({'polygon': ','.join(cmr_coords), 'provider': 'ASF', 'page_size': 1, 'attribute[]': 'string,ASF_PLATFORM,FAKEPLATFORM'})
@@ -129,6 +129,6 @@ def repairWKT(wkt_str):
 
     # All done
     return {
-        'wkt': wkt.dumps(wkt_obj, decimals=6),
+        'wkt': wkt.dumps(wkt_obj),
         'repairs': repairs
     }
