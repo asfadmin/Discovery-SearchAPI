@@ -88,11 +88,15 @@ def repairWKT(wkt_str):
     # Do some shapely magic
     original_shape = shapely.wkt.loads(wkt.dumps(wkt_obj))
     tolerance = 0.00001
+    attempts = 1
     shape = original_shape.simplify(tolerance, preserve_topology=True)
-    while shape_len(shape) > 450:
+    while shape_len(shape) > 300 and attempts <= 10:
+        attempts += 1
         logging.debug('Shape length still {0}, simplifying further with tolerance {1}'.format(shape_len(shape), tolerance * 5))
         tolerance *= 5
         shape = original_shape.simplify(tolerance, preserve_topology=True)
+    if attempts > 10:
+        return { 'error': {'type': 'SIMPLIFY', 'report': 'Could not simplify shape after {0} iterations'.format(attempts)} }
     if shape_len(original_shape) != shape_len(shape):
         repairs.append({
             'type': 'SIMPLIFY',

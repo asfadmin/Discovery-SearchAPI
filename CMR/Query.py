@@ -6,7 +6,7 @@ from CMR.SubQuery import CMRSubQuery
 
 class CMRQuery:
 
-    def __init__(self, params=None, max_results=None, output='metalink'):
+    def __init__(self, params=None, max_results=None, output='metalink', analytics=True):
         self.extra_params = {'provider': 'ASF', # always limit the results to ASF as the provider
                              'page_size': 2000, # page size to request from CMR
                              'scroll': 'true',  # used for fetching multiple page_size
@@ -17,6 +17,7 @@ class CMRQuery:
         self.params = params
         self.max_results = max_results
         self.output = output
+        self.analytics = analytics
 
         self.result_counter = 0
         self.cutoff_time = time.time() + 870 #14.5 minutes max
@@ -29,7 +30,7 @@ class CMRQuery:
         logging.debug('output: {0}'.format(self.output))
         logging.debug('maxresults: {0}'.format(self.max_results))
         self.query_list = self.get_query_list(self.params)
-        self.sub_queries = [CMRSubQuery(params=list(q), extra_params=self.extra_params) for q in self.query_list]
+        self.sub_queries = [CMRSubQuery(params=list(q), extra_params=self.extra_params, analytics=self.analytics) for q in self.query_list]
         logging.debug('{0} subqueries ready to go'.format(len(self.sub_queries)))
 
         logging.debug('new CMRQuery object ready to go')

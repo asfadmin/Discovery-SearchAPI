@@ -10,6 +10,7 @@ import sys
 import logging
 import os
 import requests
+from CacheQuery import response_from_cache
 
 # EB looks for an 'application' callable by default.
 application = Flask(__name__)
@@ -100,10 +101,15 @@ def validate_wkt():
 def filesToWKT():
     return FilesToWKT(request).get_response()
 
-# Either get the results from CMR, or pass the query through to the legacy API
+# Fetch and convert the results from CMR
 @application.route('/services/search/param', methods = ['GET', 'POST'])
 def proxy_search():
     return APIProxyQuery(request).get_response()
+
+# Fetch results from the jsonlite_cache
+@application.route('/services/search/cache', methods= ['GET', 'POST'])
+def read_cache():
+    return response_from_cache(request)
 
 # Health check endpoint
 @application.route('/health')
