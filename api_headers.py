@@ -1,7 +1,7 @@
 from werkzeug.datastructures import Headers
 
 
-def base(mimetype):
+def base(mimetype, headers=Headers()):
     base_headers = {
         'Access-Control-Allow-Origin': '*',
         'Content-type': mimetype

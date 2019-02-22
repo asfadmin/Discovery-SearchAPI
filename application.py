@@ -10,6 +10,7 @@ import sys
 import logging
 import os
 import requests
+from CacheQuery import response_from_cache
 
 # EB looks for an 'application' callable by default.
 application = Flask(__name__)
@@ -104,6 +105,11 @@ def filesToWKT():
 @application.route('/services/search/param', methods = ['GET', 'POST'])
 def proxy_search():
     return APIProxyQuery(request).get_response()
+
+# Fetch results from the jsonlite_cache
+@application.route('/services/search/cache', methods= ['GET', 'POST'])
+def read_cache():
+    return response_from_cache(request)
 
 # Health check endpoint
 @application.route('/health')
