@@ -79,6 +79,7 @@ def cmr_to_geojson(rgen):
 class JSONStreamArray(list):
     def __init__(self, gen):
         self.gen = gen
+
         # need to make sure we actually have results so we can intelligently set __len__, otherwise
         # iterencode behaves strangely and will output invalid json
         self.first_result = None
@@ -181,7 +182,8 @@ class JSONStreamArray(list):
 
 class JSONLiteStreamArray(JSONStreamArray):
 
-    def getItem(self, p):
+    @staticmethod
+    def getItem(p):
         for i in p.keys():
             if p[i] == 'NA' or p[i] == '':
                 p[i] = None

@@ -100,7 +100,7 @@ def validate_wkt():
 def filesToWKT():
     return FilesToWKT(request).get_response()
 
-# Either get the results from CMR, or pass the query through to the legacy API
+# Fetch and convert the results from CMR
 @application.route('/services/search/param', methods = ['GET', 'POST'])
 def proxy_search():
     return APIProxyQuery(request).get_response()
