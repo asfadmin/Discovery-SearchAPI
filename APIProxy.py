@@ -20,7 +20,7 @@ class APIProxyQuery:
     def can_use_cmr(self):
         # make sure the provided params are a subset of the CMR-supported params and have compatible values
         try:
-            self.cmr_params, self.output, self.max_results = translate_params(self.request.values)
+            self.cmr_params, self.output, self.max_results, self.page_size = translate_params(self.request.values)
             self.cmr_params = input_fixer(self.cmr_params)
         except ValueError as e: # didn't parse, pass it to the legacy API for now
             logging.debug('ValueError: {0}'.format(e))
@@ -44,7 +44,7 @@ class APIProxyQuery:
                 d.add('Content-Disposition', 'attachment', filename=filename)
                 if self.output == 'jsonlite':
                     # Fire off copy of same query in separate thread for caching purposes
-                    cache_id = run_threaded_caching_query(CMRQuery(params=dict(self.cmr_params), output=self.output, max_results=self.max_results, analytics=False))
+                    cache_id = run_threaded_caching_query(CMRQuery(params=dict(self.cmr_params), output=self.output, max_results=self.max_results, analytics=False), self.page_size)
                     d.add('ASF-Cache-ID', cache_id)
                 return Response(stream_with_context(translator(q.get_results)), headers=d)
             except CMRError as e:

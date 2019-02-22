@@ -7,19 +7,20 @@ from CMR.Output import output_translators, JSONLiteStreamArray
 import json
 import os
 
-def run_threaded_caching_query(query):
+def run_threaded_caching_query(query, page_size):
     cache_id = uuid()
     logging.debug('cache_id: {0}'.format(cache_id))
-    t = Thread(target=cache_results, args=(query, cache_id))
+    t = Thread(target=cache_results, args=(query, cache_id, page_size))
     logging.debug('Starting query thread')
     t.start()
     return cache_id
 
 class CacheQuery:
 
-    def __init__(self, query, cache_id):
+    def __init__(self, query, cache_id, page_size):
         self.query = query
         self.cache_id = cache_id
+        self.page_size = page_size
         self.results = []
         self.cache_path = '{0}/jsonlite_cache/{1}'.format(os.getcwd(), self.cache_id)
         try:
@@ -32,7 +33,7 @@ class CacheQuery:
         page = []
         for r in self.query.get_results():
             page.append(r)
-            if len(page) >= 5:
+            if len(page) >= self.page_size:
                 yield page
                 page = []
         yield page
@@ -47,9 +48,9 @@ class CacheQuery:
         return
 
 
-def cache_results(query, cache_id):
+def cache_results(query, cache_id, page_size):
     logging.debug('caching pages')
-    cq = CacheQuery(query, cache_id)
+    cq = CacheQuery(query, cache_id, page_size)
     page_num = 0
     for page in cq.gen_pages():
         cq.save_page(page, page_num)
