@@ -99,7 +99,8 @@ class CMRSubQuery:
             logging.debug('CMR reported {0} hits for session {1}'.format(self.hits, self.sid))
         else:
             r = s.post(get_config()['cmr_api'], data=self.params)
-        post_analytics(pageview=False, events=[{'ec': 'CMR API Status', 'ea': r.status_code}]) if self.analytics else None
+        if self.analytics:
+            post_analytics(pageview=False, events=[{'ec': 'CMR API Status', 'ea': r.status_code}])
         if r.status_code != 200:
             logging.error('Bad news bears! CMR said {0} on session {1}'.format(r.status_code, self.sid))
             logging.error('Currently on page {0}'.format(self.current_page + 1))
