@@ -1,11 +1,9 @@
 import logging
-from flask import make_response, send_file
+from flask import Response, make_response, send_file
 import api_headers
 from threading import Thread
-from asf_env import get_config
 from uuid import uuid4 as uuid
 from CMR.Output import output_translators, JSONLiteStreamArray
-import itertools
 import json
 import os
 
@@ -58,13 +56,14 @@ def cache_results(query, cache_id):
         page_num += 1
 
 def response_from_cache(request):
+    mimetype = output_translators()['jsonlite'][1]
     if 'cache_id' not in request.values or 'page' not in request.values:
-        return Response(json.dumps({'error': 'Must provide cache ID (cache-id=) and page number (page=)'}, sort_keys=True, indent=4), 200, headers=d)
+        return Response(json.dumps({'error': 'Must provide cache ID (cache-id=) and page number (page=)'}, sort_keys=True, indent=4), 200, headers=api_headers.base(mimetype))
     cid = request.values['cache_id']
     p = request.values['page']
     cache_file_path = '{0}/jsonlite_cache/{1}/{2}.json'.format(os.getcwd(), cid, p)
     if not os.path.isfile(cache_file_path):
-        return Response(json.dumps({'error': 'Requested cache file not found (cache_id={0}, page={1})'.format(cid, p)}, sort_keys=True, indent=4), 200, headers=d)
+        return Response(json.dumps({'error': 'Requested cache file not found (cache_id={0}, page={1})'.format(cid, p)}, sort_keys=True, indent=4), 200, headers=api_headers.base(mimetype))
     response = make_response(send_file(cache_file_path))
-    response.headers = api_headers.base(output_translators()['jsonlite'][1], response.headers)
+    response.headers = api_headers.base(mimetype, response.headers)
     return response
