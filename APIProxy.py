@@ -35,7 +35,10 @@ class APIProxyQuery:
             post_analytics(pageview=True, events=events)
             try:
                 logging.debug('Handling query from {0}'.format(self.request.access_route[-1]))
-                q = CMRQuery(params=dict(self.cmr_params), output=self.output, max_results=self.max_results, analytics=True)
+                maxResults = self.max_results
+                if self.output == 'jsonlite':
+                    maxResults = min(self.max_results, self.page_size)
+                q = CMRQuery(params=dict(self.cmr_params), output=self.output, max_results=maxResults, analytics=True)
                 if(self.output == 'count'):
                     return(make_response(str(q.get_count())))
                 (translator, mimetype, suffix) = output_translators().get(self.output, output_translators()['metalink'])
