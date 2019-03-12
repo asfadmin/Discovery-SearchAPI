@@ -86,6 +86,8 @@ def input_fixer(params):
             if t == 'polygon':
                 p = fix_polygon(p)
             fixed_params[t] = p
+        elif k == 'collectionname':
+            fixed_params[k] = v.replace(',', "\\,")
         else:
             fixed_params[k] = v
 
@@ -120,7 +122,7 @@ def input_map():
         'minbaselineperp':      ['attribute[]',             'float,INSAR_BASELINE,{0},',        parse_float],
         'beammode':             ['attribute[]',             'string,BEAM_MODE,{0}',             parse_string_list],
         'beamswath':            ['attribute[]',             'string,BEAM_MODE_TYPE,{0}',        parse_string_list],
-        'collectionname':       ['attribute[]',             'string,MISSION_NAME,{0}',          parse_string_list],
+        'collectionname':       ['attribute[]',             'string,MISSION_NAME,{0}',          parse_string],
         'maxdoppler':           ['attribute[]',             'float,DOPPLER,,{0}',               parse_float],
         'mindoppler':           ['attribute[]',             'float,DOPPLER,{0},',               parse_float],
         'maxfaradayrotation':   ['attribute[]',             'float,FARADAY_ROTATION,,{0}',      parse_float],
