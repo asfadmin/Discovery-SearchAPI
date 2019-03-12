@@ -150,7 +150,7 @@ def input_map():
         'end':                  [None,                      '{0}',                              parse_date],
         'temporal':             ['temporal',                '{0}',                              None], # start/end end up here
         'groupid':              ['attribute[]',             'string,GROUP_ID,{0}',              parse_string_list],
-        'pagesize':            [None,                      '{0}',                              parse_int]
+        'pagesize':             [None,                      '{0}',                              parse_int]
     }
 
 # translate supported params into CMR params
