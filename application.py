@@ -2,12 +2,15 @@ from flask import Flask, make_response
 from flask import request
 from flask import Response
 from APIProxy import APIProxyQuery
+from WKTValidator import WKTValidator
+from FilesToWKT import FilesToWKT
 from datetime import datetime
 from urllib import parse
 import sys
 import logging
 import os
 import requests
+from CacheQuery import response_from_cache
 
 # EB looks for an 'application' callable by default.
 application = Flask(__name__)
@@ -82,15 +85,31 @@ def get_script():
                     for cell in row)
     return Response(generator,
                        mimetype = 'text/plain',
-                       headers = {'Content-Disposition':
-                                    'attachment;filename=' + filename})
+                       headers = {'Access-Control-Allow-Origin': '*',
+                                  'Content-Disposition':
+                                  'attachment;filename=' + filename})
 
 ########## Search API endpoints ##########
 
-# Either get the results from CMR, or pass the query through to the legacy API
+# Validate and/or repair a WKT to ensure it meets CMR's requirements
+@application.route('/services/validate/wkt', methods = ['GET', 'POST'])
+def validate_wkt():
+    return WKTValidator(request).get_response()
+
+# Validate and/or repair a WKT to ensure it meets CMR's requirements
+@application.route('/services/convert/files_to_wkt', methods = ['POST'])
+def filesToWKT():
+    return FilesToWKT(request).get_response()
+
+# Fetch and convert the results from CMR
 @application.route('/services/search/param', methods = ['GET', 'POST'])
 def proxy_search():
     return APIProxyQuery(request).get_response()
+
+# Fetch results from the jsonlite_cache
+@application.route('/services/search/cache', methods= ['GET', 'POST'])
+def read_cache():
+    return response_from_cache(request)
 
 # Health check endpoint
 @application.route('/health')

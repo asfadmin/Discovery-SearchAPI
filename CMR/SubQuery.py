@@ -10,9 +10,10 @@ from time import time
 
 class CMRSubQuery:
 
-    def __init__(self, params, extra_params):
+    def __init__(self, params, extra_params, analytics=True):
         self.params = params
         self.extra_params = extra_params
+        self.analytics = analytics
         self.sid = None
         self.hits = 0
         self.results = []
@@ -64,7 +65,7 @@ class CMRSubQuery:
         # Get the first page of results
         r = self.get_page(s)
 
-        #post_analytics(pageview=False, events=[{'ec': 'CMR API Status', 'ea': r.status_code}])
+        #post_analytics(pageview=False, events=[{'ec': 'CMR API Status', 'ea': r.status_code}]) if self.analytics else None
         # forward anything other than a 200
         if r.status_code != 200:
             raise CMRError(r.text)
@@ -98,7 +99,8 @@ class CMRSubQuery:
             logging.debug('CMR reported {0} hits for session {1}'.format(self.hits, self.sid))
         else:
             r = s.post(get_config()['cmr_api'], data=self.params)
-        post_analytics(pageview=False, events=[{'ec': 'CMR API Status', 'ea': r.status_code}])
+        if self.analytics:
+            post_analytics(pageview=False, events=[{'ec': 'CMR API Status', 'ea': r.status_code}])
         if r.status_code != 200:
             logging.error('Bad news bears! CMR said {0} on session {1}'.format(r.status_code, self.sid))
             logging.error('Currently on page {0}'.format(self.current_page + 1))

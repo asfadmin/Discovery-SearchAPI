@@ -14,5 +14,8 @@ __pycache__/
 test/cache/*
 test/results.csv
 
+# api jsonlite local cache
+jsonlite_cache/*
+
 # misc OS files
 .DS_Store

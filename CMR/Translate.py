@@ -86,24 +86,27 @@ def input_fixer(params):
             if t == 'polygon':
                 p = fix_polygon(p)
             fixed_params[t] = p
+        elif k == 'collectionname':
+            fixed_params[k] = v.replace(',', "\\,")
         else:
             fixed_params[k] = v
 
-    # set default start and end dates if needed, and then make sure they're formatted correctly
-    # whether using the default or not
-    start_s = fixed_params['start'] if 'start' in fixed_params else '1978-01-01T00:00:00Z'
-    end_s = fixed_params['end'] if 'end' in fixed_params else datetime.utcnow().isoformat()
-    start = dateparser.parse(start_s, settings={'RETURN_AS_TIMEZONE_AWARE': True})
-    end = dateparser.parse(end_s, settings={'RETURN_AS_TIMEZONE_AWARE': True})
+    if 'start' in fixed_params or 'end' in fixed_params:
+        # set default start and end dates if needed, and then make sure they're formatted correctly
+        # whether using the default or not
+        start_s = fixed_params['start'] if 'start' in fixed_params else '1978-01-01T00:00:00Z'
+        end_s = fixed_params['end'] if 'end' in fixed_params else datetime.utcnow().isoformat()
+        start = dateparser.parse(start_s, settings={'RETURN_AS_TIMEZONE_AWARE': True})
+        end = dateparser.parse(end_s, settings={'RETURN_AS_TIMEZONE_AWARE': True})
 
-    # Check/fix the order of start/end
-    if start > end:
-        start, end = end, start
-    # Final temporal string that will actually be used
-    fixed_params['temporal'] = '{0},{1}'.format(start.strftime('%Y-%m-%dT%H:%M:%SZ'), end.strftime('%Y-%m-%dT%H:%M:%SZ'))
-    # And a little cleanup
-    fixed_params.pop('start', None)
-    fixed_params.pop('end', None)
+        # Check/fix the order of start/end
+        if start > end:
+            start, end = end, start
+        # Final temporal string that will actually be used
+        fixed_params['temporal'] = '{0},{1}'.format(start.strftime('%Y-%m-%dT%H:%M:%SZ'), end.strftime('%Y-%m-%dT%H:%M:%SZ'))
+        # And a little cleanup
+        fixed_params.pop('start', None)
+        fixed_params.pop('end', None)
 
     return fixed_params
 
@@ -119,7 +122,7 @@ def input_map():
         'minbaselineperp':      ['attribute[]',             'float,INSAR_BASELINE,{0},',        parse_float],
         'beammode':             ['attribute[]',             'string,BEAM_MODE,{0}',             parse_string_list],
         'beamswath':            ['attribute[]',             'string,BEAM_MODE_TYPE,{0}',        parse_string_list],
-        'collectionname':       ['attribute[]',             'string,MISSION_NAME,{0}',          parse_string_list],
+        'collectionname':       ['attribute[]',             'string,MISSION_NAME,{0}',          parse_string],
         'maxdoppler':           ['attribute[]',             'float,DOPPLER,,{0}',               parse_float],
         'mindoppler':           ['attribute[]',             'float,DOPPLER,{0},',               parse_float],
         'maxfaradayrotation':   ['attribute[]',             'float,FARADAY_ROTATION,,{0}',      parse_float],
@@ -146,7 +149,8 @@ def input_map():
         'start':                [None,                      '{0}',                              parse_date],
         'end':                  [None,                      '{0}',                              parse_date],
         'temporal':             ['temporal',                '{0}',                              None], # start/end end up here
-        'groupid':              ['attribute[]',             'string,GROUP_ID,{0}',              parse_string_list]
+        'groupid':              ['attribute[]',             'string,GROUP_ID,{0}',              parse_string_list],
+        'pagesize':            [None,                      '{0}',                              parse_int]
     }
 
 # translate supported params into CMR params
@@ -173,7 +177,11 @@ def translate_params(p):
         if max_results < 1:
             raise ValueError('Invalid maxResults, must be > 0: {0}'.format(max_results))
         del params['maxresults']
-    return params, output, max_results
+    page_size = 100
+    if 'pagesize' in params:
+        page_size = params['pagesize']
+        del params['pagesize']
+    return params, output, max_results, page_size
 
 # convenience method for handling echo10 additional attributes
 def attr(name):
