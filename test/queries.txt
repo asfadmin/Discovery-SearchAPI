@@ -179,10 +179,20 @@ https://api-test.asf.alaska.edu/services/search/param?start=2018-July-18&end=201
 
 
 ### Negative Tests ###
+
+# absoluteOrbit Invalid + CSV output
+https://api-test.asf.alaska.edu/services/search/param?absoluteorbit=TEST&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?absoluteorbit=@&maxresults=10&output=csv
+
+# asfframe Invalid + CSV output
+https://api-test.asf.alaska.edu/services/search/param?asfframe=TEST&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?asfframe=$&maxresults=10&output=csv
+
 # bbox invalid + CSV output
 https://api-test.asf.alaska.edu/services/search/param?bbox=TEST&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?bbox=$&output=CSV
 
-# bbox-incomplete + CSV,JSON,JSONLITE,GEOJSON output
+# bbox incomplete + CSV,JSON,JSONLITE,GEOJSON output
 https://api-test.asf.alaska.edu/services/search/param?bbox=-150.2,65.0,-150.1,65.5,0&output=CSV
 https://api-test.asf.alaska.edu/services/search/param?bbox=-150.2,65.0,-150.1,65.5,0&output=JSON
 https://api-test.asf.alaska.edu/services/search/param?bbox=-150.2,65.0,-150.1,65.5,0&output=JSONLITE
@@ -201,16 +211,20 @@ https://api-test.asf.alaska.edu/services/search/param?platform=ALOS&collectionNa
 https://api-test.asf.alaska.edu/services/search/param?platform=UAVSAR&collectionName=TEST&output=CSV
 https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1A&collectionName=ABoVE&output=CSV
 https://api-test.asf.alaska.edu/services/search/param?platform=Sentinel&collectionName=Alaska&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?collectionName=$&output=CSV
 
 # flightDirection Invalid + CSV output
 https://api-test.asf.alaska.edu/services/search/param?platform=E1&flightDirection=TEST&beamMode=STD&maxResults=100&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?platform=E1&flightDirection=$&beamMode=STD&maxResults=100&output=CSV
 
 # flightLine Invalid + CSV output
 https://api-test.asf.alaska.edu/services/search/param?platform=UAVSAR&flightLine=TEST&output=CSV
 https://api-test.asf.alaska.edu/services/search/param?platform=AIRSAR&flightLine=03901&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?platform=AIRSAR&flightLine=$&output=CSV
 
 # frame ALOS invalid + CSV output
 https://api-test.asf.alaska.edu/services/search/param?platform=ALOS&frame=TEST&maxResults=100&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?platform=ALOS&frame=@&maxResults=100&output=CSV
 
 # MaxDoppler Invalid + CSV output
 https://api-test.asf.alaska.edu/services/search/param?platform=Sentinel&maxDoppler=TEST&output=CSV
@@ -224,7 +238,7 @@ https://api-test.asf.alaska.edu/services/search/param?platform=Sentinel&maxFarad
 https://api-test.asf.alaska.edu/services/search/param?platform=Sentinel&maxFaradayRotation=***&output=CSV
 
 # maxInsarStackSize Invalid + CSV output
-https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL&maxInsarStackSize=100&maxResults=100&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL&maxInsarStackSize=#&maxResults=100&output=CSV
 https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL&maxInsarStackSize=TEST&maxResults=100&output=CSV
 
 # intersectsWithPoint Invalid + CSV output
@@ -236,6 +250,7 @@ https://api-test.asf.alaska.edu/services/search/param?intersectsWith=polygon(-11
 
 # intersectsWithLinestring Invalid + CSV output
 https://api-test.asf.alaska.edu/services/search/param?intersectsWith=linestring(TEST)&maxResults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?intersectsWith=linestring(%)&maxResults=1000&output=CSV
 
 # lookDirection Invalid + CSV output
 https://api-test.asf.alaska.edu/services/search/param?lookDirection=TEST&maxResults=1000&output=CSV
@@ -243,19 +258,20 @@ https://api-test.asf.alaska.edu/services/search/param?lookDirection=1&maxResults
 
 # offNadirAngle Invalid + CSV output
 https://api-test.asf.alaska.edu/services/search/param?offNadirAngle=TEST&maxResults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?offNadirAngle=$&maxResults=1000&output=CSV
 
-# Output Invalid
+# output Invalid
 https://api-test.asf.alaska.edu/services/search/param?platform=UAVSAR&relativeOrbit=05905-05906&output=TEST
 https://api-test.asf.alaska.edu/services/search/param?platform=UAVSAR&relativeOrbit=05905-05906&maxResults=1/2&output=CSC
 
-# Platform Invalid + CSV,COUNT output
+# platform Invalid + CSV,COUNT output
 https://api-test.asf.alaska.edu/services/search/param?platform=@&maxResults=10&output=CSV
 https://api-test.asf.alaska.edu/services/search/param?platform=@&maxResults=10&output=COUNT
 https://api-test.asf.alaska.edu/services/search/param?platform=~&maxResults=10&output=COUNT
 https://api-test.asf.alaska.edu/services/search/param?platform=%&maxResults=10&output=COUNT
 https://api-test.asf.alaska.edu/services/search/param?platform=TEST&maxResults=10&output=COUNT
 
-# Polarization Invalid + CSV output
+# polarization Invalid + CSV output
 https://api-test.asf.alaska.edu/services/search/param?platform=AIRSAR&polarization=12&output=CSV
 https://api-test.asf.alaska.edu/services/search/param?platform=AIRSAR&polarization=%@#&output=CSV
 https://api-test.asf.alaska.edu/services/search/param?platform=E1&polarization=^*&maxResults=1000&output=CSV
@@ -274,7 +290,7 @@ https://api-test.asf.alaska.edu/services/search/param?polygon=TEST&maxResults=10
 https://api-test.asf.alaska.edu/services/search/param?processingLevel=@@&maxResults=1000&output=CSV
 https://api-test.asf.alaska.edu/services/search/param?processingLevel=LSTOKES&&output=COUNT
 
-# ProcessingDate Invalid + CSV output
+# processingDate Invalid + CSV output
 https://api-test.asf.alaska.edu/services/search/processingDate=$$$&maxResults=1200&output=CSV
 
 # relativeOrbit Invalid + CSV,OUTPUT output
