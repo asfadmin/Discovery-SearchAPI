@@ -234,3 +234,178 @@ output=count&asfframe=587%2C588%2C589%2C590%2C591%2C592%2C593&processingLevel=L0
 platform=SA,SB&relativeOrbit=128&asfframe=587-593&start=2017-06-01&end=2018-05-30&output=csv
 platform=SA,SB&relativeOrbit=128&frame=587-593&start=2017-06-01&end=2018-05-30&output=csv
 output=csv&platform=Sentinel-1A&start=2018-05-30&end=2018-05-31%22
+
+### Negative Tests ###
+# absoluteOrbit Keyword Invalid
+absoluteorbit=TEST&maxresults=10&output=csv
+absoluteorbit=@&maxresults=10&output=csv
+
+# asfframe Keyword Invalid
+asfframe=TEST&maxresults=10&output=csv
+asfframe=$&maxresults=10&output=csv
+
+# bbox Keyword Invalid
+bbox=TEST&output=CSV
+bbox=$&output=CSV
+bbox=-150.2,65.0,-150.1,65.5,0&output=CSV
+bbox=-150.2,65.0,-150.1,65.5,0&output=JSON
+bbox=-150.2,65.0,-150.1,65.5,0&output=JSONLITE
+bbox=-150.2,65.0,-150.1,65.5,0&output=GEO.JSON
+bbox=-150.2,65.0,-150.1&output=CSV
+
+# beamMode Keyword Invalid
+beamMode=#&output=CSV
+beamMode=TEST&output=CSV
+beamMode=TEST&output=CSV,COUNT
+beamMode=@&output=CSV
+
+# beamSwath Keyword Invalid
+beamSwath=TEST&output=CSV
+beamSwath=TEST&output=CSV,COUNT
+beamSwath=@&output=CSV
+
+# collectionName Keyword Invalid
+platform=ALOS&collectionName=TEST&output=CSV
+platform=UAVSAR&collectionName=TEST&output=CSV
+platform=SENTINEL-1A&collectionName=ABoVE&output=CSV
+platform=Sentinel&collectionName=Alaska&output=CSV
+collectionName=$&output=CSV
+
+# end Keyword Invalid
+end=2020-01-01T00:00:00Z&output=count
+end=@%&output=count
+
+# flightDirection Keyword Invalid
+platform=E1&flightDirection=TEST&beamMode=STD&maxResults=100&output=CSV
+platform=E1&flightDirection=$&beamMode=STD&maxResults=100&output=CSV
+
+# flightLine Keyword Invalid
+platform=UAVSAR&flightLine=TEST&output=CSV
+platform=AIRSAR&flightLine=03901&output=CSV
+platform=AIRSAR&flightLine=$&output=CSV
+
+# frame Keyword Invalid
+platform=ALOS&frame=TEST&maxResults=100&output=CSV
+platform=ALOS&frame=@&maxResults=100&output=CSV
+
+# granule_list Keyword Invalid
+granule_list=TEST&output=CSV
+granule_list$#@$&output=CSV
+
+# groupid Keyword Invalid
+groupid=TEST&output=csv
+groupid=$#&output=csv
+
+# intersectsWith  Keyword Invalid
+intersectsWith=linestring(TEST)&maxResults=1000&output=CSV
+intersectsWith=linestring(%)&maxResults=1000&output=CSV
+
+intersectsWith=point(-119.543,37.925)&maxResults=1000&output=CSV
+
+intersectsWith=polygon((-119.543 37.925, -118.443 37.7421, -118.682 36.8525, -119.77 37.0352, -119.543 37.925))&maxResults=1000&output=CSV
+intersectsWith=polygon(-119.543 37.925, -118.443 37.7421, -118.682 36.8525, -119.77 37.0352, -119.543 37.925)&maxResults=1000&output=CSV
+
+
+# linestring Keyword Invalid
+linestring=-150.2,65.0,#&maxresults=10&output=csv
+linestring=TEST,FAIL&maxresults=10&output=csv
+linestring(TEST)&maxResults=1000&output=CSV
+linestring(%)&maxResults=1000&output=CSV
+
+# lookDirection Keyword Invalid
+lookDirection=TEST&maxResults=1000&output=CSV
+lookDirection=1&maxResults=1000&output=CSV
+
+# maxBaselinePerp Keyword Invalid
+maxbaselineperp=%&platform=R1&maxresults=10&output=csv
+maxbaselineperp=TEST&platform=R1&maxresults=10&output=csv
+
+# maxDoppler Keyword Invalid
+platform=Sentinel&maxDoppler=TEST&output=CSV
+platform=Sentinel&maxDoppler=@&output=CSV
+
+# maxFaradayRotation Keyword Invalid
+platform=Sentinel&maxFaradayRotation=0&output=CSV
+platform=Sentinel&maxFaradayRotation=-5.0&output=CSV
+platform=Sentinel&maxFaradayRotation=TEST&output=CSV
+platform=Sentinel&maxFaradayRotation=&output=CSV
+platform=Sentinel&maxFaradayRotation=***&output=CSV
+
+# maxInsarStackSize Keyword Invalid
+platform=SENTINEL&maxInsarStackSize=#&maxResults=100&output=CSV
+
+# minBaselinPerp Keyword Invalid
+minbaselineperp=150&platform=R1&maxresults=10&output=csv
+minbaselineperp=100&maxbaselineperp=150&platform=R1&maxresults=10&output=csv
+
+# minDoppler Keyword Invalid
+mindoppler=-20000&platform=R1&maxresults=10&output=csv
+mindoppler=-2000&maxdoppler=2000&platform=R1&maxresults=10&output=csv
+
+# minFaradayRotation Keyword Invalid
+minfaradayrotation=#&maxresults=10&output=csv
+minfaradayrotation=#&maxfaradayrotation=#&maxresults=10&output=csv
+minfaradayrotation=TEST&maxfaradayrotation=TEST&maxresults=10&output=csv
+platform=Sentinel&maxFaradayRotation=0&output=CSV
+platform=Sentinel&maxFaradayRotation=-5.0&output=CSV
+platform=Sentinel&maxFaradayRotation=TEST&output=CSV
+platform=Sentinel&maxFaradayRotation=&output=CSV
+platform=Sentinel&maxFaradayRotation=***&output=CSV
+
+# minInsarStackSize Keyword Invalid
+mininsarstacksize=$&maxresults=10&output=csv
+mininsarstacksize=$&maxinsarstacksize=#&maxresults=10&output=csv
+mininsarstacksize=TEST&maxinsarstacksize=TEST&maxresults=10&output=csv
+
+#  offNadirAngle Keyword Invalid
+offNadirAngle=TEST&maxResults=1000&output=CSV
+offNadirAngle=$&maxResults=1000&output=CSV
+
+# output Keyword Invalid
+platform=UAVSAR&relativeOrbit=05905-05906&output=TEST
+platform=UAVSAR&relativeOrbit=05905-05906&maxResults=1/2&output=CSC
+
+
+# platform Keyword Invalid
+platform=@&maxResults=10&output=CSV
+platform=@&maxResults=10&output=COUNT
+platform=~&maxResults=10&output=COUNT
+platform=%&maxResults=10&output=COUNT
+platform=TEST&maxResults=10&output=COUNT
+
+# point Keyword Invalid
+point=-150.2&maxresults=10&output=csv
+point=$#&maxresults=10&output=csv
+
+# polarization Keyword Invalid
+platform=AIRSAR&polarization=12&output=CSV
+platform=AIRSAR&polarization=%@#&output=CSV
+platform=E1&polarization=^*&maxResults=1000&output=CSV
+
+# polygon Keyword Invalid
+polygon=-155.08,65.82,-153.5,61.91,-149.50,63.07,-149.94,64.55&maxResults=1000&output=CSV
+polygon=-155.08,65.82,-153.5&maxResults=1000&output=CSV
+polygon=-155.08,65.82&maxResults=1000&output=CSV
+polygon=-155.08,65.82&maxResults=1000&output=count
+polygon=$$&maxResults=1000&output=count
+polygon=$$&maxResults=1000&output=CSV
+polygon=TEST&maxResults=1000&output=CSV
+
+
+# processingLevel Keyword Invalid
+processingLevel=@@&maxResults=1000&output=CSV
+processingLevel=LSTOKES&&output=COUNT
+
+# processingDate Keyword Invalid
+processingDate=$$$&maxResults=1200&output=CSV
+
+# relativeOrbit Keyword Invalid
+relativeOrbit=671&output=CSV
+relativeOrbit=TEST&output=CSV
+relativeOrbit=@@&output=CSV
+platform=UAVSAR&relativeOrbit=TEST&output=CSV
+platform=UAVSAR&relativeOrbit=TEST&output=COUNT
+
+# start Keyword Invalid
+start=now&end=1+week+ago&output=CSV
+start=1+week+ago&end=nowtest&output=CSV
