@@ -1,24 +1,59 @@
 # queries designed just for testing
-processingLevel=L1.1&maxResults=10&output=cSV
-processingLevel=L1.1,L1.0&maxResults=10&output=cSV
-platform=Sentinel-1A&maxResults=10&output=csV
-platform=R1,E1&maxResults=10&output=jSoN
-platform=RADARSAT-1,E1&maxResults=10&output=csv
-platform=RADARSAT-1,E1&processingLEVEL=L0,L1&maxResults=10&output=csv
-polygon=-148.52,64.63,-150.41,64.64,-149.58,63.86,-148.52,64.63&maxResults=100&output=csv
-platform=J1&polygon=-148.52,64.63,-150.41,64.64,-149.58,63.86,-148.52,64.63&maxResults=100&output=csv
-platform=A3&processinglevel=L1.0polygon=-148.52,64.63,-150.41,64.64,-149.58,63.86,-148.52,64.63&maxResults=100&output=csv
-granule_list=S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80&output=csv
-granule_list=S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80&output=metalink
-granule_list=S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80&output=kml
-granule_list=S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80&output=json
-granule_list=S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80&output=count
+# absoluteOrbit Keyword
+absoluteorbit=5000&maxresults=10&output=csv
+absoluteorbit=5000-6000&maxresults=10&output=csv
+absoluteorbit=5000,5001,5002&maxresults=10&output=csv
+absoluteorbit=5000,5100-5200&maxresults=100&output=csv
+absoluteorbit=5000,5001,5002&platform=R1&maxresults=10&output=csv
+
+# asfframe Keyword
+asfframe=345&platform=R1&maxresults=10&output=csv
+asfframe=345,346,347&platform=R1&maxresults=10&output=csv
+asfframe=345-347&platform=R1&maxresults=10&output=csv
+asfframe=340,345-347&platform=R1&maxresults=10&output=csv
+
+# bbox Keyword
+bbox=-150.2,65.0,-150.1,65.5&maxresults=10&output=csv
+
+# beamMode Keyword
 beamMode=FBD,FBS,Standard&maxresults=100&output=csv
 beamMode=Standard&maxresults=10&output=csv
-lookDirection=LEFT&maxresults=10&output=csv
-lookDirection=RIGHT&maxresults=10&output=csv
-lookDirection=L&maxresults=10&output=csv
-lookDirection=R&maxresults=10&output=csv
+beamMode=Standard,STD,Fine,High,Low,Wide,Narrow,ScanSAR+Wide,ScanSAR+Narrow&platform=RADARSAT-1&maxresults=100&output=csv
+beamMode=EW,IW,S1,S2,S3,S4,S5,S6,WV&platform=Sentinel-1A&maxresults=100&output=csv
+beamMode=EW,IW,S1,S2,S3,S4,S5,S6,WV&platform=Sentinel-1B&maxresults=100&output=csv
+beamMode=POL,RPI&maxresults=100&output=csv
+
+
+# beamSwath Keyword
+beamSwath=1&maxresults=100&output=csv
+beamSwath=3FP,ATI,XTI&platform=AIRSAR&maxresults=100&output=csv
+beamSwath=FN1,FN2,FN3,FN4,FN5&maxresults=100&output=csv
+beamSwath=STD&platform=ERS-1&maxresults=100&output=csv
+beamSwath=STD&platform=ERS-2&maxresults=100&output=csv
+beamSwath=STD&platform=JERS-1&maxresults=100&output=csv
+beamSwath=STD&platform=SEASAT&maxresults=100&output=csv
+beamSwath=1,2,3,4,5,6,7,8,9,10,11,12,15,16,17,18,19,20&platform=ALOS&maxresults=100&output=csv
+beamSwath=FN1,FN2,FN3,FN4,FN5&maxresults=100&output=csv
+beamSwath=SNA,SNB,ST1,ST2,ST3,ST4,ST5,ST6,ST7&platform=RADARSAT-1&maxresults=100&output=csv
+beamSwath=SWA,SWB&platform=RADARSAT-1&maxresults=100&output=csv
+beamSwath=WD1,WD2,WD3&platform=RADARSAT-1&maxresults=100&output=csv
+beamSwath=EH3,EH4,EH6,EL1&platform=RADARSAT-1&maxresults=100&output=csv
+beamSwath=EW,IW,S1,S2,S3,S4,S5,S6,WV&platform=Sentinel-1A&maxresults=100&output=csv
+beamSwath=EW,IW,S1,S2,S3,S4,S5,S6,WV&platform=Sentinel-1B&maxresults=100&output=csv
+beamSwath=UAVSAR&platform=POL,RPI&maxresults=100&output=csv
+
+# collectionName Keyword
+collectionName=Haiti&maxresults=100&output=csv
+collectionName=Iceland&maxresults=100&output=csv
+collectionName=earthquake&maxresults=100&output=csv
+collectionName=AIRSAR&maxresults=100&output=csv
+collectionName=Denali&maxresults=100&output=csv
+
+# end Keyword
+end=2005-01-01T00:00:00Z&output=count
+end=now&output=count
+
+# flightDirection Keyword
 flightDirection=A&maxresults=10&output=csv
 flightDirection=ASC&maxresults=10&output=csv
 flightDirection=ASCENDING&maxresults=10&output=csv
@@ -27,58 +62,163 @@ flightDirection=DESC&maxresults=10&output=csv
 flightDirection=DESCENDING&maxresults=10&output=csv
 flightDirection=asCEndInG&maxresults=10&output=csv
 flightDirection=dEsCeN&maxresults=10&output=csv
+
+# flightLine Keyword
 flightLine=15302&maxresults=10&output=csv
-end=2005-01-01T00:00:00Z&output=count
-start=2005-01-01T00:00:00Z&output=count
-start=2005-01-01T00:00:00Z&end=2005-01-01T01:00:00Z&output=csv
-platform=SA&start=2016-01-01T00:00:00Z&end=2016-01-02T00:00:00Z&output=csv
-platform=SB&start=1+week+ago&end=now&maxresults=2000&output=csv
-polygon=12.13,41.74,13.4,41.74,13.4,42.75,12.13,42.75,12.13,41.74&platform=Sentinel-1A,Sentinel-1B&processingLevel=SLC&start=2018-05-01T00:00:00UTC&output=csv
-absoluteorbit=5000&maxresults=10&output=csv
-absoluteorbit=5000-6000&maxresults=10&output=csv
-absoluteorbit=5000,5001,5002&maxresults=10&output=csv
-absoluteorbit=5000,5100-5200&maxresults=100&output=csv
-absoluteorbit=5000,5001,5002&platform=R1&maxresults=10&output=csv
-asfframe=345&platform=R1&maxresults=10&output=csv
-asfframe=345,346,347&platform=R1&maxresults=10&output=csv
-asfframe=345-347&platform=R1&maxresults=10&output=csv
-asfframe=340,345-347&platform=R1&maxresults=10&output=csv
-maxbaselineperp=150&platform=R1&maxresults=10&output=csv
-minbaselineperp=150&platform=R1&maxresults=10&output=csv
-minbaselineperp=100&maxbaselineperp=150&platform=R1&maxresults=10&output=csv
-maxdoppler=2000&platform=R1&maxresults=10&output=csv
-mindoppler=-20000&platform=R1&maxresults=10&output=csv
-mindoppler=-2000&maxdoppler=2000&platform=R1&maxresults=10&output=csv
-minfaradayrotation=3&maxresults=10&output=csv
-maxfaradayrotation=3&maxresults=10&output=csv
-minfaradayrotation=2&maxfaradayrotation=3&maxresults=10&output=csv
+flightLine=gilmorecreek045-1.93044&maxresults=10&output=csv
+
+# frame Keyword
 frame=345&platform=R1&maxresults=10&output=csv
 frame=345,346,347&platform=R1&maxresults=10&output=csv
 frame=345-347&platform=R1&maxresults=10&output=csv
 frame=340,345-347&platform=R1&maxresults=10&output=csv
+
+# granule_list Keyword
+granule_list=S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80&output=csv
+granule_list=S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80&output=count
+granule_list=S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80&output=metalink
+granule_list=S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80&output=kml
+granule_list=S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80&output=json
+granule_list=S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80&output=geo.json
+granule_list=S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80&output=download
+granule_list=S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80&output=map
+
+# groupid Keyword
+groupid=S1A_IWDV_0382_0387_019686_014&output=json
+groupid=12345&output=json
+groupid=sdfkhgsdfkhgsdf&output=json
+
+# intersectswith Keyword
+intersectsWith=point%28-119.543+37.925%29&maxResults=1000&output=CSV
+intersectsWith=polygon%28%28-119.543 37.925+ -118.443 37.7421+ -118.682 36.8525+ -119.77 37.0352+ -119.543 37.925%29%29&maxResults=1000&output=CSV
+intersectsWith=linestring(-119.543 37.925, -118.443 37.7421)&maxResults=1000&output=CSV
+intersectsWith=point(-119.543,37.925)&maxResults=1000&output=CSV
+intersectsWith=polygon((-119.543 37.925, -118.443 37.7421, -118.682 36.8525, -119.77 37.0352, -119.543 37.925))&maxResults=1000&output=CSV
+intersectsWith=polygon(-119.543 37.925, -118.443 37.7421, -118.682 36.8525, -119.77 37.0352, -119.543 37.925)&maxResults=1000&output=CSV
+intersectsWith=linestring(TEST)&maxResults=1000&output=CSV
+intersectsWith=linestring(%)&maxResults=1000&output=CSV
+
+# linestring Keyword
+linestring=-150.2,65.0,-150.1,65.5&maxresults=10&output=csv
+
+# lookDirection Keyword
+lookDirection=LEFT&maxresults=10&output=csv
+lookDirection=RIGHT&maxresults=10&output=csv
+lookDirection=L&maxresults=10&output=csv
+lookDirection=R&maxresults=10&output=csv
+
+# maxBaselinePerp Keyword
+maxbaselineperp=150&platform=R1&maxresults=10&output=csv
+
+# maxDoppler Keyword
+maxdoppler=2000&platform=R1&maxresults=10&output=csv
+
+# maxFaradayRotation Keyword
+maxfaradayrotation=3&maxresults=10&output=csv
+
+# maxInsarStackSize Keyword
+maxinsarstacksize=50&maxresults=10&output=csv
+
+# minBaselinPerp Keyword
+minbaselineperp=150&platform=R1&maxresults=10&output=csv
+minbaselineperp=100&maxbaselineperp=150&platform=R1&maxresults=10&output=csv
+
+# minDoppler Keyword
+mindoppler=-20000&platform=R1&maxresults=10&output=csv
+mindoppler=-2000&maxdoppler=2000&platform=R1&maxresults=10&output=csv
+
+# minFaradayRotation Keyword
+minfaradayrotation=3&maxresults=10&output=csv
+minfaradayrotation=2&maxfaradayrotation=3&maxresults=10&output=csv
+
+# minInsarStackSize Keyword
+mininsarstacksize=50&maxresults=10&output=csv
+mininsarstacksize=80&maxinsarstacksize=100&maxresults=10&output=csv
+
+#  offNadirAngle Keyword
+offnadirangle=21.5&maxresults=10&output=csv
+offnadirangle=21.5,23.1,27.1&maxresults=10&output=csv
+offnadirangle=20-30&maxresults=10&output=csv
+
+# output keyword
+platform=SB&start=1+week+ago&end=now&maxresults=2000&output=csv
+platform=SB&start=1+week+ago&end=now&maxresults=2000&output=count
+platform=SB&start=1+week+ago&end=now&maxresults=2000&output=download
+platform=SB&start=1+week+ago&end=now&maxresults=2000&output=geojson
+platform=SB&start=1+week+ago&end=now&maxresults=2000&output=json
+platform=SB&start=1+week+ago&end=now&maxresults=2000&output=jsonlite
+platform=SB&start=1+week+ago&end=now&maxresults=2000&output=kml
+platform=SB&start=1+week+ago&end=now&maxresults=2000&output=metalink
+
+
+# platform Keyword
+platform=SA&start=2016-01-01T00:00:00Z&end=2016-01-02T00:00:00Z&output=csv
+platform=SB&start=1+week+ago&end=now&maxresults=2000&output=csv
+platform=J1&polygon=-148.52,64.63,-150.41,64.64,-149.58,63.86,-148.52,64.63&maxResults=100&output=csv
+platform=A3&processinglevel=L1.0polygon=-148.52,64.63,-150.41,64.64,-149.58,63.86,-148.52,64.63&maxResults=100&output=csv
+platform=Sentinel-1A&maxResults=10&output=csV
+platform=R1,E1&maxResults=10&output=jSoN
+platform=RADARSAT-1,E1&maxResults=10&output=csv
+platform=RADARSAT-1,E1&processingLEVEL=L0,L1&maxResults=10&output=csv
+platform=SP&maxResults=10&output=csv
+platform=UA&maxResults=10&output=csv
+platform=E1,E2&maxResults=10&output=csv
+
+# point Keyword
+point=-150.2,65.0&maxresults=10&output=csv
+
+# polarization Keyword
 polarization=HH&platform=SA&maxresults=10&output=csv
 polarization=VV&platform=SA&maxresults=10&output=csv
 polarization=HH%2bHV&maxresults=10&output=csv
 polarization=Dual+VV&maxresults=10&output=csv
 polarization=QUADRATURE&maxresults=10&output=csv
+
+# polygon Keyword
+polygon=12.13,41.74,13.4,41.74,13.4,42.75,12.13,42.75,12.13,41.74&platform=Sentinel-1A,Sentinel-1B&processingLevel=SLC&start=2018-05-01T00:00:00UTC&output=csv
+polygon=-148.52,64.63,-150.41,64.64,-149.58,63.86,-148.52,64.63&maxResults=100&output=csv
+
+# processingLevel Keyword
+processingLevel=L1.1&maxResults=10&output=CSV
+processingLevel=L1.1,L1.0&maxResults=10&output=CSV
+processingLevel=3FP,ATI,LTIF,PTIF,CTIF,PSTOKES,BROWSE,DEM,CSTOKES,JPG,LSTOKES,THUMBNAIL&maxResults=10&output=CSV
+processingLevel=RTC_LOW_RES,RTC_HI_RES&platform=ALOS&maxResults=10&output=CSV
+processingLevel=L0,L1,BROWSE,THUMBNAIL&platform=ERS-1,ERS-2&maxResults=10&output=CSV
+processingLevel=L0,L1,BROWSE,THUMBNAIL&platform=JERS-1&maxResults=10&output=CSV
+processingLevel=L0,L1,BROWSE,THUMBNAIL&platform=RADARSAT-1&maxResults=10&output=CSV
+processingLevel=L1,BROWSE,THUMBNAIL&platform=SEASAT&maxResults=10&output=CSV
+processingLevel=METADATA_GRD,GRD_HS,GRD_HD,GRD_MS,GRD_MD,GRD_FS,GRD_FD,SLC,RAW,OCN,METADATA_RAW,METADATA,METADATA_SLC, THUMBNAIL&platform=Sentinel-1A,Sentinel-1B&maxResults=100&output=CSV
+processingLevel=L1A_Radar_RO_QA,L1B_S0_LoRes_HDF5,L1B_S0_LoRes_QA,L1B_S0_LoRes_ISO_XML,L1A_Radar_QA,L1A_Radar_RO_ISO_XML, L1C_S0_HiRes_ISO_XML,L1C_S0_HiRes_QA,L1C_S0_HiRes_HDF5,L1A_Radar_HDF5&platform=SMAP&maxResults=100&output=CSV
+processingLevel=KMZ,PROJECTED,PAULI,PROJECTED_ML5X5,STOKES,AMPLITUDE,BROWSE,COMPLEX,DEM_TIFF,PROJECTED_ML3X3,METADATA,AMPLITUDE_GRD,INTERFEROMETRY,INTERFEROMETRY_GRD,THUMBNAIL&platform=UAVSAR&maxResults=100&output=CSV
+
+
+# processingDate Keyword
+processingDate=2018-01-01T00:00:00Z&maxresults=10&output=csv
+processingDate=yesterday&maxresults=10&output=csv
+processingDate=week+ago&maxresults=10&output=csv
+processingDate=today&maxresults=10&output=csv
+processingDate=month+ago&maxresults=10&output=csv
+processingDate=2+month+ago&maxresults=10&output=csv
+
+# relativeOrbit Keyword
 relativeorbit=20&maxresults=10&output=csv
 relativeorbit=20-22&maxresults=10&output=csv
 relativeorbit=20,21,22&maxresults=10&output=csv
 relativeorbit=20,23-24&maxresults=100&output=csv
 relativeorbit=20,23,25&platform=R1&maxresults=10&output=csv
-mininsarstacksize=50&maxresults=10&output=csv
-maxinsarstacksize=50&maxresults=10&output=csv
-mininsarstacksize=80&maxinsarstacksize=100&maxresults=10&output=csv
-processingDate=2018-01-01T00:00:00Z&maxresults=10&output=csv
-offnadirangle=21.5&maxresults=10&output=csv
-offnadirangle=21.5,23.1,27.1&maxresults=10&output=csv
-offnadirangle=20-30&maxresults=10&output=csv
-bbox=-150.2,65.0,-150.1,65.5&maxresults=10&output=csv
-linestring=-150.2,65.0,-150.1,65.5&maxresults=10&output=csv
-point=-150.2,65.0&maxresults=10&output=csv
-groupid=S1A_IWDV_0382_0387_019686_014&output=json
-groupid=12345&output=json
-groupid=sdfkhgsdfkhgsdf&output=json
+
+# start Keyword
+start=2005-01-01T00:00:00Z&output=count
+start=2005-01-01T00:00:00Z&end=2005-01-01T01:00:00Z&output=csv
+start=3+months+and+a+day+ago&output=count
+start=June+30,+2018&output=count
+start=week+ago&output=count
+start=day+ago&output=count
+start=today&output=count
+start=yesterday&output=count
+
+
+# new formats
 
 # polygon closure/winding order fixer test
 polygon=12.13,41.74,13.4,41.74,13.4,42.75,12.13,42.75&platform=Sentinel-1A,Sentinel-1B&processingLevel=SLC&start=2018-05-01T00:00:00UTC&output=csv
@@ -94,3 +234,178 @@ output=count&asfframe=587%2C588%2C589%2C590%2C591%2C592%2C593&processingLevel=L0
 platform=SA,SB&relativeOrbit=128&asfframe=587-593&start=2017-06-01&end=2018-05-30&output=csv
 platform=SA,SB&relativeOrbit=128&frame=587-593&start=2017-06-01&end=2018-05-30&output=csv
 output=csv&platform=Sentinel-1A&start=2018-05-30&end=2018-05-31%22
+
+### Negative Tests ###
+# absoluteOrbit Keyword Invalid
+absoluteorbit=TEST&maxresults=10&output=csv
+absoluteorbit=@&maxresults=10&output=csv
+
+# asfframe Keyword Invalid
+asfframe=TEST&maxresults=10&output=csv
+asfframe=$&maxresults=10&output=csv
+
+# bbox Keyword Invalid
+bbox=TEST&output=CSV
+bbox=$&output=CSV
+bbox=-150.2,65.0,-150.1,65.5,0&output=CSV
+bbox=-150.2,65.0,-150.1,65.5,0&output=JSON
+bbox=-150.2,65.0,-150.1,65.5,0&output=JSONLITE
+bbox=-150.2,65.0,-150.1,65.5,0&output=GEO.JSON
+bbox=-150.2,65.0,-150.1&output=CSV
+
+# beamMode Keyword Invalid
+beamMode=#&output=CSV
+beamMode=TEST&output=CSV
+beamMode=TEST&output=CSV,COUNT
+beamMode=@&output=CSV
+
+# beamSwath Keyword Invalid
+beamSwath=TEST&output=CSV
+beamSwath=TEST&output=CSV,COUNT
+beamSwath=@&output=CSV
+
+# collectionName Keyword Invalid
+platform=ALOS&collectionName=TEST&output=CSV
+platform=UAVSAR&collectionName=TEST&output=CSV
+platform=SENTINEL-1A&collectionName=ABoVE&output=CSV
+platform=Sentinel&collectionName=Alaska&output=CSV
+collectionName=$&output=CSV
+
+# end Keyword Invalid
+end=2020-01-01T00:00:00Z&output=count
+end=@%&output=count
+
+# flightDirection Keyword Invalid
+platform=E1&flightDirection=TEST&beamMode=STD&maxResults=100&output=CSV
+platform=E1&flightDirection=$&beamMode=STD&maxResults=100&output=CSV
+
+# flightLine Keyword Invalid
+platform=UAVSAR&flightLine=TEST&output=CSV
+platform=AIRSAR&flightLine=03901&output=CSV
+platform=AIRSAR&flightLine=$&output=CSV
+
+# frame Keyword Invalid
+platform=ALOS&frame=TEST&maxResults=100&output=CSV
+platform=ALOS&frame=@&maxResults=100&output=CSV
+
+# granule_list Keyword Invalid
+granule_list=TEST&output=CSV
+granule_list$#@$&output=CSV
+
+# groupid Keyword Invalid
+groupid=TEST&output=csv
+groupid=$#&output=csv
+
+# intersectsWith  Keyword Invalid
+intersectsWith=linestring(TEST)&maxResults=1000&output=CSV
+intersectsWith=linestring(%)&maxResults=1000&output=CSV
+
+intersectsWith=point(-119.543,37.925)&maxResults=1000&output=CSV
+
+intersectsWith=polygon((-119.543 37.925, -118.443 37.7421, -118.682 36.8525, -119.77 37.0352, -119.543 37.925))&maxResults=1000&output=CSV
+intersectsWith=polygon(-119.543 37.925, -118.443 37.7421, -118.682 36.8525, -119.77 37.0352, -119.543 37.925)&maxResults=1000&output=CSV
+
+
+# linestring Keyword Invalid
+linestring=-150.2,65.0,#&maxresults=10&output=csv
+linestring=TEST,FAIL&maxresults=10&output=csv
+linestring(TEST)&maxResults=1000&output=CSV
+linestring(%)&maxResults=1000&output=CSV
+
+# lookDirection Keyword Invalid
+lookDirection=TEST&maxResults=1000&output=CSV
+lookDirection=1&maxResults=1000&output=CSV
+
+# maxBaselinePerp Keyword Invalid
+maxbaselineperp=%&platform=R1&maxresults=10&output=csv
+maxbaselineperp=TEST&platform=R1&maxresults=10&output=csv
+
+# maxDoppler Keyword Invalid
+platform=Sentinel&maxDoppler=TEST&output=CSV
+platform=Sentinel&maxDoppler=@&output=CSV
+
+# maxFaradayRotation Keyword Invalid
+platform=Sentinel&maxFaradayRotation=0&output=CSV
+platform=Sentinel&maxFaradayRotation=-5.0&output=CSV
+platform=Sentinel&maxFaradayRotation=TEST&output=CSV
+platform=Sentinel&maxFaradayRotation=&output=CSV
+platform=Sentinel&maxFaradayRotation=***&output=CSV
+
+# maxInsarStackSize Keyword Invalid
+platform=SENTINEL&maxInsarStackSize=#&maxResults=100&output=CSV
+
+# minBaselinPerp Keyword Invalid
+minbaselineperp=150&platform=R1&maxresults=10&output=csv
+minbaselineperp=100&maxbaselineperp=150&platform=R1&maxresults=10&output=csv
+
+# minDoppler Keyword Invalid
+mindoppler=-20000&platform=R1&maxresults=10&output=csv
+mindoppler=-2000&maxdoppler=2000&platform=R1&maxresults=10&output=csv
+
+# minFaradayRotation Keyword Invalid
+minfaradayrotation=#&maxresults=10&output=csv
+minfaradayrotation=#&maxfaradayrotation=#&maxresults=10&output=csv
+minfaradayrotation=TEST&maxfaradayrotation=TEST&maxresults=10&output=csv
+platform=Sentinel&maxFaradayRotation=0&output=CSV
+platform=Sentinel&maxFaradayRotation=-5.0&output=CSV
+platform=Sentinel&maxFaradayRotation=TEST&output=CSV
+platform=Sentinel&maxFaradayRotation=&output=CSV
+platform=Sentinel&maxFaradayRotation=***&output=CSV
+
+# minInsarStackSize Keyword Invalid
+mininsarstacksize=$&maxresults=10&output=csv
+mininsarstacksize=$&maxinsarstacksize=#&maxresults=10&output=csv
+mininsarstacksize=TEST&maxinsarstacksize=TEST&maxresults=10&output=csv
+
+#  offNadirAngle Keyword Invalid
+offNadirAngle=TEST&maxResults=1000&output=CSV
+offNadirAngle=$&maxResults=1000&output=CSV
+
+# output Keyword Invalid
+platform=UAVSAR&relativeOrbit=05905-05906&output=TEST
+platform=UAVSAR&relativeOrbit=05905-05906&maxResults=1/2&output=CSC
+
+
+# platform Keyword Invalid
+platform=@&maxResults=10&output=CSV
+platform=@&maxResults=10&output=COUNT
+platform=~&maxResults=10&output=COUNT
+platform=%&maxResults=10&output=COUNT
+platform=TEST&maxResults=10&output=COUNT
+
+# point Keyword Invalid
+point=-150.2&maxresults=10&output=csv
+point=$#&maxresults=10&output=csv
+
+# polarization Keyword Invalid
+platform=AIRSAR&polarization=12&output=CSV
+platform=AIRSAR&polarization=%@#&output=CSV
+platform=E1&polarization=^*&maxResults=1000&output=CSV
+
+# polygon Keyword Invalid
+polygon=-155.08,65.82,-153.5,61.91,-149.50,63.07,-149.94,64.55&maxResults=1000&output=CSV
+polygon=-155.08,65.82,-153.5&maxResults=1000&output=CSV
+polygon=-155.08,65.82&maxResults=1000&output=CSV
+polygon=-155.08,65.82&maxResults=1000&output=count
+polygon=$$&maxResults=1000&output=count
+polygon=$$&maxResults=1000&output=CSV
+polygon=TEST&maxResults=1000&output=CSV
+
+
+# processingLevel Keyword Invalid
+processingLevel=@@&maxResults=1000&output=CSV
+processingLevel=LSTOKES&&output=COUNT
+
+# processingDate Keyword Invalid
+processingDate=$$$&maxResults=1200&output=CSV
+
+# relativeOrbit Keyword Invalid
+relativeOrbit=671&output=CSV
+relativeOrbit=TEST&output=CSV
+relativeOrbit=@@&output=CSV
+platform=UAVSAR&relativeOrbit=TEST&output=CSV
+platform=UAVSAR&relativeOrbit=TEST&output=COUNT
+
+# start Keyword Invalid
+start=now&end=1+week+ago&output=CSV
+start=1+week+ago&end=nowtest&output=CSV
