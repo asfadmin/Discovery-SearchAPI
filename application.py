@@ -4,6 +4,7 @@ from flask import Response
 from APIProxy import APIProxyQuery
 from WKTValidator import WKTValidator
 from FilesToWKT import FilesToWKT
+from MissionList import MissionList
 from datetime import datetime
 from urllib import parse
 import sys
@@ -92,14 +93,19 @@ def get_script():
 ########## Search API endpoints ##########
 
 # Validate and/or repair a WKT to ensure it meets CMR's requirements
-@application.route('/services/validate/wkt', methods = ['GET', 'POST'])
+@application.route('/services/utils/wkt', methods = ['GET', 'POST'])
 def validate_wkt():
     return WKTValidator(request).get_response()
 
-# Validate and/or repair a WKT to ensure it meets CMR's requirements
-@application.route('/services/convert/files_to_wkt', methods = ['POST'])
+# Convert a set of shapefiles or a geojson file to WKT
+@application.route('/services/utils/files_to_wkt', methods = ['POST'])
 def filesToWKT():
     return FilesToWKT(request).get_response()
+
+# Collect a list of missions from CMR for a given platform
+@application.route('/services/utils/mission_list', methods = ['GET', 'POST'])
+def missionList():
+    return MissionList(request).get_response()
 
 # Fetch and convert the results from CMR
 @application.route('/services/search/param', methods = ['GET', 'POST'])
