@@ -17,6 +17,7 @@ class MissionList:
 
         data = {
             'include_facets': 'true',
+            'provider': 'ASF'
         }
         if self.platform == 'UAVSAR':
             data['platform[]'] = 'G-III'
