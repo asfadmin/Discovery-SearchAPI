@@ -89,8 +89,9 @@ class CMRSubQuery:
 
     def get_page(self, s):
         logging.debug('Fetching page {0}'.format(self.current_page + 1))
+        cfg = get_config()
         if self.sid is None:
-            r = s.post(get_config()['cmr_api'], data=self.params)
+            r = s.post(cfg['cmr_api'], headers=cfg['cmr_headers'], data=self.params)
             if 'CMR-hits' not in r.headers:
                 raise CMRError(r.text)
             self.hits = int(r.headers['CMR-hits'])
@@ -98,7 +99,7 @@ class CMRSubQuery:
             s.headers.update({'CMR-Scroll-Id': self.sid})
             logging.debug('CMR reported {0} hits for session {1}'.format(self.hits, self.sid))
         else:
-            r = s.post(get_config()['cmr_api'], data=self.params)
+            r = s.post(cfg['cmr_api'], headers=cfg['cmr_headers'], data=self.params)
         if self.analytics:
             post_analytics(pageview=False, events=[{'ec': 'CMR API Status', 'ea': r.status_code}])
         if r.status_code != 200:
