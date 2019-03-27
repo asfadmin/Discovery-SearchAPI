@@ -25,7 +25,7 @@ class MissionList:
         elif self.platform == 'AIRSAR':
             data['platform[]'] = 'DC-8'
             data['instrument[]'] = 'AIRSAR'
-        elif self.platform == 'Sentinel-1 Interferogram (BETA)':
+        elif self.platform == 'SENTINEL-1 INTERFEROGRAM (BETA)':
             data['platform[]'] = 'SENTINEL-1A'
         elif self.platform is not None:
             data['platform[]'] = self.platform
