@@ -146,7 +146,7 @@ def input_map():
         'bbox':                 ['bounding_box',            '{0}',                              parse_bbox_string],
         'processinglevel':      ['attribute[]',             'string,PROCESSING_TYPE,{0}',       parse_string_list],
         'relativeorbit':        ['attribute[]',             'int,PATH_NUMBER,{0}',              parse_int_or_range_list],
-        'processingdate':       ['attribute[]',             'date,PROCESSING_DATE,{0},',        parse_date],
+        'processingdate':       ['created_at',              '{0}',                              parse_date],
         'start':                [None,                      '{0}',                              parse_date],
         'end':                  [None,                      '{0}',                              parse_date],
         'temporal':             ['temporal',                '{0}',                              None], # start/end end up here
