@@ -110,14 +110,15 @@ def repairWKT(wkt_str):
         # Check polygons for winding order or any CMR-related issues
         cmr_coords = parse_wkt(wkt.dumps(wkt_obj)).split(':')[1].split(',')
         repair = False
-        r = requests.post(get_config()['cmr_api'], data={'polygon': ','.join(cmr_coords), 'provider': 'ASF', 'page_size': 1})
+        cfg = get_config()
+        r = requests.post(cfg['cmr_api'], headers=cfg['cmr_headers'], data={'polygon': ','.join(cmr_coords), 'provider': 'ASF', 'page_size': 1})
         logging.debug({'polygon': ','.join(cmr_coords), 'provider': 'ASF', 'page_size': 1, 'attribute[]': 'string,ASF_PLATFORM,FAKEPLATFORM'})
         if r.status_code != 200:
             if 'Please check the order of your points.' in r.text:
                 it = iter(cmr_coords)
                 rev = reversed(list(zip(it, it)))
                 rv = [i for sub in rev for i in sub]
-                r = requests.post(get_config()['cmr_api'], data={'polygon': ','.join(rv), 'provider': 'ASF', 'page_size': 1, 'attribute[]': 'string,ASF_PLATFORM,FAKEPLATFORM'})
+                r = requests.post(cfg['cmr_api'], headers=cfg['cmr_headers'], data={'polygon': ','.join(rv), 'provider': 'ASF', 'page_size': 1, 'attribute[]': 'string,ASF_PLATFORM,FAKEPLATFORM'})
                 if r.status_code == 200:
                     repair = True
                 else:

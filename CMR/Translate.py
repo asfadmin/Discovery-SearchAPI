@@ -21,7 +21,8 @@ def fix_polygon(v):
 
     # Do a quick CMR query to see if the shape is wound correctly
     logging.debug('Checking winding order')
-    r = requests.post(get_config()['cmr_api'], data={'polygon': ','.join(v), 'provider': 'ASF', 'page_size': 1})
+    cfg = get_config()
+    r = requests.post(cfg['cmr_api'], headers=cfg['cmr_headers'], data={'polygon': ','.join(v), 'provider': 'ASF', 'page_size': 1, 'attribute[]': 'string,ASF_PLATFORM,FAKEPLATFORM'})
     if r.status_code == 200:
         logging.debug('Winding order looks good')
     else:
@@ -31,7 +32,7 @@ def fix_polygon(v):
             it = iter(v)
             rev = reversed(list(zip(it, it)))
             rv = [i for sub in rev for i in sub]
-            r = requests.post(get_config()['cmr_api'], data={'polygon': ','.join(rv), 'provider': 'ASF', 'page_size': 1, 'attribute[]': 'string,ASF_PLATFORM,FAKEPLATFORM'})
+            r = requests.post(cfg['cmr_api'], headers=cfg['cmr_headers'], data={'polygon': ','.join(rv), 'provider': 'ASF', 'page_size': 1, 'attribute[]': 'string,ASF_PLATFORM,FAKEPLATFORM'})
             if r.status_code == 200:
                 logging.debug('Polygon repaired')
                 v = rv
@@ -145,12 +146,12 @@ def input_map():
         'bbox':                 ['bounding_box',            '{0}',                              parse_bbox_string],
         'processinglevel':      ['attribute[]',             'string,PROCESSING_TYPE,{0}',       parse_string_list],
         'relativeorbit':        ['attribute[]',             'int,PATH_NUMBER,{0}',              parse_int_or_range_list],
-        'processingdate':       ['attribute[]',             'date,PROCESSING_DATE,{0},',        parse_date],
+        'processingdate':       ['updated_since',           '{0}',                              parse_date],
         'start':                [None,                      '{0}',                              parse_date],
         'end':                  [None,                      '{0}',                              parse_date],
         'temporal':             ['temporal',                '{0}',                              None], # start/end end up here
         'groupid':              ['attribute[]',             'string,GROUP_ID,{0}',              parse_string_list],
-        'pagesize':            [None,                      '{0}',                              parse_int]
+        'pagesize':             [None,                      '{0}',                              parse_int]
     }
 
 # translate supported params into CMR params
