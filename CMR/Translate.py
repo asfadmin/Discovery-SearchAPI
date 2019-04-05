@@ -108,7 +108,7 @@ def input_fixer(params):
         #add the seasonal search if requested now that the regular dates are sorted out
         if 'season' in fixed_params:
             fixed_params['temporal'] += ',{0}'.format(','.join(str(x) for x in fixed_params['season']))
-        
+
         # And a little cleanup
         fixed_params.pop('start', None)
         fixed_params.pop('end', None)
@@ -157,7 +157,7 @@ def input_map():
         'season':               [None,                      '{0}',                              parse_int_list],
         'temporal':             ['temporal',                '{0}',                              None], # start/end end up here
         'groupid':              ['attribute[]',             'string,GROUP_ID,{0}',              parse_string_list],
-        'pagesize':             [None,                      '{0}',                              parse_int],
+        'pagesize':             [None,                      '{0}',                              parse_int]
     }
 
 # translate supported params into CMR params
