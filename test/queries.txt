@@ -322,7 +322,7 @@ https://api-test.asf.alaska.edu/services/search/param?processingLevel=@@&maxResu
 https://api-test.asf.alaska.edu/services/search/param?processingLevel=LSTOKES&&output=COUNT
 
 # processingDate Invalid + CSV output
-https://api-test.asf.alaska.edu/services/search/processingDate=$$$&maxResults=1200&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?processingDate=$$$&maxResults=1200&output=CSV
 
 # relativeOrbit Invalid + CSV,OUTPUT output
 https://api-test.asf.alaska.edu/services/search/param?relativeOrbit=671&output=CSV
