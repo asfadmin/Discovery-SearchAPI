@@ -232,7 +232,7 @@ def parse_granule(granule):
         'stopTime':  get_val(granule, "./Temporal/RangeDateTime/EndingDateTime"),
         'absoluteOrbit': get_val(granule, "./OrbitCalculatedSpatialDomains/OrbitCalculatedSpatialDomain/OrbitNumber"),
         'platform': get_val(granule, attr('ASF_PLATFORM'), default='NA'),
-        'md5': get_val(granule, attr('MD5SUM'), default='NA'),
+        'md5sum': get_val(granule, attr('MD5SUM'), default='NA'),
         'beamMode': get_val(granule, attr('BEAM_MODE_TYPE'), default='NA'),
         'configurationName': get_val(granule, attr('BEAM_MODE_DESC'), default='NA'),
         'bytes': get_val(granule, attr("BYTES"), default='NA'),

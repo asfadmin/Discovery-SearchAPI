@@ -175,7 +175,8 @@ class JSONStreamArray(list):
             'varianceTroposphere',
             'slaveGranule',
             'sizeMB',
-            'groupID'
+            'groupID',
+            'md5sum'
         ]
 
         return dict((k, p[k]) for k in legacy_json_keys if k in p)
@@ -278,7 +279,7 @@ class GeoJSONStreamArray(JSONStreamArray):
                 'faradayRotation': p['faradayRotation'],
                 'bytes': p['bytes'],
                 'fileName': p['fileName'],
-                'md5sum': p['md5'],
+                'md5sum': p['md5sum'],
                 'processingDate': p['processingDate'],
                 'processingLevel': p['processingLevel'],
                 'url': p['downloadUrl']
