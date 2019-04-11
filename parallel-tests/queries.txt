@@ -207,6 +207,12 @@ relativeorbit=20,21,22&maxresults=10&output=csv
 relativeorbit=20,23-24&maxresults=100&output=csv
 relativeorbit=20,23,25&platform=R1&maxresults=10&output=csv
 
+# season Keyword
+season=32,90&platform=SA,SB&maxresults=1000&output=CSV
+season=1,100&platform=SA,SB&maxresults=1000&output=CSV
+season=0,175&platform=UA&maxresults=1000&output=CSV
+season=march,august&platform=S1&maxresults=1000&output=CSV
+
 # start Keyword
 start=2005-01-01T00:00:00Z&output=count
 start=2005-01-01T00:00:00Z&end=2005-01-01T01:00:00Z&output=csv
@@ -405,6 +411,12 @@ relativeOrbit=TEST&output=CSV
 relativeOrbit=@@&output=CSV
 platform=UAVSAR&relativeOrbit=TEST&output=CSV
 platform=UAVSAR&relativeOrbit=TEST&output=COUNT
+
+# season Keyword Invalid
+season=-1,380&platform=SA,SB&maxresults=1000&output=CSV
+season=%,%&platform=SA,SB&maxresults=1000&output=CSV
+season=december,may&platform=UA&maxresults=1000&output=CSV
+season=février,juillet&platform=S1&maxresults=1000&output=CSV
 
 # start Keyword Invalid
 start=now&end=1+week+ago&output=CSV
