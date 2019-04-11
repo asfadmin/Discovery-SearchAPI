@@ -150,6 +150,8 @@ platform=SB&start=1+week+ago&end=now&maxresults=2000&output=jsonlite
 platform=SB&start=1+week+ago&end=now&maxresults=2000&output=kml
 platform=SB&start=1+week+ago&end=now&maxresults=2000&output=metalink
 
+# pagesize + CSV output
+platform=R1,E1&pagesize=1000&output=jSoN
 
 # platform Keyword
 platform=SA&start=2016-01-01T00:00:00Z&end=2016-01-02T00:00:00Z&output=csv
@@ -376,6 +378,8 @@ offNadirAngle=$&maxResults=1000&output=CSV
 platform=UAVSAR&relativeOrbit=05905-05906&output=TEST
 platform=UAVSAR&relativeOrbit=05905-05906&maxResults=1/2&output=CSC
 
+# pagesize Invalid + CSV output
+platform=R1,E1&pagesize=TEST&output=jSoN
 
 # platform Keyword Invalid
 platform=@&maxResults=10&output=CSV
