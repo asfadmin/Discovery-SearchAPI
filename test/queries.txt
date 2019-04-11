@@ -166,6 +166,12 @@ https://api-test.asf.alaska.edu/services/search/param?platform=UAVSAR&relativeOr
 https://api-test.asf.alaska.edu/services/search/param?platform=UAVSAR&relativeOrbit=5905&output=CSV
 https://api-test.asf.alaska.edu/services/search/param?platform=UAVSAR&relativeOrbit=05905&output=CSV
 
+# season + CSV output
+https://api-test.asf.alaska.edu/services/search/param?season=32,90&platform=SA,SB&maxresults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?season=1,100&platform=SA,SB&maxresults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?season=0,175&platform=UA&maxresults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?season=march,august&platform=S1&maxresults=1000&output=CSV
+
 # start, end + CSV,COUNT output
 https://api-test.asf.alaska.edu/services/search/param?end=2005-01-01T00:00:00Z&output=count
 https://api-test.asf.alaska.edu/services/search/param?start=2005-01-01T00:00:00Z&output=count
@@ -330,6 +336,12 @@ https://api-test.asf.alaska.edu/services/search/param?relativeOrbit=TEST&output=
 https://api-test.asf.alaska.edu/services/search/param?relativeOrbit=@@&output=CSV
 https://api-test.asf.alaska.edu/services/search/param?platform=UAVSAR&relativeOrbit=TEST&output=CSV
 https://api-test.asf.alaska.edu/services/search/param?platform=UAVSAR&relativeOrbit=TEST&output=COUNT
+
+# season Invalid + CSV output
+https://api-test.asf.alaska.edu/services/search/param?season=-1,380&platform=SA,SB&maxresults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?season=%,%&platform=SA,SB&maxresults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?season=december,may&platform=UA&maxresults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?season=février,juillet&platform=S1&maxresults=1000&output=CSV
 
 # start-End Invalid + CSV output
 https://api-test.asf.alaska.edu/services/search/param?now&end=1+week+ago&output=CSV
