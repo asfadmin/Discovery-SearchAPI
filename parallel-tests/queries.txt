@@ -164,6 +164,11 @@ platform=SP&maxResults=10&output=csv
 platform=UA&maxResults=10&output=csv
 platform=E1,E2&maxResults=10&output=csv
 
+# platform aliases Keyword
+platform=S1&start=2016-01-01T00:00:00Z&end=2016-01-02T00:00:00Z&output=csv
+platform=SENTINEL-1&start=1+week+ago&end=now&maxresults=2000&output=csv
+platform=ERS&start=2016-01-01T00:00:00Z&end=2016-01-02T00:00:00Z&output=csv
+
 # point Keyword
 point=-150.2,65.0&maxresults=10&output=csv
 
@@ -378,6 +383,10 @@ platform=@&maxResults=10&output=COUNT
 platform=~&maxResults=10&output=COUNT
 platform=%&maxResults=10&output=COUNT
 platform=TEST&maxResults=10&output=COUNT
+
+# platform aliases Keyword
+platform=S2&start=2016-01-01T00:00:00Z&end=2016-01-02T00:00:00Z&output=csv
+platform=SENTINEL&start=1+week+ago&end=now&maxresults=2000&output=csv
 
 # point Keyword Invalid
 point=-150.2&maxresults=10&output=csv
