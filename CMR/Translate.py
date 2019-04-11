@@ -67,7 +67,10 @@ def input_fixer(params):
                 'SA': 'Sentinel-1A',
                 'SB': 'Sentinel-1B',
                 'SP': 'SMAP',
-                'UA': 'UAVSAR'
+                'UA': 'UAVSAR',
+                'S1': ['Sentinel-1A', 'Sentinel-1B'],
+                'SENTINEL-1': ['Sentinel-1A', 'Sentinel-1B'],
+                'ERS': ['ERS-1', 'ERS-2']
             }
             fixed_params[k] = [platmap[a.upper()] if a.upper() in platmap else a for a in v]
         elif k == 'beammode':
