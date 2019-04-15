@@ -432,6 +432,12 @@ processingLevel=LSTOKES&&output=COUNT
 # processingDate Keyword Invalid
 processingDate=$$$&maxResults=1200&output=CSV
 
+# product_list Invalid + CSV output
+product_list=0,1,2,3,4&output=CSV
+product_list=a,b,c,d&output=CSV
+product_list=#,$,%,&,@output=CSV
+product_list=TEST,INVALID&output=CSV
+
 # relativeOrbit Keyword Invalid
 relativeOrbit=671&output=CSV
 relativeOrbit=TEST&output=CSV
