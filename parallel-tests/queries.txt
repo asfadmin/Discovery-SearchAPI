@@ -218,7 +218,15 @@ relativeorbit=20,23,25&platform=R1&maxresults=10&output=csv
 season=32,90&platform=SA,SB&maxresults=1000&output=CSV
 season=1,100&platform=SA,SB&maxresults=1000&output=CSV
 season=0,175&platform=UA&maxresults=1000&output=CSV
-season=march,august&platform=S1&maxresults=1000&output=CSV
+season=32,90&platform=SA,SB&start=2017-01-01T00:00:00Z&end=2019-01-01T01:00:00Z&maxresults=1000&output=CSV
+season=1,100&platform=SA,SB&start=2015-01-01T00:00:00Z&end=2018-01-01T01:00:00Z&maxresults=1000&output=CSV
+season=0,175&platform=UA&start=2005-01-01T00:00:00Z&end=2019-01-01T01:00:00Z&maxresults=1000&output=CSV
+season=32,90&platform=SA,SB&start=1+week+ago&end=now&maxresults=1000&output=CSV
+season=1,100&platform=SA,SB&start=1+week+ago&end=now&maxresults=1000&output=CSV
+season=0,175&platform=UA&start=2018-July-15&end=now&maxresults=1000&output=CSV
+season=32,90&platform=SA,SB&start=2018-July-15&end=now&maxresults=1000&output=CSV
+season=1,100&platform=SA,SB&start=yesterday&end=now&maxresults=1000&output=CSV
+season=0,175&platform=UA&start=1+month+ago&end=now&maxresults=1000&output=CSV
 
 # start Keyword
 start=2005-01-01T00:00:00Z&output=count
@@ -430,7 +438,17 @@ season=-1,380&platform=SA,SB&maxresults=1000&output=CSV
 season=%,%&platform=SA,SB&maxresults=1000&output=CSV
 season=december,may&platform=UA&maxresults=1000&output=CSV
 season=février,juillet&platform=S1&maxresults=1000&output=CSV
+season=march,august&platform=S1&maxresults=1000&output=CSV
+season=-1,380&platform=SA,SB&start=2005-01-01T00:00:00Z&end=2019-01-01T01:00:00Z&maxresults=1000&output=CSV
+season=%,%&platform=SA,SB&start=2005-01-01T00:00:00Z&end=2019-01-01T01:00:00Z&maxresults=1000&output=CSV
+season=december,may&platform=UA&start=2005-01-01T00:00:00Z&end=2019-01-01T01:00:00Z&maxresults=1000&output=CSV
+season=février,juillet&platform=S1&start=2005-01-01T00:00:00Z&end=2019-01-01T01:00:00Z&maxresults=1000&output=CSV
+season=march,august&platform=S1&start=2020-01-01T00:00:00Z&end=2019-01-01T01:00:00Z&maxresults=1000&output=CSV
+season=février,juillet&platform=S1&start=now&end=1+week+ago&maxresults=1000&output=CSV
+season=march,august&platform=S1&start=1+week_ago&end=nowtest&maxresults=1000&output=CSV
+
 
 # start Keyword Invalid
 start=now&end=1+week+ago&output=CSV
 start=1+week+ago&end=nowtest&output=CSV
+start=now&end=yesterday&output=CSV
