@@ -150,8 +150,8 @@ platform=SB&start=1+week+ago&end=now&maxresults=2000&output=jsonlite
 platform=SB&start=1+week+ago&end=now&maxresults=2000&output=kml
 platform=SB&start=1+week+ago&end=now&maxresults=2000&output=metalink
 
-# pagesize + CSV output
-platform=R1,E1&pagesize=1000&output=jSoN
+# pagesize + jsonlite output
+platform=R1,E1&pagesize=1000&output=jsonlite
 
 # platform Keyword
 platform=SA&start=2016-01-01T00:00:00Z&end=2016-01-02T00:00:00Z&output=csv
@@ -223,16 +223,16 @@ relativeorbit=20,23,25&platform=R1&maxresults=10&output=csv
 # season Keyword
 season=32,90&platform=SA,SB&maxresults=1000&output=CSV
 season=1,100&platform=SA,SB&maxresults=1000&output=CSV
-season=0,175&platform=UA&maxresults=1000&output=CSV
+season=1,175&platform=UA&maxresults=1000&output=CSV
 season=32,90&platform=SA,SB&start=2017-01-01T00:00:00Z&end=2019-01-01T01:00:00Z&maxresults=1000&output=CSV
 season=1,100&platform=SA,SB&start=2015-01-01T00:00:00Z&end=2018-01-01T01:00:00Z&maxresults=1000&output=CSV
-season=0,175&platform=UA&start=2005-01-01T00:00:00Z&end=2019-01-01T01:00:00Z&maxresults=1000&output=CSV
+season=1,175&platform=UA&start=2005-01-01T00:00:00Z&end=2019-01-01T01:00:00Z&maxresults=1000&output=CSV
 season=32,90&platform=SA,SB&start=1+week+ago&end=now&maxresults=1000&output=CSV
 season=1,100&platform=SA,SB&start=1+week+ago&end=now&maxresults=1000&output=CSV
-season=0,175&platform=UA&start=2018-July-15&end=now&maxresults=1000&output=CSV
+season=1,175&platform=UA&start=2018-July-15&end=now&maxresults=1000&output=CSV
 season=32,90&platform=SA,SB&start=2018-July-15&end=now&maxresults=1000&output=CSV
 season=1,100&platform=SA,SB&start=yesterday&end=now&maxresults=1000&output=CSV
-season=0,175&platform=UA&start=1+month+ago&end=now&maxresults=1000&output=CSV
+season=1,175&platform=UA&start=1+month+ago&end=now&maxresults=1000&output=CSV
 
 # start Keyword
 start=2005-01-01T00:00:00Z&output=count
@@ -402,7 +402,7 @@ platform=~&maxResults=10&output=COUNT
 platform=%&maxResults=10&output=COUNT
 platform=TEST&maxResults=10&output=COUNT
 
-# platform aliases Keyword
+# platform aliases Keyword Invalid
 platform=S2&start=2016-01-01T00:00:00Z&end=2016-01-02T00:00:00Z&output=csv
 platform=SENTINEL&start=1+week+ago&end=now&maxresults=2000&output=csv
 
@@ -435,7 +435,7 @@ processingDate=$$$&maxResults=1200&output=CSV
 # product_list Invalid + CSV output
 product_list=0,1,2,3,4&output=CSV
 product_list=a,b,c,d&output=CSV
-product_list=#,$,%,&,@output=CSV
+product_list=#,$,%,@&output=CSV
 product_list=TEST,INVALID&output=CSV
 
 # relativeOrbit Keyword Invalid
@@ -446,12 +446,12 @@ platform=UAVSAR&relativeOrbit=TEST&output=CSV
 platform=UAVSAR&relativeOrbit=TEST&output=COUNT
 
 # season Keyword Invalid
-season=-1,380&platform=SA,SB&maxresults=1000&output=CSV
+season=-100,-3&platform=SA,SB&maxresults=1000&output=CSV
 season=%,%&platform=SA,SB&maxresults=1000&output=CSV
 season=december,may&platform=UA&maxresults=1000&output=CSV
 season=février,juillet&platform=S1&maxresults=1000&output=CSV
 season=march,august&platform=S1&maxresults=1000&output=CSV
-season=-1,380&platform=SA,SB&start=2005-01-01T00:00:00Z&end=2019-01-01T01:00:00Z&maxresults=1000&output=CSV
+season=-100,-3&platform=SA,SB&start=2005-01-01T00:00:00Z&end=2019-01-01T01:00:00Z&maxresults=1000&output=CSV
 season=%,%&platform=SA,SB&start=2005-01-01T00:00:00Z&end=2019-01-01T01:00:00Z&maxresults=1000&output=CSV
 season=december,may&platform=UA&start=2005-01-01T00:00:00Z&end=2019-01-01T01:00:00Z&maxresults=1000&output=CSV
 season=février,juillet&platform=S1&start=2005-01-01T00:00:00Z&end=2019-01-01T01:00:00Z&maxresults=1000&output=CSV

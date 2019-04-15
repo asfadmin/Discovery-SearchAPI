@@ -1,4 +1,5 @@
 # queries designed just for testing
+# product_list Keyword Invalid
 
 # absoluteOrbit + MaxResults 10 + CSV output
 https://api-test.asf.alaska.edu/services/search/param?absoluteorbit=5000&maxresults=10&output=csv
@@ -110,8 +111,8 @@ https://api-test.asf.alaska.edu/services/search/param?offnadirangle=21.5&maxresu
 https://api-test.asf.alaska.edu/services/search/param?offnadirangle=21.5,23.1,27.1&maxresults=10&output=csv
 https://api-test.asf.alaska.edu/services/search/param?offnadirangle=20-30&maxresults=10&output=csv
 
-# pagesize + CSV output
-https://api-test.asf.alaska.edu/services/search/param?platform=R1,E1&pagesize=1000&output=jSoN
+# pagesize + jsonlite output
+https://api-test.asf.alaska.edu/services/search/param?platform=R1,E1&pagesize=1000&output=jsonlite
 
 # platform RADARSAT + Max Results 10 + CSV, JSON output
 https://api-test.asf.alaska.edu/services/search/param?platform=R1,E1&maxResults=10&output=jSoN
@@ -184,16 +185,16 @@ https://api-test.asf.alaska.edu/services/search/param?platform=UAVSAR&relativeOr
 # season + CSV output
 https://api-test.asf.alaska.edu/services/search/param?season=32,90&platform=SA,SB&maxresults=1000&output=CSV
 https://api-test.asf.alaska.edu/services/search/param?season=1,100&platform=SA,SB&maxresults=1000&output=CSV
-https://api-test.asf.alaska.edu/services/search/param?season=0,175&platform=UA&maxresults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?season=1,175&platform=UA&maxresults=1000&output=CSV
 https://api-test.asf.alaska.edu/services/search/param?season=32,90&platform=SA,SB&start=2017-01-01T00:00:00Z&end=2019-01-01T01:00:00Z&maxresults=1000&output=CSV
 https://api-test.asf.alaska.edu/services/search/param?season=1,100&platform=SA,SB&start=2015-01-01T00:00:00Z&end=2018-01-01T01:00:00Z&maxresults=1000&output=CSV
-https://api-test.asf.alaska.edu/services/search/param?season=0,175&platform=UA&start=2005-01-01T00:00:00Z&end=2019-01-01T01:00:00Z&maxresults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?season=1,175&platform=UA&start=2005-01-01T00:00:00Z&end=2019-01-01T01:00:00Z&maxresults=1000&output=CSV
 https://api-test.asf.alaska.edu/services/search/param?season=32,90&platform=SA,SB&start=1+week+ago&end=now&maxresults=1000&output=CSV
 https://api-test.asf.alaska.edu/services/search/param?season=1,100&platform=SA,SB&start=1+week+ago&end=now&maxresults=1000&output=CSV
-https://api-test.asf.alaska.edu/services/search/param?season=0,175&platform=UA&start=2018-July-15&end=now&maxresults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?season=1,175&platform=UA&start=2018-July-15&end=now&maxresults=1000&output=CSV
 https://api-test.asf.alaska.edu/services/search/param?season=32,90&platform=SA,SB&start=2018-July-15&end=now&maxresults=1000&output=CSV
 https://api-test.asf.alaska.edu/services/search/param?season=1,100&platform=SA,SB&start=yesterday&end=now&maxresults=1000&output=CSV
-https://api-test.asf.alaska.edu/services/search/param?season=0,175&platform=UA&start=1+month+ago&end=now&maxresults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?season=1,175&platform=UA&start=1+month+ago&end=now&maxresults=1000&output=CSV
 
 # start, end + CSV,COUNT output
 https://api-test.asf.alaska.edu/services/search/param?end=2005-01-01T00:00:00Z&output=count
@@ -318,8 +319,8 @@ https://api-test.asf.alaska.edu/services/search/param?offNadirAngle=$&maxResults
 https://api-test.asf.alaska.edu/services/search/param?platform=UAVSAR&relativeOrbit=05905-05906&output=TEST
 https://api-test.asf.alaska.edu/services/search/param?platform=UAVSAR&relativeOrbit=05905-05906&maxResults=1/2&output=CSC
 
-# pagesize Invalid + CSV output
-https://api-test.asf.alaska.edu/services/search/param?platform=R1,E1&pagesize=TEST&output=jSoN
+# pagesize Invalid + jsonlite output
+https://api-test.asf.alaska.edu/services/search/param?platform=R1,E1&pagesize=TEST&output=jsonlite
 
 # platform Invalid + CSV,COUNT output
 https://api-test.asf.alaska.edu/services/search/param?platform=@&maxResults=10&output=CSV
@@ -360,7 +361,7 @@ https://api-test.asf.alaska.edu/services/search/param?processingDate=$$$&maxResu
 # product_list Invalid + CSV output
 https://api-test.asf.alaska.edu/services/search/param?product_list=0,1,2,3,4&output=CSV
 https://api-test.asf.alaska.edu/services/search/param?product_list=a,b,c,d&output=CSV
-https://api-test.asf.alaska.edu/services/search/param?product_list=#,$,%,&,@output=CSV
+https://api-test.asf.alaska.edu/services/search/param?product_list=#,$,%,@&output=CSV
 https://api-test.asf.alaska.edu/services/search/param?product_list=TEST,INVALID&output=CSV
 
 # relativeOrbit Invalid + CSV,OUTPUT output
@@ -371,12 +372,12 @@ https://api-test.asf.alaska.edu/services/search/param?platform=UAVSAR&relativeOr
 https://api-test.asf.alaska.edu/services/search/param?platform=UAVSAR&relativeOrbit=TEST&output=COUNT
 
 # season Invalid + CSV output
-https://api-test.asf.alaska.edu/services/search/param?season=-1,380&platform=SA,SB&maxresults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?season=-100,-3&platform=SA,SB&maxresults=1000&output=CSV
 https://api-test.asf.alaska.edu/services/search/param?season=%,%&platform=SA,SB&maxresults=1000&output=CSV
 https://api-test.asf.alaska.edu/services/search/param?season=december,may&platform=UA&maxresults=1000&output=CSV
 https://api-test.asf.alaska.edu/services/search/param?season=février,juillet&platform=S1&maxresults=1000&output=CSV
 https://api-test.asf.alaska.edu/services/search/param?season=march,august&platform=S1&maxresults=1000&output=CSV
-https://api-test.asf.alaska.edu/services/search/param?season=-1,380&platform=SA,SB&start=2005-01-01T00:00:00Z&end=2019-01-01T01:00:00Z&maxresults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?season=-100,-3&platform=SA,SB&start=2005-01-01T00:00:00Z&end=2019-01-01T01:00:00Z&maxresults=1000&output=CSV
 https://api-test.asf.alaska.edu/services/search/param?season=%,%&platform=SA,SB&start=2005-01-01T00:00:00Z&end=2019-01-01T01:00:00Z&maxresults=1000&output=CSV
 https://api-test.asf.alaska.edu/services/search/param?season=december,may&platform=UA&start=2005-01-01T00:00:00Z&end=2019-01-01T01:00:00Z&maxresults=1000&output=CSV
 https://api-test.asf.alaska.edu/services/search/param?season=février,juillet&platform=S1&start=2005-01-01T00:00:00Z&end=2019-01-01T01:00:00Z&maxresults=1000&output=CSV
