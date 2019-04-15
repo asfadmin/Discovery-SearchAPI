@@ -150,6 +150,8 @@ platform=SB&start=1+week+ago&end=now&maxresults=2000&output=jsonlite
 platform=SB&start=1+week+ago&end=now&maxresults=2000&output=kml
 platform=SB&start=1+week+ago&end=now&maxresults=2000&output=metalink
 
+# pagesize + CSV output
+platform=R1,E1&pagesize=1000&output=jSoN
 
 # platform Keyword
 platform=SA&start=2016-01-01T00:00:00Z&end=2016-01-02T00:00:00Z&output=csv
@@ -163,6 +165,11 @@ platform=RADARSAT-1,E1&processingLEVEL=L0,L1&maxResults=10&output=csv
 platform=SP&maxResults=10&output=csv
 platform=UA&maxResults=10&output=csv
 platform=E1,E2&maxResults=10&output=csv
+
+# platform aliases Keyword
+platform=S1&start=2016-01-01T00:00:00Z&end=2016-01-02T00:00:00Z&output=csv
+platform=SENTINEL-1&start=1+week+ago&end=now&maxresults=2000&output=csv
+platform=ERS&start=2016-01-01T00:00:00Z&end=2016-01-02T00:00:00Z&output=csv
 
 # point Keyword
 point=-150.2,65.0&maxresults=10&output=csv
@@ -206,6 +213,12 @@ relativeorbit=20-22&maxresults=10&output=csv
 relativeorbit=20,21,22&maxresults=10&output=csv
 relativeorbit=20,23-24&maxresults=100&output=csv
 relativeorbit=20,23,25&platform=R1&maxresults=10&output=csv
+
+# season Keyword
+season=32,90&platform=SA,SB&maxresults=1000&output=CSV
+season=1,100&platform=SA,SB&maxresults=1000&output=CSV
+season=0,175&platform=UA&maxresults=1000&output=CSV
+season=march,august&platform=S1&maxresults=1000&output=CSV
 
 # start Keyword
 start=2005-01-01T00:00:00Z&output=count
@@ -365,6 +378,8 @@ offNadirAngle=$&maxResults=1000&output=CSV
 platform=UAVSAR&relativeOrbit=05905-05906&output=TEST
 platform=UAVSAR&relativeOrbit=05905-05906&maxResults=1/2&output=CSC
 
+# pagesize Invalid + CSV output
+platform=R1,E1&pagesize=TEST&output=jSoN
 
 # platform Keyword Invalid
 platform=@&maxResults=10&output=CSV
@@ -372,6 +387,10 @@ platform=@&maxResults=10&output=COUNT
 platform=~&maxResults=10&output=COUNT
 platform=%&maxResults=10&output=COUNT
 platform=TEST&maxResults=10&output=COUNT
+
+# platform aliases Keyword
+platform=S2&start=2016-01-01T00:00:00Z&end=2016-01-02T00:00:00Z&output=csv
+platform=SENTINEL&start=1+week+ago&end=now&maxresults=2000&output=csv
 
 # point Keyword Invalid
 point=-150.2&maxresults=10&output=csv
@@ -405,6 +424,12 @@ relativeOrbit=TEST&output=CSV
 relativeOrbit=@@&output=CSV
 platform=UAVSAR&relativeOrbit=TEST&output=CSV
 platform=UAVSAR&relativeOrbit=TEST&output=COUNT
+
+# season Keyword Invalid
+season=-1,380&platform=SA,SB&maxresults=1000&output=CSV
+season=%,%&platform=SA,SB&maxresults=1000&output=CSV
+season=december,may&platform=UA&maxresults=1000&output=CSV
+season=février,juillet&platform=S1&maxresults=1000&output=CSV
 
 # start Keyword Invalid
 start=now&end=1+week+ago&output=CSV

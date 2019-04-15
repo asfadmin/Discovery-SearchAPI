@@ -110,6 +110,9 @@ https://api-test.asf.alaska.edu/services/search/param?offnadirangle=21.5&maxresu
 https://api-test.asf.alaska.edu/services/search/param?offnadirangle=21.5,23.1,27.1&maxresults=10&output=csv
 https://api-test.asf.alaska.edu/services/search/param?offnadirangle=20-30&maxresults=10&output=csv
 
+# pagesize + CSV output
+https://api-test.asf.alaska.edu/services/search/param?platform=R1,E1&pagesize=1000&output=jSoN
+
 # platform RADARSAT + Max Results 10 + CSV, JSON output
 https://api-test.asf.alaska.edu/services/search/param?platform=R1,E1&maxResults=10&output=jSoN
 https://api-test.asf.alaska.edu/services/search/param?platform=RADARSAT-1,E1&maxResults=10&output=csv
@@ -120,6 +123,11 @@ https://api-test.asf.alaska.edu/services/search/param?platform=J1&polygon=-148.5
 
 # platform + ProcessingLevel + Polygon + MaxResults 100 + CSV output
 https://api-test.asf.alaska.edu/services/search/param?platform=A3&processinglevel=L1.0polygon=-148.52,64.63,-150.41,64.64,-149.58,63.86,-148.52,64.63&maxResults=100&output=csv
+
+# platform aliases + CSV output
+https://api-test.asf.alaska.edu/services/search/param?platform=S1&start=2016-01-01T00:00:00Z&end=2016-01-02T00:00:00Z&output=csv
+https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&start=1+week+ago&end=now&maxresults=2000&output=csv
+https://api-test.asf.alaska.edu/services/search/param?platform=ERS&start=2016-01-01T00:00:00Z&end=2016-01-02T00:00:00Z&output=csv
 
 # point + MaxResults + CSV output
 https://api-test.asf.alaska.edu/services/search/param?point=-150.2,65.0&maxresults=10&output=csv
@@ -155,6 +163,13 @@ https://api-test.asf.alaska.edu/services/search/param?start=today&output=CSV
 https://api-test.asf.alaska.edu/services/search/param?start=1+week+ago&end=now&output=CSV
 https://api-test.asf.alaska.edu/services/search/param?start=1+week+ago&end=nowtest&output=CSV
 
+# product_list + MaxResults + CSV output
+
+https://api-test.asf.alaska.edu/services/search/param?
+https://api-test.asf.alaska.edu/services/search/param?
+https://api-test.asf.alaska.edu/services/search/param?
+https://api-test.asf.alaska.edu/services/search/param?
+
 # relativeOrbit + MaxResults + CSV output
 https://api-test.asf.alaska.edu/services/search/param?relativeorbit=20&maxresults=10&output=csv
 https://api-test.asf.alaska.edu/services/search/param?relativeorbit=20-22&maxresults=10&output=csv
@@ -165,6 +180,12 @@ https://api-test.asf.alaska.edu/services/search/param?platform=UAVSAR&relativeOr
 https://api-test.asf.alaska.edu/services/search/param?platform=UAVSAR&relativeOrbit=05905-05906&output=COUNT
 https://api-test.asf.alaska.edu/services/search/param?platform=UAVSAR&relativeOrbit=5905&output=CSV
 https://api-test.asf.alaska.edu/services/search/param?platform=UAVSAR&relativeOrbit=05905&output=CSV
+
+# season + CSV output
+https://api-test.asf.alaska.edu/services/search/param?season=32,90&platform=SA,SB&maxresults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?season=1,100&platform=SA,SB&maxresults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?season=0,175&platform=UA&maxresults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?season=march,august&platform=S1&maxresults=1000&output=CSV
 
 # start, end + CSV,COUNT output
 https://api-test.asf.alaska.edu/services/search/param?end=2005-01-01T00:00:00Z&output=count
@@ -177,6 +198,11 @@ https://api-test.asf.alaska.edu/services/search/param?start=yesterday&end=now&ou
 https://api-test.asf.alaska.edu/services/search/param?start=now&end=yesterday&output=CSV
 https://api-test.asf.alaska.edu/services/search/param?start=2018-July-18&end=2018-July-17&output=CSV
 
+# temporal + MaxResults + CSV output
+#https://api-test.asf.alaska.edu/services/search/param?
+#https://api-test.asf.alaska.edu/services/search/param?
+#https://api-test.asf.alaska.edu/services/search/param?
+#https://api-test.asf.alaska.edu/services/search/param?
 
 ### Negative Tests ###
 
@@ -292,12 +318,19 @@ https://api-test.asf.alaska.edu/services/search/param?offNadirAngle=$&maxResults
 https://api-test.asf.alaska.edu/services/search/param?platform=UAVSAR&relativeOrbit=05905-05906&output=TEST
 https://api-test.asf.alaska.edu/services/search/param?platform=UAVSAR&relativeOrbit=05905-05906&maxResults=1/2&output=CSC
 
+# pagesize Invalid + CSV output
+https://api-test.asf.alaska.edu/services/search/param?platform=R1,E1&pagesize=TEST&output=jSoN
+
 # platform Invalid + CSV,COUNT output
 https://api-test.asf.alaska.edu/services/search/param?platform=@&maxResults=10&output=CSV
 https://api-test.asf.alaska.edu/services/search/param?platform=@&maxResults=10&output=COUNT
 https://api-test.asf.alaska.edu/services/search/param?platform=~&maxResults=10&output=COUNT
 https://api-test.asf.alaska.edu/services/search/param?platform=%&maxResults=10&output=COUNT
 https://api-test.asf.alaska.edu/services/search/param?platform=TEST&maxResults=10&output=COUNT
+
+# platform aliases Keyword Invalid + CSV output
+https://api-test.asf.alaska.edu/services/search/param?platform=S2&start=2016-01-01T00:00:00Z&end=2016-01-02T00:00:00Z&output=csv
+https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL&start=1+week+ago&end=now&maxresults=2000&output=csv
 
 # point Invalid + CSV output
 https://api-test.asf.alaska.edu/services/search/param?point=-150.2&maxresults=10&output=csv
@@ -331,10 +364,21 @@ https://api-test.asf.alaska.edu/services/search/param?relativeOrbit=@@&output=CS
 https://api-test.asf.alaska.edu/services/search/param?platform=UAVSAR&relativeOrbit=TEST&output=CSV
 https://api-test.asf.alaska.edu/services/search/param?platform=UAVSAR&relativeOrbit=TEST&output=COUNT
 
+# season Invalid + CSV output
+https://api-test.asf.alaska.edu/services/search/param?season=-1,380&platform=SA,SB&maxresults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?season=%,%&platform=SA,SB&maxresults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?season=december,may&platform=UA&maxresults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?season=février,juillet&platform=S1&maxresults=1000&output=CSV
+
 # start-End Invalid + CSV output
 https://api-test.asf.alaska.edu/services/search/param?now&end=1+week+ago&output=CSV
 https://api-test.asf.alaska.edu/services/search/param?start=1+week+ago&end=nowtest&output=CSV
 
+# temporal Invalid + CSV output
+#https://api-test.asf.alaska.edu/services/search/param?
+#https://api-test.asf.alaska.edu/services/search/param?
+#https://api-test.asf.alaska.edu/services/search/param?
+#https://api-test.asf.alaska.edu/services/search/param?
 
 # polygon closure/winding order fixer test
 https://api-test.asf.alaska.edu/services/search/param?polygon=12.13,41.74,13.4,41.74,13.4,42.75,12.13,42.75&platform=Sentinel-1A,Sentinel-1B&processingLevel=SLC&start=2018-05-01T00:00:00UTC&output=csv
