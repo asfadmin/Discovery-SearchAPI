@@ -124,7 +124,7 @@ https://api-test.asf.alaska.edu/services/search/param?platform=J1&polygon=-148.5
 # platform + ProcessingLevel + Polygon + MaxResults 100 + CSV output
 https://api-test.asf.alaska.edu/services/search/param?platform=A3&processinglevel=L1.0polygon=-148.52,64.63,-150.41,64.64,-149.58,63.86,-148.52,64.63&maxResults=100&output=csv
 
-# platform aliases + CSV output
+# platform aliases + count output
 https://api-test.asf.alaska.edu/services/search/param?platform=S1&start=2016-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
 https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&start=2016-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
 https://api-test.asf.alaska.edu/services/search/param?platform=Sentinel-1&start=2016-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
