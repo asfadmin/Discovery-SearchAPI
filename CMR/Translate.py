@@ -7,7 +7,7 @@ import requests
 import logging
 from asf_env import get_config
 from CMR.Input import parse_int, parse_float, parse_string, parse_wkt, parse_date
-from CMR.Input import parse_string_list, parse_int_or_range_list, parse_float_or_range_list
+from CMR.Input import parse_string_list, parse_int_list, parse_int_or_range_list, parse_float_or_range_list
 from CMR.Input import parse_coord_string, parse_bbox_string, parse_point_string
 from CMR.Output import output_translators
 
@@ -67,7 +67,10 @@ def input_fixer(params):
                 'SA': 'Sentinel-1A',
                 'SB': 'Sentinel-1B',
                 'SP': 'SMAP',
-                'UA': 'UAVSAR'
+                'UA': 'UAVSAR',
+                'S1': ['Sentinel-1A', 'Sentinel-1B'],
+                'SENTINEL-1': ['Sentinel-1A', 'Sentinel-1B'],
+                'ERS': ['ERS-1', 'ERS-2']
             }
             fixed_params[k] = [platmap[a.upper()] if a.upper() in platmap else a for a in v]
         elif k == 'beammode':
@@ -92,7 +95,7 @@ def input_fixer(params):
         else:
             fixed_params[k] = v
 
-    if 'start' in fixed_params or 'end' in fixed_params:
+    if 'start' in fixed_params or 'end' in fixed_params or 'season' in fixed_params:
         # set default start and end dates if needed, and then make sure they're formatted correctly
         # whether using the default or not
         start_s = fixed_params['start'] if 'start' in fixed_params else '1978-01-01T00:00:00Z'
@@ -105,9 +108,14 @@ def input_fixer(params):
             start, end = end, start
         # Final temporal string that will actually be used
         fixed_params['temporal'] = '{0},{1}'.format(start.strftime('%Y-%m-%dT%H:%M:%SZ'), end.strftime('%Y-%m-%dT%H:%M:%SZ'))
+        #add the seasonal search if requested now that the regular dates are sorted out
+        if 'season' in fixed_params:
+            fixed_params['temporal'] += ',{0}'.format(','.join(str(x) for x in fixed_params['season']))
+
         # And a little cleanup
         fixed_params.pop('start', None)
         fixed_params.pop('end', None)
+        fixed_params.pop('season', None)
 
     return fixed_params
 
@@ -149,6 +157,7 @@ def input_map():
         'processingdate':       ['updated_since',           '{0}',                              parse_date],
         'start':                [None,                      '{0}',                              parse_date],
         'end':                  [None,                      '{0}',                              parse_date],
+        'season':               [None,                      '{0}',                              parse_int_list],
         'temporal':             ['temporal',                '{0}',                              None], # start/end end up here
         'groupid':              ['attribute[]',             'string,GROUP_ID,{0}',              parse_string_list],
         'pagesize':             [None,                      '{0}',                              parse_int]
@@ -232,7 +241,7 @@ def parse_granule(granule):
         'stopTime':  get_val(granule, "./Temporal/RangeDateTime/EndingDateTime"),
         'absoluteOrbit': get_val(granule, "./OrbitCalculatedSpatialDomains/OrbitCalculatedSpatialDomain/OrbitNumber"),
         'platform': get_val(granule, attr('ASF_PLATFORM'), default='NA'),
-        'md5': get_val(granule, attr('MD5SUM'), default='NA'),
+        'md5sum': get_val(granule, attr('MD5SUM'), default='NA'),
         'beamMode': get_val(granule, attr('BEAM_MODE_TYPE'), default='NA'),
         'configurationName': get_val(granule, attr('BEAM_MODE_DESC'), default='NA'),
         'bytes': get_val(granule, attr("BYTES"), default='NA'),
