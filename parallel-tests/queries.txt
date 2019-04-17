@@ -229,10 +229,24 @@ platform=UAVSAR&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
 platform=UAvSAR&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
 platform=G-III&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
 platform=g-iii&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+
+# platform_list Keyword
+platform_list=sentinel,ers&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+platform_list=SENTINEL,ERS&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+platform_list=S1,Ers&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+platform_list=J1,ERS&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+platform_list=JERS-1,ERs&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+platform_list=E1,E2&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+platform_list=ERS-1,ERs-2&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+platform_list=S1&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+platform_list=SA,Sb&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+
+
 # point Keyword
 point=-150.2,65.0&maxresults=10&output=csv
 
 # polarization Keyword
+
 polarization=HH&platform=SA&maxresults=10&output=csv
 polarization=VV&platform=SA&maxresults=10&output=csv
 polarization=HH%2bHV&maxresults=10&output=csv
@@ -462,7 +476,12 @@ platform=TEST&maxResults=10&output=COUNT
 
 # platform aliases Keyword Invalid
 platform=S2&start=2016-01-01T00:00:00Z&end=2016-01-02T00:00:00Z&output=csv
-platform=SENTINEL&start=1+week+ago&end=now&maxresults=2000&output=csv
+platform=SENTI&start=1+week+ago&end=now&maxresults=2000&output=csv
+platform=TEST&start=2016-01-01T00:00:00Z&end=2016-01-02T00:00:00Z&output=csv
+
+# platform_list Keyword Invalid
+platform_list=Test,TEST&start=2016-01-01T00:00:00Z&end=2016-01-02T00:00:00Z&output=csv
+platform_list=#,$&start=2016-01-01T00:00:00Z&end=2016-01-02T00:00:00Z&output=csv
 
 # point Keyword Invalid
 point=-150.2&maxresults=10&output=csv
