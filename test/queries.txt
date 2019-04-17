@@ -208,6 +208,15 @@ https://api-test.asf.alaska.edu/services/search/param?polarization=VV&platform=S
 https://api-test.asf.alaska.edu/services/search/param?polarization=HH%2bHV&maxresults=10&output=csv
 https://api-test.asf.alaska.edu/services/search/param?polarization=Dual+VV&maxresults=10&output=csv
 https://api-test.asf.alaska.edu/services/search/param?polarization=QUADRATURE&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?polarization=hH&platform=SA&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?polarization=Vv&platform=SA&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?polarization=Hh%2bhV&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?polarization=Dual+vv&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?polarization=quadrature&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?polarization=vv%2bVH&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?polarization=Dual+hv&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?polarization=dual+VH&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?polarization=dual+vh&maxresults=10&output=csv
 
 # polygon + MaxResults 100 + CSV output
 https://api-test.asf.alaska.edu/services/search/param?polygon=-148.52,64.63,-150.41,64.64,-149.58,63.86,-148.52,64.63&maxResults=100&output=csv
@@ -341,11 +350,11 @@ https://api-test.asf.alaska.edu/services/search/param?groupid=TEST&output=CSV
 https://api-test.asf.alaska.edu/services/search/param?groupid=$#&output=CSV
 
 # intersectsWithPoint Invalid + CSV output
-https://api-test.asf.alaska.edu/services/search/param?intersectsWith=point(-119.543,37.925)&maxResults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?intersectsWith=point(TEST,37.925)&maxResults=1000&output=CSV
 
 # intersectsWithPolygon Invalid + CSV output
-https://api-test.asf.alaska.edu/services/search/param?intersectsWith=polygon((-119.543 37.925, -118.443 37.7421, -118.682 36.8525, -119.77 37.0352, -119.543 37.925))&maxResults=1000&output=CSV
-https://api-test.asf.alaska.edu/services/search/param?intersectsWith=polygon(-119.543 37.925, -118.443 37.7421, -118.682 36.8525, -119.77 37.0352, -119.543 37.925)&maxResults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?intersectsWith=polygon($ $, -118.443 37.7421, -118.682 36.8525, -119.77 37.0352, -119.543 37.925)&maxResults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?intersectsWith=polygon((TEST 37.925, -118.443 37.7421, -118.682 36.8525, -119.77 37.0352, -119.543 37.925))&maxResults=1000&output=CSV
 
 # intersectsWithLinestring Invalid + CSV output
 https://api-test.asf.alaska.edu/services/search/param?intersectsWith=linestring(TEST)&maxResults=1000&output=CSV
