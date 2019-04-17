@@ -252,6 +252,15 @@ polarization=VV&platform=SA&maxresults=10&output=csv
 polarization=HH%2bHV&maxresults=10&output=csv
 polarization=Dual+VV&maxresults=10&output=csv
 polarization=QUADRATURE&maxresults=10&output=csv
+polarization=hH&platform=SA&maxresults=10&output=csv"
+polarization=Vv&platform=SA&maxresults=10&output=csv
+polarization=Hh%2bhV&maxresults=10&output=csv
+polarization=Dual+vv&maxresults=10&output=csv
+polarization=quadrature&maxresults=10&output=csv
+polarization=vv%2bVH&maxresults=10&output=csv
+polarization=Dual+hv&maxresults=10&output=csv
+polarization=dual+VH&maxresults=10&output=csv
+polarization=dual+vh&maxresults=10&output=csv
 
 # polygon Keyword
 polygon=12.13,41.74,13.4,41.74,13.4,42.75,12.13,42.75,12.13,41.74&platform=Sentinel-1A,Sentinel-1B&processingLevel=SLC&start=2018-05-01T00:00:00UTC&output=csv
