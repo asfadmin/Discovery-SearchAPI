@@ -55,24 +55,39 @@ def input_fixer(params):
             if v[0].upper() not in ['A', 'D']:
                 raise ValueError('Invalid flight direction: {0}'.format(v))
             fixed_params[k] = {'A': 'ASCENDING', 'D': 'DESCENDING'}[v[0].upper()]
-        elif k == 'platform': # Legacy API allowed a few synonyms. If they're using one, translate it
-            platmap = {
+        elif k == 'platform': # Legacy API allowed a few synonyms. If they're using one, translate it. Also handle airsar/seasat/uavsar platform conversion
+            plat_aliases = {
+                'S1': ['SENTINEL-1A', 'SENTINEL-1B'],
+                'SENTINEL-1': ['SENTINEL-1A', 'SENTINEL-1B'],
+                'SENTINEL': ['SENTINEL-1A', 'SENTINEL-1B'],
+                'ERS': ['ERS-1', 'ERS-2']}
+
+            plat_names = {
                 'R1': 'RADARSAT-1',
                 'E1': 'ERS-1',
                 'E2': 'ERS-2',
                 'J1': 'JERS-1',
                 'A3': 'ALOS',
-                'AS': 'AIRSAR',
-                'SS': 'SEASAT',
-                'SA': 'Sentinel-1A',
-                'SB': 'Sentinel-1B',
+                'AS': 'DC-8',
+                'AIRSAR': 'DC-8',
+                'SS': 'SEASAT 1',
+                'SEASAT': 'SEASAT 1',
+                'SA': 'SENTINEL-1A',
+                'SB': 'SENTINEL-1B',
                 'SP': 'SMAP',
-                'UA': 'UAVSAR',
-                'S1': ['Sentinel-1A', 'Sentinel-1B'],
-                'SENTINEL-1': ['Sentinel-1A', 'Sentinel-1B'],
-                'ERS': ['ERS-1', 'ERS-2']
+                'UA': 'G-III',
+                'UAVSAR': 'G-III'
             }
-            fixed_params[k] = [platmap[a.upper()] if a.upper() in platmap else a for a in v]
+
+            platform_list = []
+            for p in v:
+                if p.upper() in plat_aliases:
+                    for x in plat_aliases[p.upper()]:
+                        platform_list.append(x)
+                else:
+                    platform_list.append(p)
+
+            fixed_params[k] = list(set([plat_names[a.upper()] if a.upper() in plat_names else a for a in platform_list]))
         elif k == 'beammode':
             beammap = {
                 'STD': 'Standard'
@@ -146,7 +161,7 @@ def input_map():
         'intersectswith':       [None,                      '{0}',                              parse_wkt],
         'lookdirection':        ['attribute[]',             'string,LOOK_DIRECTION,{0}',        parse_string],
         'offnadirangle':        ['attribute[]',             'float,OFF_NADIR_ANGLE,{0}',        parse_float_or_range_list],
-        'platform':             ['attribute[]',             'string,ASF_PLATFORM,{0}',          parse_string_list],
+        'platform':             ['platform[]',              '{0}',                              parse_string_list],
         'polarization':         ['attribute[]',             'string,POLARIZATION,{0}',          parse_string_list],
         'polygon':              ['polygon',                 '{0}',                              parse_coord_string], # intersectsWith ends up here
         'linestring':           ['line',                    '{0}',                              parse_coord_string], # or here
