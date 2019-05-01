@@ -44,7 +44,7 @@ class APIProxyQuery:
 
                 q = CMRQuery(params=dict(self.cmr_params), output=self.output, max_results=maxResults, analytics=True)
                 if(self.output == 'count'):
-                    return(make_response(str(q.get_count())))
+                    return(make_response(str(q.get_count()) + '\n'))
                 (translator, mimetype, suffix) = output_translators().get(self.output, output_translators()['metalink'])
                 filename = 'asf-datapool-results-{0}.{1}'.format(datetime.now().strftime('%Y-%m-%d_%H-%M-%S'), suffix)
                 d = api_headers.base(mimetype)
