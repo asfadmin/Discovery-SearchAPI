@@ -135,5 +135,6 @@ if __name__ == '__main__':
         os.environ['MATURITY'] = 'dev'
     sys.dont_write_bytecode = True  # prevent clutter
     application.debug = True        # enable debugging mode
-    logging.basicConfig(level=logging.DEBUG) # enable debugging output
+    FORMAT = "[%(filename)18s:%(lineno)-4s - %(funcName)18s() ] %(message)s"
+    logging.basicConfig(level=logging.DEBUG, format=FORMAT) # enable debugging output
     application.run(threaded=True)  # run threaded to prevent a broken pipe error
