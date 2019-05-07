@@ -17,8 +17,6 @@ class CMRSubQuery:
         self.sid = None
         self.hits = 0
         self.results = []
-        self.current_page = 0
-        self.last_page_time = time()
 
         fixed = []
         for p in self.params:
@@ -48,7 +46,7 @@ class CMRSubQuery:
                             logging.debug('Sentinel/ALOS subquery, using ESA frame instead of ASF frame')
                             self.params[n] = (p[0], p[1].replace(',CENTER_ESA_FRAME,', ',FRAME_NUMBER,'))
 
-        logging.debug('new CMRSubQuery object ready to go')
+        logging.debug('New CMRSubQuery object with params: {0}'.format(self.params))
 
     def get_count(self):
         s = requests.Session()
@@ -56,64 +54,55 @@ class CMRSubQuery:
         r = s.head(get_config()['cmr_api'], data=self.params)
         if 'CMR-hits' not in r.headers:
             raise CMRError(r.text)
+        self.sid = r.headers['CMR-Scroll-Id']
+        self.hits = int(r.headers['CMR-hits'])
+        logging.debug('CMR reported {0} hits for session {1}'.format(self.hits, self.sid))
         return int(r.headers['CMR-hits'])
 
     def get_results(self):
+        #self.get_count()
         s = requests.Session()
         s.headers.update({'Client-Id': 'vertex_asf'})
 
-        # Get the first page of results
+        logging.debug('Processing page 1')
         r = self.get_page(s)
 
-        #post_analytics(pageview=False, events=[{'ec': 'CMR API Status', 'ea': r.status_code}]) if self.analytics else None
-        # forward anything other than a 200
-        if r.status_code != 200:
-            raise CMRError(r.text)
+        self.hits = int(r.headers['CMR-hits'])
+        self.sid = r.headers['CMR-Scroll-Id']
+        logging.debug('CMR reported {0} hits for session {1}'.format(self.hits, self.sid))
 
+        logging.debug('Parsing page 1')
         for p in parse_cmr_response(r):
             yield p
 
-        # enumerate additional pages out to hit count
-        # FIXME: this is ugly and we shouldn't even need to enumerate pages anymore
-        # since we're scrolling, we should just run until no results come back
-        pages = list(range(1, int(ceil(float(self.hits) / float(self.extra_params['page_size'])))))
-        logging.debug('Preparing to fetch {0} additional pages'.format(len(pages)))
+        pages = list(range(2, int(ceil(float(self.hits) / float(self.extra_params['page_size']))) + 1))
+        logging.debug('Planning to fetch additional {0} pages'.format(len(pages)))
+        s.headers.update({'CMR-Scroll-Id': self.sid})
 
         # fetch multiple pages of results if needed, yield a product at a time
-        for page in pages:
-            for p in parse_cmr_response(self.get_page(s)):
+        for page_num in pages:
+            logging.debug('Processing page {0}'.format(page_num))
+            page = self.get_page(s)
+            logging.debug('Parsing page {0}'.format(page_num))
+            for p in parse_cmr_response(page):
                 yield p
+            logging.debug('Parsing page {0} complete'.format(page_num))
+            logging.debug('Processing page {0} complete'.format(page_num))
 
         logging.debug('Done fetching results: got {0}/{1}'.format(len(self.results), self.hits))
         return
 
     def get_page(self, s):
-        logging.debug('Fetching page {0}'.format(self.current_page + 1))
+        logging.debug('Page fetch starting')
         cfg = get_config()
-        if self.sid is None:
-            r = s.post(cfg['cmr_api'], headers=cfg['cmr_headers'], data=self.params)
-            if 'CMR-hits' not in r.headers:
-                raise CMRError(r.text)
-            self.hits = int(r.headers['CMR-hits'])
-            self.sid = r.headers['CMR-Scroll-Id']
-            s.headers.update({'CMR-Scroll-Id': self.sid})
-            logging.debug('CMR reported {0} hits for session {1}'.format(self.hits, self.sid))
-        else:
-            r = s.post(cfg['cmr_api'], headers=cfg['cmr_headers'], data=self.params)
+        r = s.post(cfg['cmr_api'], data=self.params)
         if self.analytics:
             post_analytics(pageview=False, events=[{'ec': 'CMR API Status', 'ea': r.status_code}])
         if r.status_code != 200:
             logging.error('Bad news bears! CMR said {0} on session {1}'.format(r.status_code, self.sid))
-            logging.error('Currently on page {0}'.format(self.current_page + 1))
-            if(self.current_page < 1):
-                logging.error('This was the first page! Subquery initialized {0} seconds ago'.format(time() - self.last_page_time))
-            else:
-                logging.error('Last page fetched {0} seconds ago'.format(time() - self.last_page_time))
             logging.error('Params that caused this error:')
             logging.error(self.params)
             logging.error('Error body: {0}'.format(r.text))
         else:
-            logging.debug('Fetched page {0}'.format(self.current_page + 1))
-        self.last_page_time = time()
-        self.current_page += 1
+            logging.debug('Page fetch complete')
         return r

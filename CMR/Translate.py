@@ -243,6 +243,7 @@ def parse_cmr_response(r):
     except ET.ParseError as e:
         logging.error('CMR parsing error: {0} when parsing: {1}'.format(e, r.text))
         return
+    logging.debug('Found {0} results in this page'.format(len(root.xpath('/results/result/Granule'))))
     for granule in root.xpath('/results/result/Granule'):
         yield parse_granule(granule)
 
