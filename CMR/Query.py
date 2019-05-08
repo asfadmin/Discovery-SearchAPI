@@ -28,18 +28,11 @@ class CMRQuery:
 
         logging.debug('Building subqueries using params:')
         logging.debug(self.params)
-        logging.debug('output: {0}'.format(self.output))
-        logging.debug('maxresults: {0}'.format(self.max_results))
         self.query_list = self.get_query_list(self.params)
         self.sub_queries = [CMRSubQuery(params=list(q), extra_params=self.extra_params, analytics=self.analytics) for q in self.query_list]
-        logging.debug('{0} subqueries ready to go'.format(len(self.sub_queries)))
+        logging.debug('{0} subqueries built'.format(len(self.sub_queries)))
 
-        logging.debug('new CMRQuery object ready to go')
-
-    # Not currently used, intended to act as a dispatcher for threading
-    def run_sub_query(self, n):
-        logging.debug('Dispatching subquery {0}'.format(n))
-        return self.sub_queries[n].get_results()
+        logging.debug('New CMRQuery object ready to go')
 
     # Use the cartesian product of all the list parameters to determine subqueries
     def get_query_list(self, params):

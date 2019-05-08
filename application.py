@@ -117,10 +117,17 @@ def proxy_search():
 def read_cache():
     return response_from_cache(request)
 
+########## General endpoints ##########
+
 # Health check endpoint
 @application.route('/health')
 def health_check():
     return make_response("I am putting myself to the fullest possible use, which is all I think that any conscious entity can ever hope to do.")
+
+@application.after_request
+def add_header(response):
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    return response
 
 # Run a dev server
 if __name__ == '__main__':
@@ -128,5 +135,6 @@ if __name__ == '__main__':
         os.environ['MATURITY'] = 'dev'
     sys.dont_write_bytecode = True  # prevent clutter
     application.debug = True        # enable debugging mode
-    logging.basicConfig(level=logging.DEBUG) # enable debugging output
+    FORMAT = "[%(filename)18s:%(lineno)-4s - %(funcName)18s() ] %(message)s"
+    logging.basicConfig(level=logging.DEBUG, format=FORMAT) # enable debugging output
     application.run(threaded=True)  # run threaded to prevent a broken pipe error
