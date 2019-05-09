@@ -51,7 +51,10 @@ class CMRSubQuery:
     def get_count(self):
         s = requests.Session()
         s.headers.update({'Client-Id': 'vertex_asf'})
-        r = s.head(get_config()['cmr_api'], data=self.params)
+
+
+        cfg = get_config()
+        r = s.head(cfg['cmr_base'] + cfg['cmr_api'], data=self.params)
         if 'CMR-hits' not in r.headers:
             raise CMRError(r.text)
         self.sid = r.headers['CMR-Scroll-Id']
@@ -95,7 +98,7 @@ class CMRSubQuery:
     def get_page(self, s):
         logging.debug('Page fetch starting')
         cfg = get_config()
-        r = s.post(cfg['cmr_api'], data=self.params)
+        r = s.post(cfg['cmr_base'] + cfg['cmr_api'], data=self.params)
         if self.analytics:
             post_analytics(pageview=False, events=[{'ec': 'CMR API Status', 'ea': r.status_code}])
         if r.status_code != 200:

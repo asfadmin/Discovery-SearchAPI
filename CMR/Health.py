@@ -4,6 +4,7 @@ import json
 from asf_env import get_config
 
 def get_cmr_health():
-    r = requests.get('https://cmr.earthdata.nasa.gov/search/health')
-    d = json.loads(r.text)
+    cfg = get_config()
+    r = requests.get(cfg['cmr_base'] + cfg['cmr_health'])
+    d = {'host': cfg['cmr_base'], 'health': json.loads(r.text)}
     return d

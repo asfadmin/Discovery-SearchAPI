@@ -11,7 +11,9 @@ import sys
 import logging
 import os
 import requests
+import json
 from CacheQuery import response_from_cache
+from CMR.Health import get_cmr_health
 
 # EB looks for an 'application' callable by default.
 application = Flask(__name__)
@@ -122,6 +124,9 @@ def read_cache():
 # Health check endpoint
 @application.route('/health')
 def health_check():
+    cmr_health = get_cmr_health()
+    api_health = {'ASFSearchAPI': {'ok?': True}, 'CMRSearchAPI': cmr_health}
+    return make_response(json.dumps(api_health, sort_keys=True, indent=2))
     return make_response("I am putting myself to the fullest possible use, which is all I think that any conscious entity can ever hope to do.")
 
 @application.after_request
