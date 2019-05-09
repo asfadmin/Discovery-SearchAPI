@@ -22,7 +22,7 @@ def fix_polygon(v):
     # Do a quick CMR query to see if the shape is wound correctly
     logging.debug('Checking winding order')
     cfg = get_config()
-    r = requests.post(cfg['cmr_api'], headers=cfg['cmr_headers'], data={'polygon': ','.join(v), 'provider': 'ASF', 'page_size': 1, 'attribute[]': 'string,ASF_PLATFORM,FAKEPLATFORM'})
+    r = requests.post(cfg['cmr_base'] + cfg['cmr_api'], headers=cfg['cmr_headers'], data={'polygon': ','.join(v), 'provider': 'ASF', 'page_size': 1, 'attribute[]': 'string,ASF_PLATFORM,FAKEPLATFORM'})
     if r.status_code == 200:
         logging.debug('Winding order looks good')
     else:
@@ -32,7 +32,7 @@ def fix_polygon(v):
             it = iter(v)
             rev = reversed(list(zip(it, it)))
             rv = [i for sub in rev for i in sub]
-            r = requests.post(cfg['cmr_api'], headers=cfg['cmr_headers'], data={'polygon': ','.join(rv), 'provider': 'ASF', 'page_size': 1, 'attribute[]': 'string,ASF_PLATFORM,FAKEPLATFORM'})
+            r = requests.post(cfg['cmr_base'] + cfg['cmr_api'], headers=cfg['cmr_headers'], data={'polygon': ','.join(rv), 'provider': 'ASF', 'page_size': 1, 'attribute[]': 'string,ASF_PLATFORM,FAKEPLATFORM'})
             if r.status_code == 200:
                 logging.debug('Polygon repaired')
                 v = rv
