@@ -162,6 +162,7 @@ def input_map():
         'lookdirection':        ['attribute[]',             'string,LOOK_DIRECTION,{0}',        parse_string],
         'offnadirangle':        ['attribute[]',             'float,OFF_NADIR_ANGLE,{0}',        parse_float_or_range_list],
         'platform':             ['platform[]',              '{0}',                              parse_string_list],
+        'asfplatform':          ['attribute[]',             'string,ASF_PLATFORM,{0}',          parse_string_list],
         'polarization':         ['attribute[]',             'string,POLARIZATION,{0}',          parse_string_list],
         'polygon':              ['polygon',                 '{0}',                              parse_coord_string], # intersectsWith ends up here
         'linestring':           ['line',                    '{0}',                              parse_coord_string], # or here
