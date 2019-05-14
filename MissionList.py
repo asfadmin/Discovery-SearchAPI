@@ -34,7 +34,7 @@ class MissionList:
     def getMissions(self):
         cfg = get_config()
 
-        r = requests.post(cfg['cmr_collections'], headers=cfg['cmr_headers'], data=self.data)
+        r = requests.post(cfg['cmr_base'] + cfg['cmr_collections'], headers=cfg['cmr_headers'], data=self.data)
         if r.status_code != 200:
             return { 'error': {'type': 'CMR_ERROR', 'report': 'CMR Error: {0}'.format(r.text)}}
 
