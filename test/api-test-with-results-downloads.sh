@@ -347,8 +347,14 @@ wget -d -O API-TEST-realworld-5-count-valid.csv "https://api-test.asf.alaska.edu
 wget -d -O API-TEST-realworld-6-valid.csv "https://api-test.asf.alaska.edu/services/search/param?platform=SA,SB&relativeOrbit=128&asfframe=587-593&start=2017-06-01&end=2018-05-30&output=csv"
 wget -d -O API-TEST-realworld-7-valid.csv "https://api-test.asf.alaska.edu/services/search/param?platform=SA,SB&relativeOrbit=128&frame=587-593&start=2017-06-01&end=2018-05-30&output=csv"
 wget -d -O API-TEST-realworld-8-valid.csv "https://api-test.asf.alaska.edu/services/search/param?output=csv&platform=Sentinel-1A&start=2018-05-30&end=2018-05-31%22"
+wget -d -O API-TEST-realworld-9-valid.csv "https://api-test.asf.alaska.edu/services/search/param?polygon=4794886.03996192,2658783.7409794466,4911667.405803877,2658783.7409794466,4911667.405803877,2775921.3473827764,4794886.03996192,2775921.3473827764,4794886.03996192,2658783.7409794466"
+
 
 ### Negative Tests ###
+# invalid queries
+wget -d -O API-TEST-invalid-query.csv "https://api-test.asf.alaska.edu/services/search/param?output=csv&maxresults=10"
+wget -d -O API-TEST-missing-query.csv "https://api-test.asf.alaska.edu/services/search/param"
+
 # absoluteOrbit Keyword Invalid
 wget -d -O API-TEST-absoluteOrbit-TEST-invalid.csv "https://api-test.asf.alaska.edu/services/search/param?absoluteorbit=TEST&maxresults=10&output=csv"
 wget -d -O API-TEST-absoluteOrbit-specch-invalid.csv "https://api-test.asf.alaska.edu/services/search/param?absoluteorbit=@&maxresults=10&output=csv"

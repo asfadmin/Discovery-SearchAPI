@@ -287,6 +287,10 @@ https://api-test.asf.alaska.edu/services/search/param?start=2018-July-18&end=201
 
 ### Negative Tests ###
 
+# Invalid queries
+https://api-test.asf.alaska.edu/services/search/param?output=csv&maxresults=10
+https://api-test.asf.alaska.edu/services/search/param
+
 # absoluteOrbit Invalid + CSV output
 https://api-test.asf.alaska.edu/services/search/param?absoluteorbit=TEST&maxresults=10&output=csv
 https://api-test.asf.alaska.edu/services/search/param?absoluteorbit=@&maxresults=10&output=csv
@@ -487,4 +491,5 @@ https://api-test.asf.alaska.edu/services/search/param?output=count&frame=587%2C5
 https://api-test.asf.alaska.edu/services/search/param?output=count&asfframe=587%2C588%2C589%2C590%2C591%2C592%2C593&processingLevel=L0%2CL1.0%2CSLC&platform=SENTINEL-1A%2CSENTINEL-1B&maxResults=1000&relativeOrbit=128
 https://api-test.asf.alaska.edu/services/search/param?platform=SA,SB&relativeOrbit=128&asfframe=587-593&start=2017-06-01&end=2018-05-30&output=csv
 https://api-test.asf.alaska.edu/services/search/param?platform=SA,SB&relativeOrbit=128&frame=587-593&start=2017-06-01&end=2018-05-30&output=csv
-https://api.daac.asf.alaska.edu/services/search/param?output=csv&platform=Sentinel-1A&start=2018-05-30&end=2018-05-31%22
+https://api-test.asf.alaska.edu/services/search/param?output=csv&platform=Sentinel-1A&start=2018-05-30&end=2018-05-31%22
+https://api-test.asf.alaska.edu/services/search/param?polygon=4794886.03996192,2658783.7409794466,4911667.405803877,2658783.7409794466,4911667.405803877,2775921.3473827764,4794886.03996192,2775921.3473827764,4794886.03996192,2658783.7409794466
