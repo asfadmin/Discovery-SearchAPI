@@ -102,7 +102,7 @@ def parse_number_or_range(v, h):
         return parse_range(v, h)
     except ValueError:
         raise ValueError('Invalid number or range: {0}'.format(v))
-    
+
 # Parse and validate a list of numbers or number ranges, using h() to validate each value: "1,2,3-5", "1.1,1.4,5.1-6.7"
 def parse_number_or_range_list(v, h):
     try:
@@ -132,9 +132,9 @@ def parse_coord_string(v):
         try:
             float(c)
         except ValueError:
-            raise ValueError('Invalid polygon: {0}'.format(v))
+            raise ValueError('Invalid coordinate: {0}'.format(c))
     if len(v) % 2 != 0:
-        raise ValueError('Invalid polygon, odd number of values provided: {0}'.format(v))
+        raise ValueError('Invalid coordinate list, odd number of values provided: {0}'.format(v))
     return ','.join(v)
 
 # Parse and validate a bbox coordinate string

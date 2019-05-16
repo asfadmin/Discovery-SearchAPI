@@ -38,6 +38,9 @@ def fix_polygon(v):
                 v = rv
             else:
                 logging.warning('Polygon repair needed but reversing the points did not help, query will fail')
+                raise ValueError('Invalid coordinates, could not repair: {0}'.format(v))
+        else:
+            raise ValueError('Invalid coordinates, could not repair: {0}'.format(v))
     return ','.join(v)
 
 # A few inputs need to be specially handled to make the flexible input the legacy
