@@ -126,8 +126,9 @@ def read_cache():
 def health_check():
     cmr_health = get_cmr_health()
     api_health = {'ASFSearchAPI': {'ok?': True}, 'CMRSearchAPI': cmr_health}
-    return make_response(json.dumps(api_health, sort_keys=True, indent=2))
-    return make_response("I am putting myself to the fullest possible use, which is all I think that any conscious entity can ever hope to do.")
+    response = make_response(json.dumps(api_health, sort_keys=True, indent=2))
+    response.mimetype = 'application/json; charset=utf-8'
+    return response
 
 @application.after_request
 def add_header(response):
