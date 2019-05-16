@@ -18,6 +18,10 @@ class APIProxyQuery:
         self.max_results = None
 
     def can_use_cmr(self):
+        # Make sure they actually provided some search parameters!
+        searchables = list(filter(lambda x: x not in ['output', 'maxresults', 'pagesize'], self.request.values))
+        if(len(searchables) <= 0):
+            return False
         # make sure the provided params are a subset of the CMR-supported params and have compatible values
         try:
             self.cmr_params, self.output, self.max_results, self.page_size = translate_params(self.request.values)
@@ -57,6 +61,6 @@ class APIProxyQuery:
             except CMRError as e:
                 return make_response('A CMR error has occured: {0}'.format(e))
         else:
-            logging.warning('Malformed query, returning HTTP 400')
-            logging.warning(self.request.values)
+            logging.debug('Malformed query, returning HTTP 400')
+            logging.debug(self.request.values)
             return Response('', 400)
