@@ -1,4 +1,5 @@
 from flask import Response, make_response, stream_with_context
+import json
 import api_headers
 import logging
 from datetime import datetime
@@ -64,4 +65,7 @@ class APIProxyQuery:
         else:
             logging.debug('Malformed query, returning HTTP 400')
             logging.debug(self.request.values)
-            return Response('{0}\n'.format(validated), 400)
+
+            d = api_headers.base(mimetype='application/json')
+            resp_dict = { 'error': {'type': 'VALIDATION_ERROR', 'report': 'Validation Error: {0}'.format(validated)}}
+            return Response(json.dumps(resp_dict, sort_keys=True, indent=4), 400, headers=d)
