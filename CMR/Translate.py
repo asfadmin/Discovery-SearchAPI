@@ -199,7 +199,6 @@ def translate_params(p):
             params[k.lower()] = input_map()[k.lower()][2](p[k])
         except ValueError as e:
             raise ValueError('{0}: {1}'.format(k, e))
-            raise e
 
     # be nice to make this not a special case
     output = 'metalink'
