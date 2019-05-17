@@ -22,7 +22,7 @@ def fix_polygon(v):
     # Do a quick CMR query to see if the shape is wound correctly
     logging.debug('Checking winding order')
     cfg = get_config()
-    r = requests.post(cfg['cmr_api'], headers=cfg['cmr_headers'], data={'polygon': ','.join(v), 'provider': 'ASF', 'page_size': 1, 'attribute[]': 'string,ASF_PLATFORM,FAKEPLATFORM'})
+    r = requests.post(cfg['cmr_base'] + cfg['cmr_api'], headers=cfg['cmr_headers'], data={'polygon': ','.join(v), 'provider': 'ASF', 'page_size': 1, 'attribute[]': 'string,ASF_PLATFORM,FAKEPLATFORM'})
     if r.status_code == 200:
         logging.debug('Winding order looks good')
     else:
@@ -32,12 +32,15 @@ def fix_polygon(v):
             it = iter(v)
             rev = reversed(list(zip(it, it)))
             rv = [i for sub in rev for i in sub]
-            r = requests.post(cfg['cmr_api'], headers=cfg['cmr_headers'], data={'polygon': ','.join(rv), 'provider': 'ASF', 'page_size': 1, 'attribute[]': 'string,ASF_PLATFORM,FAKEPLATFORM'})
+            r = requests.post(cfg['cmr_base'] + cfg['cmr_api'], headers=cfg['cmr_headers'], data={'polygon': ','.join(rv), 'provider': 'ASF', 'page_size': 1, 'attribute[]': 'string,ASF_PLATFORM,FAKEPLATFORM'})
             if r.status_code == 200:
                 logging.debug('Polygon repaired')
                 v = rv
             else:
                 logging.warning('Polygon repair needed but reversing the points did not help, query will fail')
+                raise ValueError('Invalid coordinates, could not repair: {0}'.format(v))
+        else:
+            raise ValueError('Invalid coordinates, could not repair: {0}'.format(v))
     return ','.join(v)
 
 # A few inputs need to be specially handled to make the flexible input the legacy
@@ -162,6 +165,7 @@ def input_map():
         'lookdirection':        ['attribute[]',             'string,LOOK_DIRECTION,{0}',        parse_string],
         'offnadirangle':        ['attribute[]',             'float,OFF_NADIR_ANGLE,{0}',        parse_float_or_range_list],
         'platform':             ['platform[]',              '{0}',                              parse_string_list],
+        'asfplatform':          ['attribute[]',             'string,ASF_PLATFORM,{0}',          parse_string_list],
         'polarization':         ['attribute[]',             'string,POLARIZATION,{0}',          parse_string_list],
         'polygon':              ['polygon',                 '{0}',                              parse_coord_string], # intersectsWith ends up here
         'linestring':           ['line',                    '{0}',                              parse_coord_string], # or here

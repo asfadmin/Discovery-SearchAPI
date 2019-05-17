@@ -1,4 +1,5 @@
 from flask import Response, make_response, stream_with_context
+import json
 import api_headers
 import logging
 from datetime import datetime
@@ -18,19 +19,24 @@ class APIProxyQuery:
         self.max_results = None
 
     def can_use_cmr(self):
+        # Make sure they actually provided some search parameters!
+        searchables = list(filter(lambda x: x not in ['output', 'maxresults', 'pagesize'], self.request.values))
+        if(len(searchables) <= 0):
+            return False
         # make sure the provided params are a subset of the CMR-supported params and have compatible values
         try:
             self.cmr_params, self.output, self.max_results, self.page_size = translate_params(self.request.values)
             self.cmr_params = input_fixer(self.cmr_params)
         except ValueError as e: # didn't parse, pass it to the legacy API for now
             logging.debug('ValueError: {0}'.format(e))
-            return False
+            return e
         return True
 
     def get_response(self):
         events = [{'ec': 'Param', 'ea': v} for v in self.request.values]
         events.append({'ec': 'Param List', 'ea': ', '.join(sorted([p.lower() for p in self.request.values]))})
-        if self.can_use_cmr():
+        validated = self.can_use_cmr()
+        if validated == True:
             events.append({'ec': 'Proxy Search', 'ea': 'CMR'})
             post_analytics(pageview=True, events=events)
             try:
@@ -57,6 +63,9 @@ class APIProxyQuery:
             except CMRError as e:
                 return make_response('A CMR error has occured: {0}'.format(e))
         else:
-            logging.warning('Malformed query, returning HTTP 400')
-            logging.warning(self.request.values)
-            return Response('', 400)
+            logging.debug('Malformed query, returning HTTP 400')
+            logging.debug(self.request.values)
+
+            d = api_headers.base(mimetype='application/json')
+            resp_dict = { 'error': {'type': 'VALIDATION_ERROR', 'report': 'Validation Error: {0}'.format(validated)}}
+            return Response(json.dumps(resp_dict, sort_keys=True, indent=4), 400, headers=d)

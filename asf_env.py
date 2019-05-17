@@ -8,8 +8,10 @@ def get_config():
         'dev': {
             'bulk_download_api': 'https://bulk-download-test.asf.alaska.edu',
             'analytics_id': 'UA-118881300-4',
-            'cmr_api': 'https://cmr.earthdata.nasa.gov/search/granules.echo10',
-            'cmr_collections': 'https://cmr.earthdata.nasa.gov/search/collections',
+            'cmr_base': 'https://cmr.earthdata.nasa.gov',
+            'cmr_health': '/search/health',
+            'cmr_api': '/search/granules.echo10',
+            'cmr_collections': '/search/collections',
             'cmr_headers': {
                 'Client-Id': 'vertex_asf'
             }
@@ -17,8 +19,10 @@ def get_config():
         'test': {
             'bulk_download_api': 'https://bulk-download-test.asf.alaska.edu',
             'analytics_id': 'UA-118881300-3',
-            'cmr_api': 'https://cmr.uat.earthdata.nasa.gov/search/granules.echo10',
-            'cmr_collections': 'https://cmr.uat.earthdata.nasa.gov/search/collections',
+            'cmr_base': 'https://cmr.uat.earthdata.nasa.gov',
+            'cmr_health': '/search/health',
+            'cmr_api': '/search/granules.echo10',
+            'cmr_collections': '/search/collections',
             'cmr_headers': {
                 'Client-Id': 'vertex_asf'
             }
@@ -26,8 +30,10 @@ def get_config():
         'prod': {
             'bulk_download_api': 'https://bulk-download.asf.alaska.edu',
             'analytics_id': 'UA-118881300-2',
-            'cmr_api': 'https://cmr.earthdata.nasa.gov/search/granules.echo10',
-            'cmr_collections': 'https://cmr.earthdata.nasa.gov/search/collections',
+            'cmr_base': 'https://cmr.earthdata.nasa.gov',
+            'cmr_health': '/search/health',
+            'cmr_api': '/search/granules.echo10',
+            'cmr_collections': '/search/collections',
             'cmr_headers': {
                 'Client-Id': 'vertex_asf'
             }
