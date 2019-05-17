@@ -58,6 +58,12 @@ def input_fixer(params):
             if v[0].upper() not in ['A', 'D']:
                 raise ValueError('Invalid flight direction: {0}'.format(v))
             fixed_params[k] = {'A': 'ASCENDING', 'D': 'DESCENDING'}[v[0].upper()]
+        elif k == 'season': # clamp range or abort
+            if len(v) != 2:
+                raise ValueError('Invalid season, must provide two values: {0}'.format(v))
+            if not (1 <= v[0] <= 366) or not (1 <= v[1] < 366):
+                raise ValueError('Invalid season value, must be between 1 and 366: {0}'.format(v))
+            fixed_params[k] = v
         elif k == 'platform': # Legacy API allowed a few synonyms. If they're using one, translate it. Also handle airsar/seasat/uavsar platform conversion
             plat_aliases = {
                 'S1': ['SENTINEL-1A', 'SENTINEL-1B'],

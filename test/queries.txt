@@ -394,7 +394,7 @@ https://api-test.asf.alaska.edu/services/search/param?offNadirAngle=$&maxResults
 
 # output Invalid
 https://api-test.asf.alaska.edu/services/search/param?platform=UAVSAR&relativeOrbit=05905-05906&output=TEST
-https://api-test.asf.alaska.edu/services/search/param?platform=UAVSAR&relativeOrbit=05905-05906&maxResults=1/2&output=CSC
+https://api-test.asf.alaska.edu/services/search/param?platform=UAVSAR&relativeOrbit=05905-05906&maxResults=0.5&output=CSC
 
 # pagesize Invalid + jsonlite output
 https://api-test.asf.alaska.edu/services/search/param?platform=R1,E1&pagesize=TEST&output=jsonlite
