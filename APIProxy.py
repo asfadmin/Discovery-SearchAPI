@@ -20,9 +20,12 @@ class APIProxyQuery:
 
     def can_use_cmr(self):
         # Make sure they actually provided some search parameters!
-        searchables = list(filter(lambda x: x not in ['output', 'maxresults', 'pagesize'], self.request.values))
-        if(len(searchables) <= 0):
-            return False
+        try:
+            searchables = list(filter(lambda x: x not in ['output', 'maxresults', 'pagesize'], self.request.values))
+            if(len(searchables) <= 0):
+                raise ValueError('No searchable parameters specified, queries must include parameters besides output= and maxresults=')
+        except ValueError as e:
+            return e
         # make sure the provided params are a subset of the CMR-supported params and have compatible values
         try:
             self.cmr_params, self.output, self.max_results, self.page_size = translate_params(self.request.values)

@@ -306,15 +306,15 @@ https://api-test.asf.alaska.edu/services/search/param?bbox=-150.2,65.0,-150.1,65
 https://api-test.asf.alaska.edu/services/search/param?bbox=-150.2,65.0,-150.1&output=CSV
 
 # beamMode Invalid + CSV output
-https://api-test.asf.alaska.edu/services/search/param?beamMode=#&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?beamMode=%23&output=CSV
 https://api-test.asf.alaska.edu/services/search/param?beamMode=TEST&output=CSV
 https://api-test.asf.alaska.edu/services/search/param?beamMode=TEST&output=CSV,COUNT
-https://api-test.asf.alaska.edu/services/search/param?beamMode=@&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?beamMode=%40&output=CSV
 
 # beamSwath Invalid + CSV output
 https://api-test.asf.alaska.edu/services/search/param?beamSwath=TEST&output=CSV
 https://api-test.asf.alaska.edu/services/search/param?beamSwath=TEST&output=CSV,COUNT
-https://api-test.asf.alaska.edu/services/search/param?beamSwath=@&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?beamSwath=%40&output=CSV
 
 # CollectionName Invalid + CSV output
 https://api-test.asf.alaska.edu/services/search/param?platform=ALOS&collectionName=TEST&output=CSV
@@ -394,7 +394,7 @@ https://api-test.asf.alaska.edu/services/search/param?offNadirAngle=$&maxResults
 
 # output Invalid
 https://api-test.asf.alaska.edu/services/search/param?platform=UAVSAR&relativeOrbit=05905-05906&output=TEST
-https://api-test.asf.alaska.edu/services/search/param?platform=UAVSAR&relativeOrbit=05905-05906&maxResults=1/2&output=CSC
+https://api-test.asf.alaska.edu/services/search/param?platform=UAVSAR&relativeOrbit=05905-05906&maxResults=0.5&output=CSC
 
 # pagesize Invalid + jsonlite output
 https://api-test.asf.alaska.edu/services/search/param?platform=R1,E1&pagesize=TEST&output=jsonlite
