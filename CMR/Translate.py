@@ -194,10 +194,11 @@ def translate_params(p):
 
     for k in p:
         if k.lower() not in input_map():
-            raise ValueError('Unsupported CMR parameter', k)
+            raise ValueError('Unsupported parameter: {0}'.format(k))
         try:
             params[k.lower()] = input_map()[k.lower()][2](p[k])
         except ValueError as e:
+            raise ValueError('{0}: {1}'.format(k, e))
             raise e
 
     # be nice to make this not a special case
