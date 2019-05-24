@@ -342,8 +342,12 @@ output=count&asfframe=587%2C588%2C589%2C590%2C591%2C592%2C593&processingLevel=L0
 platform=SA,SB&relativeOrbit=128&asfframe=587-593&start=2017-06-01&end=2018-05-30&output=csv
 platform=SA,SB&relativeOrbit=128&frame=587-593&start=2017-06-01&end=2018-05-30&output=csv
 output=csv&platform=Sentinel-1A&start=2018-05-30&end=2018-05-31%22
+polygon=4794886.03996192,2658783.7409794466,4911667.405803877,2658783.7409794466,4911667.405803877,2775921.3473827764,4794886.03996192,2775921.3473827764,4794886.03996192,2658783.7409794466
 
 ### Negative Tests ###
+# Invalid queries 
+output=csv&maxresults=10
+
 # absoluteOrbit Keyword Invalid
 absoluteorbit=TEST&maxresults=10&output=csv
 absoluteorbit=@&maxresults=10&output=csv

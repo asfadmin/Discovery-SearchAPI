@@ -347,6 +347,14 @@ wget -d -O API-PROD-realworld-5-count-valid.csv "https://api.daac.asf.alaska.edu
 wget -d -O API-PROD-realworld-6-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?platform=SA,SB&relativeOrbit=128&asfframe=587-593&start=2017-06-01&end=2018-05-30&output=csv"
 wget -d -O API-PROD-realworld-7-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?platform=SA,SB&relativeOrbit=128&frame=587-593&start=2017-06-01&end=2018-05-30&output=csv"
 wget -d -O API-PROD-realworld-8-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?output=csv&platform=Sentinel-1A&start=2018-05-30&end=2018-05-31%22"
+wget -d -O API-PROD-realworld-9-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?polygon=4794886.03996192,2658783.7409794466,4911667.405803877,2658783.7409794466,4911667.405803877,2775921.3473827764,4794886.03996192,2775921.3473827764,4794886.03996192,2658783.7409794466"
+
+
+### Negative Tests ###
+# invalid queries
+wget -d -O API-PROD-invalid-query.csv "https://api.daac.asf.alaska.edu/services/search/param?output=csv&maxresults=10"
+wget -d -O API-PROD-missing-query.csv "https://api.daac.asf.alaska.edu/services/search/param"
+
 
 ### Negative Tests ###
 # absoluteOrbit Keyword Invalid

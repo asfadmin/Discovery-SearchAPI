@@ -236,7 +236,8 @@ class JSONLiteStreamArray(JSONStreamArray):
             'orbit': p['absoluteOrbit'],
             'startTime': p['startTime'],
             'wkt': p['stringFootprint'],
-            'productType': p['processingLevel']
+            'productType': p['processingLevel'],
+            'productTypeDisplay': p['processingTypeDisplay']
         }
 
 class GeoJSONStreamArray(JSONStreamArray):
