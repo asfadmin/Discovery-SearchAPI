@@ -46,6 +46,13 @@ class APIProxyQuery:
                 logging.debug('Handling query from {0}'.format(self.request.access_route[-1]))
                 maxResults = self.max_results
 
+                # This is absolutely the darndest thing. Something about streaming json AND having maxresults
+                # set leads to truncating the last result. If maxresults is not set, no truncation happens.
+                # This only affects json-based formats, all others work fine with or without maxresults.
+                # This is an admittedly kludgey workaround but I just can't seem to pinpoint the issue yet.
+                if self.output.lower() in ['json', 'jsonlite', 'geojson']:
+                    maxResults += 1
+
                 if self.output == 'jsonlite':
                     maxResults = min(maxResults, self.page_size) \
                         if maxResults is not None \
