@@ -50,7 +50,7 @@ class APIProxyQuery:
                 # set leads to truncating the last result. If maxresults is not set, no truncation happens.
                 # This only affects json-based formats, all others work fine with or without maxresults.
                 # This is an admittedly kludgey workaround but I just can't seem to pinpoint the issue yet.
-                if self.output.lower() in ['json', 'jsonlite', 'geojson']:
+                if maxResults is not None and self.output.lower() in ['json', 'jsonlite', 'geojson']:
                     maxResults += 1
 
                 if self.output == 'jsonlite':
