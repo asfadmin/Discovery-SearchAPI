@@ -298,9 +298,9 @@ wget -d -O API-PROD-procLevel-UA-valid.csv "https://api.daac.asf.alaska.edu/serv
 # processingDate Keyword
 wget -d -O API-PROD-procDate-Z-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?processingDate=2018-01-01T00:00:00Z&maxresults=10&output=csv"
 wget -d -O API-PROD-procDate-yesterday-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?processingDate=yesterday&maxresults=10&output=csv"
-wget -d -O API-PROD-procDate-weekago-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?processingDate=week+ago&maxresults=10&output=csv"
+wget -d -O API-PROD-procDate-weekago-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?processingDate=1+week+ago&maxresults=10&output=csv"
 wget -d -O API-PROD-procDate-today-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?processingDate=today&maxresults=10&output=csv"
-wget -d -O API-PROD-procDate-monthago-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?processingDate=month+ago&maxresults=10&output=csv"
+wget -d -O API-PROD-procDate-monthago-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?processingDate=1+month+ago&maxresults=10&output=csv"
 wget -d -O API-PROD-procDate-2monthago-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?processingDate=2+month+ago&maxresults=10&output=csv"
 
 # product_list Keyword

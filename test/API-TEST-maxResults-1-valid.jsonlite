@@ -1,0 +1,44 @@
+{
+  "results": [
+    {
+      "beamMode": "IW",
+      "browse": null,
+      "downloadUrl": "https://datapool.asf.alaska.edu/RAW/SA/S1A_IW_RAW__0SDV_20190524T103219_20190524T103257_027368_031643_DDF4.zip",
+      "fileName": "S1A_IW_RAW__0SDV_20190524T103219_20190524T103257_027368_031643_DDF4.zip",
+      "flightDirection": "DESCENDING",
+      "frame": 547,
+      "frequency": null,
+      "granuleName": "S1A_IW_RAW__0SDV_20190524T103219_20190524T103257_027368_031643_DDF4",
+      "groupID": "S1A_IWDV_0547_0555_027368_171",
+      "orbit": 27368,
+      "path": 171,
+      "platform": "Sentinel-1A",
+      "polarization": "VV+VH",
+      "productID": "S1A_IW_RAW__0SDV_20190524T103219_20190524T103257_027368_031643_DDF4-RAW",
+      "productType": "RAW",
+      "sizeMB": 1719.4518365859985,
+      "startTime": "2019-05-24T10:32:19.000000",
+      "wkt": "POLYGON((-69.629600 11.472900,-71.859500 11.761600,-71.414900 14.012800,-69.164700 13.728200,-69.629600 11.472900))"
+    },
+    {
+      "beamMode": "IW",
+      "browse": null,
+      "downloadUrl": "https://datapool.asf.alaska.edu/METADATA_RAW/SA/S1A_IW_RAW__0SDV_20190524T103219_20190524T103257_027368_031643_DDF4.iso.xml",
+      "fileName": "S1A_IW_RAW__0SDV_20190524T103219_20190524T103257_027368_031643_DDF4.iso.xml",
+      "flightDirection": "DESCENDING",
+      "frame": 547,
+      "frequency": null,
+      "granuleName": "S1A_IW_RAW__0SDV_20190524T103219_20190524T103257_027368_031643_DDF4",
+      "groupID": "S1A_IWDV_0547_0555_027368_171",
+      "orbit": 27368,
+      "path": 171,
+      "platform": "Sentinel-1A",
+      "polarization": "VV+VH",
+      "productID": "S1A_IW_RAW__0SDV_20190524T103219_20190524T103257_027368_031643_DDF4-METADATA_RAW",
+      "productType": "METADATA_RAW",
+      "sizeMB": 0.0396728515625,
+      "startTime": "2019-05-24T10:32:19.000000",
+      "wkt": "POLYGON((-69.629600 11.472900,-71.859500 11.761600,-71.414900 14.012800,-69.164700 13.728200,-69.629600 11.472900))"
+    }
+  ]
+}
