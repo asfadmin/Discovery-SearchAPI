@@ -84,6 +84,16 @@ https://api-test.asf.alaska.edu/services/search/param?minbaselineperp=100&maxbas
 # maxdoppler + platform + MaxResults + CSV output
 https://api-test.asf.alaska.edu/services/search/param?maxdoppler=2000&platform=R1&maxresults=10&output=csv
 
+# maxResults Keyword
+https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=1&output=csv
+https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=1&output=json
+https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=1&output=jsonlite
+https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=1&output=geojson
+https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=2&output=csv
+https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=2&output=json
+https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=2&output=jsonlite
+https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=2&output=geojson
+
 # mindoppler + platform + MaxResults + CSV output
 https://api-test.asf.alaska.edu/services/search/param?mindoppler=-20000&platform=R1&maxresults=10&output=csv
 https://api-test.asf.alaska.edu/services/search/param?mindoppler=-2000&maxdoppler=2000&platform=R1&maxresults=10&output=csv
@@ -391,6 +401,20 @@ https://api-test.asf.alaska.edu/services/search/param?platform=Sentinel&maxFarad
 # maxInsarStackSize Invalid + CSV output
 https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL&maxInsarStackSize=#&maxResults=100&output=CSV
 https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL&maxInsarStackSize=TEST&maxResults=100&output=CSV
+
+# maxResults Keyword Invalid
+https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=0&output=csv
+https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=0&output=json
+https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=0&output=jsonlite
+https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=0&output=geojson
+https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=a&output=csv
+https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=a&output=json
+https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=a&output=jsonlite
+https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=a&output=geojson
+https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=%&output=csv
+https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=%&output=json
+https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=%&output=jsonlite
+https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=%&output=geojson
 
 # offNadirAngle Invalid + CSV output
 https://api-test.asf.alaska.edu/services/search/param?offNadirAngle=TEST&maxResults=1000&output=CSV
