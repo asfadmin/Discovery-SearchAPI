@@ -6,7 +6,7 @@ from CMR.Translate import parse_cmr_response
 from CMR.Exceptions import CMRError
 from Analytics import post_analytics
 from asf_env import get_config
-from time import time
+from time import time, sleep
 
 class CMRSubQuery:
 
@@ -69,7 +69,8 @@ class CMRSubQuery:
 
         logging.debug('Processing page 1')
         r = self.get_page(s)
-
+        if r is None:
+            return
         self.hits = int(r.headers['CMR-hits'])
         self.sid = r.headers['CMR-Scroll-Id']
         logging.debug('CMR reported {0} hits for session {1}'.format(self.hits, self.sid))
@@ -98,14 +99,23 @@ class CMRSubQuery:
     def get_page(self, s):
         logging.debug('Page fetch starting')
         cfg = get_config()
-        r = s.post(cfg['cmr_base'] + cfg['cmr_api'], data=self.params)
-        if self.analytics:
-            post_analytics(pageview=False, events=[{'ec': 'CMR API Status', 'ea': r.status_code}])
-        if r.status_code != 200:
-            logging.error('Bad news bears! CMR said {0} on session {1}'.format(r.status_code, self.sid))
-            logging.error('Params that caused this error:')
-            logging.error(self.params)
-            logging.error('Error body: {0}'.format(r.text))
-        else:
-            logging.debug('Page fetch complete')
-        return r
+        max_retry = 3
+        for attempt in range(max_retry): # Sometimes CMR is on the fritz, retry for a bit
+            r = s.post(cfg['cmr_base'] + cfg['cmr_api'], data=self.params)
+            if self.analytics:
+                post_analytics(pageview=False, events=[{'ec': 'CMR API Status', 'ea': r.status_code}])
+            if r.status_code != 200:
+                logging.error('Bad news bears! CMR said {0} on session {1}'.format(r.status_code, self.sid))
+                logging.error('Attempt {0} of {1}'.format(attempt + 1, max_retry))
+                logging.error('Params sent to CMR:')
+                logging.error(self.params)
+                logging.error('Headers sent to CMR:')
+                logging.error(s.headers)
+                logging.error('Error body: {0}'.format(r.text))
+                sleep(0.5) # Yikes, but maybe give CMR a chance to sort itself out
+            else:
+                logging.debug('Page fetch complete')
+                return r
+        # CMR isn't cooperating, just move on?
+        logging.error('Max number of retries reached, moving on')
+        return
