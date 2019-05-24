@@ -226,6 +226,7 @@ class JSONLiteStreamArray(JSONStreamArray):
             'sizeMB': p['sizeMB'],
             'platform': p['platform'],
             'browse': p['browse'],
+            'thumb': p['thumbnailUrl'],
             'groupID': p['groupID'],
             'beamMode': p['beamMode'],
             'polarization': p['polarization'],
