@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>ASF Datapool Search Results</name>
+    <description>Search Performed: </description>
+    <Style id="yellowLineGreenPoly">
+      <LineStyle>
+        <color>30ff8800</color>
+        <width>4</width>
+      </LineStyle>
+      <PolyStyle>
+        <color>7f00ff00</color>
+      </PolyStyle>
+    </Style>
+    <Placemark>
+      <name>S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80</name>
+      <description> &lt;![CDATA[  <h1>Sentinel-1A (Interferometric Wide. 250 km swath, 5 m x 20 m spatial resolution and burst synchronization for interferometry. IW is considered to be the standard mode over land masses.), acquired 2017-12-13T15:56:13.427559</h1><h2>https://datapool.asf.alaska.edu/GRD_HD/SA/S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80.zip</h2><div style="position:absolute;left:20px;top:200px"><h3>Metadata</h3><ul><li>Processing type: L1 Detected High-Res Dual-Pol (GRD-HD)</li><li>Frame: 382</li><li>Path: 14</li><li>Orbit: 19686</li><li>Start time: 2017-12-13T15:55:48.429578</li><li>End time: 2017-12-13T15:56:13.427559</li><li>Faraday Rotation: NA</li><li>Ascending/Descending: DESCENDING</li><li>Off Nadir Angle: NA</li></ul></div><div style="position:absolute;left:300px;top:250px"><a href="https://datapool.asf.alaska.edu/BROWSE/SA/S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80.jpg"><img src="https://datapool.asf.alaska.edu/THUMBNAIL/SA/S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80_thumb.jpg"/></a></div></description>
+      <styleUrl>#yellowLineGreenPoly</styleUrl>
+      <Polygon>
+        <extrude>1</extrude>
+        <altitudeMode>relativeToGround</altitudeMode>
+        <outerBoundaryIs>
+          <LinearRing>
+            <coordinates>
+              -140.445251,62.117283,2000
+              -145.252029,62.547974,2000
+              -144.719879,64.035500,2000
+              -139.667053,63.593872,2000
+              -140.445251,62.117283,2000
+            </coordinates>
+          </LinearRing>
+        </outerBoundaryIs>
+      </Polygon>
+    </Placemark>
+    <Placemark>
+      <name>S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80</name>
+      <description> &lt;![CDATA[  <h1>Sentinel-1A (Interferometric Wide. 250 km swath, 5 m x 20 m spatial resolution and burst synchronization for interferometry. IW is considered to be the standard mode over land masses.), acquired 2017-12-13T15:56:13.427559</h1><h2>https://datapool.asf.alaska.edu/METADATA_GRD_HD/SA/S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80.iso.xml</h2><div style="position:absolute;left:20px;top:200px"><h3>Metadata</h3><ul><li>Processing type: XML Metadata (GRD-HD)</li><li>Frame: 382</li><li>Path: 14</li><li>Orbit: 19686</li><li>Start time: 2017-12-13T15:55:48.429578</li><li>End time: 2017-12-13T15:56:13.427559</li><li>Faraday Rotation: NA</li><li>Ascending/Descending: DESCENDING</li><li>Off Nadir Angle: NA</li></ul></div><div style="position:absolute;left:300px;top:250px"><a href="https://datapool.asf.alaska.edu/BROWSE/SA/S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80.jpg"><img src="https://datapool.asf.alaska.edu/THUMBNAIL/SA/S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80_thumb.jpg"/></a></div></description>
+      <styleUrl>#yellowLineGreenPoly</styleUrl>
+      <Polygon>
+        <extrude>1</extrude>
+        <altitudeMode>relativeToGround</altitudeMode>
+        <outerBoundaryIs>
+          <LinearRing>
+            <coordinates>
+              -140.445251,62.117283,2000
+              -145.252029,62.547974,2000
+              -144.719879,64.035500,2000
+              -139.667053,63.593872,2000
+              -140.445251,62.117283,2000
+            </coordinates>
+          </LinearRing>
+        </outerBoundaryIs>
+      </Polygon>
+    </Placemark>
+  </Document>
+</kml>

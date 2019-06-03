@@ -119,6 +119,16 @@ maxfaradayrotation=3&maxresults=10&output=csv
 # maxInsarStackSize Keyword
 maxinsarstacksize=50&maxresults=10&output=csv
 
+# maxResults Keyword
+platform=SENTINEL-1&maxresults=1&output=csv
+platform=SENTINEL-1&maxresults=1&output=json
+platform=SENTINEL-1&maxresults=1&output=jsonlite
+platform=SENTINEL-1&maxresults=1&output=geojson
+platform=SENTINEL-1&maxresults=2&output=csv
+platform=SENTINEL-1&maxresults=2&output=json
+platform=SENTINEL-1&maxresults=2&output=jsonlite
+platform=SENTINEL-1&maxresults=2&output=geojson
+
 # minBaselinPerp Keyword
 minbaselineperp=150&platform=R1&maxresults=10&output=csv
 minbaselineperp=100&maxbaselineperp=150&platform=R1&maxresults=10&output=csv
@@ -443,6 +453,21 @@ platform=Sentinel&maxFaradayRotation=***&output=CSV
 
 # maxInsarStackSize Keyword Invalid
 platform=SENTINEL&maxInsarStackSize=#&maxResults=100&output=CSV
+
+# maxResults Keyword Invalid
+platform=SENTINEL-1&maxresults=0&output=csv
+platform=SENTINEL-1&maxresults=0&output=json
+platform=SENTINEL-1&maxresults=0&output=jsonlite
+platform=SENTINEL-1&maxresults=0&output=geojson
+platform=SENTINEL-1&maxresults=a&output=csv
+platform=SENTINEL-1&maxresults=a&output=json
+platform=SENTINEL-1&maxresults=a&output=jsonlite
+platform=SENTINEL-1&maxresults=a&output=geojson
+platform=SENTINEL-1&maxresults=%&output=csv
+platform=SENTINEL-1&maxresults=%&output=json
+platform=SENTINEL-1&maxresults=%&output=jsonlite
+platform=SENTINEL-1&maxresults=%&output=geojson
+
 
 # minBaselinPerp Keyword Invalid
 minbaselineperp=150&platform=R1&maxresults=10&output=csv
