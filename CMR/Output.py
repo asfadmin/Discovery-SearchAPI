@@ -237,7 +237,9 @@ class JSONLiteStreamArray(JSONStreamArray):
             'startTime': p['startTime'],
             'wkt': p['stringFootprint'],
             'productType': p['processingLevel'],
-            'productTypeDisplay': p['processingTypeDisplay']
+            'productTypeDisplay': p['processingTypeDisplay'],
+            'faradayRotation': p['faradayRotation'],
+            'offNadirAngle': p['offNadirAngle']
         }
 
 class GeoJSONStreamArray(JSONStreamArray):
