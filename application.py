@@ -3,6 +3,7 @@ from flask import request
 from flask import Response
 from APIProxy import APIProxyQuery
 from WKTValidator import WKTValidator
+from DateValidator import DateValidator
 from FilesToWKT import FilesToWKT
 from MissionList import MissionList
 from datetime import datetime
@@ -98,6 +99,11 @@ def get_script():
 @application.route('/services/utils/wkt', methods = ['GET', 'POST'])
 def validate_wkt():
     return WKTValidator(request).get_response()
+
+# Validate a date to ensure it meets our requirements
+@application.route('/services/utils/date', methods = ['GET', 'POST'])
+def validate_date():
+    return DateValidator(request).get_response()
 
 # Convert a set of shapefiles or a geojson file to WKT
 @application.route('/services/utils/files_to_wkt', methods = ['POST'])
