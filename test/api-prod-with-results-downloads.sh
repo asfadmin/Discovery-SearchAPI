@@ -122,6 +122,16 @@ wget -d -O API-PROD-maxFaradayRotation-valid.CSV "https://api.daac.asf.alaska.ed
 # maxInsarStackSize Keyword
 wget -d -O API-PROD-maxInsarStackSize-valid.CSV "https://api.daac.asf.alaska.edu/services/search/param?maxinsarstacksize=50&maxresults=10&output=csv"
 
+# maxResults Keyword
+wget -d -O API-PROD-maxResults-1-valid.CSV "https://api.daac.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=1&output=csv"
+wget -d -O API-PROD-maxResults-1-valid.json "https://api.daac.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=1&output=json"
+wget -d -O API-PROD-maxResults-1-valid.jsonlite "https://api.daac.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=1&output=jsonlite"
+wget -d -O API-PROD-maxResults-1-valid.geojson "https://api.daac.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=1&output=geojson"
+wget -d -O API-PROD-maxResults-2-valid.CSV "https://api.daac.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=2&output=csv"
+wget -d -O API-PROD-maxResults-2-valid.json "https://api.daac.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=2&output=json"
+wget -d -O API-PROD-maxResults-1-valid.jsonlite "https://api.daac.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=2&output=jsonlite"
+wget -d -O API-PROD-maxResults-2-valid.geojson "https://api.daac.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=2&output=geojson"
+
 # minBaselinPerp Keyword
 wget -d -O API-PROD-minBaselinePerp-150-10-valid.CSV "https://api.daac.asf.alaska.edu/services/search/param?minbaselineperp=150&platform=R1&maxresults=10&output=csv"
 wget -d -O API-PROD-minBaselinPerp-100-150-valid.CSV "https://api.daac.asf.alaska.edu/services/search/param?minbaselineperp=100&maxbaselineperp=150&platform=R1&maxresults=10&output=csv"
@@ -288,9 +298,9 @@ wget -d -O API-PROD-procLevel-UA-valid.csv "https://api.daac.asf.alaska.edu/serv
 # processingDate Keyword
 wget -d -O API-PROD-procDate-Z-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?processingDate=2018-01-01T00:00:00Z&maxresults=10&output=csv"
 wget -d -O API-PROD-procDate-yesterday-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?processingDate=yesterday&maxresults=10&output=csv"
-wget -d -O API-PROD-procDate-weekago-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?processingDate=week+ago&maxresults=10&output=csv"
+wget -d -O API-PROD-procDate-weekago-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?processingDate=1+week+ago&maxresults=10&output=csv"
 wget -d -O API-PROD-procDate-today-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?processingDate=today&maxresults=10&output=csv"
-wget -d -O API-PROD-procDate-monthago-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?processingDate=month+ago&maxresults=10&output=csv"
+wget -d -O API-PROD-procDate-monthago-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?processingDate=1+month+ago&maxresults=10&output=csv"
 wget -d -O API-PROD-procDate-2monthago-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?processingDate=2+month+ago&maxresults=10&output=csv"
 
 # product_list Keyword
@@ -347,6 +357,14 @@ wget -d -O API-PROD-realworld-5-count-valid.csv "https://api.daac.asf.alaska.edu
 wget -d -O API-PROD-realworld-6-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?platform=SA,SB&relativeOrbit=128&asfframe=587-593&start=2017-06-01&end=2018-05-30&output=csv"
 wget -d -O API-PROD-realworld-7-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?platform=SA,SB&relativeOrbit=128&frame=587-593&start=2017-06-01&end=2018-05-30&output=csv"
 wget -d -O API-PROD-realworld-8-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?output=csv&platform=Sentinel-1A&start=2018-05-30&end=2018-05-31%22"
+wget -d -O API-PROD-realworld-9-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?polygon=4794886.03996192,2658783.7409794466,4911667.405803877,2658783.7409794466,4911667.405803877,2775921.3473827764,4794886.03996192,2775921.3473827764,4794886.03996192,2658783.7409794466"
+
+
+### Negative Tests ###
+# invalid queries
+wget -d -O API-PROD-invalid-query.csv "https://api.daac.asf.alaska.edu/services/search/param?output=csv&maxresults=10"
+wget -d -O API-PROD-missing-query.csv "https://api.daac.asf.alaska.edu/services/search/param"
+
 
 ### Negative Tests ###
 # absoluteOrbit Keyword Invalid
@@ -445,6 +463,20 @@ wget -d -O API-PROD-maxFaradayRotation-specchar-invalid.csv "https://api.daac.as
 # maxInsarStackSize Keyword Invalid
 wget -d -O API-PROD-maxInsarStackSize-specchar-invalid.csv "https://api.daac.asf.alaska.edu/services/search/param?platform=SENTINEL&maxInsarStackSize=#&maxResults=100&output=CSV"
 wget -d -O API-PROD-maxInsarStackSize-TEST-invalid.csv "https://api.daac.asf.alaska.edu/services/search/param?platform=SENTINEL&maxInsarStackSize=TEST&maxResults=100&output=CSV"
+
+# maxResults Keyword Invalid
+wget -d -O API-PROD-maxResults-0-invalid.CSV "https://api.daac.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=0&output=csv"
+wget -d -O API-PROD-maxResults-0-invalid.json "https://api.daac.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=0&output=json"
+wget -d -O API-PROD-maxResults-0-invalid.jsonlite "https://api.daac.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=0&output=jsonlite"
+wget -d -O API-PROD-maxResults-0-invalid.geojson "https://api.daac.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=0&output=geojson"
+wget -d -O API-PROD-maxResults-a-invalid.CSV "https://api.daac.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=a&output=csv"
+wget -d -O API-PROD-maxResults-a-invalid.json "https://api.daac.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=a&output=json"
+wget -d -O API-PROD-maxResults-a-invalid.jsonlite "https://api.daac.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=a&output=jsonlite"
+wget -d -O API-PROD-maxResults-a-invalid.geojson "https://api.daac.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=a&output=geojson"
+wget -d -O API-PROD-maxResults-%-invalid.CSV "https://api.daac.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=%&output=csv"
+wget -d -O API-PROD-maxResults-%-invalid.json "https://api.daac.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=%&output=json"
+wget -d -O API-PROD-maxResults-%-invalid.jsonlite "https://api.daac.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=%&output=jsonlite"
+wget -d -O API-PROD-maxResults-%-invalid.geojson "https://api.daac.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=%&output=geojson"
 
 # minBaselinPerp Keyword Invalid
 wget -d -O API-PROD-minBaselineperp-TEST-invalid.csv "https://api.daac.asf.alaska.edu/services/search/param?minbaselineperp=TEST&platform=R1&maxresults=10&output=csv"

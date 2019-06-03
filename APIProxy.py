@@ -20,9 +20,12 @@ class APIProxyQuery:
 
     def can_use_cmr(self):
         # Make sure they actually provided some search parameters!
-        searchables = list(filter(lambda x: x not in ['output', 'maxresults', 'pagesize'], self.request.values))
-        if(len(searchables) <= 0):
-            return False
+        try:
+            searchables = list(filter(lambda x: x not in ['output', 'maxresults', 'pagesize'], self.request.values))
+            if(len(searchables) <= 0):
+                raise ValueError('No searchable parameters specified, queries must include parameters besides output= and maxresults=')
+        except ValueError as e:
+            return e
         # make sure the provided params are a subset of the CMR-supported params and have compatible values
         try:
             self.cmr_params, self.output, self.max_results, self.page_size = translate_params(self.request.values)
@@ -42,6 +45,13 @@ class APIProxyQuery:
             try:
                 logging.debug('Handling query from {0}'.format(self.request.access_route[-1]))
                 maxResults = self.max_results
+
+                # This is absolutely the darndest thing. Something about streaming json AND having maxresults
+                # set leads to truncating the last result. If maxresults is not set, no truncation happens.
+                # This only affects json-based formats, all others work fine with or without maxresults.
+                # This is an admittedly kludgey workaround but I just can't seem to pinpoint the issue yet.
+                if maxResults is not None and self.output.lower() in ['json', 'jsonlite', 'geojson']:
+                    maxResults += 1
 
                 if self.output == 'jsonlite':
                     maxResults = min(maxResults, self.page_size) \

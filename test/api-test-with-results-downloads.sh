@@ -122,6 +122,16 @@ wget -d -O API-TEST-maxFaradayRotation-valid.CSV "https://api-test.asf.alaska.ed
 # maxInsarStackSize Keyword
 wget -d -O API-TEST-maxInsarStackSize-valid.CSV "https://api-test.asf.alaska.edu/services/search/param?maxinsarstacksize=50&maxresults=10&output=csv"
 
+# maxResults Keyword
+wget -d -O API-TEST-maxResults-1-valid.CSV "https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=1&output=csv"
+wget -d -O API-TEST-maxResults-1-valid.json "https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=1&output=json"
+wget -d -O API-TEST-maxResults-1-valid.jsonlite "https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=1&output=jsonlite"
+wget -d -O API-TEST-maxResults-1-valid.geojson "https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=1&output=geojson"
+wget -d -O API-TEST-maxResults-2-valid.CSV "https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=2&output=csv"
+wget -d -O API-TEST-maxResults-2-valid.json "https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=2&output=json"
+wget -d -O API-TEST-maxResults-1-valid.jsonlite "https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=2&output=jsonlite"
+wget -d -O API-TEST-maxResults-2-valid.geojson "https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=2&output=geojson"
+
 # minBaselinPerp Keyword
 wget -d -O API-TEST-minBaselinePerp-150-10-valid.CSV "https://api-test.asf.alaska.edu/services/search/param?minbaselineperp=150&platform=R1&maxresults=10&output=csv"
 wget -d -O API-TEST-minBaselinPerp-100-150-valid.CSV "https://api-test.asf.alaska.edu/services/search/param?minbaselineperp=100&maxbaselineperp=150&platform=R1&maxresults=10&output=csv"
@@ -347,8 +357,14 @@ wget -d -O API-TEST-realworld-5-count-valid.csv "https://api-test.asf.alaska.edu
 wget -d -O API-TEST-realworld-6-valid.csv "https://api-test.asf.alaska.edu/services/search/param?platform=SA,SB&relativeOrbit=128&asfframe=587-593&start=2017-06-01&end=2018-05-30&output=csv"
 wget -d -O API-TEST-realworld-7-valid.csv "https://api-test.asf.alaska.edu/services/search/param?platform=SA,SB&relativeOrbit=128&frame=587-593&start=2017-06-01&end=2018-05-30&output=csv"
 wget -d -O API-TEST-realworld-8-valid.csv "https://api-test.asf.alaska.edu/services/search/param?output=csv&platform=Sentinel-1A&start=2018-05-30&end=2018-05-31%22"
+wget -d -O API-TEST-realworld-9-valid.csv "https://api-test.asf.alaska.edu/services/search/param?polygon=4794886.03996192,2658783.7409794466,4911667.405803877,2658783.7409794466,4911667.405803877,2775921.3473827764,4794886.03996192,2775921.3473827764,4794886.03996192,2658783.7409794466"
+
 
 ### Negative Tests ###
+# invalid queries
+wget -d -O API-TEST-invalid-query.csv "https://api-test.asf.alaska.edu/services/search/param?output=csv&maxresults=10"
+wget -d -O API-TEST-missing-query.csv "https://api-test.asf.alaska.edu/services/search/param"
+
 # absoluteOrbit Keyword Invalid
 wget -d -O API-TEST-absoluteOrbit-TEST-invalid.csv "https://api-test.asf.alaska.edu/services/search/param?absoluteorbit=TEST&maxresults=10&output=csv"
 wget -d -O API-TEST-absoluteOrbit-specch-invalid.csv "https://api-test.asf.alaska.edu/services/search/param?absoluteorbit=@&maxresults=10&output=csv"
@@ -445,6 +461,20 @@ wget -d -O API-TEST-maxFaradayRotation-specchar-invalid.csv "https://api-test.as
 # maxInsarStackSize Keyword Invalid
 wget -d -O API-TEST-maxInsarStackSize-specchar-invalid.csv "https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL&maxInsarStackSize=#&maxResults=100&output=CSV"
 wget -d -O API-TEST-maxInsarStackSize-TEST-invalid.csv "https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL&maxInsarStackSize=TEST&maxResults=100&output=CSV"
+
+# maxResults Keyword Invalid
+wget -d -O API-TEST-maxResults-0-invalid.CSV "https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=0&output=csv"
+wget -d -O API-TEST-maxResults-0-invalid.json "https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=0&output=json"
+wget -d -O API-TEST-maxResults-0-invalid.jsonlite "https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=0&output=jsonlite"
+wget -d -O API-TEST-maxResults-0-invalid.geojson "https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=0&output=geojson"
+wget -d -O API-TEST-maxResults-a-invalid.CSV "https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=a&output=csv"
+wget -d -O API-TEST-maxResults-a-invalid.json "https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=a&output=json"
+wget -d -O API-TEST-maxResults-a-invalid.jsonlite "https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=a&output=jsonlite"
+wget -d -O API-TEST-maxResults-a-invalid.geojson "https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=a&output=geojson"
+wget -d -O API-TEST-maxResults-%-invalid.CSV "https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=%&output=csv"
+wget -d -O API-TEST-maxResults-%-invalid.json "https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=%&output=json"
+wget -d -O API-TEST-maxResults-%-invalid.jsonlite "https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=%&output=jsonlite"
+wget -d -O API-TEST-maxResults-%-invalid.geojson "https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=%&output=geojson"
 
 # minBaselinPerp Keyword Invalid
 wget -d -O API-TEST-minBaselineperp-TEST-invalid.csv "https://api-test.asf.alaska.edu/services/search/param?minbaselineperp=TEST&platform=R1&maxresults=10&output=csv"
