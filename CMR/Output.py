@@ -231,14 +231,15 @@ class JSONLiteStreamArray(JSONStreamArray):
             'beamMode': p['beamMode'],
             'polarization': p['polarization'],
             'flightDirection': p['flightDirection'],
-            'frequency': p['frequency'],
             'path': p['relativeOrbit'],
             'frame': p['frameNumber'],
             'orbit': p['absoluteOrbit'],
             'startTime': p['startTime'],
             'wkt': p['stringFootprint'],
             'productType': p['processingLevel'],
-            'productTypeDisplay': p['processingTypeDisplay']
+            'productTypeDisplay': p['processingTypeDisplay'],
+            'faradayRotation': p['faradayRotation'],
+            'offNadirAngle': p['offNadirAngle']
         }
 
 class GeoJSONStreamArray(JSONStreamArray):

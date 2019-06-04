@@ -29,22 +29,18 @@ class CMRSubQuery:
         # Platform-specific hacks
         # We do them at the subquery level in case the main query crosses platforms
         # that don't suffer these issue.
-        plat = None
+        use_asf_frame = False
         for p in self.params:
-            if isinstance(p[1], str):
-                m = re.search(r'ASF_PLATFORM,(.+)', p[1])
-                if m is not None:
-                    plat = m.group(1)
-                    break
-        if plat is not None:
+            if p[0] == 'platform[]' and p[1] in ['SENTINEL-1A', 'SENTINEL-1B', 'ALOS']:
+                use_asf_frame = True
+        if use_asf_frame:
             # Sentinel/ALOS: always use asf frame instead of esa frame
-            if plat.upper() in ['ALOS', 'SENTINEL-1A', 'SENTINEL-1B']:
-                for n, p in enumerate(self.params):
-                    if isinstance(p[1], str):
-                        m = re.search(r'CENTER_ESA_FRAME', p[1])
-                        if m is not None:
-                            logging.debug('Sentinel/ALOS subquery, using ESA frame instead of ASF frame')
-                            self.params[n] = (p[0], p[1].replace(',CENTER_ESA_FRAME,', ',FRAME_NUMBER,'))
+            for n, p in enumerate(self.params):
+                if isinstance(p[1], str):
+                    m = re.search(r'CENTER_ESA_FRAME', p[1])
+                    if m is not None:
+                        logging.debug('Sentinel/ALOS subquery, using ASF frame instead of ESA frame')
+                        self.params[n] = (p[0], p[1].replace(',CENTER_ESA_FRAME,', ',FRAME_NUMBER,'))
 
         logging.debug('New CMRSubQuery object with params: {0}'.format(self.params))
 
