@@ -239,7 +239,9 @@ class JSONLiteStreamArray(JSONStreamArray):
             'productType': p['processingLevel'],
             'productTypeDisplay': p['processingTypeDisplay'],
             'faradayRotation': p['faradayRotation'],
-            'offNadirAngle': p['offNadirAngle']
+            'offNadirAngle': p['offNadirAngle'],
+            'missionName': p['missionName'],
+            'flightLine': p['flightLine']
         }
 
 class GeoJSONStreamArray(JSONStreamArray):
