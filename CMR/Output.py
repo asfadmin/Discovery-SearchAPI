@@ -241,7 +241,8 @@ class JSONLiteStreamArray(JSONStreamArray):
             'faradayRotation': p['faradayRotation'],
             'offNadirAngle': p['offNadirAngle'],
             'missionName': p['missionName'],
-            'flightLine': p['flightLine']
+            'flightLine': p['flightLine'],
+            'stackSize': p['insarStackSize']
         }
 
 class GeoJSONStreamArray(JSONStreamArray):
