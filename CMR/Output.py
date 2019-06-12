@@ -238,6 +238,7 @@ class JSONLiteStreamArray(JSONStreamArray):
             'wkt': p['stringFootprint'],
             'productType': p['processingLevel'],
             'productTypeDisplay': p['processingTypeDisplay'],
+            'productTypeDescription': p['processingDescription'],
             'faradayRotation': p['faradayRotation'],
             'offNadirAngle': p['offNadirAngle'],
             'missionName': p['missionName'],
