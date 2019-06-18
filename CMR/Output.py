@@ -219,27 +219,34 @@ class JSONLiteStreamArray(JSONStreamArray):
             pass
 
         return {
-            'granuleName': p['granuleName'],
-            'productID': p['product_file_id'],
-            'fileName': p['fileName'],
+            # Mandatory:
+            'dataset': p['platform'],
+            'platform': p['platform'], # FIXME: This is to maintain continuous compatibility with different versions of Vertex. Delete once it's fully updated
             'downloadUrl': p['downloadUrl'],
-            'sizeMB': p['sizeMB'],
-            'platform': p['platform'],
-            'browse': p['browse'],
-            'thumb': p['thumbnailUrl'],
+            'fileName': p['fileName'],
+            'granuleName': p['granuleName'],
             'groupID': p['groupID'],
-            'beamMode': p['beamMode'],
-            'polarization': p['polarization'],
-            'flightDirection': p['flightDirection'],
-            'path': p['relativeOrbit'],
-            'frame': p['frameNumber'],
-            'orbit': p['absoluteOrbit'],
-            'startTime': p['startTime'],
-            'wkt': p['stringFootprint'],
+            'productID': p['product_file_id'],
             'productType': p['processingLevel'],
             'productTypeDisplay': p['processingTypeDisplay'],
-            'faradayRotation': p['faradayRotation'],
-            'offNadirAngle': p['offNadirAngle']
+            'startTime': p['startTime'],
+            'wkt': p['stringFootprint'],
+            # Optional:
+            'beamMode': p['beamMode'],
+            'browse': p['browse'],
+            'flightDirection': p['flightDirection'],
+            'flightLine': p['flightLine'],
+            'frame': p['frameNumber'],
+            'missionName': p['missionName'],
+            'orbit': p['absoluteOrbit'],
+            'path': p['relativeOrbit'],
+            'polarization': p['polarization'],
+            'sizeMB': p['sizeMB'],
+            'stackSize': p['insarStackSize'], # Used for datasets with precalculated stacks
+            'thumb': p['thumbnailUrl'],
+            # Dataset-specific:
+            'faradayRotation': p['faradayRotation'], # ALOS
+            'offNadirAngle': p['offNadirAngle'] # ALOS
         }
 
 class GeoJSONStreamArray(JSONStreamArray):
