@@ -74,7 +74,7 @@ def repairWKT(wkt_str):
     if clamped > 0:
         repairs.append({
             'type': 'CLAMP',
-            'report': 'Clamped {0} values to +/-90 latitude'.format(wrapped)
+            'report': 'Clamped {0} values to +/-90 latitude'.format(clamped)
         })
         logging.debug(repairs[-1])
 
