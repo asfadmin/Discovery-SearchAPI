@@ -147,7 +147,9 @@ def repairWKT(wkt_str):
 
     # All done
     return {
-        'wkt': wkt.dumps(wkt_obj),
-        'wkt_unwrapped': wkt.dumps(wkt_obj_unwrapped),
+        'wkt': {
+            'wrapped': wkt.dumps(wkt_obj),
+            'unwrapped': wkt.dumps(wkt_obj_unwrapped)
+        },
         'repairs': repairs
     }
