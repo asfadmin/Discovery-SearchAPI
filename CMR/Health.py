@@ -10,5 +10,7 @@ def get_cmr_health():
         d = {'host': cfg['cmr_base'], 'health': json.loads(r.text)}
     except Exception as e:
         logging.debug(e)
-        d = {'host': cfg['cmr_base'], 'error': '{0}'.format(e)}
+        d = {'host': cfg['cmr_base'], 'error': {
+            'display': 'An error occured while attempting to connect to CMR. Please try again later.',
+            'raw': '{0}'.format(e)}}
     return d
