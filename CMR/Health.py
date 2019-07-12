@@ -11,6 +11,6 @@ def get_cmr_health():
     except Exception as e:
         logging.debug(e)
         d = {'host': cfg['cmr_base'], 'error': {
-            'display': 'An error occured while attempting to connect to CMR. Please try again later.',
+            'display': 'The Search API encountered an error while attempting to connect to CMR. Please try again later.',
             'raw': '{0}'.format(e)}}
     return d
