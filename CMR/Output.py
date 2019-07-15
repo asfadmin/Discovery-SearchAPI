@@ -221,7 +221,6 @@ class JSONLiteStreamArray(JSONStreamArray):
         return {
             # Mandatory:
             'dataset': p['platform'],
-            'platform': p['platform'], # FIXME: This is to maintain continuous compatibility with different versions of Vertex. Delete once it's fully updated
             'downloadUrl': p['downloadUrl'],
             'fileName': p['fileName'],
             'granuleName': p['granuleName'],
