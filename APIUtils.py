@@ -153,3 +153,9 @@ def repairWKT(wkt_str):
         },
         'repairs': repairs
     }
+
+def unwrap_wkt(v):
+    logging.debug('=====================unwrap_wkt=============')
+    logging.debug(v)
+    logging.debug('=====================unwrap_wkt=============')
+    return v
