@@ -13,7 +13,6 @@ import logging
 import os
 import requests
 import json
-from CacheQuery import response_from_cache
 from CMR.Health import get_cmr_health
 
 # EB looks for an 'application' callable by default.

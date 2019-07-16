@@ -184,8 +184,7 @@ def input_map():
         'end':                  [None,                      '{0}',                              parse_date],
         'season':               [None,                      '{0}',                              parse_int_list],
         'temporal':             ['temporal',                '{0}',                              None], # start/end end up here
-        'groupid':              ['attribute[]',             'string,GROUP_ID,{0}',              parse_string_list],
-        'pagesize':             [None,                      '{0}',                              parse_int]
+        'groupid':              ['attribute[]',             'string,GROUP_ID,{0}',              parse_string_list]
     }
 
 # translate supported params into CMR params
@@ -212,11 +211,7 @@ def translate_params(p):
         if max_results < 1:
             raise ValueError('Invalid maxResults, must be > 0: {0}'.format(max_results))
         del params['maxresults']
-    page_size = 100
-    if 'pagesize' in params:
-        page_size = params['pagesize']
-        del params['pagesize']
-    return params, output, max_results, page_size
+    return params, output, max_results
 
 # convenience method for handling echo10 additional attributes
 def attr(name):
