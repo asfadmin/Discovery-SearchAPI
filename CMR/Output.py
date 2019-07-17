@@ -271,7 +271,8 @@ class GeoJSONStreamArray(JSONStreamArray):
                 ]
             },
             'properties': {
-                'granuleName': p['granuleName'],
+                'sceneName': p['granuleName'],
+                'fileID': p['product_file_id'],
                 'platform': p['platform'],
                 'sensor': p['sensor'],
                 'orbit': p['absoluteOrbit'],
