@@ -49,7 +49,7 @@ def get_config():
                 'Client-Id': 'vertex_asf'
             }
         },
-        'sarsearch-prod': {
+        'prod-private': {
             'bulk_download_api': 'https://bulk-download.asf.alaska.edu',
             'analytics_id': 'UA-118881300-5',
             'cmr_base': 'https://cmr.earthdata.nasa.gov',
