@@ -2,6 +2,7 @@ import logging
 from jinja2 import Environment, PackageLoader
 import json
 import requests
+from geomet import wkt
 from asf_env import get_config
 
 templateEnv = Environment(
@@ -230,6 +231,7 @@ class JSONLiteStreamArray(JSONStreamArray):
             'productTypeDisplay': p['processingTypeDisplay'],
             'startTime': p['startTime'],
             'wkt': p['stringFootprint'],
+            'wkt_unwrapped': unwrap_wkt(p['stringFootprint']),
             # Optional:
             'beamMode': p['beamMode'],
             'browse': p['browse'],
@@ -295,3 +297,16 @@ class GeoJSONStreamArray(JSONStreamArray):
                 'url': p['downloadUrl']
             }
         }
+
+
+
+def unwrap_wkt(wkt_str):
+    try:
+        wkt_obj = wkt.loads(wkt_str)
+        lons = [p[0] for p in wkt_obj['coordinates'][0]]
+        if(max(lons) - min(lons) > 180):
+            wkt_obj['coordinates'] = [[a if a[0] > 0 else [a[0] + 360, a[1]] for a in wkt_obj['coordinates'][0]]]
+        return wkt.dumps(wkt_obj, decimals=6)
+        except ValueError as e:
+        return wkt_str
+    return wkt_str
