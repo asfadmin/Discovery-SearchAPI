@@ -210,7 +210,7 @@ class bulk_downloader:
              redir_url = response.getheader('Location')
 
           #Funky Test env:
-          if ("vertex.daac.asf.alaska.edu" in redir_url and "test" in self.asf_urs4['redir']):
+          if ("vertex-retired.daac.asf.alaska.edu" in redir_url and "test" in self.asf_urs4['redir']):
              print ("Cough, cough. It's dusty in this test env!")
              return True
 
