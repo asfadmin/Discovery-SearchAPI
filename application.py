@@ -28,7 +28,7 @@ def create_script():
     # need to move these to external config
     script = script.replace('REPLACE_URS_URL', 'https://urs.earthdata.nasa.gov/oauth/authorize')
     script = script.replace('REPLACE_CLIENT_ID', 'BO_n7nTIlMljdvU6kRRB3g')
-    script = script.replace('REPLACE_REDIR_URL', 'https://vertex.daac.asf.alaska.edu/services/urs4_token_request')
+    script = script.replace('REPLACE_REDIR_URL', 'https://vertex-retired.daac.asf.alaska.edu/services/urs4_token_request')
     script = script.replace('REPLACE_HELP_URL', 'http://bulk-download.asf.alaska.edu/help')
 
     filename = get_filename()
