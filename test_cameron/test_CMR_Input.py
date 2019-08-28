@@ -2,12 +2,13 @@ import pytest
 import sys, os
 import dateparser
 
-# import unittest
 from geomet import wkt
 
-# Test Files starting one dir behind this one:
-sys.path.insert(0, os.path.abspath('..'))
+# Let python discover other modules, starting one dir behind this one (root of project):
+sys.path.insert(0, os.path.realpath(os.path.dirname(__file__)+"/.."))
 import CMR.Input as test_file
+
+
 
 # A lot of these tests don't throw the custom error message if "v" doesn't have a length param... ok?
 #		i.e. "if not len(v) > 0" fails instantly if passed None, or [], but passes with ["1","2"]
