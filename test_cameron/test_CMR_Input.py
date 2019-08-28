@@ -269,6 +269,13 @@ class Test_parseFloatRange():
 ## what to test yet, since a lot of them will be included in tests like parse_string_list that calls it...
 
 # class Test_parseStringList():
+	# Rewrite test, string is supposed to fail if len(v) > 0...
+	# value error that gets raised->: Invalid string: Empty string: <--
+	# def test_emptyStr(self):
+	# 	emptyStr = ""
+	# 	strings = test_file.parse_string_list(testStr)
+	# 	assert strings[0] == ""
+
 	# After writing this, I remembered there's no such thing as an "escaped quote"...
 	# def test_escapedQuotesInList(self):
 	# 	stringList = "word-0,word\,1\,with\,commas\,in\,it,word2"
@@ -277,6 +284,22 @@ class Test_parseFloatRange():
 	# 	assert strings[1] == "word\,1\,with\,commas\,in\,it"
 	# 	assert strings[2] == "word2"
 
+	# Rewrite tomorrow, empty elements fail in parse_str
+	# def test_emptyElements(self):
+	# 	testStr = "word0,,word2"
+	# 	strings = test_file.parse_string_list(testStr)
+	# 	assert strings[0] == "word0"
+	# 	assert strings[1] == ""
+	# 	assert strings[2] == "word2"
+
+
+## TODO: Only thing I can think of that may fail list: French use
+## 		commas as our periods: 8.3 vs 8,3. Look into how python
+## 		handles this
+
+
+# class Test_parseNumberOrRange():
+	# def 
 
 
 # class Test_ParseWKT(unittest.TestCase):
