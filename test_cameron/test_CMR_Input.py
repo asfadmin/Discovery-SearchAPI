@@ -4,7 +4,7 @@ import dateparser
 
 from geomet import wkt
 
-# Let python discover other modules, starting one dir behind this one (root of project):
+# Let python discover other modules, starting one dir behind this one (project root):
 sys.path.insert(0, os.path.realpath(os.path.dirname(__file__)+"/.."))
 import CMR.Input as test_file
 
@@ -299,8 +299,20 @@ class Test_parseFloatRange():
 ## 		handles this
 
 
-# class Test_parseNumberOrRange():
-	# def 
+class Test_parseNumberOrRange():
+	# def test_basicIntToInt(self):
+	# 	myInt = 4321
+	# 	test_file.parse_number_or_range(myInt, test_file.parse_int)
+
+	def test_stringIntToInt(self):
+		myInt = "4321"
+		result = test_file.parse_number_or_range(myInt, test_file.parse_int)
+		assert result == 4321
+
+	def test_stringFloatToInt(self):
+		myFloat = "4321.56789"
+		test_file.parse_number_or_range(myFloat, test_file.parse_int)
+		assert result == 4321
 
 
 # class Test_ParseWKT(unittest.TestCase):
