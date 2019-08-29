@@ -1,6 +1,8 @@
 import pytest
 import sys, os
 import dateparser
+import random
+import string
 
 from geomet import wkt
 
@@ -29,9 +31,7 @@ class Test_ParseString():
         assert "Invalid string: Empty string:" in str(excinfo.value), "\033[1;36;40m CMR/Input.py parse_string-> Empty string did not raise a ValueError: Empty string \033[0m"
 
     def test_stringBasic(self):
-        expected = ""
-        for i in range(900000):
-            expected += "GonnaBeAReallllyLongString..."
+        expected = ''.join(random.choice(string.ascii_letters) for _ in range(1000000))
         actual = test_file.parse_string(expected)
         assert expected == actual, "\033[1;36;40m CMR/Input.py parse_string-> The expected string does not equal actual \033[0m"
 
