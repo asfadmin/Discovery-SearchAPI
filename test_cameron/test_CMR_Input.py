@@ -42,13 +42,13 @@ class Test_ParseString():
 	# 	assert expected == actual
 
 	def test_listBasic(self):
-		test_list = ["testing", "because", "this", "also", "has", "a", "non-zero", "length"] 
+		test_list = ["testing", "because", "this", "also", "has", "a", "non-zero", "length"]
 		expected = "['testing', 'because', 'this', 'also', 'has', 'a', 'non-zero', 'length']"
 		actual = test_file.parse_string(test_list)
 		assert expected == actual
 
 
-	# PARSE_STRING: automatically converts bytes to string... 
+	# PARSE_STRING: automatically converts bytes to string...
 	def test_stringUnicode(self):
 		original_raw = "ಔ ೠ ண Ⴃ ፴ ᛉ ៘ᣠ ᵆ Ⅻ ∬ ⏳ ⏰ ⚇ ⛵ ⛷"
 		original_encoded = original_raw.encode("utf-8")
@@ -168,7 +168,7 @@ class Test_parseDate():
 			test_file.parse_date(test_str)
 		assert "Invalid date: {0}".format(test_str) == str(execinfo.value)
 
-class Test_parseDateRange():	
+class Test_parseDateRange():
 # NOTE: as is, this function doesn't assert date_one < date_two...
 # 	check if functions that call this account for that
 #   parse_range raises an ValueError on incorrect ordering, but also has no error message why...
@@ -211,7 +211,7 @@ class Test_parseIntRange():
 		intRange = "0--0"
 		ints = test_file.parse_int_range(intRange)
 		assert ints[0] == 0
-		assert ints[1] == 0	
+		assert ints[1] == 0
 
 	def test_throwsIfNotSorted(self):
 		intRange = "321-123"
@@ -222,7 +222,7 @@ class Test_parseIntRange():
 		assert "Invalid int range: Invalid range: " == str(execinfo.value)
 
 class Test_parseFloatRange():
-# Floats that have "e" fail to pass the parse_range regex... 
+# Floats that have "e" fail to pass the parse_range regex...
 # Stop users from using "e"? or add "e" as option in regex for floats?
 	# def test_wOutLeadingDigit(self):
 	# 	floatRange = ".2-.3"
@@ -263,7 +263,7 @@ class Test_parseFloatRange():
 		floatRange = "-0.0--0.0"
 		floats = test_file.parse_float_range(floatRange)
 		assert floats[0] == 0
-		assert floats[1] == 0		
+		assert floats[1] == 0
 
 
 ## Tests for parse_list will go here, but same as above, I'm not sure exactly
@@ -300,7 +300,7 @@ class Test_parseFloatRange():
 
 
 # class Test_parseNumberOrRange():
-	# def 
+	# def
 
 
 # class Test_ParseWKT(unittest.TestCase):
@@ -309,7 +309,7 @@ class Test_parseFloatRange():
 # 		inner_cords = "(20 30, 35 35, 30 20, 20 30)"
 # 		test1_wkt = "POLYGON (" + outer_cords + "," + inner_cords + ")"
 # 		test2_wkt = "POLYGON (" + inner_cords + "," + outer_cords + ")"
-		
+
 # 		test1_wkt = test_file.parse_wkt(test1_wkt)
 # 		test2_wkt = test_file.parse_wkt(test2_wkt)
 # 		# It Fails... bad?
@@ -319,4 +319,3 @@ class Test_parseFloatRange():
 # 		# More-so testing because "MULTILINESTRING" contains "LINESTRING", so it should be supported...?
 # 		# wkt_multiline = "MULTILINESTRING ((10 10, 20 20, 10 40),(40 40, 30 30, 40 20, 30 10))"
 # 		# print(test_file.parse_wkt(wkt_multiline))
-
