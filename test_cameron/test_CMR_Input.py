@@ -299,20 +299,20 @@ class Test_parseFloatRange():
 ##         handles this
 
 class Test_parseNumberOrRange():
-	# def test_basicIntToInt(self):
-	# 	myInt = 4321
-	# 	test_file.parse_number_or_range(myInt, test_file.parse_int)
+    # def test_basicIntToInt(self):
+    #   myInt = 4321
+    #   test_file.parse_number_or_range(myInt, test_file.parse_int)
 
-	def test_stringIntToInt(self):
-		myInt = "4321"
-		result = test_file.parse_number_or_range(myInt, test_file.parse_int)
-		assert result == 4321
+    def test_stringIntToInt(self):
+        myInt = "4321"
+        result = test_file.parse_number_or_range(myInt, test_file.parse_int)
+        assert result == 4321
 
-		# Cant go from float to int in string form:
-	# def test_stringFloatToInt(self):
-	# 	myFloat = "4321.56789"
-	# 	test_file.parse_number_or_range(myFloat, test_file.parse_int)
-	# 	assert result == 4321
+        # Cant go from float to int in string form:
+    # def test_stringFloatToInt(self):
+    #   myFloat = "4321.56789"
+    #   test_file.parse_number_or_range(myFloat, test_file.parse_int)
+    #   assert result == 4321
 
 
 # class Test_ParseWKT(unittest.TestCase):
