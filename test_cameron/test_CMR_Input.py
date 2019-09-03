@@ -7,7 +7,8 @@ import string
 from geomet import wkt
 
 # Let python discover other modules, starting one dir behind this one (project root):
-sys.path.insert(0, os.path.realpath(os.path.dirname(__file__)+"/.."))
+project_root = os.path.realpath(os.path.join(os.path.dirname(__file__),".."))
+sys.path.insert(0, project_root)
 import CMR.Input as test_file
 
 
