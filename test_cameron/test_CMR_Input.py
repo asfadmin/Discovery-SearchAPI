@@ -12,7 +12,6 @@ sys.path.insert(0, project_root)
 import CMR.Input as test_file
 
 
-
 # A lot of these tests don't throw the custom error message if "v" doesn't have a length param... ok?
 #        i.e. "if not len(v) > 0" fails instantly if passed None, or [], but passes with ["1","2"]
 
