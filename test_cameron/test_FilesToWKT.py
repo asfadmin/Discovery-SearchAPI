@@ -12,19 +12,6 @@ project_root = os.path.realpath(os.path.join(os.path.dirname(__file__),".."))
 sys.path.insert(0, project_root)
 import FilesToWKT as test_file
 
-# json recursive method modified from: https://stackoverflow.com/questions/21028979/recursive-iteration-through-nested-json-for-specific-key-in-python
-def find_elements(json_input, lookup_key):
-    if isinstance(json_input, dict):
-        for k, v in json_input.items():
-            if k.lower() == lookup_key.lower():
-                yield v
-            else:
-                yield from find_elements(v, lookup_key)
-    elif isinstance(json_input, list):
-        for item in json_input:
-            yield from find_elements(item, lookup_key)
-
-
 class Test_parseGeoJson():
     resources_root = os.path.join(project_root, "test_cameron", "Resources")
 
