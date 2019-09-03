@@ -73,15 +73,24 @@ def parse_geojson(f):
 
     # Geometry is just one object
     for geom in find_elements(geojson, "geometry"):
-        geometry_objs.append(geom)
+        # IF it's a geom object with a "coordinates" key, add it:
+        try:
+            geom["coordinates"]
+            geometry_objs.append(geom)
+        except KeyError:
+            pass
 
     # Geometries is a list of objects
     for geometries in find_elements(geojson, "geometries"):
         for geom in geometries:
-            geometry_objs.append(geom)
+            try:
+                geom["coordinates"]
+                geometry_objs.append(geom)
+            except KeyError:
+                pass
 
     if len(geometry_objs) == 0:
-        return {'error': {'type': 'VALUE', 'report': 'Could not find any "geometry" or "geometries" in geojson.'}}
+        return {'error': {'type': 'VALUE', 'report': 'Could not find any "geometry" or "geometries" fields in geojson.'}}
     elif len(geometry_objs) == 1:
         wkt_str = wkt.dumps(geometry_objs[0])
         return repairWKT(wkt_str)
@@ -104,6 +113,7 @@ def parse_geojson(f):
     wkt_json = json.loads('{"type": "MultiPoint", "properties": {}, "coordinates": ' + all_coords + '}')
     # convex_hull will make the shape point if one coord, line for two, and poly for three+
     wkt_str = str(shape(wkt_json).convex_hull)
+    # print("---->>> " + wkt_str)
 
     return repairWKT(wkt_str)
 
