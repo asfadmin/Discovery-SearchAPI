@@ -48,14 +48,17 @@ class CMRSubQuery:
         s = requests.Session()
         s.headers.update({'Client-Id': 'vertex_asf'})
 
-
         cfg = get_config()
-        r = s.head(cfg['cmr_base'] + cfg['cmr_api'], data=self.params)
+
+        # over-ride scroll and page size for count queries to minimize data transfer, since we can't do a HEAD request like this anymore
+        params = [x for x in self.params if x[0] not in ['scroll', 'page_size']]
+        params.append(('page_size', 0))
+
+        r = s.post(cfg['cmr_base'] + cfg['cmr_api'], data=params)
         if 'CMR-hits' not in r.headers:
             raise CMRError(r.text)
-        self.sid = r.headers['CMR-Scroll-Id']
         self.hits = int(r.headers['CMR-hits'])
-        logging.debug('CMR reported {0} hits for session {1}'.format(self.hits, self.sid))
+        logging.debug('CMR reported {0} hits'.format(self.hits))
         return int(r.headers['CMR-hits'])
 
     def get_results(self):

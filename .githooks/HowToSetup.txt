@@ -1,0 +1,6 @@
+
+1) Add these hooks to git's hookPath: (In root of project)
+git config core.hooksPath .githooks
+
+2) Make the hooks executable:
+Linux: chmod +x .githooks/pre-push
