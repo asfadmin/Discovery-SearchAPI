@@ -1,11 +1,4 @@
 import pytest, sys, os
-from geomet import wkt
-from shapely.geometry import shape 
-import shapely
-
-from geomet import wkt
-
-import json, re
 
 # Let python discover other modules, starting one dir behind this one (project root):
 project_root = os.path.realpath(os.path.join(os.path.dirname(__file__),".."))
