@@ -100,14 +100,14 @@ def parse_geojson(f):
     all_coords = "["
     for geom in geometry_objs:
         # Matches sets like: "[5.304, .5]" or "[623, 9.]"
-        match_coords = r'(\[\s*((\d+\.\d*)|(\d*\.\d+)|(\d+))\s*,\s*((\d+\.\d*)|(\d*\.\d+)|(\d+))\s*\])'
+        match_coords = r'(\[\s*((-?\d+\.\d*)|(-?\d*\.\d+)|(-?\d+))\s*,\s*((-?\d+\.\d*)|(-?\d*\.\d+)|(-?\d+))\s*\])'
         cords = re.findall(match_coords,str(geom["coordinates"]))
         for i, cord in enumerate(cords):
             # Not sure why this is a 2D array, (ie. [i][0]). Maybe a regex fix here...
             all_coords += str(cords[i][0]) + ","
     # Take off the last cooma, add the last brace:
     all_coords = str(all_coords)[0:-1] + "]"
-    if all_coords == "[]":
+    if all_coords == "]":
         # This gets hit on for loop not finding any coords to add 
         return {'error': {'type': 'VALUE', 'report': 'Could not find/parse any "coordinates" fields in geojson.'}}
     wkt_json = json.loads('{"type": "MultiPoint", "properties": {}, "coordinates": ' + all_coords + '}')
