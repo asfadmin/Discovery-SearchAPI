@@ -1,0 +1,71 @@
+{
+    "type": "FeatureCollection",
+    "features": 
+    [
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "GeometryCollection",
+                "geometries": 
+                [
+                    {
+                        "type": "Point",
+                        "coordinates": [102.0, 0.5]
+                    },
+                    {
+                        "type": "Polygon",
+                        "coordinates": 
+                        [[
+                            [ 59.94140624999999, 50.65294336725709 ],
+                            [ 59.94140624999999, 50.65294336725709 ]
+                        ]]
+                    }
+                ]
+            },
+            "properties": {
+                "prop0": "value0"
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "LineString",
+                "coordinates": [
+                    [102.0, 0.0], [103.0, 1.0], [104.0, 0.0], [105.0, 1.0]
+                ]
+            },
+            "properties": {
+                "prop0": "value0",
+                "prop1": 0.0
+            }
+        },
+        {
+            "type": "Feature",
+            "geometry": {
+                "type": "GeometryCollection",
+                "geometries": 
+                [
+                    {
+                        "type": "Polygon",
+                        "coordinates": 
+                        [[
+                            [ 59.94140624999999, 50.65294336725709 ],
+                            [ 59.94140624999999, 50.65294336725709 ]
+                        ]]
+                    },
+                    {
+                        "type": "Polygon", 
+                        "coordinates": 
+                        [[
+                            [30, 10], [40, 40], [20, 40], [10, 20], [30, 10]
+                        ]]
+                    }
+                ]
+            },
+            "properties": {
+                "prop0": "value0",
+                "prop1": { "this": "that" }
+            }
+        }
+    ]
+}
