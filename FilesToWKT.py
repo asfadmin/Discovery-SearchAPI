@@ -7,7 +7,9 @@ import shapefile
 import zipfile
 import api_headers
 import os
+import re
 from APIUtils import repairWKT
+from shapely.geometry import shape 
 
 class FilesToWKT:
 
@@ -43,17 +45,76 @@ class FilesToWKT:
         else:
             return {'error': 'Unrecognized file type'}
 
+# json recursive method modified from: https://stackoverflow.com/questions/21028979/recursive-iteration-through-nested-json-for-specific-key-in-python
+def find_elements(json_input, lookup_key):
+    if isinstance(json_input, dict):
+        for k, v in json_input.items():
+            if k.lower() == lookup_key.lower():
+                yield v
+            else:
+                yield from find_elements(v, lookup_key)
+    elif isinstance(json_input, list):
+        for item in json_input:
+            yield from find_elements(item, lookup_key)
+
 def parse_geojson(f):
     try:
         data = f.read()
-        geom = json.loads(data)['features'][0]['geometry']
-        wkt_str = wkt.dumps(geom)
+        geojson = json.loads(data)
     except InvalidGeoJSONException as e:
         return {'error': {'type': 'VALUE', 'report': 'Could not parse GeoJSON: {0}'.format(str(e))}}
     except KeyError as e:
         return {'error': {'type': 'VALUE', 'report': 'Missing expected key: {0}'.format(str(e))}}
     except ValueError as e:
         return {'error': {'type': 'VALUE', 'report': 'Could not parse GeoJSON: {0}'.format(str(e))}}
+    
+    # Add all geometries you find to a list. Could be nested deep inside json:
+    geometry_objs = []
+
+    # Geometry is just one object
+    for geom in find_elements(geojson, "geometry"):
+        # IF it's a geom object with a "coordinates" key, add it:
+        try:
+            geom["coordinates"]
+            geometry_objs.append(geom)
+        except KeyError:
+            pass
+
+    # Geometries is a list of objects
+    for geometries in find_elements(geojson, "geometries"):
+        for geom in geometries:
+            try:
+                geom["coordinates"]
+                geometry_objs.append(geom)
+            except KeyError:
+                pass
+
+    if len(geometry_objs) == 0:
+        return {'error': {'type': 'VALUE', 'report': 'Could not find any "geometry" or "geometries" fields in geojson.'}}
+    elif len(geometry_objs) == 1:
+        wkt_str = wkt.dumps(geometry_objs[0])
+        return repairWKT(wkt_str)
+    # else len(geometry_objs) > 1:
+
+    # Combine all the points of each object into one:
+    all_coords = "["
+    for geom in geometry_objs:
+        # Matches sets like: "[5.304, .5]" or "[623, 9.]"
+        match_coords = r'(\[\s*((-?\d+\.\d*)|(-?\d*\.\d+)|(-?\d+))\s*,\s*((-?\d+\.\d*)|(-?\d*\.\d+)|(-?\d+))\s*\])'
+        cords = re.findall(match_coords,str(geom["coordinates"]))
+        for i, cord in enumerate(cords):
+            # Not sure why this is a 2D array, (ie. [i][0]). Maybe a regex fix here...
+            all_coords += str(cords[i][0]) + ","
+    # Take off the last cooma, add the last brace:
+    all_coords = str(all_coords)[0:-1] + "]"
+    if all_coords == "]":
+        # This gets hit on for loop not finding any coords to add 
+        return {'error': {'type': 'VALUE', 'report': 'Could not find/parse any "coordinates" fields in geojson.'}}
+    wkt_json = json.loads('{"type": "MultiPoint", "properties": {}, "coordinates": ' + all_coords + '}')
+    # convex_hull will make the shape point if one coord, line for two, and poly for three+
+    wkt_str = str(shape(wkt_json).convex_hull)
+    # print("---->>> " + wkt_str)
+
     return repairWKT(wkt_str)
 
 def parse_kml(f):
