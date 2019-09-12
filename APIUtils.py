@@ -33,6 +33,9 @@ class simplifyWKT():
     # wkt_json can have nested GEOMETRYCOLLECTIONS,
     # This goes inside all of them and populates self.shapes
     # with jsons of broken-down shapes
+    ##########
+    # TO DO!!!: Add check for poly's not forming a ring
+    ##########
     def __simplifyJsonRecursively(self, wkt_json):
 
         # If GEOMETRY COLLECTION, grab the shapes inside it:
@@ -119,8 +122,9 @@ class simplifyWKT():
         print("==================================")
 
    
-
-
+    ##########
+    # TO DO!!!: Add check for if a shape is completely inside another, delete it
+    ##########
     def __repairShapelyList_Merge(self):
         shapely_shapes = []
         # First check if you can merge it with an existing shape, then add it to the end
