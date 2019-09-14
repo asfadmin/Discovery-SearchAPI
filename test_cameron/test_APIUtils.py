@@ -7,8 +7,64 @@ project_root = os.path.realpath(os.path.join(os.path.dirname(__file__),".."))
 sys.path.insert(0, project_root)
 import APIUtils as test_file
 
+
+# Helper method. Used on tests that are expected to return legit responses
+def simplify_legit_wkt(test_wkt):
+    wkt_simplified = test_file.repairWKT_v2(test_wkt)
+    try:
+        actual_wrapped = wkt_simplified["wkt"]["wrapped"]
+        actual_unwrapped = wkt_simplified["wkt"]["unwrapped"]
+        repairs = wkt_simplified["repairs"]
+    except KeyError:
+        # This means the parse function failed to load the file:
+        print("OUTPUT: " + str(wkt))
+        assert False
+    actual_wrapped = shapely.wkt.loads(actual_wrapped)
+    actual_unwrapped = shapely.wkt.loads(actual_unwrapped)
+
+    return actual_wrapped, actual_unwrapped, repairs
+
+
 class Test_repairWKT():
     resources_root = os.path.join(project_root, "test_cameron", "Resources")
+    ###############################
+    #   STORAGE OF GENERIC WKT's  #
+    ###############################
+    long_forked_poly = "POLYGON((58 35,-36 15,65 39,5 -26,29 7.5,-1 15,31 10,58 35))"
+    long_forked_poly_unconnected = "POLYGON((58 35,-36 15,65 39,5 -26,29 7.5,-1 15,31 10))"
+
+
+    def test_mergeTwoPolysToFormAHole(self):
+        # These merge to form a polygon w/ a hole between them
+        left_donut_side = "POLYGON((12 8,8 6,10 2,14 3,15 0,9 0,7 7,12 10,12 8))"
+        right_donut_side = "POLYGON((10 8,14 6,14 4,13 1,13 0,15 4,14.5 7,10 9,10 8))"  
+        test_donut = "GEOMETRYCOLLECTION ("+left_donut_side+", "+right_donut_side+")"
+        # Get the response:
+        actual_wrapped, actual_unwrapped, repairs = simplify_legit_wkt(test_donut)
+        # Make both strings consistant by loading/dumping with same library:
+        expected_result_wkt = "POLYGON ((12 8.1111111111111107, 14.5 7, 15 4, 14.1999999999999993 2.3999999999999999, 15 0, 13 0, 9 0, 7 7, 10 8.8000000000000007, 10 9, 10.1914893617021285 8.9148936170212760, 12 10, 12 8.1111111111111107))"
+        expected_result_wkt = shapely.wkt.loads(expected_result_wkt)
+
+        assert expected_result_wkt == actual_wrapped
+        assert expected_result_wkt == actual_unwrapped
+        # Should removing the hole AFTER the merge be a repair?
+        assert len(repairs) == 0
+
+    def test_REPAIR_unconnectedPolygon(self):
+        # Unconnected poly means the first set of coords do not match the last
+        test_unconnected = self.long_forked_poly_unconnected
+        actual_wrapped, actual_unwrapped, repairs = simplify_legit_wkt(test_unconnected)
+        
+        expected_result_wkt = self.long_forked_poly
+        expected_result_wkt = shapely.wkt.loads(expected_result_wkt)
+
+        assert expected_result_wkt == actual_wrapped
+        assert expected_result_wkt == actual_unwrapped
+
+
+
+
+
 
     #############################
     #  NO REPAIRS NEEDED TESTS  #
@@ -53,17 +109,15 @@ class Test_repairWKT():
     #############################
     def test_polygonUnconeected(self):
 
-        left_donut = "POLYGON((12 8,8 6,10 2,14 3,15 0,9 0,7 7,12 10,12 8))"
-        right_donut = "POLYGON((10 8,14 6,14 4,13 1,13 0,15 4,14.5 7,10 9,10 8))"
         # Polygon w/ hole: "POLYGON ((12 8.111111111111111, 14.5 7, 15 4, 14.2 2.4, 15 0, 13 0, 9 0, 7 7, 10 8.800000000000001, 10 9, 10.19148936170213 8.914893617021276, 12 10, 12 8.111111111111111), (13.63636363636364 2.909090909090909, 14 4, 14 6, 11 7.5, 8 6, 10 2, 13.63636363636364 2.909090909090909))"
         #      This removes the hole from a union: p = Polygon(union.exterior.coords)
         #      w/out hole: "POLYGON ((12 8.111111111111111, 14.5 7, 15 4, 14.2 2.4, 15 0, 13 0, 9 0, 7 7, 10 8.800000000000001, 10 9, 10.19148936170213 8.914893617021276, 12 10, 12 8.111111111111111))"
 
         multi_point_1 = "MULTIPOINT ((10 40), (40 30), (20 20), (30 10))"
-        multi_point_2 = "MULTIPOINT (10 40, 40 30, 20 20, 30 10) "
+        multi_point_2 = "MULTIPOINT (10 40, 40 30, 20 20, 30 10)"
         # assert multi_point_1 == multi_point_2
 
-
+        poly_hole_stretches_out = "MULTIPOLYGON (((20 35, 10 30, 10 10, 30 5, 45 20, 20 35), (30 20, 20 15, 35 35, 30 20)))"
 
         long_poly = "POLYGON((58 35,-36.2890625 15,65 39,5.60546875 -26,29 7.5,-1 15,31 10,58 35))"
         wkt_str = "GEOMETRYCOLLECTION ( POINT (40 10), LINESTRING (10 10, 20 20, 10 40), POLYGON ((40 40, 20 45, 45 30, 40 40)))"
@@ -82,11 +136,10 @@ class Test_repairWKT():
         # With two points, can't be simplified to polygon. three points can
         line1 = "LINESTRING(12 42,30 25,14 3.14)"
 
-        GeoColection = "GEOMETRYCOLLECTION ( "+left_donut+", "+right_donut+")"
 
-        print(multi_point_1)
-        reparied_str = test_file.repairWKT_v2(multi_point_1)
-
+        print(MultiPolygonWithHole)
+        reparied_str = test_file.repairWKT_v2(MultiPolygonWithHole)
+        print(reparied_str)
         return
         reparied_str = test_file.repairWKT_v2(wkt_str)
         reparied_str = test_file.repairWKT_v2(wkt_str2)
