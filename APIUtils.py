@@ -136,7 +136,7 @@ class simplifyWKT_v2():
             # Quicky convert to shapely obj for the convex hull, then back again:
             shape = shapely.wkt.loads(wkt.dumps(MultiPoint))
             return wkt.loads(shapely.wkt.dumps(shape.convex_hull))
-            
+
     ########
     # TODO:
     # Return None if merge failed, or the single shape itself?
@@ -237,7 +237,7 @@ def repairWKT(wkt_str):
             'type': 'SIMPLIFY',
             'report': 'Simplified shape from {0} points to {1} points'.format(shape_len(original_shape), shape_len(shape))
         })
-        logging.debug(self.repairs[-1])
+        logging.debug(repairs[-1])
 
     wkt_obj = wkt.loads(shapely.wkt.dumps(shape))
 
@@ -260,7 +260,7 @@ def repairWKT(wkt_str):
             'type': 'CLAMP',
             'report': 'Clamped {0} values to +/-90 latitude'.format(clamped)
         })
-        logging.debug(self.repairs[-1])
+        logging.debug(repairs[-1])
 
     # Check for polygon-specific issues
     if wkt_obj['type'] == 'Polygon':
@@ -270,7 +270,7 @@ def repairWKT(wkt_str):
                 'type': 'CLOSE',
                 'report': 'Closed open polygon'
             })
-            logging.debug(self.repairs[-1])
+            logging.debug(repairs[-1])
 
     # Re-assemble the repaired object prior to unwrapping
     if wkt_obj['type'] == 'Polygon':
@@ -292,7 +292,7 @@ def repairWKT(wkt_str):
             'type': 'WRAP',
             'report': 'Wrapped {0} values to +/-180 longitude'.format(wrapped)
         })
-        logging.debug(self.repairs[-1])
+        logging.debug(repairs[-1])
 
     # Re-assemble the final unwrapped object
     if wkt_obj['type'] == 'Polygon':
@@ -325,7 +325,7 @@ def repairWKT(wkt_str):
                 return { 'error': {'type': 'UNKNOWN', 'report': 'Unknown CMR error: {0}'.format(r.text)}}
         if repair:
             repairs.append({'type': 'REVERSE', 'report': 'Reversed polygon winding order'})
-            logging.debug(self.repairs[-1])
+            logging.debug(repairs[-1])
             wkt_obj['coordinates'][0].reverse()
             wkt_obj_unwrapped['coordinates'][0].reverse()
 
