@@ -1,6 +1,9 @@
 #!/bin/bash
 clear
-echo "Starting wget search test cses from api-test.asf.alaska.edu"
+LOG_LOCATION=/path/to/my/location/
+exec > >(tee -i $LOG_LOCATION/apitest.log)
+exec 2>&1
+echo "Starting wget search test cases from api-test.asf.alaska.edu. Log Location should be: [ $LOG_LOCATION]"
 
 # queries designed just for testing
 # absoluteOrbit Keyword
