@@ -18,7 +18,7 @@ class simplifyWKT_v2():
         try:
             wkt_json = wkt.loads(wkt_str)
         except ValueError as e:
-            self.error = { 'error': {'type': 'VALUE', 'report': 'Could not parse WKT: {0}'.format(str(e))} }
+            self.error = { 'error': {'type': 'VALUE', 'report': 'Could not parse WKT: {0}.'.format(str(e))} }
             return
         except TypeError as e:
             self.error =  { 'error': {'type': 'TYPE', 'report': str(e)} }
@@ -31,28 +31,40 @@ class simplifyWKT_v2():
 
         # See if a merge is required or not:
         if len(self.shapes) == 0:
-            self.error = { 'error': {'type': 'VALUE', 'report': 'Could not parse WKT: No valid shapes found'} }
+            self.error = { 'error': {'type': 'VALUE', 'report': 'Could not parse WKT: No valid shapes found.'} }
             return
         elif len(self.shapes) == 1:
-            self.wkt_unwrapped = shapely.wkt.dumps(self.shapes[0])
+            single_wkt = self.shapes[0]
         else:
             # Else More than one shape. Try to merge them:
-            shapely_union = self.__mergeShapelyList(self.shapes)
-            if shapely_union == None:
+            single_wkt = self.__mergeShapelyList(self.shapes)
+            if single_wkt == None:
                 for i, shape in enumerate(self.shapes):
-                    # 0 = shape, 1 = bool success:
-                    shape = self.__convexHullShape(shape)[0]
+                    # 0 = shape, 1 = bool success: (NOT first shape)
+                    shape = self.__convexHullShape(shape)
                     self.shapes[i] = shape
                 # Now that each shape is convexed hulled, try again
-                shapely_union = self.__mergeShapelyList(self.shapes)
+                single_wkt = self.__mergeShapelyList(self.shapes)
                 # If it's STILL not possible, just convex hull everything together and return.
-                if shapely_union == None:
+                if single_wkt == None:
                     all_shapes = shapely.ops.unary_union(self.shapes)
-                    # 0 = shape, 1 = bool success:
-                    shapely_union = self.__convexHullShape(all_shapes)[0]
-            self.wkt_unwrapped = shapely.wkt.dumps(shapely_union)
+                    # 0 = shape, 1 = bool success: (NOT first shape)
+                    single_wkt = self.__convexHullShape(all_shapes)
 
-        self.wkt_wrapped = self.wkt_unwrapped
+        # Quick sanity check. No clue if it's actually possible to hit this:
+        if single_wkt.geom_type.upper() not in ["POLYGON", "LINESTRING", "POINT"]:
+            self.error = {'error': {'type': 'VALUE', 'report': 'Could not parse WKT: Couldn\'t simplify to single shape.'} }
+            return
+            
+        # Simplify down to the number of points CMR can handle:
+        single_wkt = self.__simplifyPoints(single_wkt)
+        if single_wkt == None:
+            self.error = { 'error': {'type': 'SIMPLIFY', 'report': 'Could not simplify shape past 300 points.'} }
+            return
+        # Convert that one shape into the strings:
+        self.wkt_unwrapped, self.wkt_wrapped = self.__clampAndWrapWKT(single_wkt)
+
+        # self.wkt_wrapped = self.wkt_unwrapped
         ###########
         # TODO: Add wrapped vs unwrapped:
         ###########
@@ -113,9 +125,9 @@ class simplifyWKT_v2():
             self.shapes.append(basic_shape)
 
         else: 
-            wkt_json, successful = self.__convexHullShape(wkt_json)
+            wkt_json = self.__convexHullShape(wkt_json)
             # If it was able to create a shape from the points:
-            if successful:
+            if wkt_json != None:
                 self.repairs.append({
                     'type': 'CONVEX_HULL',
                     'report': 'Shape {} was not of a supported type; using it\'s convex hull instead'.format(wkt_json['type'])
@@ -145,7 +157,7 @@ class simplifyWKT_v2():
         coords = re.findall(match_coords,str(wkt_json["coordinates"]))
         # If you couldn't find any points:
         if len(coords) == 0:
-            return None, False
+            return None
 
         all_coords = []
         for i in range(len(coords)):
@@ -158,10 +170,10 @@ class simplifyWKT_v2():
         shape = shapely.wkt.loads(wkt.dumps(MultiPoint)).convex_hull
         # If they passed in a shapely object, return one. Else return a geojson
         if converted_from_shapely:
-            return shape, True
+            return shape
         else:
             # else convert back to geojson:
-            return wkt.loads(shapely.wkt.dumps(shape)), True
+            return wkt.loads(shapely.wkt.dumps(shape))
 
     # Returns the merge of the shapes IF it could get it down to one,
     # else None otherwise
@@ -190,6 +202,49 @@ class simplifyWKT_v2():
             print("--- UNCHECKED FIX IN MERGE ---")
             print(union)
             return None
+
+    # single_wkt => Shapely object of type ["POLYGON", "LINESTRING", "POINT"]
+    def __simplifyPoints(self, single_wkt):
+        tolerance = 0.00001
+        attempts = 0
+        original_num_points = self.__shapeLength(single_wkt)
+        # If already less than 300 points, wont enter
+        while self.__shapeLength(single_wkt) > 300 and attempts < 10:
+            attempts += 1
+            logging.debug('Shape length is {0}, simplifying further with tolerance {1}'.format(self.__shapeLength(shape), tolerance ))
+            single_wkt = single_wkt.simplify(tolerance, preserve_topology=True)
+            # Set the tolerance for the next loop around:
+            tolerance *= 5
+        # If it didn't work, what calls this will catch the None and return an error:
+        if self.__shapeLength(single_wkt) > 300:
+            return None
+        # Tack on the report if needed:
+        if attempts > 0:
+            repairs.append({
+                'type': 'SIMPLIFY',
+                'report': 'Simplified shape from {0} points to {1} points, after {2} iterations.'.format(original_num_points, self.__shapeLength(single_wkt), attempts)
+            })
+            logging.debug(repairs[-1])
+        return single_wkt
+
+
+    # Do some shapely magic:
+    def __shapeLength(self, shp):
+        shp_type = shp.geom_type.upper()
+        if shp_type == 'POINT':
+            return 1
+        if shp_type == 'LINESTRING':
+            return len(shp.coords)
+        if shp_type == 'POLYGON':
+            return len(shp.exterior.coords)
+        return None
+
+    # single_wkt => Shapely object of type ["POLYGON", "LINESTRING", "POINT"]
+    def __clampAndWrapWKT(self, single_wkt):
+        wkt_unwrapped = shapely.wkt.dumps(single_wkt)
+        wkt_wrapped = wkt_unwrapped
+        return wkt_unwrapped, wkt_wrapped
+
 
 
 
