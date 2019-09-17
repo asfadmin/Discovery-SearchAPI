@@ -26,7 +26,7 @@ def simplify_legit_wkt(test_wkt):
 
 
 class Test_repairWKT():
-    resources_root = os.path.join(project_root, "test_cameron", "Resources")
+    resources_root = os.path.join(project_root, "unit_tests", "Resources")
     ###############################
     #   STORAGE OF GENERIC WKT's  #
     ###############################
