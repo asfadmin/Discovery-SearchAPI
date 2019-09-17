@@ -192,8 +192,16 @@ class JSONLiteStreamArray(JSONStreamArray):
         try:
             if float(p['offNadirAngle']) < 0:
                 p['offNadirAngle'] = None
+        except TypeError:
+            pass
+
+        try:
             if float(p['relativeOrbit']) < 0:
                 p['relativeOrbit'] = None
+        except TypeError:
+            pass
+
+        try:
             if p['groupID'] is None:
                 p['groupID'] = p['granuleName']
         except TypeError:
