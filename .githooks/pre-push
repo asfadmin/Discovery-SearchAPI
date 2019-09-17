@@ -22,8 +22,8 @@ def run_test_suite():
     # Run the test suite, and exit with whatever exit code the testsuite gives
     #   if all tests pass, it exits with 0 and is allowed to push
 
-    test_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "..", "unit_tests"))
-    sys.exit( pytest.main(["unit_tests"]) )
+    test_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "unit_tests"))
+    sys.exit( pytest.main([test_dir]) )
 
 
 if __name__ == "__main__":

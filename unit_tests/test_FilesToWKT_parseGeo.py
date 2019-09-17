@@ -8,7 +8,7 @@ sys.path.insert(0, project_root)
 import FilesToWKT as test_file
 
 class Test_parseGeoJson():
-    resources_root = os.path.join(project_root, "test_cameron", "Resources")
+    resources_root = os.path.join(project_root, "unit_tests", "Resources")
 
     def test_Basic_1(self):
         geojson_path = os.path.join(self.resources_root, "geojsons_valid", "Basic_1.geojson")

@@ -9,7 +9,7 @@ sys.path.insert(0, project_root)
 import FilesToWKT as test_file
 
 class Test_parseGeoJson():
-    resources_root = os.path.join(project_root, "test_cameron", "Resources")
+    resources_root = os.path.join(project_root, "unit_tests", "Resources")
 
     #Tests to add:
     #	File names more than 8 char long (legacy systems don't allow it, do we?)
