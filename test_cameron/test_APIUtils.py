@@ -60,11 +60,46 @@ class Test_repairWKT():
 
         assert expected_result_wkt == actual_wrapped
         assert expected_result_wkt == actual_unwrapped
+        assert len(repairs) == 1
+        assert "Closed open polygon" in str(repairs)
 
+    def test_REPAIR_mergeSingleShapesBeforeUnion(self):
+        convex_hull_intersects = "MULTIPOLYGON((( 11 5, 16 40, 36 39, 13 43, 11 5)),(( 19 33, 32 25, 47 42, 31 29, 19 33)) )"
+        actual_wrapped, actual_unwrapped, repairs = simplify_legit_wkt(convex_hull_intersects)
 
+        expected_result_wkt = "POLYGON ((11 5, 13 43, 36 39, 35.48418156808803 38.29848693259972, 47 42, 32 25, 27.66666666666667 27.66666666666667, 11 5))"
+        expected_result_wkt = shapely.wkt.loads(expected_result_wkt)
 
+        # assert expected_result_wkt == actual_wrapped
+        # assert expected_result_wkt == actual_unwrapped
 
+        # add repair?
 
+    # When two shapes touch, but don't intersect. It shouldn't merge them
+    # Should convex_hull the total shape:
+    def test_zeroPointGeomerty_touchOnce(self):
+        poly1 = "POLYGON((20 5, 24 5, 24 10, 20 10, 20 5))"
+        poly2 = "POLYGON((20 0, 22 5, 24 0, 22 3, 20 0))"
+        two_touching_shapes = "GEOMETRYCOLLECTION("+poly1+","+poly2+")"
+        actual_wrapped, actual_unwrapped, repairs = simplify_legit_wkt(two_touching_shapes)
+        expected_result_wkt = "POLYGON ((20 0, 20 10, 24 10, 24 0, 20 0))"
+        print(actual_unwrapped)
+        # print(repairs)
+
+    # These shapes touch twice, but don't intersect at all. I'm checking if
+    # the built in union function is "smart" enough to delete the middle:
+    def test_zeroPointGeomerty_touchTwice(self):
+        poly1 = "POLYGON((20 0, 21 5, 22 4, 23 5, 24 0, 22 2, 20 0))"
+        poly2 = "POLYGON((20 5, 24 5, 24 10, 20 10, 20 5))"
+        two_touching_shapes = "GEOMETRYCOLLECTION("+poly1+","+poly2+")"
+        actual_wrapped, actual_unwrapped, repairs = simplify_legit_wkt(two_touching_shapes)
+
+        expected_result_wkt = "POLYGON ((20 0, 21 5, 20 5, 20 10, 24 10, 24 5, 23 5, 24 0, 20 0))"
+
+    # Anything that intersects should throw an error:
+    def test_intersectedPoly(self):
+        poly = "POLYGON ((20 5, 20 10, 24 10, 24 5, 22 5, 24 0, 22 3, 20 0, 22 5, 20 5))"
+        actual_wrapped, actual_unwrapped, repairs = simplify_legit_wkt(poly)
 
     #############################
     #  NO REPAIRS NEEDED TESTS  #

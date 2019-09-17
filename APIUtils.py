@@ -36,7 +36,20 @@ class simplifyWKT_v2():
         elif len(self.shapes) == 1:
             self.wkt_unwrapped = shapely.wkt.dumps(self.shapes[0])
         else:
+            # Else More than one shape. Try to merge them:
             shapely_union = self.__mergeShapelyList(self.shapes)
+            if shapely_union == None:
+                for i, shape in enumerate(self.shapes):
+                    # 0 = shape, 1 = bool success:
+                    shape = self.__convexHullShape(shape)[0]
+                    self.shapes[i] = shape
+                # Now that each shape is convexed hulled, try again
+                shapely_union = self.__mergeShapelyList(self.shapes)
+                # If it's STILL not possible, just convex hull everything together and return.
+                if shapely_union == None:
+                    all_shapes = shapely.ops.unary_union(self.shapes)
+                    # 0 = shape, 1 = bool success:
+                    shapely_union = self.__convexHullShape(all_shapes)[0]
             self.wkt_unwrapped = shapely.wkt.dumps(shapely_union)
 
         self.wkt_wrapped = self.wkt_unwrapped
@@ -119,60 +132,64 @@ class simplifyWKT_v2():
 
 
     # Takes a geomet.wkt object, and returns the convex_hull of that shape
-    def __convexHullShape(self, wkt_json):
-            match_coords = match_coords = r'(\[\s*-?((\d+\.\d*)|(\d*\.\d+)|(\d+))\s*,\s*-?((\d+\.\d*)|(\d*\.\d+)|(\d+))\s*\])'
-            coords = re.findall(match_coords,str(wkt_json["coordinates"]))
-            # If you couldn't find any points:
-            if len(coords) == 0:
-                return None, False
+    def __convexHullShape(self, wkt_obj):
+        # To convert back at the end if needed:
+        converted_from_shapely = False
+        if isinstance(wkt_obj, dict):
+            wkt_json = wkt_obj
+        else:
+            wkt_json = wkt.loads(shapely.wkt.dumps(wkt_obj))
+            converted_from_shapely = True
 
-            all_coords = []
-            for i in range(len(coords)):
-                # Group 0 = "[ 1.0, 1.0 ]" as a literall string. Convert to list of floats:
-                this_set = coords[i][0].strip('][').split(', ')
-                all_coords.append([ float(this_set[0]), float(this_set[1]) ])
-            # Convex_hull and add the new shape:
-            MultiPoint = {'type': 'MultiPoint', 'coordinates': all_coords }
-            # Quicky convert to shapely obj for the convex hull, then back again:
-            shape = shapely.wkt.loads(wkt.dumps(MultiPoint))
-            return wkt.loads(shapely.wkt.dumps(shape.convex_hull))
+        match_coords = match_coords = r'(\[\s*-?((\d+\.\d*)|(\d*\.\d+)|(\d+))\s*,\s*-?((\d+\.\d*)|(\d*\.\d+)|(\d+))\s*\])'
+        coords = re.findall(match_coords,str(wkt_json["coordinates"]))
+        # If you couldn't find any points:
+        if len(coords) == 0:
+            return None, False
 
-    ########
-    # TODO:
-    # Return None if merge failed, or the single shape itself?
-    # Lets me call this function, then if none, convex hall
-    # each single shape, then if None again, just convex_hull everything.
-    ########
+        all_coords = []
+        for i in range(len(coords)):
+            # Group 0 = "[ 1.0, 1.0 ]" as a literall string. Convert to list of floats:
+            this_set = coords[i][0].strip('][').split(', ')
+            all_coords.append([ float(this_set[0]), float(this_set[1]) ])
+        # Convex_hull and add the new shape:
+        MultiPoint = {'type': 'MultiPoint', 'coordinates': all_coords }
+        # Quicky convert to shapely obj for the convex hull:
+        shape = shapely.wkt.loads(wkt.dumps(MultiPoint)).convex_hull
+        # If they passed in a shapely object, return one. Else return a geojson
+        if converted_from_shapely:
+            return shape, True
+        else:
+            # else convert back to geojson:
+            return wkt.loads(shapely.wkt.dumps(shape)), True
+
+    # Returns the merge of the shapes IF it could get it down to one,
+    # else None otherwise
     def __mergeShapelyList(self, shapely_list):
         # Merge the shape, then apply some repairs:
         union = shapely.ops.unary_union(shapely_list)
 
         if union.geom_type.upper() in ['GEOMETRYCOLLECTION', 'MULTIPOLYGON']:
-            # This means there are shapes by themselves. Convex_hull everything:
-            union = wkt.loads(shapely.wkt.dumps(union))
-            union = self.__convexHullShape(union)
-            return shapely.wkt.loads(wkt.dumps(union))
-
+            # This means there are shapes completely by themselves:
+            return None
+        # IF only one line, merge returns linestring.
+        # IF two+ lines, even if they're connected, merge returns multilinestring
         elif union.geom_type.upper() == 'POLYGON':
             # This removes any holes inside the poly:
             return Polygon(union.exterior.coords)
+        elif union.geom_type.upper() == 'LINESTRING':
+            return union
         elif union.geom_type.upper() == 'MULTILINESTRING':
             line_merge = shapely.ops.linemerge(union)
             # If it collapsed into one line:
             if line_merge.geom_type.upper() == 'LINESTRING':
-                return True, line_merge
+                return line_merge
             else:
-                return False, line_merge
-        elif union.geom_type.upper() == 'MULTIPOLYGON':
-            # The polygon's don't intersect
-            return False, union
-
+                return None
         else:
             print("--- UNCHECKED FIX IN MERGE ---")
             print(union)
-
-
-        return False, union
+            return None
 
 
 
