@@ -77,9 +77,13 @@ class tester:
             if len(q) <= 0 or q[0] == '#':
                 continue
             m = re.search(r'\?(.+)', q)
-            p = m.group(1)
-            if self.args.replace:
-                q = '{0}?{1}'.format(self.args.replace, p)
+            if m is None:
+                q = self.args.replace
+                p = 'empty_query_string'
+            else:
+                p = m.group(1)
+                if self.args.replace:
+                    q = '{0}?{1}'.format(self.args.replace, p)
             cache = ''
             if self.args.cache:
                 try:
