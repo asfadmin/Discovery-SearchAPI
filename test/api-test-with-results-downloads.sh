@@ -178,6 +178,10 @@ wget -d -O API-TEST-platform-R1-E1-L0-valid.csv "https://api-test.asf.alaska.edu
 wget -d -O API-TEST-platform-SP-valid.csv "https://api-test.asf.alaska.edu/services/search/param?platform=SP&maxResults=10&output=csv"
 wget -d -O API-TEST-platform-UA-valid.csv "https://api-test.asf.alaska.edu/services/search/param?platform=UA&maxResults=10&output=csv"
 wget -d -O API-TEST-platform-E1E2-valid.csv "https://api-test.asf.alaska.edu/services/search/param?platform=E1,E2&maxResults=10&output=csv"
+wget -d -O API-TEST-platform-SIRC-valid.csv "https://api-test.asf.alaska.edu/services/search/param?platform=SIR-C&maxResults=10&output=csv"
+wget -d -O API-TEST-platform-SIRC-valid.csv "https://api-test.asf.alaska.edu/services/search/param?platform=STS-59&maxResults=10&output=csv"
+wget -d -O API-TEST-platform-SIRC-valid.csv "https://api-test.asf.alaska.edu/services/search/param?platform=STS&maxResults=10&output=csv"
+wget -d -O API-TEST-platform-SIRC-valid.csv "https://api-test.asf.alaska.edu/services/search/param?platform=STS-68,STS-59&maxResults=10&output=csv"
 
 # platform aliases + count output
 wget -d -O API-TEST-platform-S1-count-valid.csv "https://api-test.asf.alaska.edu/services/search/param?platform=S1&start=2016-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count"
@@ -241,6 +245,13 @@ wget -d -O API-TEST-platform-UAVSAR-count-valid.csv "https://api-test.asf.alaska
 wget -d -O API-TEST-platform-UAvSAR-count-valid.csv "https://api-test.asf.alaska.edu/services/search/param?platform=UAvSAR&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count"
 wget -d -O API-TEST-platform-G-III-count-valid.csv "https://api-test.asf.alaska.edu/services/search/param?platform=G-III&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count"
 wget -d -O API-TEST-platform-g-iii-count-valid.csv "https://api-test.asf.alaska.edu/services/search/param?platform=g-iii&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count"
+wget -d -O API-TEST-platform-STS-59-count-valid.csv "https://api-test.asf.alaska.edu/services/search/param?platform=STS-59&output=count"
+wget -d -O API-TEST-platform-STS-68-count-valid.csv "https://api-test.asf.alaska.edu/services/search/param?platform=STS-68&output=count"
+wget -d -O API-TEST-platform-STS-59-68-count-valid.csv "https://api-test.asf.alaska.edu/services/search/param?platform=STS-59,STS-68&output=count"
+wget -d -O API-TEST-platform-sts-59-count-valid.csv "https://api-test.asf.alaska.edu/services/search/param?platform=sts-59&output=count"
+wget -d -O API-TEST-platform-StS-68-count-valid.csv "https://api-test.asf.alaska.edu/services/search/param?platform=StS-68&output=count"
+wget -d -O API-TEST-platform-Sts-59-StS-68-count-valid.csv "https://api-test.asf.alaska.edu/services/search/param?platform=Sts-59,StS-68&output=count"
+
 
 # platform_list Keyword
 wget -d -O API-TEST-platform_list-lc-count-valid.csv "https://api-test.asf.alaska.edu/services/search/param?platform_list=sentinel,ers&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count"
@@ -253,6 +264,9 @@ wget -d -O API-TEST-platform_list-ERS12-count-valid.csv "https://api-test.asf.al
 wget -d -O API-TEST-platform_list-S1-count-valid.csv "https://api-test.asf.alaska.edu/services/search/param?platform_list=S1&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count"
 wget -d -O API-TEST-platform_list-SASB-count-valid.csv "https://api-test.asf.alaska.edu/services/search/param?platform_list=SA,Sb&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count"
 
+wget -d -O API-TEST-platform_list-SIR-C-count-valid.csv "https://api-test.asf.alaska.edu/services/search/param?platform_list=SIR-C&output=count"
+wget -d -O API-TEST-platform_list-sIR-c-count-valid.csv "https://api-test.asf.alaska.edu/services/search/param?platform_list=siR-c&output=count"
+wget -d -O API-TEST-platform_list-SiR-C-count-valid.csv "https://api-test.asf.alaska.edu/services/search/param?platform_list=SiR-C&output=count"
 
 # point Keyword
 wget -d -O API-TEST-point-valid.csv "https://api-test.asf.alaska.edu/services/search/param?point=-150.2,65.0&maxresults=10&output=csv"
