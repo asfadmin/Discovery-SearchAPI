@@ -1,6 +1,6 @@
 #!/bin/bash
 clear
-LOG_LOCATION=/Users/mshapran/Test/Logs/
+LOG_LOCATION=/path/to/my/location/
 exec > >(tee -i $LOG_LOCATION/apiprod.log)
 exec 2>&1
 echo "Starting wget search test cases from api.daac.asf.alaska.edu. Log Location should be: [ $LOG_LOCATION]"
