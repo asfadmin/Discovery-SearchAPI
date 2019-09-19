@@ -5,7 +5,7 @@ from asf_env import get_config
 import requests
 import shapely.wkt
 import shapely.ops
-from shapely.geometry import Polygon, MultiPolygon
+from shapely.geometry import Polygon, LineString, Point
 import re
 
 
@@ -53,9 +53,9 @@ class simplifyWKT_v2():
 
         # Quick sanity check. No clue if it's actually possible to hit this:
         if single_wkt.geom_type.upper() not in ["POLYGON", "LINESTRING", "POINT"]:
-            self.error = {'error': {'type': 'VALUE', 'report': 'Could not parse WKT: Couldn\'t simplify to single shape.'} }
+            self.error = {'error': {'type': 'VALUE', 'report': 'Could not simplify WKT down to single shape.'} }
             return
-            
+
         # Simplify down to the number of points CMR can handle:
         single_wkt = self.__simplifyPoints(single_wkt)
         if single_wkt == None:
@@ -64,15 +64,9 @@ class simplifyWKT_v2():
         # Convert that one shape into the strings:
         self.wkt_unwrapped, self.wkt_wrapped = self.__clampAndWrapWKT(single_wkt)
 
-        # self.wkt_wrapped = self.wkt_unwrapped
-        ###########
-        # TODO: Add wrapped vs unwrapped:
-        ###########
-        # Fixes to apply AFTER it's one shape:
-        #   clamp/wrap each coords. shapely is okay with (9000 9000) so not a problem
-        #       also makes storing wrapped vs unwrapped easy
-        #   Reverse winding order if neededself.wkt_unwrappedself.wkt_unwrapped
-        #   Reduce number of points
+        if single_wkt.geom_type.upper() == "POLYGON":
+            # Uses/Modifies wkt_wrapped and wkt_unwrapped:
+            self.__runWKTsAgainstCMR()
 
 
 
@@ -143,7 +137,8 @@ class simplifyWKT_v2():
                 logging.debug(self.repairs[-1])
 
 
-    # Takes a geomet.wkt object, and returns the convex_hull of that shape
+    # Takes either a geomet.wkt or shapely.wkt, and returns the convex_hull
+    # of the same type
     def __convexHullShape(self, wkt_obj):
         # To convert back at the end if needed:
         converted_from_shapely = False
@@ -215,16 +210,17 @@ class simplifyWKT_v2():
             single_wkt = single_wkt.simplify(tolerance, preserve_topology=True)
             # Set the tolerance for the next loop around:
             tolerance *= 5
-        # If it didn't work, what calls this will catch the None and return an error:
+        # If it didn't work, what calls this method will catch
+        #  the None and return an error:
         if self.__shapeLength(single_wkt) > 300:
             return None
         # Tack on the report if needed:
         if attempts > 0:
-            repairs.append({
+            self.repairs.append({
                 'type': 'SIMPLIFY',
                 'report': 'Simplified shape from {0} points to {1} points, after {2} iterations.'.format(original_num_points, self.__shapeLength(single_wkt), attempts)
             })
-            logging.debug(repairs[-1])
+            logging.debug(self.repairs[-1])
         return single_wkt
 
 
@@ -241,9 +237,113 @@ class simplifyWKT_v2():
 
     # single_wkt => Shapely object of type ["POLYGON", "LINESTRING", "POINT"]
     def __clampAndWrapWKT(self, single_wkt):
+        # You can't edit coords in shapely. You have to creat a new shape and override:
+        wkt_json = wkt.loads(shapely.wkt.dumps(single_wkt))
+        # make coords of any shape the format of [[coord, coord],[coord,coord]]:
+        if wkt_json["type"].upper() == "POLYGON":
+            [coords] = wkt_json["coordinates"]
+        elif wkt_json["type"].upper() == "LINESTRING":
+            coords = wkt_json["coordinates"]
+        elif wkt_json["type"].upper() == "POINT":
+            coords = [wkt_json["coordinates"]]
+
+        # Wrap long to +/- 180
+        wrapped = 0
+        # Clamp lat to +/- 90
+        clamped = 0
+
+        new_coords = []
+        for i in range(len(coords)):
+            x = coords[i][0]
+            y = coords[i][1]
+            # Longitude:
+            if abs(x) > 180:
+                wrapped += 1
+                x = (coords[i][0] + 180) % 360 - 180
+            # Latitude:
+            if y > 90:
+                clamped += 1
+                y = 90
+            elif y < -90:
+                clamped += 1
+                y = -90
+            new_coords.append([x,y])
+        # Do the reporting:
+        if wrapped > 0:
+            self.repairs.append({
+                'type': 'WRAP',
+                'report': 'Wrapped {0} value(s) to +/-180 longitude'.format(wrapped)
+            })
+            logging.debug(self.repairs[-1])
+        if clamped > 0:
+            self.repairs.append({
+                'type': 'CLAMP',
+                'report': 'Clamped {0} value(s) to +/-90 latitude'.format(clamped)
+            })
+            logging.debug(self.repairs[-1])
+
         wkt_unwrapped = shapely.wkt.dumps(single_wkt)
-        wkt_wrapped = wkt_unwrapped
-        return wkt_unwrapped, wkt_wrapped
+
+        if wkt_json["type"].upper() == "POLYGON":
+            wkt_wrapped = shapely.wkt.dumps(Polygon( new_coords ))
+            return wkt_unwrapped, wkt_wrapped
+
+        elif wkt_json["type"].upper() == "LINESTRING":
+            wkt_wrapped = shapely.wkt.dumps(LineString( new_coords ))
+            return wkt_unwrapped, wkt_wrapped
+
+        elif wkt_json["type"].upper() == "POINT":
+            wkt_wrapped = shapely.wkt.dumps(Point( new_coords[0] ))
+            return wkt_unwrapped, wkt_wrapped
+
+    def __runWKTsAgainstCMR(self):
+        wkt_obj_wrapped = wkt.loads(self.wkt_wrapped)
+        wkt_obj_unwrapped = wkt.loads(self.wkt_unwrapped)
+
+        # cmr only accepts coords as "x1,y1,x2,y2,x3,y3,...." (No lists)
+        cmr_coords = parse_wkt(wkt.dumps(wkt_obj_wrapped)).split(':')[1].split(',')
+        cfg = get_config()
+        status_code, text = self.__CMRSendRequest(cmr_coords)
+        if status_code != 200:
+            if 'Please check the order of your points.' in text:
+                it = iter(cmr_coords)
+                rev = reversed(list(zip(it, it)))
+                reversed_coords = [i for sub in rev for i in sub]
+                status_code, text = self.__CMRSendRequest(reversed_coords)
+                # If switching the coords worked:
+                if status_code == 200:
+                    wkt_obj_wrapped['coordinates'][0].reverse()
+                    wkt_obj_unwrapped['coordinates'][0].reverse()
+
+                    self.repairs.append({
+                        'type': 'REVERSE', 
+                        'report': 'Reversed polygon winding order'
+                        })
+                    logging.debug(self.repairs[-1])
+                else:
+                    self.error = { 'error': {'type': 'UNKNOWN', 'report': 'Tried to repair winding order but still getting CMR error: {0}'.format(text)} }
+                    return
+            elif 'The polygon boundary intersected itself' in text:
+                self.error = { 'error': {'type': 'SELF_INTERSECT', 'report': 'Self-intersecting polygon'}}
+                return
+            elif 'The shape contained duplicate points' in text:
+                # Get the list of points from the error, and list them to the user:
+                match_brackets = r'\[(.*?)\]'
+                bad_points = re.findall(match_brackets, text)
+                self.error = { 'error': {'type': 'DUPLICATE_POINTS', 'report': 'Duplicated or too-close points: {0}'.format(bad_points)}}
+            else:
+                self.error = { 'error': {'type': 'UNKNOWN', 'report': 'Unknown CMR error: {0}'.format(text)}}     
+                return     
+
+        self.wkt_wrapped = wkt.dumps(wkt_obj_wrapped)
+        self.wkt_unwrapped = wkt.dumps(wkt_obj_unwrapped)
+
+    def __CMRSendRequest(self, cmr_coords):
+        cfg = get_config()
+        logging.debug({'polygon': ','.join(cmr_coords), 'provider': 'ASF', 'page_size': 1, 'attribute[]': 'string,ASF_PLATFORM,FAKEPLATFORM'})
+        r = requests.post(cfg['cmr_base'] + cfg['cmr_api'], headers=cfg['cmr_headers'], data={'polygon': ','.join(cmr_coords), 'provider': 'ASF', 'page_size': 1})
+        return r.status_code, r.text
+
 
 
 
@@ -305,11 +405,11 @@ def repairWKT(wkt_str):
     if attempts > 10:
         return { 'error': {'type': 'SIMPLIFY', 'report': 'Could not simplify shape after {0} iterations'.format(attempts)} }
     if shape_len(original_shape) != shape_len(shape):
-        repairs.append({
+        self.repairs.append({
             'type': 'SIMPLIFY',
             'report': 'Simplified shape from {0} points to {1} points'.format(shape_len(original_shape), shape_len(shape))
         })
-        logging.debug(repairs[-1])
+        logging.debug(self.repairs[-1])
 
     wkt_obj = wkt.loads(shapely.wkt.dumps(shape))
 
