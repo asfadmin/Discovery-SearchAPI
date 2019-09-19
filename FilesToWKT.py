@@ -35,9 +35,9 @@ class FilesToWKT:
         filename = f.filename
         ext = os.path.splitext(filename)[1].lower()
         if ext == '.geojson':
-            return parse_geojson(f)
+            return repairWKT(parse_geojson(f))
         elif ext == '.kml':
-            return parse_kml(f)
+            return repairWKT(parse_kml(f))
         elif ext == '.shp':
             return repairWKT(parse_shp(f))
         elif ext == '.zip':
@@ -115,7 +115,7 @@ def parse_geojson(f):
     wkt_str = str(shape(wkt_json).convex_hull)
     # print("---->>> " + wkt_str)
 
-    return repairWKT(wkt_str)
+    return wkt_str
 
 def parse_kml(f):
     return 'kml'
