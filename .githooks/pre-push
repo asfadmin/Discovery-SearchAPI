@@ -23,7 +23,10 @@ def run_test_suite():
     #   if all tests pass, it exits with 0 and is allowed to push
 
     test_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "unit_tests"))
-    sys.exit( pytest.main([test_dir]) )
+    # -s => Bind the print statements to the console
+    # -x => Exit on first failure
+    # -v => Show a little more information wen test fails. (-vv and -vvv work too)
+    sys.exit( pytest.main(["-sv", test_dir]) )
 
 
 if __name__ == "__main__":
