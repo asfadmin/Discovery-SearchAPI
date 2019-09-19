@@ -9,7 +9,7 @@ import api_headers
 import os
 import re
 from APIUtils import repairWKT
-from shapely.geometry import shape 
+from shapely.geometry import shape
 
 class FilesToWKT:
 
@@ -67,7 +67,7 @@ def parse_geojson(f):
         return {'error': {'type': 'VALUE', 'report': 'Missing expected key: {0}'.format(str(e))}}
     except ValueError as e:
         return {'error': {'type': 'VALUE', 'report': 'Could not parse GeoJSON: {0}'.format(str(e))}}
-    
+
     # Add all geometries you find to a list. Could be nested deep inside json:
     geometry_objs = []
 
@@ -108,7 +108,7 @@ def parse_geojson(f):
     # Take off the last cooma, add the last brace:
     all_coords = str(all_coords)[0:-1] + "]"
     if all_coords == "]":
-        # This gets hit on for loop not finding any coords to add 
+        # This gets hit on for loop not finding any coords to add
         return {'error': {'type': 'VALUE', 'report': 'Could not find/parse any "coordinates" fields in geojson.'}}
     wkt_json = json.loads('{"type": "MultiPoint", "properties": {}, "coordinates": ' + all_coords + '}')
     # convex_hull will make the shape point if one coord, line for two, and poly for three+
@@ -158,17 +158,20 @@ def parse_zip(f):
     return repairWKT(wkt_str)
 
 def parse_shapefile_set(files):
-    logging.debug(files)
+    fileset = {}
     for p in files:
         ext = os.path.splitext(p.filename)[1].lower()
         if ext == '.shp':
+            fileset['shp'] = BytesIO(p.read())
             shp_file = BytesIO(p.read())
         elif ext == '.dbf':
+            fileset['dbf'] = BytesIO(p.read())
             dbf_file = BytesIO(p.read())
         elif ext == '.shx':
+            fileset['shx'] = BytesIO(p.read())
             shx_file = BytesIO(p.read())
 
-    sf = shapefile.Reader(shp=shp_file, shx=shx_file, dbf=dbf_file)
+    sf = shapefile.Reader(**fileset)
     wkt_str = wkt.dumps(sf.shape(0).__geo_interface__)
 
     return repairWKT(wkt_str)
