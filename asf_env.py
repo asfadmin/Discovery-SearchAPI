@@ -8,7 +8,7 @@ def get_config():
         'dev': {
             'bulk_download_api': 'https://bulk-download-test.asf.alaska.edu',
             'analytics_id': 'UA-118881300-4',
-            'cmr_base': 'https://cmr.earthdata.nasa.gov',
+            'cmr_base': 'https://cmr.uat.earthdata.nasa.gov',
             'cmr_health': '/search/health',
             'cmr_api': '/search/granules.echo10',
             'cmr_collections': '/search/collections',

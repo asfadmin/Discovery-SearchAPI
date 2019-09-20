@@ -1,6 +1,9 @@
 #!/bin/bash
 clear
-echo "Starting wget search test cases from api.daac.asf.alaska.edu"
+LOG_LOCATION=/path/to/my/location/
+exec > >(tee -i $LOG_LOCATION/apiprod.log)
+exec 2>&1
+echo "Starting wget search test cases from api.daac.asf.alaska.edu. Log Location should be: [ $LOG_LOCATION]"
 
 # queries designed just for testing
 # absoluteOrbit Keyword
@@ -83,7 +86,7 @@ wget -d -O API-PROD-granule_list-single-metalink-valid.metalink "https://api.daa
 wget -d -O API-PROD-granule_list-single-kml-valid.kml "https://api.daac.asf.alaska.edu/services/search/param?granule_list=S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80&output=kml"
 wget -d -O API-PROD-granule_list-single-json-valid.json "https://api.daac.asf.alaska.edu/services/search/param?granule_list=S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80&output=json"
 wget -d -O API-PROD-granule_list-single-geo-json-valid.geo.json "https://api.daac.asf.alaska.edu/services/search/param?granule_list=S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80&output=geo.json"
-wget -d -O API-PROD-granule_list-single-download-valid.download "https://api.daac.asf.alaska.edu/services/search/param?granule_list=S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80&output=download"
+wget -d -O API-PROD-granule_list-single-download-valid.py "https://api.daac.asf.alaska.edu/services/search/param?granule_list=S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80&output=download"
 wget -d -O API-PROD-granule_list-single-map-valid.map "https://api.daac.asf.alaska.edu/services/search/param?granule_list=S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80&output=map"
 
 # groupid Keyword
@@ -156,7 +159,7 @@ wget -d -O API-PROD-offNadirAngle-range-valid.CSV "https://api.daac.asf.alaska.e
 # output keyword
 wget -d -O API-PROD-platform-SB-valid.CSV "https://api.daac.asf.alaska.edu/services/search/param?platform=SB&start=1+week+ago&end=now&maxresults=2000&output=csv"
 wget -d -O API-PROD-platform-SB-count-valid.CSV "https://api.daac.asf.alaska.edu/services/search/param?platform=SB&start=1+week+ago&end=now&maxresults=2000&output=count"
-wget -d -O API-PROD-platform-SB-download-valid.download "https://api.daac.asf.alaska.edu/services/search/param?platform=SB&start=1+week+ago&end=now&maxresults=2000&output=download"
+wget -d -O API-PROD-platform-SB-download-valid.py "https://api.daac.asf.alaska.edu/services/search/param?platform=SB&start=1+week+ago&end=now&maxresults=2000&output=download"
 wget -d -O API-PROD-platform-SB-geojson-valid.geojson "https://api.daac.asf.alaska.edu/services/search/param?platform=SB&start=1+week+ago&end=now&maxresults=2000&output=geojson"
 wget -d -O API-PROD-platform-SB-json-valid.json "https://api.daac.asf.alaska.edu/services/search/param?platform=SB&start=1+week+ago&end=now&maxresults=2000&output=json"
 wget -d -O API-PROD-platform-SB-jsonlite-valid.jsonlite "https://api.daac.asf.alaska.edu/services/search/param?platform=SB&start=1+week+ago&end=now&maxresults=2000&output=jsonlite"
@@ -382,7 +385,7 @@ wget -d -O API-PROD-bbox-incomplete-invalid.csv "https://api.daac.asf.alaska.edu
 wget -d -O API-PROD-bbox-incomplete-json-invalid.json "https://api.daac.asf.alaska.edu/services/search/param?bbox=-150.2,65.0,-150.1,65.5,0&output=JSON"
 wget -d -O API-PROD-bbox-incomplete-jsonlite-invalid.jsonlite "https://api.daac.asf.alaska.edu/services/search/param?bbox=-150.2,65.0,-150.1,65.5,0&output=JSONLITE"
 wget -d -O API-PROD-bbox-incomplete-geojson-invalid.geojson "https://api.daac.asf.alaska.edu/services/search/param?bbox=-150.2,65.0,-150.1,65.5,0&output=GEO.JSON"
-wget -d -O API-PROD-bbox-incomplete-download-invalid.download "https://api.daac.asf.alaska.edu/services/search/param?bbox=-150.2,65.0,-150.1&output=download"
+wget -d -O API-PROD-bbox-incomplete-download-invalid.py "https://api.daac.asf.alaska.edu/services/search/param?bbox=-150.2,65.0,-150.1&output=download"
 
 # beamMode Keyword Invalid
 wget -d -O API-PROD-beamMode-specchar-invalid.csv "https://api.daac.asf.alaska.edu/services/search/param?beamMode=#&output=CSV"

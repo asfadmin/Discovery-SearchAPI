@@ -69,7 +69,8 @@ def input_fixer(params):
                 'S1': ['SENTINEL-1A', 'SENTINEL-1B'],
                 'SENTINEL-1': ['SENTINEL-1A', 'SENTINEL-1B'],
                 'SENTINEL': ['SENTINEL-1A', 'SENTINEL-1B'],
-                'ERS': ['ERS-1', 'ERS-2']}
+                'ERS': ['ERS-1', 'ERS-2'],
+                'SIR-C': ['STS-59', 'STS-68'],}
 
             plat_names = {
                 'R1': 'RADARSAT-1',

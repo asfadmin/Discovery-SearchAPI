@@ -1,6 +1,6 @@
 import logging
 from CMR.Input import parse_wkt
-from geomet import wkt
+from geomet import wkt, InvalidGeoJSONException
 from asf_env import get_config
 import requests
 import shapely.wkt
@@ -17,7 +17,7 @@ class simplifyWKT_v2():
         self.repairs = []
         try:
             wkt_json = wkt.loads(wkt_str)
-        except ValueError as e:
+        except (ValueError, InvalidGeoJSONException) as e:
             self.error = { 'error': {'type': 'VALUE', 'report': 'Could not parse WKT: {0}.'.format(str(e))} }
             return
         except TypeError as e:
@@ -39,6 +39,7 @@ class simplifyWKT_v2():
             # Else More than one shape. Try to merge them:
             single_wkt = self.__mergeShapelyList(self.shapes)
             if single_wkt == None:
+                possible_repair = {'type': 'CONVEX_HULL_INDIVIDUAL', 'report': 'Convex-halled the INDIVIDUAL shapes to merge them together.'}
                 for i, shape in enumerate(self.shapes):
                     # 0 = shape, 1 = bool success: (NOT first shape)
                     shape = self.__convexHullShape(shape)
@@ -47,9 +48,12 @@ class simplifyWKT_v2():
                 single_wkt = self.__mergeShapelyList(self.shapes)
                 # If it's STILL not possible, just convex hull everything together and return.
                 if single_wkt == None:
+                    possible_repair = {'type': 'CONVEX_HULL_ALL', 'report': 'Convex-halled ALL the shapes to merge them together.'}
                     all_shapes = shapely.ops.unary_union(self.shapes)
                     # 0 = shape, 1 = bool success: (NOT first shape)
                     single_wkt = self.__convexHullShape(all_shapes)
+                self.repairs.append(possible_repair)
+                logging.debug(self.repairs[-1])
 
         # Quick sanity check. No clue if it's actually possible to hit this:
         if single_wkt.geom_type.upper() not in ["POLYGON", "LINESTRING", "POINT"]:
@@ -149,7 +153,7 @@ class simplifyWKT_v2():
             converted_from_shapely = True
 
         match_coords = match_coords = r'(\[\s*-?((\d+\.\d*)|(\d*\.\d+)|(\d+))\s*,\s*-?((\d+\.\d*)|(\d*\.\d+)|(\d+))\s*\])'
-        coords = re.findall(match_coords,str(wkt_json["coordinates"]))
+        coords = re.findall(match_coords, str(wkt_json))
         # If you couldn't find any points:
         if len(coords) == 0:
             return None

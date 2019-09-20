@@ -116,7 +116,8 @@ class Test_repairWKT():
         assert expected_result_wkt == actual_wrapped
         assert expected_result_wkt == actual_unwrapped
         assert "Reversed polygon winding order" in str(repairs)
-        assert len(repairs) == 1
+        assert "Convex-halled the INDIVIDUAL shapes to merge them together" in str(repairs)
+        assert len(repairs) == 2
 
 
     def test_REPAIR_wrapLongitude(self):
@@ -165,7 +166,8 @@ class Test_repairWKT():
         assert expected_result_wkt == actual_wrapped
         assert expected_result_wkt == actual_unwrapped
         assert "Reversed polygon winding order" in str(repairs)
-        assert len(repairs) == 1
+        assert "Convex-halled ALL the shapes to merge them together" in str(repairs)
+        assert len(repairs) == 2
 
 
     # These shapes touch twice, but don't intersect at all. Convex_hulling
@@ -182,7 +184,8 @@ class Test_repairWKT():
         assert expected_result_wkt == actual_wrapped
         assert expected_result_wkt == actual_unwrapped
         assert "Reversed polygon winding order" in str(repairs)
-        assert len(repairs) == 1
+        assert "Convex-halled the INDIVIDUAL shapes to merge them together" in str(repairs)
+        assert len(repairs) == 2
 
     def test_mergeTwoPolysToFormAHole(self):
         # Get the response:
