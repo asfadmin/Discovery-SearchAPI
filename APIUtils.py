@@ -124,13 +124,13 @@ def repairWKT(wkt_str):
         repair = False
         cfg = get_config()
         r = requests.post(cfg['cmr_base'] + cfg['cmr_api'], headers=cfg['cmr_headers'], data={'polygon': ','.join(cmr_coords), 'provider': 'ASF', 'page_size': 1})
-        logging.debug({'polygon': ','.join(cmr_coords), 'provider': 'ASF', 'page_size': 1, 'attribute[]': 'string,ASF_PLATFORM,FAKEPLATFORM'})
+        logging.debug({'polygon': ','.join(cmr_coords), 'provider': 'ASF', 'page_size': 1, 'concept-id': 'C1266376001-ASF', 'attribute[]': 'string,ASF_PLATFORM,FAKEPLATFORM'})
         if r.status_code != 200:
             if 'Please check the order of your points.' in r.text:
                 it = iter(cmr_coords)
                 rev = reversed(list(zip(it, it)))
                 rv = [i for sub in rev for i in sub]
-                r = requests.post(cfg['cmr_base'] + cfg['cmr_api'], headers=cfg['cmr_headers'], data={'polygon': ','.join(rv), 'provider': 'ASF', 'page_size': 1, 'attribute[]': 'string,ASF_PLATFORM,FAKEPLATFORM'})
+                r = requests.post(cfg['cmr_base'] + cfg['cmr_api'], headers=cfg['cmr_headers'], data={'polygon': ','.join(rv), 'provider': 'ASF', 'page_size': 1, 'concept-id': 'C1266376001-ASF', 'attribute[]': 'string,ASF_PLATFORM,FAKEPLATFORM'})
                 if r.status_code == 200:
                     repair = True
                 else:
