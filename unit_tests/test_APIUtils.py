@@ -12,7 +12,7 @@ import APIUtils as test_file
 
 # Helper method. Used on tests that are expected to return legit responses
 def simplify_legit_wkt(test_wkt):
-    wkt_simplified = test_file.repairWKT_v2(test_wkt)
+    wkt_simplified = test_file.repairWKT(test_wkt)
     try:
         actual_wrapped = wkt_simplified["wkt"]["wrapped"]
         actual_unwrapped = wkt_simplified["wkt"]["unwrapped"]
@@ -30,7 +30,7 @@ def simplify_legit_wkt(test_wkt):
 
 # Helper method. This one assumes something WILL go wrong.
 def simplify_NOT_legit_wkt(test_wkt):
-    wkt_simplified = test_file.repairWKT_v2(test_wkt)
+    wkt_simplified = test_file.repairWKT(test_wkt)
     try:
         error = wkt_simplified["error"]
     except KeyError:
