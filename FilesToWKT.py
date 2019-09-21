@@ -10,8 +10,8 @@ import os
 import re
 from APIUtils import repairWKT
 from shapely.geometry import shape
-import kml2geojson
-
+from kml2geojson import build_feature_collection as kml2json
+import xml.dom.minidom as md
 
 
 class FilesToWKT:
@@ -68,20 +68,7 @@ def recurse_find_geojson(json_input):
         for item in json_input:
             yield from recurse_find_geojson(item)
 
-
-
-
-def parse_geojson(f):
-    try:
-        data = f.read()
-        geojson = json.loads(data)
-    except json.JSONDecodeError as e:
-        return {'error': {'type': 'VALUE', 'report': 'Could not parse GeoJSON: {0}'.format(str(e))}}
-    except KeyError as e:
-        return {'error': {'type': 'VALUE', 'report': 'Missing expected key: {0}'.format(str(e))}}
-    except ValueError as e:
-        return {'error': {'type': 'VALUE', 'report': 'Could not parse GeoJSON: {0}'.format(str(e))}}
-    
+def json_to_wkt(geojson):
     geojson_list = []
     for shape in recurse_find_geojson(geojson):
         geojson_list.append(shape)
@@ -103,14 +90,26 @@ def parse_geojson(f):
     return wkt_str
 
 
+def parse_geojson(f):
+    try:
+        data = f.read()
+        geojson = json.loads(data)
+    except json.JSONDecodeError as e:
+        return {'error': {'type': 'VALUE', 'report': 'Could not parse GeoJSON: {0}'.format(str(e))}}
+    except KeyError as e:
+        return {'error': {'type': 'VALUE', 'report': 'Missing expected key: {0}'.format(str(e))}}
+    except ValueError as e:
+        return {'error': {'type': 'VALUE', 'report': 'Could not parse GeoJSON: {0}'.format(str(e))}}
+    return json_to_wkt(geojson)
+
+
+
+
 def parse_kml(f):
-    # try:
-    #     data = f.read()
-    #     json_data = bf.data(fromstring(data))
-    # except Exception as e:
-    #     return {'error': {'type': 'VALUE', 'report': 'Problem parsing kml: {0}'.format(e)}}
-    # print(json.dumps(json_data, sort_keys=True, indent=4))
-    return 'kml'
+    kml_str = f.read()
+    kml_root = md.parseString(kml_str)
+    wkt_json = kml2json(kml_root)
+    return json_to_wkt(wkt_json)
 
 def parse_shp(f):
     fileset = {'shp': BytesIO(f.read())}
