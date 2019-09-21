@@ -306,7 +306,6 @@ class simplifyWKT():
 
         # cmr only accepts coords as "x1,y1,x2,y2,x3,y3,...." (No lists)
         cmr_coords = parse_wkt(wkt.dumps(wkt_obj_wrapped)).split(':')[1].split(',')
-        cfg = get_config()
         status_code, text = self.__CMRSendRequest(cmr_coords)
         if status_code != 200:
             if 'Please check the order of your points.' in text:

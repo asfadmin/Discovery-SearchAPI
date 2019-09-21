@@ -10,6 +10,9 @@ import os
 import re
 from APIUtils import repairWKT
 from shapely.geometry import shape
+import kml2geojson
+
+
 
 class FilesToWKT:
 
@@ -101,6 +104,12 @@ def parse_geojson(f):
 
 
 def parse_kml(f):
+    # try:
+    #     data = f.read()
+    #     json_data = bf.data(fromstring(data))
+    # except Exception as e:
+    #     return {'error': {'type': 'VALUE', 'report': 'Problem parsing kml: {0}'.format(e)}}
+    # print(json.dumps(json_data, sort_keys=True, indent=4))
     return 'kml'
 
 def parse_shp(f):

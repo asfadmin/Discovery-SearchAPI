@@ -22,7 +22,7 @@ def fix_polygon(v):
     # Do a quick CMR query to see if the shape is wound correctly
     logging.debug('Checking winding order')
     cfg = get_config()
-    r = requests.post(cfg['cmr_base'] + cfg['cmr_api'], headers=cfg['cmr_headers'], data={'polygon': ','.join(v), 'provider': 'ASF', 'page_size': 1, 'attribute[]': 'string,ASF_PLATFORM,FAKEPLATFORM'})
+    r = requests.post(cfg['cmr_base'] + cfg['cmr_api'], headers=cfg['cmr_headers'], data={'polygon': ','.join(v), 'provider': 'ASF', 'page_size': 1, 'concept-id': 'C1266376001-ASF', 'attribute[]': 'string,ASF_PLATFORM,FAKEPLATFORM'})
     if r.status_code == 200:
         logging.debug('Winding order looks good')
     else:
@@ -32,7 +32,7 @@ def fix_polygon(v):
             it = iter(v)
             rev = reversed(list(zip(it, it)))
             rv = [i for sub in rev for i in sub]
-            r = requests.post(cfg['cmr_base'] + cfg['cmr_api'], headers=cfg['cmr_headers'], data={'polygon': ','.join(rv), 'provider': 'ASF', 'page_size': 1, 'attribute[]': 'string,ASF_PLATFORM,FAKEPLATFORM'})
+            r = requests.post(cfg['cmr_base'] + cfg['cmr_api'], headers=cfg['cmr_headers'], data={'polygon': ','.join(rv), 'provider': 'ASF', 'page_size': 1, 'concept-id': 'C1266376001-ASF', 'attribute[]': 'string,ASF_PLATFORM,FAKEPLATFORM'})
             if r.status_code == 200:
                 logging.debug('Polygon repaired')
                 v = rv
@@ -241,6 +241,10 @@ def wkt_from_gpolygon(gpoly):
     #logging.debug('Translated to WKT: {0}'.format(wkt))
     return longest, wkt_shape
 
+def get_browse_list(browseUrls):
+    #ProviderBrowseUrl/URL
+    return ''
+
 # Convert echo10 xml to results list used by output translators
 def parse_cmr_response(r):
     logging.debug('parsing CMR results')
@@ -312,7 +316,7 @@ def parse_granule(granule):
         'sensor': get_val(granule, './Platforms/Platform/Instruments/Instrument/ShortName'),
         'fileName': get_val(granule, "./OnlineAccessURLs/OnlineAccessURL/URL").split('/')[-1],
         'downloadUrl': get_val(granule, "./OnlineAccessURLs/OnlineAccessURL/URL"),
-        'browse': get_val(granule, "./AssociatedBrowseImageUrls/ProviderBrowseUrl/URL"),
+        'browse': get_browse_urls(get_val(granule, "./AssociatedBrowseImageUrls/")),
         'shape': shape,
         'sarSceneId': 'NA', # always None in API
         #'product_file_id': '{0}_{1}'.format(granule.findtext("./DataGranule/ProducerGranuleId"), granule.findtext(attr('PROCESSING_TYPE'))),
