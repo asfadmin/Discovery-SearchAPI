@@ -241,9 +241,12 @@ def wkt_from_gpolygon(gpoly):
     #logging.debug('Translated to WKT: {0}'.format(wkt))
     return longest, wkt_shape
 
-def get_browse_list(browseUrls):
-    #ProviderBrowseUrl/URL
-    return ''
+def get_browse_urls(browseElems):
+    browseList = []
+    [browseList.extend(b.findall('ProviderBrowseUrl')) for b in browseElems]
+    browseUrls = [''.join(b.itertext()).strip() for b in browseList]
+    browseUrls.sort()
+    return browseUrls
 
 # Convert echo10 xml to results list used by output translators
 def parse_cmr_response(r):
@@ -316,7 +319,7 @@ def parse_granule(granule):
         'sensor': get_val(granule, './Platforms/Platform/Instruments/Instrument/ShortName'),
         'fileName': get_val(granule, "./OnlineAccessURLs/OnlineAccessURL/URL").split('/')[-1],
         'downloadUrl': get_val(granule, "./OnlineAccessURLs/OnlineAccessURL/URL"),
-        'browse': get_browse_urls(get_val(granule, "./AssociatedBrowseImageUrls/")),
+        'browse': get_browse_urls(granule.xpath('./AssociatedBrowseImageUrls')),
         'shape': shape,
         'sarSceneId': 'NA', # always None in API
         #'product_file_id': '{0}_{1}'.format(granule.findtext("./DataGranule/ProducerGranuleId"), granule.findtext(attr('PROCESSING_TYPE'))),
