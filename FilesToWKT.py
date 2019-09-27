@@ -7,11 +7,9 @@ import shapefile
 import zipfile
 import api_headers
 import os
-import re
 from APIUtils import repairWKT
-from shapely.geometry import shape
 from kml2geojson import build_feature_collection as kml2json
-import xml.dom.minidom as md
+import defusedxml.minidom as md
 
 
 class FilesToWKT:
@@ -47,31 +45,32 @@ class FilesToWKT:
             return repairWKT(parse_shapefile_zip(f))
         else:
             return {'error': 'Unrecognized file type'}
-
-# def recurse_find_geojson_v2(json_input):
     
 
-# json recursive method modified from: https://stackoverflow.com/questions/21028979/recursive-iteration-through-nested-json-for-specific-key-in-python
+# Takes any json, and returns a list of all {"type": x, "coordinates": y} objects 
+# found, ignoring anything else in the block
 def recurse_find_geojson(json_input):
     if isinstance(json_input, type({})):
         # If it's a dict, try to load the minimal required for a shape.
-        # Then recurse on every object, just incase more are hiding:
+        # Then recurse on every object, just incase more are nested inside:
         try:
-            shape = { "type": json_input["type"], "coordinates": json_input["coordinates"] }
-            yield shape
+            new_shape = { "type": json_input["type"], "coordinates": json_input["coordinates"] }
+            yield new_shape
         except KeyError:
             pass
-        for k, v in json_input.items():
-            yield from recurse_find_geojson(v)
+        for key_value_pair in json_input.items():
+            yield from recurse_find_geojson(key_value_pair[1])
     # If it's a list, just loop through it:
     elif isinstance(json_input, type([])):
         for item in json_input:
             yield from recurse_find_geojson(item)
 
+# Takes a wkt.loads() geojson, and returns a simplified wkt_str
+# Used by both parse_geojson, and parse_kml
 def json_to_wkt(geojson):
     geojson_list = []
-    for shape in recurse_find_geojson(geojson):
-        geojson_list.append(shape)
+    for new_shape in recurse_find_geojson(geojson):
+        geojson_list.append(new_shape)
 
     if len(geojson_list) == 0:
         return {'error': {'type': 'VALUE', 'report': 'Could not find any shapes inside geojson.'}}
@@ -82,10 +81,7 @@ def json_to_wkt(geojson):
 
     try:
         wkt_str = wkt.dumps(wkt_json)
-    #########
-    # TODO: Look up exactly what can go wrong ^here^
-    #########
-    except Exception as e:
+    except (KeyError, ValueError) as e:
         return {'error': {'type': 'VALUE', 'report': 'Problem converting a shape to string: {0}'.format(str(e))}}
     return wkt_str
 
@@ -103,17 +99,17 @@ def parse_geojson(f):
     return json_to_wkt(geojson)
 
 
-
-
 def parse_kml(f):
     kml_str = f.read()
     kml_root = md.parseString(kml_str)
     wkt_json = kml2json(kml_root)
     return json_to_wkt(wkt_json)
 
+
 def parse_shp(f):
     fileset = {'shp': BytesIO(f.read())}
     return parse_shapefile(fileset)
+
 
 def parse_shapefile_zip(f):
     with BytesIO(f.read()) as file:
