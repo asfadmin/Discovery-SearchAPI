@@ -210,12 +210,11 @@ class simplifyWKT():
         # If already less than 300 points, wont enter
         while self.__shapeLength(single_wkt) > 300 and attempts < 10:
             attempts += 1
-            logging.debug('Shape length is {0}, simplifying further with tolerance {1}'.format(self.__shapeLength(shape), tolerance ))
+            logging.debug('The shape\'s length is {0}, simplifying further with tolerance {1}'.format(self.__shapeLength(single_wkt), tolerance ))
             single_wkt = single_wkt.simplify(tolerance, preserve_topology=True)
             # Set the tolerance for the next loop around:
             tolerance *= 5
-        # If it didn't work, what calls this method will catch
-        #  the None and return an error:
+        # The __init__ that calls this function will check if this returns 'None', and return an error to user: 
         if self.__shapeLength(single_wkt) > 300:
             return None
         # Tack on the report if needed:
