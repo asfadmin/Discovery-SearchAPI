@@ -10,6 +10,7 @@ import os
 from APIUtils import repairWKT
 from kml2geojson import build_feature_collection as kml2json
 import defusedxml.minidom as md
+from defusedxml import DefusedXmlException, DTDForbidden, EntitiesForbidden, ExternalReferenceForbidden, NotSupportedError
 
 
 class FilesToWKT:
@@ -65,7 +66,7 @@ def recurse_find_geojson(json_input):
         for item in json_input:
             yield from recurse_find_geojson(item)
 
-# Takes a wkt.loads() geojson, and returns a simplified wkt_str
+# Takes a json, and returns a possibly-simplified wkt_str
 # Used by both parse_geojson, and parse_kml
 def json_to_wkt(geojson):
     geojson_list = []
@@ -101,8 +102,13 @@ def parse_geojson(f):
 
 def parse_kml(f):
     kml_str = f.read()
-    kml_root = md.parseString(kml_str)
-    wkt_json = kml2json(kml_root)
+    try:
+        kml_root = md.parseString(kml_str)
+        wkt_json = kml2json(kml_root)
+    # All these BUT the type/value errors are for the md.parseString:
+    except (DefusedXmlException, DTDForbidden, EntitiesForbidden, ExternalReferenceForbidden, NotSupportedError, TypeError, ValueError) as e:
+        return {'error': {'type': 'VALUE', 'report': 'Could not parse kml: {0}'.format(str(e))}} 
+
     return json_to_wkt(wkt_json)
 
 
