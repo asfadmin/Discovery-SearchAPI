@@ -1,10 +1,8 @@
-import pytest
-import sys, os
-import dateparser
+import pytest, sys, os
 import random
 import string
 
-from geomet import wkt
+# from geomet import wkt
 
 # Let python discover other modules, starting one dir behind this one (project root):
 project_root = os.path.realpath(os.path.join(os.path.dirname(__file__),".."))
@@ -81,7 +79,7 @@ class Test_ParseInt():
 
     def test_reallyLongInt(self):
         test_str = ""
-        for i in range(9000):
+        for _ in range(9000):
             test_str += "987654321"
         expected = int(test_str)
         actual = test_file.parse_int(test_str)

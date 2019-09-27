@@ -1,5 +1,4 @@
-import pytest, sys, os
-import shapely
+import sys, os
 from geomet import wkt
 
 
@@ -62,6 +61,7 @@ class Test_repairWKT():
     left_donut_side = "POLYGON((12 8,8 6,10 2,14 3,15 0,9 0,7 7,12 10,12 8))"
     right_donut_side = "POLYGON((10 8,14 6,14 4,13 1,13 0,15 4,14.5 7,10 9,10 8))"  
     test_donut = "GEOMETRYCOLLECTION ("+left_donut_side+", "+right_donut_side+")"
+    
 
     #############################
     #  NO REPAIRS NEEDED TESTS  #

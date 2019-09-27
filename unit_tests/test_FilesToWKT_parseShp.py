@@ -1,12 +1,12 @@
-import pytest, sys, os
+import sys, os
 
-from io import BytesIO
-import shapefile
+# from io import BytesIO
+# import shapefile
 
 # Let python discover other modules, starting one dir behind this one (project root):
 project_root = os.path.realpath(os.path.join(os.path.dirname(__file__),".."))
 sys.path.insert(0, project_root)
-import FilesToWKT as test_file
+# import FilesToWKT as test_file
 
 # class Test_parseGeoJson():
 #     resources_root = os.path.join(project_root, "unit_tests", "Resources")
