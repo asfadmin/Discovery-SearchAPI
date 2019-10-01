@@ -7,7 +7,7 @@ from CMR.Query import CMRQuery
 from CMR.Translate import translate_params, input_fixer
 from CMR.Output import output_translators
 from CMR.Exceptions import CMRError
-from Analytics import post_analytics
+from Analytics import analytics_events
 
 class APIProxyQuery:
 
@@ -37,10 +37,9 @@ class APIProxyQuery:
     def get_response(self):
         events = [{'ec': 'Param', 'ea': v} for v in self.request.values]
         events.append({'ec': 'Param List', 'ea': ', '.join(sorted([p.lower() for p in self.request.values]))})
+        analytics_events(events=events)
         validated = self.can_use_cmr()
         if validated == True:
-            events.append({'ec': 'Proxy Search', 'ea': 'CMR'})
-            post_analytics(pageview=True, events=events)
             try:
                 logging.debug('Handling query from {0}'.format(self.request.access_route[-1]))
                 maxResults = self.max_results
