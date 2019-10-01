@@ -158,6 +158,21 @@ class Test_repairWKT():
         assert expected_wrapped == actual_wrapped
         assert expected_unwrapped == actual_unwrapped
 
+    ############
+    # geomet.wkt fails to load this entirely. Opened a ticket: https://github.com/geomet/geomet/issues/49
+    ############
+    # def test_REPAIR_removeEmptyShape(self):
+    #     empty_line = "LINESTRING EMPTY"
+    #     basic_poly = "POLYGON((27 25,102 36,102 46,92 61,13 41,16 30,27 25))"
+    #     geocolection = "GEOMETRYCOLLECTION("+basic_poly+","+empty_line+")"
+    #     actual_wrapped, actual_unwrapped, repairs = simplify_legit_wkt(geocolection)
+
+    #     expected_unwrapped = wkt.loads("POLYGON((27 25,102 36,102 46,92 61,13 41,16 30,27 25))")
+    #     expected_wrapped = expected_unwrapped
+    #     assert expected_wrapped == actual_wrapped
+    #     assert expected_unwrapped == actual_unwrapped
+    #     print(repairs)
+
     ####################
     #  ADVANCED TESTS  #
     ####################
@@ -224,4 +239,8 @@ class Test_repairWKT():
         error = simplify_NOT_legit_wkt(poly)
         assert "Self-intersecting polygon" in str(error)
 
+    def test_ERROR_noValidShapes(self):
+        poly = "POLYGON EMPTY"
+        error = simplify_NOT_legit_wkt(poly)
+        assert "Could not parse WKT: No valid shapes found" in str(error)
 
