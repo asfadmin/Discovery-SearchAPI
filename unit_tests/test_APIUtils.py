@@ -51,6 +51,7 @@ class Test_repairWKT():
     # Random single wkt's:
     long_forked_poly = "POLYGON ((58 35, 31 10, -1 15, 29 7.5, 5 -26, 65 39, -36 15, 58 35))"
     long_forked_poly_unconnected = "POLYGON ((58 35, 31 10, -1 15, 29 7.5, 5 -26, 65 39, -36 15))"
+    mulidimentional_poly_1 = "POLYGON((27 25 0 0, 102 36 -96 83, 102 46 4 8, 92 61 15 16, 13 41 23 42, 16 30 -73 8, 27 25 0 0))"
 
     # basics don't need ANY repair work done: (Others may need reversed winding order repair, for example)
     basic_point = "POINT (30 10)"
@@ -61,7 +62,7 @@ class Test_repairWKT():
     left_donut_side = "POLYGON((12 8,8 6,10 2,14 3,15 0,9 0,7 7,12 10,12 8))"
     right_donut_side = "POLYGON((10 8,14 6,14 4,13 1,13 0,15 4,14.5 7,10 9,10 8))"  
     test_donut = "GEOMETRYCOLLECTION ("+left_donut_side+", "+right_donut_side+")"
-    
+
 
     #############################
     #  NO REPAIRS NEEDED TESTS  #
@@ -104,7 +105,7 @@ class Test_repairWKT():
 
         assert expected_result_wkt == actual_wrapped
         assert expected_result_wkt == actual_unwrapped
-        assert "Closed open polygon" in str(repairs)
+        assert "Closed 1 open polygon(s)" in str(repairs)
         assert len(repairs) == 1
 
 
@@ -123,8 +124,8 @@ class Test_repairWKT():
     def test_REPAIR_wrapLongitude(self):
         poly = "POLYGON ((22 22, 9000 8, 120 3, 22 22))"
         actual_wrapped, actual_unwrapped, repairs = simplify_legit_wkt(poly)
-        expected_result_wkt = wkt.loads("POLYGON ((22 22, 0 8, 120 3, 22 22))")
-        assert expected_result_wkt == actual_wrapped
+        expected_wrapped = wkt.loads("POLYGON ((22 22, 0 8, 120 3, 22 22))")
+        assert expected_wrapped == actual_wrapped
         assert wkt.loads(poly) == actual_unwrapped
         assert "Wrapped 1 value(s) to +/-180 longitude" in str(repairs)
         assert len(repairs) == 1
@@ -133,8 +134,8 @@ class Test_repairWKT():
     def test_REPAIR_clampLatitudePositive(self):
         poly = "POLYGON((-9 6, 48 -20, 25 500, -9 6))"
         actual_wrapped, actual_unwrapped, repairs = simplify_legit_wkt(poly)
-        expected_result_wkt = wkt.loads("POLYGON((-9 6, 48 -20, 25 90, -9 6))")
-        assert expected_result_wkt == actual_wrapped
+        expected_wrapped = wkt.loads("POLYGON((-9 6, 48 -20, 25 90, -9 6))")
+        assert expected_wrapped == actual_wrapped
         assert wkt.loads(poly) == actual_unwrapped
         assert "Clamped 1 value(s) to +/-90 latitude" in str(repairs)
         assert len(repairs) == 1
@@ -143,12 +144,19 @@ class Test_repairWKT():
     def test_REPAIR_clampLatitudeNegative(self):
         poly = "POLYGON((-9 6, 25 -500, 48 -20, -9 6))"
         actual_wrapped, actual_unwrapped, repairs = simplify_legit_wkt(poly)
-        expected_result_wkt = wkt.loads("POLYGON((-9 6, 25 -90, 48 -20, -9 6))")
-        assert expected_result_wkt == actual_wrapped
+        expected_wrapped = wkt.loads("POLYGON((-9 6, 25 -90, 48 -20, -9 6))")
+        assert expected_wrapped == actual_wrapped
         assert wkt.loads(poly) == actual_unwrapped
         assert "Clamped 1 value(s) to +/-90 latitude" in str(repairs)
         assert len(repairs) == 1
 
+    def test_REPAIR_multiDimentionalCoords(self):
+        poly = self.mulidimentional_poly_1
+        actual_wrapped, actual_unwrapped, repairs = simplify_legit_wkt(poly)
+        expected_unwrapped = wkt.loads("POLYGON((27 25,102 36,102 46,92 61,13 41,16 30,27 25))")
+        expected_wrapped = expected_unwrapped
+        assert expected_wrapped == actual_wrapped
+        assert expected_unwrapped == actual_unwrapped
 
     ####################
     #  ADVANCED TESTS  #
@@ -197,6 +205,7 @@ class Test_repairWKT():
         # Should removing the hole AFTER the merge be a repair?
         assert "Reversed polygon winding order" in str(repairs)
         assert len(repairs) == 1
+
 
 
     #################
