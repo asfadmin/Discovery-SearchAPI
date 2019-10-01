@@ -45,7 +45,7 @@ paths:
       responses:
         200:
           description: JSON data containing detailed API health report
-  
+
   /services/search/param:
     post:
       tags:

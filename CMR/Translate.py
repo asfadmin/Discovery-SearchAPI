@@ -243,7 +243,8 @@ def wkt_from_gpolygon(gpoly):
 
 def get_browse_urls(browseElems):
     browseList = []
-    [browseList.extend(b.findall('ProviderBrowseUrl')) for b in browseElems]
+    for b in browseElems:
+        browseList.extend(b.findall('ProviderBrowseUrl'))
     browseUrls = [''.join(b.itertext()).strip() for b in browseList]
     browseUrls.sort()
     return browseUrls

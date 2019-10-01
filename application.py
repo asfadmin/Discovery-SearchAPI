@@ -11,7 +11,6 @@ from urllib import parse
 import sys
 import logging
 import os
-import requests
 import json
 from CMR.Health import get_cmr_health
 from Analytics import analytics_pageview
