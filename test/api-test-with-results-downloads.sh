@@ -1,6 +1,9 @@
 #!/bin/bash
 clear
-echo "Starting wget search test cses from api-test.asf.alaska.edu"
+LOG_LOCATION=/path/to/my/location/
+exec > >(tee -i $LOG_LOCATION/apitest.log)
+exec 2>&1
+echo "Starting wget search test cases from api-test.asf.alaska.edu. Log Location should be: [ $LOG_LOCATION]"
 
 # queries designed just for testing
 # absoluteOrbit Keyword
@@ -83,7 +86,7 @@ wget -d -O API-TEST-granule_list-single-metalink-valid.metalink "https://api-tes
 wget -d -O API-TEST-granule_list-single-kml-valid.kml "https://api-test.asf.alaska.edu/services/search/param?granule_list=S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80&output=kml"
 wget -d -O API-TEST-granule_list-single-json-valid.json "https://api-test.asf.alaska.edu/services/search/param?granule_list=S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80&output=json"
 wget -d -O API-TEST-granule_list-single-geo-json-valid.geo.json "https://api-test.asf.alaska.edu/services/search/param?granule_list=S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80&output=geo.json"
-wget -d -O API-TEST-granule_list-single-download-valid.download "https://api-test.asf.alaska.edu/services/search/param?granule_list=S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80&output=download"
+wget -d -O API-TEST-granule_list-single-download-valid.py "https://api-test.asf.alaska.edu/services/search/param?granule_list=S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80&output=download"
 wget -d -O API-TEST-granule_list-single-map-valid.map "https://api-test.asf.alaska.edu/services/search/param?granule_list=S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80&output=map"
 
 # groupid Keyword
@@ -154,14 +157,14 @@ wget -d -O API-TEST-offNadirAngle-list-valid.CSV "https://api-test.asf.alaska.ed
 wget -d -O API-TEST-offNadirAngle-range-valid.CSV "https://api-test.asf.alaska.edu/services/search/param?offnadirangle=20-30&maxresults=10&output=csv"
 
 # output keyword
-wget -d -O API-TEST-platform-SB-valid.CSV "https://api-test.asf.alaska.edu/services/search/param?platform=SB&start=1+week+ago&end=now&maxresults=2000&output=csv"
-wget -d -O API-TEST-platform-SB-count-valid.CSV "https://api-test.asf.alaska.edu/services/search/param?platform=SB&start=1+week+ago&end=now&maxresults=2000&output=count"
-wget -d -O API-TEST-platform-SB-download-valid.download "https://api-test.asf.alaska.edu/services/search/param?platform=SB&start=1+week+ago&end=now&maxresults=2000&output=download"
-wget -d -O API-TEST-platform-SB-geojson-valid.geojson "https://api-test.asf.alaska.edu/services/search/param?platform=SB&start=1+week+ago&end=now&maxresults=2000&output=geojson"
-wget -d -O API-TEST-platform-SB-json-valid.json "https://api-test.asf.alaska.edu/services/search/param?platform=SB&start=1+week+ago&end=now&maxresults=2000&output=json"
-wget -d -O API-TEST-platform-SB-jsonlite-valid.jsonlite "https://api-test.asf.alaska.edu/services/search/param?platform=SB&start=1+week+ago&end=now&maxresults=2000&output=jsonlite"
-wget -d -O API-TEST-platform-SB-kml-valid.kml "https://api-test.asf.alaska.edu/services/search/param?platform=SB&start=1+week+ago&end=now&maxresults=2000&output=kml"
-wget -d -O API-TEST-platform-SB-metalink-valid.metalink "https://api-test.asf.alaska.edu/services/search/param?platform=SB&start=1+week+ago&end=now&maxresults=2000&output=metalink"
+wget -d -O API-TEST-platform-SB-valid.CSV "https://api-test.asf.alaska.edu/services/search/param?platform=SB&maxresults=2000&output=csv"
+wget -d -O API-TEST-platform-SB-count-valid.CSV "https://api-test.asf.alaska.edu/services/search/param?platform=SB&maxresults=2000&output=count"
+wget -d -O API-TEST-platform-SB-download-valid.py "https://api-test.asf.alaska.edu/services/search/param?platform=SB&maxresults=2000&output=download"
+wget -d -O API-TEST-platform-SB-geojson-valid.geojson "https://api-test.asf.alaska.edu/services/search/param?platform=SB&maxresults=2000&output=geojson"
+wget -d -O API-TEST-platform-SB-json-valid.json "https://api-test.asf.alaska.edu/services/search/param?platform=SB&maxresults=2000&output=json"
+wget -d -O API-TEST-platform-SB-jsonlite-valid.jsonlite "https://api-test.asf.alaska.edu/services/search/param?platform=SB&maxresults=2000&output=jsonlite"
+wget -d -O API-TEST-platform-SB-kml-valid.kml "https://api-test.asf.alaska.edu/services/search/param?platform=SB&maxresults=2000&output=kml"
+wget -d -O API-TEST-platform-SB-metalink-valid.metalink "https://api-test.asf.alaska.edu/services/search/param?platform=SB&maxresults=2000&output=metalink"
 
 # pagesize + jsonlite output
 wget -d -O API-TEST-pagesize-R1-E1-valid.jsonlite "https://api-test.asf.alaska.edu/services/search/param?platform=R1,E1&pagesize=1000&output=jsonlite"
@@ -394,7 +397,7 @@ wget -d -O API-TEST-bbox-incomplete-invalid.csv "https://api-test.asf.alaska.edu
 wget -d -O API-TEST-bbox-incomplete-json-invalid.json "https://api-test.asf.alaska.edu/services/search/param?bbox=-150.2,65.0,-150.1,65.5,0&output=JSON"
 wget -d -O API-TEST-bbox-incomplete-jsonlite-invalid.jsonlite "https://api-test.asf.alaska.edu/services/search/param?bbox=-150.2,65.0,-150.1,65.5,0&output=JSONLITE"
 wget -d -O API-TEST-bbox-incomplete-geojson-invalid.geojson "https://api-test.asf.alaska.edu/services/search/param?bbox=-150.2,65.0,-150.1,65.5,0&output=GEO.JSON"
-wget -d -O API-TEST-bbox-incomplete-download-invalid.download "https://api-test.asf.alaska.edu/services/search/param?bbox=-150.2,65.0,-150.1&output=download"
+wget -d -O API-TEST-bbox-incomplete-download-invalid.py "https://api-test.asf.alaska.edu/services/search/param?bbox=-150.2,65.0,-150.1&output=download"
 
 # beamMode Keyword Invalid
 wget -d -O API-TEST-beamMode-specchar-invalid.csv "https://api-test.asf.alaska.edu/services/search/param?beamMode=#&output=CSV"

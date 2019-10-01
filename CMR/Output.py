@@ -105,6 +105,7 @@ class JSONStreamArray(list):
 
     # Override this method for other json-based output formats (i.e. geojson)
     def getItem(self, p):
+        p['browse'] = p['browse'][0] if len(p['browse']) > 0 else None
         legacy_json_keys = [
             'sceneSize',
             'absoluteOrbit',
@@ -292,8 +293,8 @@ class GeoJSONStreamArray(JSONStreamArray):
                 'flightDirection': p['flightDirection'],
                 'granuleType': p['granuleType'],
                 'polarization': p['polarization'],
-                'browse': p['browse'], # need to source this info
-                'frameNumber': p['frameNumber'], # make sure we're using the right one for S1/A3
+                'browse': p['browse'],
+                'frameNumber': p['frameNumber'],
                 'pathNumber': p['relativeOrbit'],
                 'beamModeType': p['beamModeType'],
                 'faradayRotation': p['faradayRotation'],

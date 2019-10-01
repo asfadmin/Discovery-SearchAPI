@@ -4,7 +4,7 @@ import logging
 import re
 from CMR.Translate import parse_cmr_response
 from CMR.Exceptions import CMRError
-from Analytics import post_analytics
+from Analytics import analytics_events
 from asf_env import get_config
 from time import time, sleep
 
@@ -102,7 +102,7 @@ class CMRSubQuery:
         for attempt in range(max_retry): # Sometimes CMR is on the fritz, retry for a bit
             r = s.post(cfg['cmr_base'] + cfg['cmr_api'], data=self.params)
             if self.analytics:
-                post_analytics(pageview=False, events=[{'ec': 'CMR API Status', 'ea': r.status_code}])
+                analytics_events(events=[{'ec': 'CMR API Status', 'ea': r.status_code}])
             if r.status_code != 200:
                 logging.error('Bad news bears! CMR said {0} on session {1}'.format(r.status_code, self.sid))
                 logging.error('Attempt {0} of {1}'.format(attempt + 1, max_retry))
