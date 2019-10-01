@@ -158,14 +158,14 @@ class simplifyWKT():
                 if shape != None:
                     repaired_report.append({
                         'type': 'CONVEX_HULL',
-                        'report': 'Shape {} was not of a supported type; using it\'s convex hull instead'.format(wkt_json['type'])
+                        'report': 'Shape {} was not of a supported type; using it\'s convex hull instead'.format(shape['type'])
                     })
                     logging.debug(repaired_report[-1])
                     repaired_shapes.append(shape)
                 else:
                     repaired_report.append({
                         'type': 'CONVEX_HULL_FAILED',
-                        'report': 'Could not parse points inside unknown shape: {}. Skipping it.'.format(wkt_json['type'])
+                        'report': 'Could not parse points inside unknown shape: {}. Skipping it.'.format(shape['type'])
                     })
                     logging.debug(repaired_report[-1])
             elif shape['type'].upper() == 'POLYGON':
