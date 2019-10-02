@@ -99,11 +99,17 @@ class simplifyWKT():
     def __splitApartShapes(self, wkt_json):
         # If GEOMETRY COLLECTION, grab the shapes inside it:
         if wkt_json['type'].upper() == 'GEOMETRYCOLLECTION':
+            # If empty set:
+            if len(wkt_json["geometries"]) == 0:
+                return
             inner_wkt = wkt_json["geometries"]
             for shape in inner_wkt:
                 # Run each shape through again. Did this way because "shape" might be another GeometryCollection:
                 self.__splitApartShapes(shape)
 
+        # If empty shape:
+        elif len(wkt_json["coordinates"]) == 0:
+            return
         # Else if one of the "MULTI" shapes, send each sub-shape through again:
         # (MULTISTRING, MULTIPOLYGON, MULTIPOINT, MULTILINESTRING, etc...)
         elif wkt_json['type'].upper()[0:5] == 'MULTI':
@@ -128,7 +134,6 @@ class simplifyWKT():
 
         list_of_points = []
 
-        shapes_empty = 0
         num_multidim_repair = 0
         num_open_polys = 0
 
@@ -147,7 +152,7 @@ class simplifyWKT():
                 num_multidim_repair += 1
                 shape['coordinates'] = json_coords
 
-
+            ### BEGIN specific shape fixes:
 
             if shape['type'].upper() not in ['POINT', 'LINESTRING', 'POLYGON']:
                 #################
@@ -161,13 +166,14 @@ class simplifyWKT():
                         'report': 'Shape {} was not of a supported type; using it\'s convex hull instead'.format(shape['type'])
                     })
                     logging.debug(repaired_report[-1])
-                    repaired_shapes.append(shape)
                 else:
                     repaired_report.append({
                         'type': 'CONVEX_HULL_FAILED',
                         'report': 'Could not parse points inside unknown shape: {}. Skipping it.'.format(shape['type'])
                     })
                     logging.debug(repaired_report[-1])
+                    continue
+
             elif shape['type'].upper() == 'POLYGON':
                 #################
                 # CLOSE POLYGON #
@@ -180,17 +186,16 @@ class simplifyWKT():
                     num_open_polys += 1
                 # Save the coords, connected and w/out holes, back to the shape
                 shape['coordinates'] = [coords]
-                repaired_shapes.append(shape)
-
-            elif shape['type'].upper() == 'LINESTRING':
-                repaired_shapes.append(shape)
 
             elif shape['type'].upper() == 'POINT':
                 list_of_points.append(shape)
+                continue
 
-        #####
+            repaired_shapes.append(shape)
+
+        ##########
         # Now do most of the reporting. This way, the user won't get 200 unique "Closed Polygon" reports:
-        #####
+        ##########
 
         ### POINT_MERGE:
         # If just one one point, append it:
@@ -200,7 +205,7 @@ class simplifyWKT():
         elif len(list_of_points) > 1:
             new_shape = self.__convexHullShape(list_of_points)
             repaired_shapes.append(new_shape)
-            repaired_report.append({'type': 'POINT_MERGE', 'report': 'More than one point found. Using their convex_hull'})
+            repaired_report.append({'type': 'POINT_MERGE', 'report': '{0} points found. Grouping them and using their convex hull instead'.format(len(list_of_points))})
             logging.debug(repaired_report[-1])
 
         ### CLOSED POLY:
@@ -219,21 +224,30 @@ class simplifyWKT():
             })
             logging.debug(repaired_report[-1])
 
-
         return repaired_shapes, repaired_report
 
 
 
-    # Takes either a geomet.wkt or shapely.wkt, and returns the convex_hull
-    # of the same type
+    # Returns the same type of obj as wkt_obj (either geomet.wkt, or shapely.wkt)
+    # Can take in a list of objs, BUT ALL items in the list are assumed to be same type.
+    # (If for whatever reason there's both, shapely is the default return).
     def __convexHullShape(self, wkt_obj):
         # To convert back at the end if needed:
         converted_from_shapely = False
-        if isinstance(wkt_obj, dict):
-            wkt_json = wkt_obj
-        else:
-            wkt_json = wkt.loads(shapely.wkt.dumps(wkt_obj))
-            converted_from_shapely = True
+        wkt_json = []
+        # If you passed it a single geomet.wkt or shapely.wkt:
+        if not isinstance(wkt_obj, type([])):
+            wkt_obj = [wkt_obj]
+        for item in wkt_obj:
+            # If a json / geojson:
+            if isinstance(item, type({})):
+                wkt_json.append(item)
+            # Else you got it from shapely:
+            elif getattr(item, "geom_type", None) != None:
+                converted_from_shapely = True
+                item = wkt.loads(shapely.wkt.dumps(item))
+                wkt_json.append(item)
+
 
         match_coords = r'(\[\s*-?((\d+\.\d*)|(\d*\.\d+)|(\d+))\s*,\s*-?((\d+\.\d*)|(\d*\.\d+)|(\d+))\s*\])'
         coords = re.findall(match_coords, str(wkt_json))
