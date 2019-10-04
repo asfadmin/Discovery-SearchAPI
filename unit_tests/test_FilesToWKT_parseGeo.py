@@ -10,7 +10,7 @@ import FilesToWKT as test_file
 import APIUtils as repair_file
 
 def get_wkt_from_geo_file(geojson_path):
-    file = open(geojson_path, "r")
+    file = open(geojson_path, "rb")
     try:
         wkt_str = test_file.parse_geojson(file)
     except Exception as e:
