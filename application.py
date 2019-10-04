@@ -11,9 +11,9 @@ from urllib import parse
 import sys
 import logging
 import os
-import requests
 import json
 from CMR.Health import get_cmr_health
+from Analytics import analytics_pageview
 
 # EB looks for an 'application' callable by default.
 application = Flask(__name__)
@@ -52,36 +52,19 @@ def get_filename():
         return request.values['filename']
     return 'download-all-{0}.py'.format(datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
 
-# Posts a pageview to google universal analytics
-def post_analytics():
-    url = "http://www.google-analytics.com/collect"
-    params = {
-        "v":    "1",
-        "tid":  "UA-116306456-1",
-        "cid":  "555",
-        "t":    "pageview",
-        "uip":  request.access_route[-1],
-        "dr":   request.referrer,
-        "dl":   request.url}
-
-    r = requests.post(url, data = params)
-
 # Send the help docs
 @application.route('/help')
 def view_help():
-    post_analytics()
     return application.send_static_file('./help.html')
 
 # Send the generated script as content formatted for display in the browser
 @application.route('/view')
 def view_script():
-    post_analytics()
     return '<html><pre>' + create_script() + '</pre></html>'
 
 # Send the generated script as an attachment so it downloads directly
 @application.route('/', methods = ['GET', 'POST'])
 def get_script():
-    post_analytics()
     filename = get_filename()
     results = create_script()
     generator = (cell for row in results
@@ -119,11 +102,6 @@ def missionList():
 def proxy_search():
     return APIProxyQuery(request).get_response()
 
-# Fetch results from the jsonlite_cache
-@application.route('/services/search/cache', methods= ['GET', 'POST'])
-def read_cache():
-    return response_from_cache(request)
-
 ########## General endpoints ##########
 
 # Health check endpoint
@@ -135,6 +113,19 @@ def health_check():
     response.mimetype = 'application/json; charset=utf-8'
     return response
 
+# Send the API swagger docs
+@application.route('/reference')
+def reference():
+    return application.send_static_file('./SearchAPIRef.yaml')
+
+########## Helper functionality ##########
+
+# Pre-flight operations
+@application.before_request
+def preflight():
+    analytics_pageview()
+
+# Cleanup operations
 @application.after_request
 def add_header(response):
     response.headers['Access-Control-Allow-Origin'] = '*'

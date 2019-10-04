@@ -1,0 +1,75 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              -76.9002014085,
+              43.5831678113
+            ],
+            [
+              -80.024925,
+              43.185299
+            ],
+            [
+              -80.0598828582,
+              43.3130937289
+            ],
+            [
+              -80.0593369429,
+              43.3131630925
+            ],
+            [
+              -80.4371509535,
+              44.6942759988
+            ],
+            [
+              -77.228706,
+              45.092274
+            ],
+            [
+              -76.8994176376,
+              43.5833930601
+            ],
+            [
+              -76.9002276008,
+              43.583289931
+            ],
+            [
+              -76.9002014085,
+              43.5831678113
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "properties": {
+        "beamModeType": "slc",
+        "browse": "https://grfn-public-prod.asf.alaska.edu/S1-GUNW-A-R-004-tops-20190804_20190711-230839-45103N_43235N-PP-6a90-v2_0_2.png",
+        "bytes": null,
+        "faradayRotation": null,
+        "fileID": "S1-GUNW-A-R-004-tops-20190804_20190711-230839-45103N_43235N-PP-6a90-v2_0_2-amplitude",
+        "fileName": "amplitude",
+        "flightDirection": "ascending",
+        "frameNumber": null,
+        "granuleType": null,
+        "md5sum": null,
+        "offNadirAngle": null,
+        "orbit": "28426",
+        "pathNumber": "4",
+        "platform": "Sentinel-1 Interferogram (BETA)",
+        "polarization": "VV",
+        "processingDate": "2019-09-03T18:32:25.835764Z",
+        "processingLevel": "GUNW_AMP",
+        "sceneName": "S1-GUNW-A-R-004-tops-20190804_20190711-230839-45103N_43235N-PP-6a90-v2_0_2",
+        "sensor": "SENTINEL-1A C-Band SAR",
+        "startTime": "2019-08-04T23:08:26.497552Z",
+        "stopTime": "2019-08-04T23:08:51.659616Z",
+        "url": "https://services.asf.alaska.edu/geospatial/reformat?product=S1-GUNW-A-R-004-tops-20190804_20190711-230839-45103N_43235N-PP-6a90-v2_0_2.nc&layer=science/grids/data/amplitude"
+      },
+      "type": "Feature"
+    }
+  ]
+}
