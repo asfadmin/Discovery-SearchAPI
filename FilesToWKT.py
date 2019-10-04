@@ -147,6 +147,8 @@ def parse_shapefile_set(files):
     return parse_shapefile(fileset)
 
 def parse_shapefile(fileset):
-    sf = shapefile.Reader(**fileset)
-    wkt_str = wkt.dumps(sf.shape(0).__geo_interface__)
+    reader = shapefile.Reader(**fileset)
+    shapes = [i.__geo_interface__ for i in reader.shapes()]
+    wkt_json = {'type':'GeometryCollection', 'geometries': shapes }
+    wkt_str = json_to_wkt(wkt_json)
     return wkt_str
