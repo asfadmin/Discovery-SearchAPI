@@ -54,7 +54,7 @@ class simplifyWKT():
                     self.shapes[i] = shape
                 # Now that each shape is convexed hulled, try again
                 single_wkt = self.__mergeShapelyList(self.shapes)
-                # If it's STILL not possible, just convex hull everything together and return.
+                # If it's STILL not possible, just convex hull everything together.
                 if single_wkt == None:
                     possible_repair = {'type': 'CONVEX_HULL_ALL', 'report': 'Unconnected shapes: Convex-halled ALL the shapes together.'}
                     all_shapes = shapely.ops.unary_union(self.shapes)

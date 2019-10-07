@@ -147,8 +147,12 @@ def parse_shapefile_set(files):
     return parse_shapefile(fileset)
 
 def parse_shapefile(fileset):
-    reader = shapefile.Reader(**fileset)
-    shapes = [i.__geo_interface__ for i in reader.shapes()]
+    try:
+        reader = shapefile.Reader(**fileset)
+        shapes = [i.__geo_interface__ for i in reader.shapes()]
+    # In the sourcecode, it looks like sometimes the reader throws "Exception":
+    except Exception as e:
+        return {'error': {'type': 'VALUE', 'report': 'Could not parse shp: {0}'.format(str(e))}}
     wkt_json = {'type':'GeometryCollection', 'geometries': shapes }
     wkt_str = json_to_wkt(wkt_json)
     return wkt_str
