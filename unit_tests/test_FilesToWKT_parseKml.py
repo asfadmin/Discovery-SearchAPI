@@ -63,8 +63,8 @@ class Test_parseKml():
                         }
             assert repaired_wkt['wkt'] == expected_wkt['wkt']
             assert len(repaired_wkt['repairs']) == 3
-            assert '4 points found. Grouping them and using their convex hull instead' in str(repaired_wkt['repairs'])
-            assert '5 shape(s) used multidimentional coords. Truncated to 2D' in str(repaired_wkt['repairs'])
+            assert 'Multiple points found: 4. Grouping them and using their convex hull instead' in str(repaired_wkt['repairs'])
+            assert 'Shape(s) that used multidimentional coords: 5. Truncated to 2D' in str(repaired_wkt['repairs'])
             assert 'Reversed polygon winding order' in str(repaired_wkt['repairs'])
 
 
