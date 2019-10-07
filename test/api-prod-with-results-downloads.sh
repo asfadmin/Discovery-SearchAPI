@@ -90,9 +90,18 @@ wget -d -O API-PROD-granule_list-single-download-valid.py "https://api.daac.asf.
 wget -d -O API-PROD-granule_list-single-map-valid.map "https://api.daac.asf.alaska.edu/services/search/param?granule_list=S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80&output=map"
 
 # groupid Keyword
-wget -d -O API-PROD-groupid-granuleid-valid.json "https://api.daac.asf.alaska.edu/services/search/param?groupid=S1A_IWDV_0382_0387_019686_014&output=json"
 wget -d -O API-PROD-groupid-number-valid.json "https://api.daac.asf.alaska.edu/services/search/param?groupid=12345&output=json"
 wget -d -O API-PROD-groupid-hash-valid.json "https://api.daac.asf.alaska.edu/services/search/param?groupid=sdfkhgsdfkhgsdf&output=json"
+wget -d -O API-PROD-groupid-sentinel-valid.json "https://api.daac.asf.alaska.edu/services/search/param?groupid=S1A_IWDV_0382_0387_019686_014&output=json"
+wget -d -O API-PROD-groupid-s1-insar-valid.json "https://api.daac.asf.alaska.edu/services/search/param?groupid=S1-GUNW-D-R-087-tops-20190816_20190804-161614-19149N_17138N-PP-fee7-v2_0_2&output=json"
+wget -d -O API-PROD-groupid-smap-valid.json "https://api.daac.asf.alaska.edu/services/search/param?groupid=SP_15077_D_005&output=json"
+wget -d -O API-PROD-groupid-uavsar-valid.json "https://api.daac.asf.alaska.edu/services/search/param?groupid=UA_EcuVol_17700_15024_006_150319_L090_CX_01&output=json"
+wget -d -O API-PROD-groupid-alos-valid.json "https://api.daac.asf.alaska.edu/services/search/param?groupid=ALPSRP278477070&output=json"
+wget -d -O API-PROD-groupid-airsar-valid.json "https://api.daac.asf.alaska.edu/services/search/param?groupid=ts1902&output=json"
+wget -d -O API-PROD-groupid-radarsat-valid.json "https://api.daac.asf.alaska.edu/services/search/param?groupid=R1_63781_FN1_F277&output=json"
+wget -d -O API-PROD-groupid-ers-valid.json "https://api.daac.asf.alaska.edu/services/search/param?groupid=E1_08794_STD_F267&output=json"
+wget -d -O API-PROD-groupid-jers-valid.json "https://api.daac.asf.alaska.edu/services/search/param?groupid=J1_01508_STD_F315&output=json"
+wget -d -O API-PROD-groupid-seasat-valid.json "https://api.daac.asf.alaska.edu/services/search/param?groupid=SS_01499_STD_F1200&output=json"
 
 # intersectswith Keyword
 wget -d -O API-PROD-intersectsWith-point-valid.CSV "https://api.daac.asf.alaska.edu/services/search/param?intersectsWith=point%28-119.543+37.925%29&maxResults=1000&output=CSV"
@@ -346,7 +355,6 @@ wget -d -O API-PROD-realworld-5-count-valid.csv "https://api.daac.asf.alaska.edu
 wget -d -O API-PROD-realworld-6-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?platform=SA,SB&relativeOrbit=128&asfframe=587-593&start=2017-06-01&end=2018-05-30&output=csv"
 wget -d -O API-PROD-realworld-7-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?platform=SA,SB&relativeOrbit=128&frame=587-593&start=2017-06-01&end=2018-05-30&output=csv"
 wget -d -O API-PROD-realworld-8-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?output=csv&platform=Sentinel-1A&start=2018-05-30&end=2018-05-31%22"
-wget -d -O API-PROD-realworld-9-acid-test-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?polygon=4794886.03996192,2658783.7409794466,4911667.405803877,2658783.7409794466,4911667.405803877,2775921.3473827764,4794886.03996192,2775921.3473827764,4794886.03996192,2658783.7409794466"
 
 
 ### Negative Tests ###
@@ -575,3 +583,6 @@ wget -d -O API-PROD-start-tomorrow-invalid.csv "https://api.daac.asf.alaska.edu/
 start=tomorrow&end=nowtest&output=CSV"
 wget -d -O API-PROD-end-nowtest-invalid.csv "https://api.daac.asf.alaska.edu/services/search/param?start=1+week+ago&end=nowtest&output=CSV"
 wget -d -O API-PROD-start-now-end-yesterday-invalid.csv "https://api.daac.asf.alaska.edu/services/search/param?start=now&end=yesterday&output=CSV"
+
+# queries taken from real world usage Invalid
+wget -d -O API-PROD-realworld-9-invalid.csv "https://api.daac.asf.alaska.edu/services/search/param?polygon=4794886.03996192,2658783.7409794466,4911667.405803877,2658783.7409794466,4911667.405803877,2775921.3473827764,4794886.03996192,2775921.3473827764,4794886.03996192,2658783.7409794466"

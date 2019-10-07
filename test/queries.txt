@@ -57,9 +57,18 @@ https://api-test.asf.alaska.edu/services/search/param?granule_list=S1A_IW_GRDH_1
 https://api-test.asf.alaska.edu/services/search/param?granule_list=S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80&output=download
 
 # groupid + JSON output
-https://api-test.asf.alaska.edu/services/search/param?groupid=S1A_IWDV_0382_0387_019686_014&output=json
 https://api-test.asf.alaska.edu/services/search/param?groupid=12345&output=json
 https://api-test.asf.alaska.edu/services/search/param?groupid=sdfkhgsdfkhgsdf&output=json
+https://api-test.asf.alaska.edu/services/search/param?groupid=S1A_IWDV_0382_0387_019686_014&output=json
+https://api-test.asf.alaska.edu/services/search/param?groupid=S1-GUNW-D-R-087-tops-20190816_20190804-161614-19149N_17138N-PP-fee7-v2_0_2&output=json
+https://api-test.asf.alaska.edu/services/search/param?groupid=SP_15077_D_005&output=json
+https://api-test.asf.alaska.edu/services/search/param?groupid=UA_EcuVol_17700_15024_006_150319_L090_CX_01&output=json
+https://api-test.asf.alaska.edu/services/search/param?groupid=ALPSRP278477070&output=json
+https://api-test.asf.alaska.edu/services/search/param?groupid=ts1902&output=json
+https://api-test.asf.alaska.edu/services/search/param?groupid=R1_63781_FN1_F277&output=json
+https://api-test.asf.alaska.edu/services/search/param?groupid=E1_08794_STD_F267&output=json
+https://api-test.asf.alaska.edu/services/search/param?groupid=J1_01508_STD_F315&output=json
+https://api-test.asf.alaska.edu/services/search/param?groupid=SS_01499_STD_F1200&output=json
 
 # intersectsWithPoint + MaxResults + CSV output
 https://api-test.asf.alaska.edu/services/search/param?intersectsWith=point%28-119.543+37.925%29&maxResults=1000&output=CSV
