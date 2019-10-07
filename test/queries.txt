@@ -120,9 +120,6 @@ https://api-test.asf.alaska.edu/services/search/param?offnadirangle=21.5&maxresu
 https://api-test.asf.alaska.edu/services/search/param?offnadirangle=21.5,23.1,27.1&maxresults=10&output=csv
 https://api-test.asf.alaska.edu/services/search/param?offnadirangle=20-30&maxresults=10&output=csv
 
-# pagesize + jsonlite output
-https://api-test.asf.alaska.edu/services/search/param?platform=R1,E1&pagesize=1000&output=jsonlite
-
 # platform RADARSAT + Max Results 10 + CSV, JSON output
 https://api-test.asf.alaska.edu/services/search/param?platform=R1,E1&maxResults=10&output=jSoN
 https://api-test.asf.alaska.edu/services/search/param?platform=RADARSAT-1,E1&maxResults=10&output=csv
@@ -138,7 +135,7 @@ https://api-test.asf.alaska.edu/services/search/param?platform=A3&processingleve
 https://api-test.asf.alaska.edu/services/search/param?platform=S1&start=2016-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
 https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&start=2016-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
 https://api-test.asf.alaska.edu/services/search/param?platform=Sentinel-1&start=2016-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
-https://api-test.asf.alaska.edu/services/search/param?platform=s-1&start=2016-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=s1&start=2016-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
 https://api-test.asf.alaska.edu/services/search/param?platform=ERS&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
 https://api-test.asf.alaska.edu/services/search/param?platform=erS&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
 https://api-test.asf.alaska.edu/services/search/param?platform=R1&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
@@ -203,20 +200,6 @@ https://api-test.asf.alaska.edu/services/search/param?platform=STS-59,STS-68&out
 https://api-test.asf.alaska.edu/services/search/param?platform=sts-59&output=count
 https://api-test.asf.alaska.edu/services/search/param?platform=StS-68&output=count
 https://api-test.asf.alaska.edu/services/search/param?platform=Sts-59,StS-68&output=count
-
-# platform_list Keyword
-https://api-test.asf.alaska.edu/services/search/param?platform_list=sentinel,ers&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
-https://api-test.asf.alaska.edu/services/search/param?platform_list=SENTINEL,ERS&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
-https://api-test.asf.alaska.edu/services/search/param?platform_list=S1,Ers&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
-https://api-test.asf.alaska.edu/services/search/param?platform_list=J1,ERS&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
-https://api-test.asf.alaska.edu/services/search/param?platform_list=JERS-1,ERs&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
-https://api-test.asf.alaska.edu/services/search/param?platform_list=E1,E2&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
-https://api-test.asf.alaska.edu/services/search/param?platform_list=ERS-1,ERs-2&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
-https://api-test.asf.alaska.edu/services/search/param?platform_list=S1&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
-https://api-test.asf.alaska.edu/services/search/param?platform_list=SA,Sb&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
-https://api-test.asf.alaska.edu/services/search/param?platform_list=SIR-C&output=count
-https://api-test.asf.alaska.edu/services/search/param?platform_list=siR-c&output=count
-https://api-test.asf.alaska.edu/services/search/param?platform_list=SiR-C&output=count
 
 # point + MaxResults + CSV output
 https://api-test.asf.alaska.edu/services/search/param?point=-150.2,65.0&maxresults=10&output=csv
@@ -285,12 +268,12 @@ https://api-test.asf.alaska.edu/services/search/param?season=1,175&platform=UA&m
 https://api-test.asf.alaska.edu/services/search/param?season=32,90&platform=SA,SB&start=2017-01-01T00:00:00Z&end=2019-01-01T01:00:00Z&maxresults=1000&output=CSV
 https://api-test.asf.alaska.edu/services/search/param?season=1,100&platform=SA,SB&start=2015-01-01T00:00:00Z&end=2018-01-01T01:00:00Z&maxresults=1000&output=CSV
 https://api-test.asf.alaska.edu/services/search/param?season=1,175&platform=UA&start=2005-01-01T00:00:00Z&end=2019-01-01T01:00:00Z&maxresults=1000&output=CSV
-https://api-test.asf.alaska.edu/services/search/param?season=32,90&platform=SA,SB&start=1+week+ago&end=now&maxresults=1000&output=CSV
-https://api-test.asf.alaska.edu/services/search/param?season=1,100&platform=SA,SB&start=1+week+ago&end=now&maxresults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?season=32,90&platform=SA,SB&start=2+year+ago&end=now&maxresults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?season=1,100&platform=SA,SB&start=2+year+ago&end=now&maxresults=1000&output=CSV
 https://api-test.asf.alaska.edu/services/search/param?season=1,175&platform=UA&start=2018-July-15&end=now&maxresults=1000&output=CSV
 https://api-test.asf.alaska.edu/services/search/param?season=32,90&platform=SA,SB&start=2018-July-15&end=now&maxresults=1000&output=CSV
-https://api-test.asf.alaska.edu/services/search/param?season=1,100&platform=SA,SB&start=yesterday&end=now&maxresults=1000&output=CSV
-https://api-test.asf.alaska.edu/services/search/param?season=1,175&platform=UA&start=1+month+ago&end=now&maxresults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?season=1,100&platform=SA,SB&start=1+year+ago&end=now&maxresults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?season=1,175&platform=UA&start=3+year+ago&end=now&maxresults=1000&output=CSV
 
 # start, end + CSV,COUNT output
 https://api-test.asf.alaska.edu/services/search/param?end=2005-01-01T00:00:00Z&output=count
