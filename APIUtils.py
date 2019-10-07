@@ -48,16 +48,15 @@ class simplifyWKT():
             # Else More than one shape. Try to merge them:
             single_wkt = self.__mergeShapelyList(self.shapes)
             if single_wkt == None:
-                possible_repair = {'type': 'CONVEX_HULL_INDIVIDUAL', 'report': 'Convex-halled the INDIVIDUAL shapes to merge them together.'}
+                possible_repair = {'type': 'CONVEX_HULL_INDIVIDUAL', 'report': 'Unconnected shapes: Convex-halled each INDIVIDUAL shape to merge them together.'}
                 for i, shape in enumerate(self.shapes):
-                    # 0 = shape, 1 = bool success: (NOT first shape)
                     shape = self.__convexHullShape(shape)
                     self.shapes[i] = shape
                 # Now that each shape is convexed hulled, try again
                 single_wkt = self.__mergeShapelyList(self.shapes)
-                # If it's STILL not possible, just convex hull everything together and return.
+                # If it's STILL not possible, just convex hull everything together.
                 if single_wkt == None:
-                    possible_repair = {'type': 'CONVEX_HULL_ALL', 'report': 'Convex-halled ALL the shapes to merge them together.'}
+                    possible_repair = {'type': 'CONVEX_HULL_ALL', 'report': 'Unconnected shapes: Convex-halled ALL the shapes together.'}
                     all_shapes = shapely.ops.unary_union(self.shapes)
                     # 0 = shape, 1 = bool success: (NOT first shape)
                     single_wkt = self.__convexHullShape(all_shapes)
@@ -122,7 +121,6 @@ class simplifyWKT():
         elif wkt_json['type'].upper() in ['POINT', 'LINESTRING', 'POLYGON']:
             if wkt_json not in self.shapes:
                 self.shapes.append(wkt_json)
-
         else: 
             # Append whatever it is as is. Each individual shape gets sent through
             # a repair function anyway before converting it to shapely.
@@ -389,11 +387,10 @@ class simplifyWKT():
         nbrs = NearestNeighbors(n_neighbors=2, metric=distance).fit(points)
         distances, indices = nbrs.kneighbors(points)
         distances = distances.tolist()
-        #Throw away unneded data in distances:
+        #Throw away unneeded data in distances:
         for i, dist in enumerate(distances):
             distances[i] = dist[1]
         return min(distances)
-
 
 
     # Do some shapely magic:
@@ -409,7 +406,7 @@ class simplifyWKT():
 
     # shapely_wkt => Shapely object of type ["POLYGON", "LINESTRING", "POINT"]
     def __clampAndWrapWKT(self, shapely_wkt):
-        # You can't edit coords in shapely. You have to creat a new shape and override:
+        # You can't edit coords in shapely. You have to create a new shape w/ the new coords:
         wkt_json = wkt.loads(shapely.wkt.dumps(shapely_wkt))
         # make coords of any shape the format of [[coord, coord],[coord,coord]]:
         if wkt_json["type"].upper() == "POLYGON":
@@ -419,9 +416,9 @@ class simplifyWKT():
         elif wkt_json["type"].upper() == "POINT":
             coords = [wkt_json["coordinates"]]
 
-        # Wrap long to +/- 180
+        # num_coords out of lon +/- 180
         wrapped = 0
-        # Clamp lat to +/- 90
+        # num_coords out of lat +/- 90
         clamped = 0
 
         new_coords = []
@@ -469,9 +466,6 @@ class simplifyWKT():
             return wkt_unwrapped, wkt_wrapped
 
     def __runWKTsAgainstCMR(self):
-        # NOTE: Only polygons get sent here. Linestrings and points already returned.
-        wkt_obj_wrapped = wkt.loads(self.wkt_wrapped)
-        wkt_obj_unwrapped = wkt.loads(self.wkt_unwrapped)
     
         def CMRSendRequest(cmr_coords):
             cfg = get_config()
@@ -479,6 +473,10 @@ class simplifyWKT():
             logging.debug({'polygon': ','.join(cmr_coords), 'provider': 'ASF', 'page_size': 1, 'attribute[]': 'string,ASF_PLATFORM,FAKEPLATFORM'})
             r = requests.post(cfg['cmr_base'] + cfg['cmr_api'], headers=cfg['cmr_headers'], data={'polygon': ','.join(cmr_coords), 'provider': 'ASF', 'page_size': 1, 'attribute[]': 'string,ASF_PLATFORM,FAKEPLATFORM'})
             return r.status_code, r.text
+
+        # NOTE: Only polygons get sent here. Linestring and point wkt's have already returned.
+        wkt_obj_wrapped = wkt.loads(self.wkt_wrapped)
+        wkt_obj_unwrapped = wkt.loads(self.wkt_unwrapped)
 
         # cmr only accepts coords as "x1,y1,x2,y2,x3,y3,...." (No lists)
         cmr_coords = parse_wkt(wkt.dumps(wkt_obj_wrapped)).split(':')[1].split(',')

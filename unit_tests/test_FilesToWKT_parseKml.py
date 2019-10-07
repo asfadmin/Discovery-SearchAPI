@@ -9,7 +9,7 @@ import APIUtils as repair_file
 
 
 def get_wkt_from_kml_file(kml_path):
-    file = open(kml_path, "r")
+    file = open(kml_path, "rb")
     try:
         wkt_str = test_file.parse_kml(file)
     except Exception as e:
