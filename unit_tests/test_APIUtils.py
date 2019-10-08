@@ -38,11 +38,6 @@ def simplify_NOT_legit_wkt(test_wkt):
         assert error == None
     return error
 
-# TESTS TODO:
-#   MULTI* shapes
-#   Nested GEOMETRIC COLLECTION
-#   Simplify number of points repair
-#   repairs for convex_hulling single shapes, and whole shape
 
 class Test_repairWKT():
     ###############################
@@ -117,7 +112,7 @@ class Test_repairWKT():
         assert expected_result_wkt == actual_wrapped
         assert expected_result_wkt == actual_unwrapped
         assert "Reversed polygon winding order" in str(repairs)
-        assert "Convex-halled the INDIVIDUAL shapes to merge them together" in str(repairs)
+        assert "Unconnected shapes: Convex-halled each INDIVIDUAL shape to merge them together" in str(repairs)
         assert len(repairs) == 2
 
 
@@ -158,9 +153,7 @@ class Test_repairWKT():
         assert expected_wrapped == actual_wrapped
         assert expected_unwrapped == actual_unwrapped
 
-    ############
-    # geomet.wkt fails to load this entirely. Opened a ticket: https://github.com/geomet/geomet/issues/49
-    ############
+    ##### geomet.wkt fails to load this entirely. Opened a ticket: https://github.com/geomet/geomet/issues/49
     # def test_REPAIR_removeEmptyShape(self):
     #     empty_line = "LINESTRING EMPTY"
     #     basic_poly = "POLYGON((27 25,102 36,102 46,92 61,13 41,16 30,27 25))"
@@ -189,7 +182,7 @@ class Test_repairWKT():
         assert expected_result_wkt == actual_wrapped
         assert expected_result_wkt == actual_unwrapped
         assert "Reversed polygon winding order" in str(repairs)
-        assert "Convex-halled ALL the shapes to merge them together" in str(repairs)
+        assert "Unconnected shapes: Convex-halled ALL the shapes together" in str(repairs)
         assert len(repairs) == 2
 
 
@@ -207,7 +200,7 @@ class Test_repairWKT():
         assert expected_result_wkt == actual_wrapped
         assert expected_result_wkt == actual_unwrapped
         assert "Reversed polygon winding order" in str(repairs)
-        assert "Convex-halled the INDIVIDUAL shapes to merge them together" in str(repairs)
+        assert "Unconnected shapes: Convex-halled each INDIVIDUAL shape to merge them together" in str(repairs)
         assert len(repairs) == 2
 
     def test_mergeTwoPolysToFormAHole(self):
@@ -226,6 +219,11 @@ class Test_repairWKT():
     #################
     #  TEST ERRORS  #
     #################
+
+    def test_ERROR_dontPassWKT(self):
+        poly = "Totally a ligit poly...."
+        error = simplify_NOT_legit_wkt(poly)
+        assert "Could not parse WKT" in str(error)
 
     # Anything that intersects should throw an error.
     # Here, the "22 5" point is duplicated:
