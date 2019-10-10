@@ -17,6 +17,7 @@ from Analytics import analytics_pageview
 
 # EB looks for an 'application' callable by default.
 application = Flask(__name__)
+application.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024 # limit to 10 MB, primarily affects file uploads
 
 ########## Bulk Download API endpoints and support ##########
 
