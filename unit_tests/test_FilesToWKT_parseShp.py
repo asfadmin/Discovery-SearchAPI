@@ -43,6 +43,13 @@ class Test_parseShp():
                         ]}
             assert expected_wkt == repaired_wkt
 
+    def test_westcoast(self):
+        # This file has 2500+ shapes, so the convex_hull needs to be fast
+        # to do this in >1min
+        shp_path = os.path.join(self.resources_root, "shps_valid", "westcoast.shp")
+        wkt_str = get_wkt_from_shp_file(shp_path)
+        repaired_wkt = repair_file.repairWKT(wkt_str)
+        print(repaired_wkt)
     # def test_FilesToWKT_class(self):
 
 
