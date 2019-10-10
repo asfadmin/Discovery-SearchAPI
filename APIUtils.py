@@ -252,20 +252,24 @@ class simplifyWKT():
     def __convexHullShape(self, wkt_obj):
         # To convert back at the end if needed:
         converted_from_shapely = False
-        wkt_json = []
+        wkt_shapely = []
         # If you passed it a single geomet.wkt or shapely.wkt:
         if not isinstance(wkt_obj, type([])):
             wkt_obj = [wkt_obj]
         for item in wkt_obj:
             # If a json / geojson:
             if isinstance(item, type({})):
-                wkt_json.append(item)
+                wkt_shapely.append(shapely.wkt.loads(wkt.dumps(item)))
             # Else you got it from shapely:
             elif getattr(item, "geom_type", None) != None:
                 converted_from_shapely = True
-                item = wkt.loads(shapely.wkt.dumps(item))
-                wkt_json.append(item)
-        
+                wkt_shapely.append(item)
+        # Check for simple case:
+        if len(wkt_shapely) == 1 and wkt_shapely[0].geom_type.upper() in ["POINT","MULTIPOINT","LINESTRING","POLYGON"]:
+            hulled_shape = wkt_shapely[0].convex_hull
+            return hulled_shape if converted_from_shapely else wkt.loads(shapely.wkt.dumps(hulled_shape))
+        # Have to merge the coords:
+        wkt_json = [wkt.loads(shapely.wkt.dumps(shape)) for shape in wkt_shapely]
         all_coords = self.__getAllCoords(wkt_json)
         if len(all_coords) == 0:
             return None
