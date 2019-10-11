@@ -93,11 +93,7 @@ def validate_date():
 # Convert a set of shapefiles or a geojson file to WKT
 @application.route('/services/utils/files_to_wkt', methods = ['POST'])
 def filesToWKT():
-    try:
-        return FilesToWKT(request).get_response()
-    except RequestEntityTooLarge as e:
-        resp = Response(json.dumps({'error': {'type': 'VALUE', 'report': 'Selected file is too large.'} }, sort_keys=True, indent=2), status=413, mimetype='application/json')
-        return resp
+    return FilesToWKT(request).get_response()
 
 # Collect a list of missions from CMR for a given platform
 @application.route('/services/utils/mission_list', methods = ['GET', 'POST'])
@@ -126,6 +122,11 @@ def reference():
     return application.send_static_file('./SearchAPIRef.yaml')
 
 ########## Helper functionality ##########
+
+@application.errorhandler(RequestEntityTooLarge)
+def handle_oversize_request(error):
+    resp = Response(json.dumps({'error': {'type': 'VALUE', 'report': 'Selected file is too large.'} }, sort_keys=True, indent=2), status=413, mimetype='application/json')
+    return resp
 
 # Pre-flight operations
 @application.before_request
