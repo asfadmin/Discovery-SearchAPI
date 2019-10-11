@@ -103,7 +103,7 @@ def parse_geojson(f):
 def parse_kml(f):
     kml_str = f.read()
     try:
-        kml_root = md.parseString(kml_str)
+        kml_root = md.parseString(kml_str, forbid_dtd=True)
         wkt_json = kml2json(kml_root)
     # All these BUT the type/value errors are for the md.parseString:
     except (DefusedXmlException, DTDForbidden, EntitiesForbidden, ExternalReferenceForbidden, NotSupportedError, TypeError, ValueError) as e:
