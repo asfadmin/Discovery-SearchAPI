@@ -16,6 +16,8 @@ class simplifyWKT():
         self.shapes = []
         self.error = None
         self.repairs = []
+        # I use this in a couple areas. It matches things like: .5, 6e-6, -9. etc.
+        self.regex_digit = r"(-?(((\d+\.\d+|\d+)(e-?\d+)?)|(\d+\.|\.\d+)))"
 
         # wkt.loads doesn't like 3D/4D tags, BUT it loads the coords just fine:
         wkt_str = wkt_str.upper()
@@ -139,9 +141,10 @@ class simplifyWKT():
             # Turn all [x,y,z,...] coords into [x,y]:
             # (Other repairs assume 2D coords, Do this first)
             str_coords = str(shape["coordinates"])
-            match = re.compile(r"(\[\s*((-?\d+\.\d*)|(-?\d*\.\d+)|(-?\d+))\s*,\s*((-?\d+\.\d*)|(-?\d*\.\d+)|(-?\d+))(.*?)\])")
-            # for [x,y,z], "\2"=x, "\6"=y. re.sub(match_regex, replace_with, whole_string):
-            str_coords = re.sub(match,r'[\2,\6]',str_coords)
+            match = re.compile(r"(\[\s*" +self.regex_digit+ r"\s*,\s*" +self.regex_digit+ r"(.*?)\])")
+            # for [x,y,z], "\2"=x, "\8"=y. re.sub(match_regex, replace_with, whole_string):
+            str_coords = re.sub(match,r'[\2,\8]',str_coords)
+
             json_coords = json.loads(str_coords)
             if json_coords != shape["coordinates"]:
                 repair_report.append("FIXED_DIMENTIONS")
@@ -326,8 +329,7 @@ class simplifyWKT():
         attempts = 0
         original_num_points = self.__shapeLength(shapely_wkt)
         closest_distance = self.__getClosestPointDist(shapely_wkt)
-
-        while (self.__shapeLength(shapely_wkt) > 300 or closest_distance < 0.0003) and attempts < 10:
+        while (self.__shapeLength(shapely_wkt) > 300 or closest_distance < 0.004) and attempts < 10:
             attempts += 1
             logging.debug('The shape\'s length is {0}, simplifying further with tolerance {1}'.format(self.__shapeLength(shapely_wkt), tolerance ))
             shapely_wkt = shapely_wkt.simplify(tolerance, preserve_topology=True)
@@ -357,7 +359,7 @@ class simplifyWKT():
             if getattr(single_shape, "geom_type", None) != None:
                 wkt_obj[i] = wkt.loads(shapely.wkt.dumps(single_shape))
 
-        match_coords = r'(\[\s*-?((\d+\.\d*)|(\d*\.\d+)|(\d+))\s*,\s*-?((\d+\.\d*)|(\d*\.\d+)|(\d+))\s*\])'
+        match_coords = r'(\[\s*' +self.regex_digit+ r'\s*,\s*' +self.regex_digit+ r'\s*\])'
         coords = re.findall(match_coords, str(wkt_obj))
 
         all_coords = []
@@ -482,8 +484,9 @@ class simplifyWKT():
         wkt_obj_wrapped = wkt.loads(self.wkt_wrapped)
         wkt_obj_unwrapped = wkt.loads(self.wkt_unwrapped)
 
-        # cmr only accepts coords as "x1,y1,x2,y2,x3,y3,...." (No lists)
         cmr_coords = parse_wkt(wkt.dumps(wkt_obj_wrapped)).split(':')[1].split(',')
+        # IS a list of strings. Get rid of *literal* "5e06":
+        cmr_coords = ['{:.16f}'.format(float(cord)) for cord in cmr_coords]
         status_code, text = CMRSendRequest(cmr_coords)
         if status_code != 200:
             if 'Please check the order of your points.' in text:
