@@ -1,0 +1,12 @@
+To run tests:
+    1) cd <to this dir>
+    2) pytest -s test_CMR_Input.py
+-----------
+To start env: "source ~/SearchAPI-env/bin/activate"
+To start API: "python application.py"
+To Run tests: "python -m unittest discover [ -p test_CMR_*.py ]"
+
+URL health check: http://127.0.0.1:5000/health
+List all branches: git branch -a
+Get changes FROM origin: git pull origin devel
+Push changes TO origin: git merge origin/devel

@@ -1,6 +1,9 @@
 #!/bin/bash
 clear
-echo "Starting wget search test cases from api.daac.asf.alaska.edu"
+LOG_LOCATION=/path/to/my/location/
+exec > >(tee -i $LOG_LOCATION/apiprod.log)
+exec 2>&1
+echo "Starting wget search test cases from api.daac.asf.alaska.edu. Log Location should be: [ $LOG_LOCATION]"
 
 # queries designed just for testing
 # absoluteOrbit Keyword
@@ -83,19 +86,28 @@ wget -d -O API-PROD-granule_list-single-metalink-valid.metalink "https://api.daa
 wget -d -O API-PROD-granule_list-single-kml-valid.kml "https://api.daac.asf.alaska.edu/services/search/param?granule_list=S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80&output=kml"
 wget -d -O API-PROD-granule_list-single-json-valid.json "https://api.daac.asf.alaska.edu/services/search/param?granule_list=S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80&output=json"
 wget -d -O API-PROD-granule_list-single-geo-json-valid.geo.json "https://api.daac.asf.alaska.edu/services/search/param?granule_list=S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80&output=geo.json"
-wget -d -O API-PROD-granule_list-single-download-valid.download "https://api.daac.asf.alaska.edu/services/search/param?granule_list=S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80&output=download"
+wget -d -O API-PROD-granule_list-single-download-valid.py "https://api.daac.asf.alaska.edu/services/search/param?granule_list=S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80&output=download"
 wget -d -O API-PROD-granule_list-single-map-valid.map "https://api.daac.asf.alaska.edu/services/search/param?granule_list=S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80&output=map"
 
 # groupid Keyword
-wget -d -O API-PROD-groupid-granuleid-valid.json "https://api.daac.asf.alaska.edu/services/search/param?groupid=S1A_IWDV_0382_0387_019686_014&output=json"
 wget -d -O API-PROD-groupid-number-valid.json "https://api.daac.asf.alaska.edu/services/search/param?groupid=12345&output=json"
 wget -d -O API-PROD-groupid-hash-valid.json "https://api.daac.asf.alaska.edu/services/search/param?groupid=sdfkhgsdfkhgsdf&output=json"
+wget -d -O API-PROD-groupid-sentinel-valid.json "https://api.daac.asf.alaska.edu/services/search/param?groupid=S1A_IWDV_0382_0387_019686_014&output=json"
+wget -d -O API-PROD-groupid-s1-insar-valid.json "https://api.daac.asf.alaska.edu/services/search/param?groupid=S1-GUNW-D-R-087-tops-20190816_20190804-161614-19149N_17138N-PP-fee7-v2_0_2&output=json"
+wget -d -O API-PROD-groupid-smap-valid.json "https://api.daac.asf.alaska.edu/services/search/param?groupid=SP_15077_D_005&output=json"
+wget -d -O API-PROD-groupid-uavsar-valid.json "https://api.daac.asf.alaska.edu/services/search/param?groupid=UA_EcuVol_17700_15024_006_150319_L090_CX_01&output=json"
+wget -d -O API-PROD-groupid-alos-valid.json "https://api.daac.asf.alaska.edu/services/search/param?groupid=ALPSRP278477070&output=json"
+wget -d -O API-PROD-groupid-airsar-valid.json "https://api.daac.asf.alaska.edu/services/search/param?groupid=ts1902&output=json"
+wget -d -O API-PROD-groupid-radarsat-valid.json "https://api.daac.asf.alaska.edu/services/search/param?groupid=R1_63781_FN1_F277&output=json"
+wget -d -O API-PROD-groupid-ers-valid.json "https://api.daac.asf.alaska.edu/services/search/param?groupid=E1_08794_STD_F267&output=json"
+wget -d -O API-PROD-groupid-jers-valid.json "https://api.daac.asf.alaska.edu/services/search/param?groupid=J1_01508_STD_F315&output=json"
+wget -d -O API-PROD-groupid-seasat-valid.json "https://api.daac.asf.alaska.edu/services/search/param?groupid=SS_01499_STD_F1200&output=json"
 
 # intersectswith Keyword
 wget -d -O API-PROD-intersectsWith-point-valid.CSV "https://api.daac.asf.alaska.edu/services/search/param?intersectsWith=point%28-119.543+37.925%29&maxResults=1000&output=CSV"
 wget -d -O API-PROD-intersectsWith-polygon-valid.CSV "https://api.daac.asf.alaska.edu/services/search/param?intersectsWith=polygon%28%28-119.543 37.925+ -118.443 37.7421+ -118.682 36.8525+ -119.77 37.0352+ -119.543 37.925%29%29&maxResults=1000&output=CSV"
 wget -d -O API-PROD-intersectsWith-linestring-valid.CSV "https://api.daac.asf.alaska.edu/services/search/param?intersectsWith=linestring(-119.543 37.925, -118.443 37.7421)&maxResults=1000&output=CSV"
-wget -d -O API-PROD-intersectsWith-point-1000-valid.CSV "https://api.daac.asf.alaska.edu/services/search/param?intersectsWith=point(-119.543,37.925)&maxResults=1000&output=CSV"
+wget -d -O API-PROD-intersectsWith-point-1000-valid.CSV "https://api.daac.asf.alaska.edu/services/search/param?intersectsWith=point(-119.543 37.925)&maxResults=1000&output=CSV"
 wget -d -O API-PROD-intersectsWith-polygon-10000-valid.CSV "https://api.daac.asf.alaska.edu/services/search/param?intersectsWith=polygon((-119.543 37.925, -118.443 37.7421, -118.682 36.8525, -119.77 37.0352, -119.543 37.925))&maxResults=1000&output=CSV"
 wget -d -O API-PROD-intersectsWith-polygon2-valid.CSV "https://api.daac.asf.alaska.edu/services/search/param?intersectsWith=polygon(-119.543 37.925, -118.443 37.7421, -118.682 36.8525, -119.77 37.0352, -119.543 37.925)&maxResults=1000&output=CSV"
 wget -d -O API-PROD-intersectsWith-linestring-invalid.CSV "https://api.daac.asf.alaska.edu/services/search/param?intersectsWith=linestring(TEST)&maxResults=1000&output=CSV"
@@ -156,15 +168,12 @@ wget -d -O API-PROD-offNadirAngle-range-valid.CSV "https://api.daac.asf.alaska.e
 # output keyword
 wget -d -O API-PROD-platform-SB-valid.CSV "https://api.daac.asf.alaska.edu/services/search/param?platform=SB&start=1+week+ago&end=now&maxresults=2000&output=csv"
 wget -d -O API-PROD-platform-SB-count-valid.CSV "https://api.daac.asf.alaska.edu/services/search/param?platform=SB&start=1+week+ago&end=now&maxresults=2000&output=count"
-wget -d -O API-PROD-platform-SB-download-valid.download "https://api.daac.asf.alaska.edu/services/search/param?platform=SB&start=1+week+ago&end=now&maxresults=2000&output=download"
+wget -d -O API-PROD-platform-SB-download-valid.py "https://api.daac.asf.alaska.edu/services/search/param?platform=SB&start=1+week+ago&end=now&maxresults=2000&output=download"
 wget -d -O API-PROD-platform-SB-geojson-valid.geojson "https://api.daac.asf.alaska.edu/services/search/param?platform=SB&start=1+week+ago&end=now&maxresults=2000&output=geojson"
 wget -d -O API-PROD-platform-SB-json-valid.json "https://api.daac.asf.alaska.edu/services/search/param?platform=SB&start=1+week+ago&end=now&maxresults=2000&output=json"
 wget -d -O API-PROD-platform-SB-jsonlite-valid.jsonlite "https://api.daac.asf.alaska.edu/services/search/param?platform=SB&start=1+week+ago&end=now&maxresults=2000&output=jsonlite"
 wget -d -O API-PROD-platform-SB-kml-valid.kml "https://api.daac.asf.alaska.edu/services/search/param?platform=SB&start=1+week+ago&end=now&maxresults=2000&output=kml"
 wget -d -O API-PROD-platform-SB-metalink-valid.metalink "https://api.daac.asf.alaska.edu/services/search/param?platform=SB&start=1+week+ago&end=now&maxresults=2000&output=metalink"
-
-# pagesize + jsonlite output
-wget -d -O API-PROD-pagesize-R1-E1-valid.jsonlite "https://api.daac.asf.alaska.edu/services/search/param?platform=R1,E1&pagesize=1000&output=jsonlite"
 
 # platform Keyword
 wget -d -O API-PROD-platform-SA-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?platform=SA&start=2016-01-01T00:00:00Z&end=2016-01-02T00:00:00Z&output=csv"
@@ -183,13 +192,13 @@ wget -d -O API-PROD-platform-E1E2-valid.csv "https://api.daac.asf.alaska.edu/ser
 wget -d -O API-PROD-platform-S1-count-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?platform=S1&start=2016-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count"
 wget -d -O API-PROD-platform-SENTINEL1-count-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?platform=SENTINEL-1&start=2016-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count"
 wget -d -O API-PROD-platform-Sentinel-1-count-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?platform=Sentinel-1&start=2016-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count"
-wget -d -O API-PROD-platform-s-1-count-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?platform=s-1&start=2016-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count"
+wget -d -O API-PROD-platform-s1-count-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?platform=s1&start=2016-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count"
 wget -d -O API-PROD-platform-ERS-count-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?platform=ERS&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count"
 wget -d -O API-PROD-platform-erS-count-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?platform=erS&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count"
 wget -d -O API-PROD-platform-R1-count-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?platform=R1&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count"
 wget -d -O API-PROD-platform-r1-count-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?platform=r1&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count"
-wget -d -O API-PROD-platform-RADARSAT-1-count-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?platform=RADARSAT-1&start=2016-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count"
-wget -d -O API-PROD-platform-Radarsat-1-count-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?platform=Radarsat-1&start=2016-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count"
+wget -d -O API-PROD-platform-RADARSAT-1-count-0results-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?platform=RADARSAT-1&start=2016-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count"
+wget -d -O API-PROD-platform-Radarsat-1-count-0results-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?platform=Radarsat-1&start=2016-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count"
 wget -d -O API-PROD-platform-E1-count-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?platform=E1&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count"
 wget -d -O API-PROD-platform-ERS-1-count-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?platform=ERS-1&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count"
 wget -d -O API-PROD-platform-Ers-1-count-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?platform=Ers-1&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count"
@@ -242,17 +251,6 @@ wget -d -O API-PROD-platform-UAvSAR-count-valid.csv "https://api.daac.asf.alaska
 wget -d -O API-PROD-platform-G-III-count-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?platform=G-III&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count"
 wget -d -O API-PROD-platform-g-iii-count-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?platform=g-iii&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count"
 
-# platform_list Keyword
-wget -d -O API-PROD-platform_list-lc-count-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?platform_list=sentinel,ers&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count"
-wget -d -O API-PROD-platform_list-uc-count-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?platform_list=SENTINEL,ERS&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count"
-wget -d -O API-PROD-platform_list-aliases-count-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?platform_list=S1,Ers&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count"
-wget -d -O API-PROD-platform_list-aliases-uc-count-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?platform_list=J1,ERS&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count"
-wget -d -O API-PROD-platform_list-uc2-count-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?platform_list=JERS-1,ERs&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count"
-wget -d -O API-PROD-platform_list-E1E2-count-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?platform_list=E1,E2&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count"
-wget -d -O API-PROD-platform_list-ERS12-count-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?platform_list=ERS-1,ERs-2&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count"
-wget -d -O API-PROD-platform_list-S1-count-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?platform_list=S1&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count"
-wget -d -O API-PROD-platform_list-SASB-count-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?platform_list=SA,Sb&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count"
-
 
 # point Keyword
 wget -d -O API-PROD-point-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?point=-150.2,65.0&maxresults=10&output=csv"
@@ -298,7 +296,7 @@ wget -d -O API-PROD-procLevel-UA-valid.csv "https://api.daac.asf.alaska.edu/serv
 # processingDate Keyword
 wget -d -O API-PROD-procDate-Z-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?processingDate=2018-01-01T00:00:00Z&maxresults=10&output=csv"
 wget -d -O API-PROD-procDate-yesterday-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?processingDate=yesterday&maxresults=10&output=csv"
-wget -d -O API-PROD-procDate-weekago-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?processingDate=1+week+ago&maxresults=10&output=csv"
+wget -d -O API-PROD-procDate-1weekago-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?processingDate=1+week+ago&maxresults=10&output=csv"
 wget -d -O API-PROD-procDate-today-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?processingDate=today&maxresults=10&output=csv"
 wget -d -O API-PROD-procDate-monthago-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?processingDate=1+month+ago&maxresults=10&output=csv"
 wget -d -O API-PROD-procDate-2monthago-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?processingDate=2+month+ago&maxresults=10&output=csv"
@@ -323,20 +321,20 @@ wget -d -O API-PROD-season-1-175-UA-valid.csv "https://api.daac.asf.alaska.edu/s
 wget -d -O API-PROD-season-32-90-S1-start-end-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?season=32,90&platform=SA,SB&start=2017-01-01T00:00:00Z&end=2019-01-01T01:00:00Z&maxresults=1000&output=CSV"
 wget -d -O API-PROD-season-1-100-S1-start-end-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?season=1,100&platform=SA,SB&start=2015-01-01T00:00:00Z&end=2018-01-01T01:00:00Z&maxresults=1000&output=CSV"
 wget -d -O API-PROD-season-1-175-UA-start-end-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?season=1,175&platform=UA&start=2005-01-01T00:00:00Z&end=2019-01-01T01:00:00Z&maxresults=1000&output=CSV"
-wget -d -O API-PROD-season-32-90-S1-1weekago-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?season=32,90&platform=SA,SB&start=1+week+ago&end=now&maxresults=1000&output=CSV"
-wget -d -O API-PROD-season-1-100-S1-1weekago-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?season=1,100&platform=SA,SB&start=1+week+ago&end=now&maxresults=1000&output=CSV"
+wget -d -O API-PROD-season-32-90-S1-2yearago-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?season=32,90&platform=SA,SB&start=2+year+ago&end=now&maxresults=1000&output=CSV"
+wget -d -O API-PROD-season-1-100-S1-2yearago-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?season=1,100&platform=SA,SB&start=2+year+ago&end=now&maxresults=1000&output=CSV"
 wget -d -O API-PROD-season-1-175-UA-july2018-now-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?season=1,175&platform=UA&start=2018-July-15&end=now&maxresults=1000&output=CSV"
 wget -d -O API-PROD-season-32-90-S1-july2018-now-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?season=32,90&platform=SA,SB&start=2018-July-15&end=now&maxresults=1000&output=CSV"
-wget -d -O API-PROD-season-1-100-S1-yesterday-now-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?season=1,100&platform=SA,SB&start=yesterday&end=now&maxresults=1000&output=CSV"
-wget -d -O API-PROD-season-1-100-UA-monthago-now-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?season=1,175&platform=UA&start=1+month+ago&end=now&maxresults=1000&output=CSV"
+wget -d -O API-PROD-season-1-100-S1-1yearago-now-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?season=1,100&platform=SA,SB&start=1+year+ago&end=now&maxresults=1000&output=CSV"
+wget -d -O API-PROD-season-1-100-UA-3yearago-now-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?season=1,175&platform=UA&start=3+year+ago&end=now&maxresults=1000&output=CSV"
 
 # start Keyword
 wget -d -O API-PROD-start-Zdate-count-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?start=2005-01-01T00:00:00Z&output=count"
 wget -d -O API-PROD-start-Zdate-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?start=2005-01-01T00:00:00Z&end=2005-01-01T01:00:00Z&output=csv"
 wget -d -O API-PROD-start-3monthagoplus1day-count-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?start=3+months+and+a+day+ago&output=count"
 wget -d -O API-PROD-start-june302018-count-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?start=June+30,+2018&output=count"
-wget -d -O API-PROD-start-weekago-count-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?start=week+ago&output=count"
-wget -d -O API-PROD-start-dayago-count-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?start=day+ago&output=count"
+wget -d -O API-PROD-start-1weekago-count-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?start=1+week+ago&output=count"
+wget -d -O API-PROD-start-1dayago-count-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?start=1+day+ago&output=count"
 wget -d -O API-PROD-start-today-count-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?start=today&output=count"
 wget -d -O API-PROD-start-yesterday-count-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?start=yesterday&output=count"
 
@@ -357,7 +355,6 @@ wget -d -O API-PROD-realworld-5-count-valid.csv "https://api.daac.asf.alaska.edu
 wget -d -O API-PROD-realworld-6-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?platform=SA,SB&relativeOrbit=128&asfframe=587-593&start=2017-06-01&end=2018-05-30&output=csv"
 wget -d -O API-PROD-realworld-7-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?platform=SA,SB&relativeOrbit=128&frame=587-593&start=2017-06-01&end=2018-05-30&output=csv"
 wget -d -O API-PROD-realworld-8-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?output=csv&platform=Sentinel-1A&start=2018-05-30&end=2018-05-31%22"
-wget -d -O API-PROD-realworld-9-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?polygon=4794886.03996192,2658783.7409794466,4911667.405803877,2658783.7409794466,4911667.405803877,2775921.3473827764,4794886.03996192,2775921.3473827764,4794886.03996192,2658783.7409794466"
 
 
 ### Negative Tests ###
@@ -382,7 +379,7 @@ wget -d -O API-PROD-bbox-incomplete-invalid.csv "https://api.daac.asf.alaska.edu
 wget -d -O API-PROD-bbox-incomplete-json-invalid.json "https://api.daac.asf.alaska.edu/services/search/param?bbox=-150.2,65.0,-150.1,65.5,0&output=JSON"
 wget -d -O API-PROD-bbox-incomplete-jsonlite-invalid.jsonlite "https://api.daac.asf.alaska.edu/services/search/param?bbox=-150.2,65.0,-150.1,65.5,0&output=JSONLITE"
 wget -d -O API-PROD-bbox-incomplete-geojson-invalid.geojson "https://api.daac.asf.alaska.edu/services/search/param?bbox=-150.2,65.0,-150.1,65.5,0&output=GEO.JSON"
-wget -d -O API-PROD-bbox-incomplete-download-invalid.download "https://api.daac.asf.alaska.edu/services/search/param?bbox=-150.2,65.0,-150.1&output=download"
+wget -d -O API-PROD-bbox-incomplete-download-invalid.py "https://api.daac.asf.alaska.edu/services/search/param?bbox=-150.2,65.0,-150.1&output=download"
 
 # beamMode Keyword Invalid
 wget -d -O API-PROD-beamMode-specchar-invalid.csv "https://api.daac.asf.alaska.edu/services/search/param?beamMode=#&output=CSV"
@@ -586,3 +583,6 @@ wget -d -O API-PROD-start-tomorrow-invalid.csv "https://api.daac.asf.alaska.edu/
 start=tomorrow&end=nowtest&output=CSV"
 wget -d -O API-PROD-end-nowtest-invalid.csv "https://api.daac.asf.alaska.edu/services/search/param?start=1+week+ago&end=nowtest&output=CSV"
 wget -d -O API-PROD-start-now-end-yesterday-invalid.csv "https://api.daac.asf.alaska.edu/services/search/param?start=now&end=yesterday&output=CSV"
+
+# queries taken from real world usage Invalid
+wget -d -O API-PROD-realworld-9-invalid.csv "https://api.daac.asf.alaska.edu/services/search/param?polygon=4794886.03996192,2658783.7409794466,4911667.405803877,2658783.7409794466,4911667.405803877,2775921.3473827764,4794886.03996192,2775921.3473827764,4794886.03996192,2658783.7409794466"
