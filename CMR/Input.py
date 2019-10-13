@@ -49,6 +49,8 @@ def parse_range(v, h):
         a = [h(m.group(1)), h(m.group(3))]
         if a[0] > a[1]:
             raise ValueError()
+        if a[0] == a[1]:
+            a = a[0]
     except ValueError as e:
         raise ValueError('Invalid range: {0}'.format(e))
     return a
