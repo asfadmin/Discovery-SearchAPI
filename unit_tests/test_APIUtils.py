@@ -1,5 +1,6 @@
-import sys, os
+import sys, os, pytest, yaml, ntpath
 from geomet import wkt
+import shapely.wkt
 
 
 # Let python discover other modules, starting one dir behind this one (project root):
@@ -39,7 +40,95 @@ def simplify_NOT_legit_wkt(test_wkt):
     return error
 
 
+
+class RunTestsFromYaml():
+    def __init__(self, yaml_path):
+        self.yaml_name = ntpath.split(yaml_path)[1]
+        self.yaml_path = yaml_path
+
+        # Updates self.unit_tests w/ yaml:
+        self.getFileContents()
+        if self.unit_tests == None:
+            return
+        
+        # TODO: Add a test-checker here. (make sure expected wkt and 
+        #       expected error aren't in same block)
+
+        # Run each test:
+        for test in self.unit_tests:
+            self.runRepairTest(test)
+
+
+    def getFileContents(self):
+        if not os.path.exists(self.yaml_path):
+            pytest.skip("File not Found: " + self.yaml_path)
+            self.unit_tests = None
+            return
+        with open(self.yaml_path, "r") as yaml_file:
+            unit_tests = []
+            try:
+                list_of_tests = yaml.safe_load(yaml_file)
+                if list_of_tests == None:
+                    pytest.skip("Empty YAML: " + self.yaml_name)
+                    self.unit_tests = None
+                    return
+                # Ditch the names of the test, just grab the rest:
+                for test in list_of_tests:
+                    unit_tests.append(next(iter(test.values())))
+            except (yaml.YAMLError, StopIteration) as e:
+                print(e)
+            if len(unit_tests) == 0:
+                pytest.skip("No tests Found: " + self.yaml_name)
+                self.unit_tests = None
+                return
+            self.unit_tests = unit_tests
+
+    def runRepairTest(self, test_dict):
+        test_wkt = test_dict["test wkt"]
+        result = test_file.repairWKT(test_wkt)
+        # Set expected repair to be a list:
+        if "repair" not in test_dict:
+            expected_repairs = []
+        # Elif they gave a single repair, turn to list:
+        elif not isinstance(test_dict["repair"], type([])):
+            expected_repairs = [test_dict["repair"]]
+        else:
+            expected_repairs = test_dict["repair"]
+
+        if "error" in result:
+            if "expected error msg" in test_dict:
+                assert str(test_dict["expected error msg"]) in str(result["error"])
+                print("\nsuccess")
+                return
+        elif "wkt" in result:
+            expected_wkt = False
+            if "expected wkt" in test_dict:
+                expected_wkt = True
+                unwrapped_wkt = wrapped_wkt = test_dict["expected wkt"]
+            elif "expected wkt wrapped" in test_dict and "expected wkt unwrapped" in test_dict:
+                expected_wkt = True
+                unwrapped_wkt = test_dict["expected wkt unwrapped"]
+                wrapped_wkt = test_dict["expected wkt wrapped"]
+            # If you were able to load what the wkt's are supposed to be, see if they match:
+            if expected_wkt:
+                # Shapely here because 30 != 30.000000 as strings
+                assert shapely.wkt.loads(result["wkt"]["wrapped"]) == shapely.wkt.loads(wrapped_wkt)
+                assert shapely.wkt.loads(result["wkt"]["unwrapped"]) == shapely.wkt.loads(unwrapped_wkt)
+                for repair in expected_repairs:
+                    assert repair in str(result["repairs"])
+                assert len(result["repairs"]) == len(expected_repairs)
+                print("\nsuccess")
+                return
+        # What is expected didn't line up with what was returned:
+        assert result == False
+
+
+
 class Test_repairWKT():
+    def test_FileTests(self):
+        yaml_name = os.path.splitext(os.path.basename(__file__))[0]+".yml"
+        yaml_path = os.path.join(project_root, "unit_tests", yaml_name)
+        RunTestsFromYaml(yaml_path)
     ###############################
     #   STORAGE OF GENERIC WKT's  #
     ###############################
@@ -59,61 +148,11 @@ class Test_repairWKT():
     test_donut = "GEOMETRYCOLLECTION ("+left_donut_side+", "+right_donut_side+")"
 
 
-    #############################
-    #  NO REPAIRS NEEDED TESTS  #
-    #############################
-    def test_basicPointWkt(self):
-        actual_wrapped, actual_unwrapped, repairs = simplify_legit_wkt(self.basic_point)
-        expected_result_wkt = wkt.loads(self.basic_point)
-
-        assert expected_result_wkt == actual_wrapped
-        assert expected_result_wkt == actual_unwrapped
-        assert len(repairs) == 0
-
-
-    def test_basicLineStringWKT(self):
-        actual_wrapped, actual_unwrapped, repairs = simplify_legit_wkt(self.basic_linestring)
-        expected_result_wkt = wkt.loads(self.basic_linestring)
-
-        assert expected_result_wkt == actual_wrapped
-        assert expected_result_wkt == actual_unwrapped
-        assert len(repairs) == 0
-
-
-    def test_basicPolyWKT(self):
-        actual_wrapped, actual_unwrapped, repairs = simplify_legit_wkt(self.basic_poly)
-        expected_result_wkt = wkt.loads(self.basic_poly)
-
-        assert expected_result_wkt == actual_wrapped
-        assert expected_result_wkt == actual_unwrapped
-        assert len(repairs) == 0
-
 
     ##################
     #  TEST REPAIRS  #
     ##################
-    def test_REPAIR_unconnectedPolygon(self):
-        # Unconnected poly means the first set of coords do not match the last
-        actual_wrapped, actual_unwrapped, repairs = simplify_legit_wkt(self.long_forked_poly_unconnected)
-        # Load the connected poly, reverse the coords:
-        expected_result_wkt = wkt.loads(self.long_forked_poly)
 
-        assert expected_result_wkt == actual_wrapped
-        assert expected_result_wkt == actual_unwrapped
-        assert "Closed 1 open polygon(s)" in str(repairs)
-        assert len(repairs) == 1
-
-
-    def test_REPAIR_mergedByConvexHullingIndividual(self):
-        convex_hull_intersects = "MULTIPOLYGON((( 11 5, 16 40, 36 39, 13 43, 11 5)),(( 19 33, 32 25, 47 42, 31 29, 19 33)) )"
-        actual_wrapped, actual_unwrapped, repairs = simplify_legit_wkt(convex_hull_intersects)
-        expected_result_wkt = wkt.loads("POLYGON ((11 5, 27.6666666666666679 27.6666666666666679, 32 25, 47 42, 35.4841815680880330 38.2984869325997224, 36 39, 13 43, 11 5))")
-
-        assert expected_result_wkt == actual_wrapped
-        assert expected_result_wkt == actual_unwrapped
-        assert "Reversed polygon winding order" in str(repairs)
-        assert "Unconnected shapes: Convex-halled each INDIVIDUAL shape to merge them together" in str(repairs)
-        assert len(repairs) == 2
 
 
     def test_REPAIR_wrapLongitude(self):
@@ -123,16 +162,6 @@ class Test_repairWKT():
         assert expected_wrapped == actual_wrapped
         assert wkt.loads(poly) == actual_unwrapped
         assert "Wrapped 1 value(s) to +/-180 longitude" in str(repairs)
-        assert len(repairs) == 1
-
-
-    def test_REPAIR_clampLatitudePositive(self):
-        poly = "POLYGON((-9 6, 48 -20, 25 500, -9 6))"
-        actual_wrapped, actual_unwrapped, repairs = simplify_legit_wkt(poly)
-        expected_wrapped = wkt.loads("POLYGON((-9 6, 48 -20, 25 90, -9 6))")
-        assert expected_wrapped == actual_wrapped
-        assert wkt.loads(poly) == actual_unwrapped
-        assert "Clamped 1 value(s) to +/-90 latitude" in str(repairs)
         assert len(repairs) == 1
 
 
