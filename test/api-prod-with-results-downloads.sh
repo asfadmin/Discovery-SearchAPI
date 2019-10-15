@@ -1,6 +1,6 @@
 #!/bin/bash
 clear
-LOG_LOCATION=/path/to/my/location/
+LOG_LOCATION=/home/ccfleming/github/SearchAPI/test
 exec > >(tee -i $LOG_LOCATION/apiprod.log)
 exec 2>&1
 echo "Starting wget search test cases from api.daac.asf.alaska.edu. Log Location should be: [ $LOG_LOCATION]"
@@ -8,16 +8,20 @@ echo "Starting wget search test cases from api.daac.asf.alaska.edu. Log Location
 # queries designed just for testing
 # absoluteOrbit Keyword
 wget -d -O API-PROD-absoluteOrbit-single-valid.CSV "https://api.daac.asf.alaska.edu/services/search/param?absoluteorbit=5000&maxresults=10&output=csv"
-wget -d -O API-PROD-absoluteOrbit-rangle-valid.CSV "https://api.daac.asf.alaska.edu/services/search/param?absoluteorbit=5000-6000&maxresults=10&output=csv"
+wget -d -O API-PROD-absoluteOrbit-range-valid.CSV "https://api.daac.asf.alaska.edu/services/search/param?absoluteorbit=5000-6000&maxresults=10&output=csv"
 wget -d -O API-PROD-absoluteOrbit-list-valid.CSV "https://api.daac.asf.alaska.edu/services/search/param?absoluteorbit=5000,5001,5002&maxresults=10&output=csv"
 wget -d -O API-PROD-absoluteOrbit-list-range-valid.CSV "https://api.daac.asf.alaska.edu/services/search/param?absoluteorbit=5000,5100-5200&maxresults=100&output=csv"
 wget -d -O API-PROD-absoluteOrbit-list-R1-valid.CSV "https://api.daac.asf.alaska.edu/services/search/param?absoluteorbit=5000,5001,5002&platform=R1&maxresults=10&output=csv"
+wget -d -O API-PROD-absoluteOrbit-zero-range-valid.CSV "https://api.daac.asf.alaska.edu/services/search/param?absoluteorbit=27601-27601&maxresults=10&output=csv"
+wget -d -O API-PROD-absoluteOrbit-zero-range-list-valid.CSV "https://api.daac.asf.alaska.edu/services/search/param?absoluteorbit=27120-27120,27076&maxresults=10&output=csv"
 
 # asfframe Keyword
 wget -d -O API-PROD-asfframe-platformR1-single-valid.CSV "https://api.daac.asf.alaska.edu/services/search/param?asfframe=345&platform=R1&maxresults=10&output=csv"
 wget -d -O API-PROD-asfframe-platformR1-list-valid.CSV "https://api.daac.asf.alaska.edu/services/search/param?asfframe=345,346,347&platform=R1&maxresults=10&output=csv"
 wget -d -O API-PROD-asfframe-platformR1-range-valid.CSV "https://api.daac.asf.alaska.edu/services/search/param?asfframe=345-347&platform=R1&maxresults=10&output=csv"
 wget -d -O API-PROD-asfframe-platformR1-list-range-valid.CSV "https://api.daac.asf.alaska.edu/services/search/param?asfframe=340,345-347&platform=R1&maxresults=10&output=csv"
+wget -d -O API-PROD-asfframe-platformR1-zero-range-valid.CSV "https://api.daac.asf.alaska.edu/services/search/param?asfframe=340-340&platform=R1&maxresults=10&output=csv"
+wget -d -O API-PROD-asfframe-platformR1-zero-range-list-valid.CSV "https://api.daac.asf.alaska.edu/services/search/param?asfframe=340-340,345&platform=R1&maxresults=10&output=csv"
 
 # bbox Keyword
 wget -d -O API-PROD-bbox-10-valid.CSV "https://api.daac.asf.alaska.edu/services/search/param?bbox=-150.2,65.0,-150.1,65.5&maxresults=10&output=csv"
@@ -78,6 +82,8 @@ wget -d -O API-PROD-frame-single-10-valid.CSV "https://api.daac.asf.alaska.edu/s
 wget -d -O API-PROD-frame-range-10-valid.CSV "https://api.daac.asf.alaska.edu/services/search/param?frame=345-347&platform=R1&maxresults=10&output=csv"
 wget -d -O API-PROD-frame-list-10-valid.CSV "https://api.daac.asf.alaska.edu/services/search/param?frame=345,346,347&platform=R1&maxresults=10&output=csv"
 wget -d -O API-PROD-frame-list-range-10-valid.CSV "https://api.daac.asf.alaska.edu/services/search/param?frame=340,345-347&platform=R1&maxresults=10&output=csv"
+wget -d -O API-PROD-frame-platformALOS-zero-range-valid.CSV "https://api.daac.asf.alaska.edu/services/search/param?frame=190-190&platform=ALOS&maxresults=10&output=csv"
+wget -d -O API-PROD-frame-platformALOS-zero-range-list-valid.CSV "https://api.daac.asf.alaska.edu/services/search/param?frame=180-180,185&platform=ALOS&maxresults=10&output=csv"
 
 # granule_list Keyword
 wget -d -O API-PROD-granule_list-single-csv-valid.CSV "https://api.daac.asf.alaska.edu/services/search/param?granule_list=S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80&output=csv"
@@ -164,6 +170,8 @@ wget -d -O API-PROD-minInsarStackSize-80-valid.CSV "https://api.daac.asf.alaska.
 wget -d -O API-PROD-offNadirAngle-single-valid.CSV "https://api.daac.asf.alaska.edu/services/search/param?offnadirangle=21.5&maxresults=10&output=csv"
 wget -d -O API-PROD-offNadirAngle-list-valid.CSV "https://api.daac.asf.alaska.edu/services/search/param?offnadirangle=21.5,23.1,27.1&maxresults=10&output=csv"
 wget -d -O API-PROD-offNadirAngle-range-valid.CSV "https://api.daac.asf.alaska.edu/services/search/param?offnadirangle=20-30&maxresults=10&output=csv"
+wget -d -O API-PROD-offNadirAngle-zero-range-valid.CSV "https://api.daac.asf.alaska.edu/services/search/param?offnadirangle=21.5-21.5&maxresults=10&output=csv"
+wget -d -O API-PROD-offNadirAngle-zero-range-list-valid.CSV "https://api.daac.asf.alaska.edu/services/search/param?offnadirangle=34.3-34.3,20-25&maxresults=10&output=csv"
 
 # output keyword
 wget -d -O API-PROD-platform-SB-valid.CSV "https://api.daac.asf.alaska.edu/services/search/param?platform=SB&start=1+week+ago&end=now&maxresults=2000&output=csv"
@@ -313,6 +321,9 @@ wget -d -O API-PROD-relativeOrbit-range-valid.csv "https://api.daac.asf.alaska.e
 wget -d -O API-PROD-relativeOrbit-list-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?relativeorbit=20,21,22&maxresults=10&output=csv"
 wget -d -O API-PROD-relativeOrbit-list-range-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?relativeorbit=20,23-24&maxresults=100&output=csv"
 wget -d -O API-PROD-relativeOrbit-list-R1-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?relativeorbit=20,23,25&platform=R1&maxresults=10&output=csv"
+wget -d -O API-PROD-relativeOrbit-zero-range-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?relativeorbit=16-16&maxresults=10&output=csv"
+wget -d -O API-PROD-relativeOrbit-zero-range-list-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?relativeorbit=16-16,17&maxresults=10&output=csv"
+wget -d -O API-PROD-relativeOrbit-zero-range-list-reverse-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?relativeorbit=17,16-16&maxresults=10&output=csv"
 
 # season Keyword
 wget -d -O API-PROD-season-32-90-S1-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?season=32,90&platform=SA,SB&maxresults=1000&output=CSV"
@@ -345,6 +356,7 @@ wget -d -O API-PROD-start-yesterday-count-valid.csv "https://api.daac.asf.alaska
 wget -d -O API-PROD-polygonclosure1-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?polygon=12.13,41.74,13.4,41.74,13.4,42.75,12.13,42.75&platform=Sentinel-1A,Sentinel-1B&processingLevel=SLC&start=2018-05-01T00:00:00UTC&output=csv"
 wget -d -O API-PROD-polygonclosure2-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?polygon=12.13,41.74,13.4,41.74,13.4,42.75,12.13,42.75,12.13,41.74&platform=Sentinel-1A,Sentinel-1B&processingLevel=SLC&start=2018-05-01T00:00:00UTC&output=csv"
 wget -d -O API-PROD-polygonclosure3-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?polygon=12.13,41.74,12.13,42.75,13.4,42.75,13.4,41.74,12.13,41.74&platform=Sentinel-1A,Sentinel-1B&processingLevel=SLC&start=2018-05-01T00:00:00UTC&output=csv"
+wget -d -O API-PROD-polygon-broken-will-close-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?polygon=-155.08,65.82,-153.5,61.91,-149.50,63.07,-149.94,64.55&maxResults=10&output=CSV"
 
 # queries taken from real-world usage
 wget -d -O API-PROD-realworld-1-count-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?intersectsWith=point(-168.0380672+53.9279675)&platform=Sentinel-1A,Sentinel-1B&processingLevel=GRD_HS,GRD_HD&beamMode=IW&output=count"
@@ -534,9 +546,8 @@ wget -d -O API-PROD-polar-specchar-invalid.csv "https://api.daac.asf.alaska.edu/
 wget -d -O API-PROD-polar-E1-specchar-invalid.csv "https://api.daac.asf.alaska.edu/services/search/param?platform=E1&polarization=^*&maxResults=1000&output=CSV"
 
 # polygon Keyword Invalid
-wget -d -O API-PROD-polygon-broken-invalid.csv "https://api.daac.asf.alaska.edu/services/search/param?polygon=-155.08,65.82,-153.5,61.91,-149.50,63.07,-149.94,64.55&maxResults=1000&output=CSV"
 wget -d -O API-PROD-polygon-3points-invalid.csv "https://api.daac.asf.alaska.edu/services/search/param?polygon=-155.08,65.82,-153.5&maxResults=1000&output=CSV"
-pwget -d -O API-PROD-polygon-1point-invalid.csv "https://api.daac.asf.alaska.edu/services/search/param?olygon=-155.08,65.82&maxResults=1000&output=CSV"
+wget -d -O API-PROD-polygon-1point-invalid.csv "https://api.daac.asf.alaska.edu/services/search/param?polygon=-155.08,65.82&maxResults=1000&output=CSV"
 wget -d -O API-PROD-polygon-1point-count-invalid.csv "https://api.daac.asf.alaska.edu/services/search/param?polygon=-155.08,65.82&maxResults=1000&output=count"
 wget -d -O API-PROD-polygon-specchar-count-invalid.csv "https://api.daac.asf.alaska.edu/services/search/param?polygon=$$&maxResults=1000&output=count"
 wget -d -O API-PROD-polygon-specchar-invalid.csv "https://api.daac.asf.alaska.edu/services/search/param?polygon=$$&maxResults=1000&output=CSV"
