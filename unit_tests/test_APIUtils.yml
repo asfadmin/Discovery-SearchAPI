@@ -1,3 +1,7 @@
+#################
+## BASIC TESTS ##
+#################
+# *always* check for repairs, unless "check repairs: False"?
 - basic point:
     test wkt: POINT (30 10)
     expected wkt: POINT (30 10)
@@ -10,25 +14,50 @@
     test wkt: POLYGON((30 10, 40 40, 20 40, 10 20, 30 10))
     expected wkt: POLYGON((30 10, 40 40, 20 40, 10 20, 30 10))
 
+##################
+## TEST REPAIRS ##
+##################
 - unconnected poly:
     test wkt: POLYGON ((58 35, 31 10, -1 15, 29 7.5, 5 -26, 65 39, -36 15))
-    expected wkt: POLYGON ((58 35, 31 10, -1 15, 29 7.5, 5 -26, 65 39, -36 15, 58 35))
+    # expected wkt: POLYGON ((58 35, 31 10, -1 15, 29 7.5, 5 -26, 65 39, -36 15, 58 35))
     repair: Closed 1 open polygon(s)
 
 - merge by convex hulling individual polys:
     test wkt: MULTIPOLYGON((( 11 5, 16 40, 36 39, 13 43, 11 5)),(( 19 33, 32 25, 47 42, 31 29, 19 33)) )
     expected wkt: POLYGON ((11 5, 27.6666666666666679 27.6666666666666679, 32 25, 47 42, 35.4841815680880330 38.2984869325997224, 36 39, 13 43, 11 5))
     repair:
-        - Reversed polygon winding order
+        - "Reversed polygon winding order"
         # Note, this needs to be in quotes because of the ':'. Easy to see with color coading:
         - "Unconnected shapes: Convex-halled each INDIVIDUAL shape to merge them together"
 
 - clamp latitude:
+    # Just noticed expected wkt unwrapped values are not clamped. Should they be? (clamped vs wrapped independant?)
     test wkt: POLYGON((-9 6, 48 -20, 25 500, -9 6))
     expected wkt unwrapped: POLYGON((-9 6, 48 -20, 25 500, -9 6))
     expected wkt wrapped: POLYGON((-9 6, 48 -20, 25 90, -9 6))
-    repair: Clamped 1 value(s) to +/-90 latitude
+    repair: "Clamped 1 value(s) to +/-90 latitude"
+    # print result: True
 
+- clamp negative latitude:
+    test wkt: POLYGON((-9 6, 25 -500, 48 -20, -9 6))
+    expected wkt unwrapped: POLYGON((-9 6, 25 -500, 48 -20, -9 6))
+    expected wkt wrapped: POLYGON((-9 6, 25 -90, 48 -20, -9 6))
+    repair: "Clamped 1 value(s) to +/-90 latitude"
+
+- wrap longitude:
+    test wkt: POLYGON ((22 22, 9000 8, 120 3, 22 22))
+    expected wkt unwrapped: POLYGON ((22 22, 9000 8, 120 3, 22 22))
+    expected wkt wrapped: POLYGON ((22 22, 0 8, 120 3, 22 22))
+    repair: "Wrapped 1 value(s) to +/-180 longitude"
+    # check repair: False
+
+
+
+#################
+## TEST ERRORS ##
+#################
 - Bad input:
     test wkt: Totally a ligit poly....
     expected error msg: Could not parse WKT
+
+# TODO: add "test path" that takes relative paths. Let FilesToWKT figure out which parser to use
