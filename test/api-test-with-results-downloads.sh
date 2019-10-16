@@ -50,7 +50,7 @@ wget -d -O API-TEST-beamSwath-R1-list-WD-100-valid.CSV "https://api-test.asf.ala
 wget -d -O API-TEST-beamSwath-R1-list-E-100-valid.CSV "https://api-test.asf.alaska.edu/services/search/param?beamSwath=EH3,EH4,EH6,EL1&platform=RADARSAT-1&maxresults=100&output=csv"
 wget -d -O API-TEST-beamSwath-SA-list-100-valid.CSV "https://api-test.asf.alaska.edu/services/search/param?beamSwath=EW,IW,S1,S2,S3,S4,S5,S6,WV&platform=Sentinel-1A&maxresults=100&output=csv"
 wget -d -O API-TEST-beamSwath-SB-list-100-valid.CSV "https://api-test.asf.alaska.edu/services/search/param?beamSwath=EW,IW,S1,S2,S3,S4,S5,S6,WV&platform=Sentinel-1B&maxresults=100&output=csv"
-wget -d -O API-TEST-beamSwath-UA-list-100-valid.CSV "https://api-test.asf.alaska.edu/services/search/param?beamSwath=UAVSAR&platform=POL,RPI&maxresults=100&output=csv"
+wget -d -O API-TEST-beamSwath-UA-list-100-valid.CSV "https://api-test.asf.alaska.edu/services/search/param?beamSwath=POL,RPI&platform=UAVSAR&maxresults=100&output=csv"
 
 # collectionName Keyword
 wget -d -O API-TEST-colName-Haiti-100-valid.CSV "https://api-test.asf.alaska.edu/services/search/param?collectionName=Haiti&maxresults=100&output=csv"
@@ -365,7 +365,7 @@ wget -d -O API-TEST-start-yesterday-count-valid.csv "https://api-test.asf.alaska
 wget -d -O API-TEST-polygonclosure1-valid.csv "https://api-test.asf.alaska.edu/services/search/param?polygon=12.13,41.74,13.4,41.74,13.4,42.75,12.13,42.75&platform=Sentinel-1A,Sentinel-1B&processingLevel=SLC&start=2018-05-01T00:00:00UTC&output=csv"
 wget -d -O API-TEST-polygonclosure2-valid.csv "https://api-test.asf.alaska.edu/services/search/param?polygon=12.13,41.74,13.4,41.74,13.4,42.75,12.13,42.75,12.13,41.74&platform=Sentinel-1A,Sentinel-1B&processingLevel=SLC&start=2018-05-01T00:00:00UTC&output=csv"
 wget -d -O API-TEST-polygonclosure3-valid.csv "https://api-test.asf.alaska.edu/services/search/param?polygon=12.13,41.74,12.13,42.75,13.4,42.75,13.4,41.74,12.13,41.74&platform=Sentinel-1A,Sentinel-1B&processingLevel=SLC&start=2018-05-01T00:00:00UTC&output=csv"
-wget -d -O API-TEST-polygon-broken-will-close-valid.csv "https://api-test.asf.alaska.edu/services/search/param?polygon=-155.08,65.82,-153.5,61.91,-149.50,63.07,-149.94,64.55&maxResults=1000&output=CSV"
+wget -d -O API-TEST-polygonclosure4-valid.csv "https://api-test.asf.alaska.edu/services/search/param?polygon=-155.08,65.82,-153.5,61.91,-149.50,63.07,-149.94,64.55&maxResults=1000&output=CSV"
 
 # queries taken from real-world usage
 wget -d -O API-TEST-realworld-1-count-valid.csv "https://api-test.asf.alaska.edu/services/search/param?intersectsWith=point(-168.0380672+53.9279675)&platform=Sentinel-1A,Sentinel-1B&processingLevel=GRD_HS,GRD_HD&beamMode=IW&output=count"
