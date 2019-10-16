@@ -25,7 +25,6 @@ https://api-test.asf.alaska.edu/services/search/param?beamMode=Standard&maxresul
 https://api-test.asf.alaska.edu/services/search/param?bbox=-150.2,65.0,-150.1,65.5&maxresults=10&output=csv
 
 # collectionName + CSV output
-https://api-test.asf.alaska.edu/services/search/param?platform=UAVSAR&collectionName=Haiti&output=CSV
 https://api-test.asf.alaska.edu/services/search/param?platform=UAVSAR&collectionName=ABoVE&output=CSV
 https://api-test.asf.alaska.edu/services/search/param?platform=AIRSAR&collectionName=Almo&output=CSV
 https://api-test.asf.alaska.edu/services/search/param?platform=AIRSAR&collectionName=Almo+GA&output=CSV
