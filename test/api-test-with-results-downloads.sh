@@ -74,10 +74,10 @@ wget -d -O API-TEST-flightLine-10-valid.CSV "https://api-test.asf.alaska.edu/ser
 wget -d -O API-TEST-flightLine-gilmorecreek-10-valid.CSV "https://api-test.asf.alaska.edu/services/search/param?flightLine=gilmorecreek045-1.93044&maxresults=10&output=csv"
 
 # frame Keyword
-wget -d -O API-TEST-frame-single-10-valid.CSV "https://api-test.asf.alaska.edu/services/search/param?frame=345&platform=R1&maxresults=10&output=csv"
-wget -d -O API-TEST-frame-range-10-valid.CSV "https://api-test.asf.alaska.edu/services/search/param?frame=345-347&platform=R1&maxresults=10&output=csv"
-wget -d -O API-TEST-frame-list-10-valid.CSV "https://api-test.asf.alaska.edu/services/search/param?frame=345,346,347&platform=R1&maxresults=10&output=csv"
-wget -d -O API-TEST-frame-list-range-10-valid.CSV "https://api-test.asf.alaska.edu/services/search/param?frame=340,345-347&platform=R1&maxresults=10&output=csv"
+wget -d -O API-TEST-frame-single-10-valid.CSV "https://api-test.asf.alaska.edu/services/search/param?frame=2277&platform=R1&maxresults=10&output=csv"
+wget -d -O API-TEST-frame-range-10-valid.CSV "https://api-test.asf.alaska.edu/services/search/param?frame=1530-1532&platform=R1&maxresults=10&output=csv"
+wget -d -O API-TEST-frame-list-10-valid.CSV "https://api-test.asf.alaska.edu/services/search/param?frame=1531,1530,1532&platform=R1&maxresults=10&output=csv"
+wget -d -O API-TEST-frame-list-range-10-valid.CSV "https://api-test.asf.alaska.edu/services/search/param?frame=688,1530-1532&platform=R1&maxresults=10&output=csv"
 wget -d -O API-TEST-frame-platformALOS-zero-range-valid.CSV "https://api-test.asf.alaska.edu/services/search/param?frame=190-190&platform=ALOS&maxresults=10&output=csv"
 wget -d -O API-TEST-frame-platformALOS-zero-range-list-valid.CSV "https://api-test.asf.alaska.edu/services/search/param?frame=180-180,185&platform=ALOS&maxresults=10&output=csv"
 
@@ -183,7 +183,7 @@ wget -d -O API-TEST-platform-SB-metalink-valid.metalink "https://api-test.asf.al
 wget -d -O API-TEST-platform-SA-valid.csv "https://api-test.asf.alaska.edu/services/search/param?platform=SA&start=2016-01-01T00:00:00Z&end=2016-01-02T00:00:00Z&output=csv"
 wget -d -O API-TEST-platform-SB-valid.csv "https://api-test.asf.alaska.edu/services/search/param?platform=SB&start=1+week+ago&end=now&maxresults=2000&output=csv"
 wget -d -O API-TEST-platform-J1-valid.csv "https://api-test.asf.alaska.edu/services/search/param?platform=J1&polygon=-148.52,64.63,-150.41,64.64,-149.58,63.86,-148.52,64.63&maxResults=100&output=csv"
-wget -d -O API-TEST-platform-A3-valid.csv "https://api-test.asf.alaska.edu/services/search/param?platform=A3&processinglevel=L1.0polygon=-148.52,64.63,-150.41,64.64,-149.58,63.86,-148.52,64.63&maxResults=100&output=csv"
+wget -d -O API-TEST-platform-A3-valid.csv "https://api-test.asf.alaska.edu/services/search/param?platform=A3&processinglevel=L1.0&polygon=-148.52,64.63,-150.41,64.64,-149.58,63.86,-148.52,64.63&maxResults=100&output=csv"
 wget -d -O API-TEST-platform-Sentinel-1A-valid.csv "https://api-test.asf.alaska.edu/services/search/param?platform=Sentinel-1A&maxResults=10&output=csV"
 wget -d -O API-TEST-platform-R1-E1-valid.json "https://api-test.asf.alaska.edu/services/search/param?platform=R1,E1&maxResults=10&output=jSoN"
 wget -d -O API-TEST-platform-R1-E1-10-valid.csv "https://api-test.asf.alaska.edu/services/search/param?platform=RADARSAT-1,E1&maxResults=10&output=csv"
