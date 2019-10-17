@@ -1,5 +1,5 @@
-import sys, os, pytest, yaml, ntpath, json
-from geomet import wkt
+import sys, os, pytest, yaml, json
+# from geomet import wkt
 import shapely.wkt
 
 
@@ -24,20 +24,20 @@ class RunSingleShapeFromYaml():
     def applyDefaultValues(self, test_dict):
         # If you just say "expected wkt", switch that to the wrapped and unwrapped versions:
         if "expected wkt" in test_dict:
-            wkt = test_dict["expected wkt"]
+            default_wkt = test_dict["expected wkt"]
             del test_dict["expected wkt"]
             # Make expected wkt the default, if one of these are not declared:
             if "expected wkt wrapped" not in test_dict:
-                test_dict["expected wkt wrapped"] = wkt
+                test_dict["expected wkt wrapped"] = default_wkt
             if "expected wkt unwrapped" not in test_dict:
-                test_dict["expected wkt unwrapped"] = wkt
+                test_dict["expected wkt unwrapped"] = default_wkt
 
         # Figure out what is expected to happen:
         pass_assertions = ["expected wkt wrapped", "expected wkt unwrapped", "repair"]
         fail_assertions = ["expected error msg"]
         # True if at least one of the above is used, False otherwise:
-        test_dict["asserts pass"] = 0 != len([k for k,v in test_dict.items() if k in pass_assertions])
-        test_dict["asserts fail"] = 0 != len([k for k,v in test_dict.items() if k in fail_assertions])
+        test_dict["asserts pass"] = 0 != len([k for k,_ in test_dict.items() if k in pass_assertions])
+        test_dict["asserts fail"] = 0 != len([k for k,_ in test_dict.items() if k in fail_assertions])
 
         # Default Print the result to screen if tester isn't asserting anything:
         if "print" not in test_dict:
