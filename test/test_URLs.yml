@@ -1,0 +1,49 @@
+
+API: Test
+
+
+tests:
+- test full pass:
+    polarization: HH
+    platform: SA
+    maxresults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- test partial pass:
+    beamMode: Test
+    output: KML
+
+    expected file: blank kml
+    expected code: 200
+
+- test returns different file:
+    output: asdf
+    platform: SA
+    polarization: HH
+    maxresults: 10
+
+    expected file: metalink
+    expected code: 200
+
+
+- test complete fail:
+    output: csv
+    maxresults: 10
+
+    expected file: error json
+    expected code: 400
+
+- test exception:
+    asfframe: 345,346,347
+    platform: R1
+    maxresults: 10
+    output: csv
+    expected file: blank csv
+    expected code: 200
+  # Not sure what to expect yet...
+
+
+
