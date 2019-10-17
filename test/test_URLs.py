@@ -18,6 +18,10 @@ class RunSingleURLFromFile():
             # IF val is None, just add the key. Else add "key=val"
             if val == "None":
                 keywords.append(str(key))
+            # If you're testing multiple SAME params, add each key-val pair:
+            elif isinstance(val, type([])):
+                for sub_val in val:
+                    keywords.append(str(key)+"="+str(sub_val))
             else:
                 keywords.append(str(key)+"="+str(val))
         self.query = url_api + "&".join(keywords)
@@ -141,14 +145,14 @@ for i, test in enumerate(list_of_tests):
     # Else leave whatever it is alone.
 
 if undeclared_api > 0:
-    print("\nWARNING: Api was not declared for {0} test(s). Defaulting to Test API.".format(undeclared_api))
+    print("\nWARNING: Api was not declared for {0} test(s). Defaulting to Test API.\n".format(undeclared_api))
 
 
 @pytest.mark.parametrize("json_test", list_of_tests)
 def test_EachURLInYaml(json_test):
     test_info = json_test[0]
     api_url = json_test[1]
-    
+
     title = list(test_info.keys())[0]
     test_info = next(iter(test_info.values()))
     test_info["title"] = title
