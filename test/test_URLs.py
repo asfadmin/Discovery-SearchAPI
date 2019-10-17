@@ -21,7 +21,10 @@ class RunSingleURLFromFile():
             # If you're testing multiple SAME params, add each key-val pair:
             elif isinstance(val, type([])):
                 for sub_val in val:
-                    keywords.append(str(key)+"="+str(sub_val))
+                    if sub_val == "None":
+                        keywords.append(str(key))
+                    else:
+                        keywords.append(str(key)+"="+str(sub_val))
             else:
                 keywords.append(str(key)+"="+str(val))
         self.query = url_api + "&".join(keywords)
