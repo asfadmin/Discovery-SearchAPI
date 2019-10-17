@@ -111,7 +111,7 @@ wget -d -O API-TEST-intersectsWith-polygon-valid.CSV "https://api-test.asf.alask
 wget -d -O API-TEST-intersectsWith-linestring-valid.CSV "https://api-test.asf.alaska.edu/services/search/param?intersectsWith=linestring(-119.543 37.925, -118.443 37.7421)&maxResults=1000&output=CSV"
 wget -d -O API-TEST-intersectsWith-point-1000-valid.CSV "https://api-test.asf.alaska.edu/services/search/param?intersectsWith=point(-119.543 37.925)&maxResults=1000&output=CSV"
 wget -d -O API-TEST-intersectsWith-polygon-10000-valid.CSV "https://api-test.asf.alaska.edu/services/search/param?intersectsWith=polygon((-119.543 37.925, -118.443 37.7421, -118.682 36.8525, -119.77 37.0352, -119.543 37.925))&maxResults=1000&output=CSV"
-wget -d -O API-TEST-intersectsWith-polygon2-valid.CSV "https://api-test.asf.alaska.edu/services/search/param?intersectsWith=polygon(-119.543 37.925, -118.443 37.7421, -118.682 36.8525, -119.77 37.0352, -119.543 37.925)&maxResults=1000&output=CSV"
+wget -d -O API-TEST-intersectsWith-polygon2-valid.CSV "https://api-test.asf.alaska.edu/services/search/param?intersectsWith=polygon((-119.543 37.925, -118.443 37.7421, -118.682 36.8525, -119.77 37.0352, -119.543 37.925))&maxResults=1000&output=CSV"
 wget -d -O API-TEST-intersectsWith-linestring-invalid.CSV "https://api-test.asf.alaska.edu/services/search/param?intersectsWith=linestring(TEST)&maxResults=1000&output=CSV"
 wget -d -O API-TEST-intersectsWith-linestring2-invalid.CSV "https://api-test.asf.alaska.edu/services/search/param?intersectsWith=linestring(%)&maxResults=1000&output=CSV"
 
