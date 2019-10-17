@@ -2,7 +2,9 @@
 import os, yaml, pytest
 import hashlib
 import requests
-
+import glob
+import itertools
+import argparse
 
 class RunSingleURLFromFile():
     def __init__(self, json_dict, url_api):
@@ -86,44 +88,68 @@ class RunSingleURLFromFile():
 
         return h.status_code, content_type
 
+def getTestsFromDirectory(dir_path):
+    list_of_tests = []
+    for file in glob.glob(dir_path, recursive=True):
+        with open(file, "r") as yaml_file:
+            try:
+                yaml_dict = yaml.safe_load(yaml_file)
+                api = yaml_dict["API"] if "API" in yaml_dict else None
+                if "tests" in yaml_dict:
+                    # pair the test with what api the test is expected to use:
+                    tests = zip(yaml_dict["tests"], itertools.repeat(api))
+                    list_of_tests.extend(tests)
+                yaml_file.close()
+            except yaml.YAMLError as e:
+                print("###########")
+                print("Failed to parse yaml: {0}".format(str(e)))
+                print("###########")
+                continue
+    return list_of_tests
 
-# Can't do __name__ == __main__ trick. list_of_tests needs to be declared for the parametrize:
+
+
+
+# Can't do __name__ == __main__ trick. list_of_tests needs to be declared for the @pytest.mark.parametrize:
 project_root = os.path.realpath(os.path.join(os.path.dirname(__file__),".."))
-yaml_name = os.path.splitext(os.path.basename(__file__))[0]+".yml"
-yaml_path = os.path.join(project_root, "test", yaml_name)
+list_of_tests = []
 
-if not os.path.exists(yaml_path):
-    print("File not Found: " + yaml_path)
-    exit(1)
-with open(yaml_path, "r") as yaml_file:
-    try:
-        yaml_dict = yaml.safe_load(yaml_file)
-        api_keyword = yaml_dict['API']
-        list_of_tests = yaml_dict["tests"]
-    except yaml.YAMLError as e:
-        print("###########")
-        print("Failed to parse yaml: {0}".format(str(e)))
-        print("###########")
-        exit(2)
-    except KeyError as e:
-        print("###########")
-        print("Failed to find key in Yaml: {0}".format(str(e)))
-        print("###########")
-        exit(3)
+# Get the tests from all *yml* files:
+tests_root = os.path.join(project_root, "test","**","test_*.yml")
+print(tests_root)
+list_of_tests.extend(getTestsFromDirectory(tests_root))
+# Same, but with *yaml* files now:
+tests_root = os.path.join(project_root, "test","**","test_*.yaml")
+list_of_tests.extend(getTestsFromDirectory(tests_root))
+
 
 # Figure out which API to use:
-if api_keyword.upper() == "TEST":
-    api_url = "https://api-test.asf.alaska.edu/services/search/param?"
-elif api_keyword.upper() == "PROD":
-    api_url = "https://api.daac.asf.alaska.edu/services/search/param?"
-elif api_keyword.upper() == "LOCAL": # Not yet tested. May need "services/search..." part
-    api_url = "http://127.0.0.1:5000/"
-else:
-    api_url = api_keyword
+undeclared_api = 0
+for i, test in enumerate(list_of_tests):
+    # Default to test if api is not set, and count how many do this:
+    if test[1] == None or test[1].upper() == "TEST":
+        if test[1] == None:
+            undeclared_api += 1
+        list_of_tests[i] = (test[0],"https://api-test.asf.alaska.edu/services/search/param?")
+
+    elif test[1].upper() == "PROD":
+        list_of_tests[i] = (test[0],"https://api.daac.asf.alaska.edu/services/search/param?")
+
+    # Not yet tested. May need "services/search..." part:
+    elif test[1].upper() == "LOCAL":
+        list_of_tests[i] = (test[0],"http://127.0.0.1:5000/")
+    # Else leave whatever it is alone.
+
+if undeclared_api > 0:
+    print("\nWARNING: Api was not declared for {0} test(s). Defaulting to Test API.".format(undeclared_api))
+
 
 @pytest.mark.parametrize("json_test", list_of_tests)
 def test_EachURLInYaml(json_test):
-    title = list(json_test.keys())[0]
-    json_test = next(iter(json_test.values()))
-    json_test["title"] = title
-    RunSingleURLFromFile(json_test, api_url)
+    test_info = json_test[0]
+    api_url = json_test[1]
+    
+    title = list(test_info.keys())[0]
+    test_info = next(iter(test_info.values()))
+    test_info["title"] = title
+    RunSingleURLFromFile(test_info, api_url)
