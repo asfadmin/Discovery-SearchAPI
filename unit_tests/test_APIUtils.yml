@@ -1,0 +1,109 @@
+
+
+#################
+## BASIC TESTS ##
+#################
+# *always* check for repairs, unless "check repairs: False"?
+- basic point:
+    test wkt: POINT (30 10)
+    expected wkt: POINT (30 10)
+
+- basic linestring:
+    test wkt: LINESTRING(13 5, 30 25, 12 42, 22 38, -3 40, 45 -19)
+    expected wkt: LINESTRING(13 5, 30 25, 12 42, 22 38, -3 40, 45 -19)
+
+- basic poly:
+    test wkt: POLYGON((30 10, 40 40, 20 40, 10 20, 30 10))
+    expected wkt: POLYGON((30 10, 40 40, 20 40, 10 20, 30 10))
+
+##################
+## TEST REPAIRS ##
+##################
+- unconnected poly:
+    test wkt: POLYGON ((58 35, 31 10, -1 15, 29 7.5, 5 -26, 65 39, -36 15))
+    # expected wkt: POLYGON ((58 35, 31 10, -1 15, 29 7.5, 5 -26, 65 39, -36 15, 58 35))
+    repair: Closed 1 open polygon(s)
+
+- merge by convex hulling individual polys:
+    test wkt: MULTIPOLYGON((( 11 5, 16 40, 36 39, 13 43, 11 5)),(( 19 33, 32 25, 47 42, 31 29, 19 33)) )
+    expected wkt: POLYGON ((11 5, 27.6666666666666679 27.6666666666666679, 32 25, 47 42, 35.4841815680880330 38.2984869325997224, 36 39, 13 43, 11 5))
+    repair:
+        - "Reversed polygon winding order"
+        # Note, this needs to be in quotes because of the ':'. Easy to see with color coading:
+        - "Unconnected shapes: Convex-halled each INDIVIDUAL shape to merge them together"
+
+- clamp latitude:
+    # Just noticed expected wkt unwrapped values are not clamped. Should they be? (clamped vs wrapped independant?)
+    test wkt: POLYGON((-9 6, 48 -20, 25 500, -9 6))
+    expected wkt unwrapped: POLYGON((-9 6, 48 -20, 25 500, -9 6))
+    expected wkt wrapped: POLYGON((-9 6, 48 -20, 25 90, -9 6))
+    repair: "Clamped 1 value(s) to +/-90 latitude"
+    # print: True
+
+- clamp negative latitude:
+    test wkt: POLYGON((-9 6, 25 -500, 48 -20, -9 6))
+    expected wkt unwrapped: POLYGON((-9 6, 25 -500, 48 -20, -9 6))
+    expected wkt wrapped: POLYGON((-9 6, 25 -90, 48 -20, -9 6))
+    repair: "Clamped 1 value(s) to +/-90 latitude"
+
+- wrap longitude:
+    test wkt: POLYGON ((22 22, 9000 8, 120 3, 22 22))
+    expected wkt unwrapped: POLYGON ((22 22, 9000 8, 120 3, 22 22))
+    expected wkt wrapped: POLYGON ((22 22, 0 8, 120 3, 22 22))
+    repair: "Wrapped 1 value(s) to +/-180 longitude"
+    # check repair: False
+
+- multidimentional poly:
+    test wkt: POLYGON((27 25 0 0, 102 36 -96 83, 102 46 4 8, 92 61 15 16, 13 41 23 42, 16 30 -73 8, 27 25 0 0))
+    expected wkt: POLYGON((27 25,102 36,102 46,92 61,13 41,16 30,27 25))
+    repair: "Shape(s) that used multidimentional coords: 1. Truncated to 2D"
+
+#### geomet.wkt fails to load this entirely. Opened a ticket: https://github.com/geomet/geomet/issues/49
+# - remove empty shape from geocollection:
+#     test wkt: GEOMETRYCOLLECTION( LINESTRING EMPTY, POLYGON((27 25,102 36,102 46,92 61,13 41,16 30,27 25)) )
+#     expected wkt: POLYGON((27 25,102 36,102 46,92 61,13 41,16 30,27 25))
+
+
+
+####################
+## ADVANCED TESTS ##
+####################
+- two shapes touch at single point:
+    description: They touch at a literal *point*, so it shouldn't merge them. Zero point geometry error
+    test wkt: GEOMETRYCOLLECTION(POLYGON((20 5, 24 5, 24 10, 20 10, 20 5)),POLYGON((20 0, 22 5, 24 0, 22 3, 20 0)))
+    expected wkt: POLYGON ((20 0, 24 0, 24 10, 20 10, 20 0))
+    repair:
+        - "Reversed polygon winding order"
+        - "Unconnected shapes: Convex-halled ALL the shapes together"
+
+- two shapes touch at two points:
+    description: This CAN merge because then the covex hull happens on individual shapes, the two points become a mergeable line
+    test wkt: GEOMETRYCOLLECTION(POLYGON((20 0, 21 5, 22 4, 23 5, 24 0, 22 2, 20 0)),POLYGON((20 5, 24 5, 24 10, 20 10, 20 5)))
+    expected wkt: POLYGON ((20.0000000000000000 0.0000000000000000, 24.0000000000000000 0.0000000000000000, 23.0000000000000000 5.0000000000000000, 24.0000000000000000 5.0000000000000000, 24.0000000000000000 10.0000000000000000, 20.0000000000000000 10.0000000000000000, 20.0000000000000000 5.0000000000000000, 21.0000000000000000 5.0000000000000000, 20.0000000000000000 0.0000000000000000))
+    repair:
+        - "Reversed polygon winding order"
+        - "Unconnected shapes: Convex-halled each INDIVIDUAL shape to merge them together"
+
+- two polys form a donut:
+    description: Two polys without holes, merge to form a shape WITH a hole. Testing if that hole gets removed
+    test wkt: GEOMETRYCOLLECTION (POLYGON((12 8,8 6,10 2,14 3,15 0,9 0,7 7,12 10,12 8)), POLYGON((10 8,14 6,14 4,13 1,13 0,15 4,14.5 7,10 9,10 8)))
+    expected wkt: POLYGON ((12.0000000000000000 8.1111111111111107, 12.0000000000000000 10.0000000000000000, 10.1914893617021285 8.9148936170212760, 10.0000000000000000 9.0000000000000000, 10.0000000000000000 8.8000000000000007, 7.0000000000000000 7.0000000000000000, 9.0000000000000000 0.0000000000000000, 13.0000000000000000 0.0000000000000000, 15.0000000000000000 0.0000000000000000, 14.1999999999999993 2.3999999999999999, 15.0000000000000000 4.0000000000000000, 14.5000000000000000 7.0000000000000000, 12.0000000000000000 8.1111111111111107))
+    repair: "Reversed polygon winding order"
+
+
+#################
+## TEST ERRORS ##
+#################
+- Bad input: 
+    test wkt: Totally a ligit poly....
+    expected error msg: "Could not parse WKT: Unsupported geometry type 'TOTALLY'."
+
+- self intersectiong poly:
+    test wkt: POLYGON((7 8, 36 38, 11 42, 48 -20,7 8))
+    expected error msg: "Self-intersecting polygon"
+
+- no valid shapes:
+    test wkt: POLYGON EMPTY
+    expected error msg: "Could not parse WKT: No valid shapes found"
+
+# TODO: add "test path" that takes relative paths. Let FilesToWKT figure out which parser to use
