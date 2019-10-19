@@ -1,0 +1,25 @@
+
+API: tEsT
+
+
+tests:
+- test partial pass:
+    beamMode: Test
+    output: KML
+
+    expected file: blank kml
+    expected code: 200
+
+- groupid number:
+    groupid: 12345
+    output: json
+
+    expected file: blank json
+    expected code: 200
+
+- groupid hash:
+    groupid: sdfkhgsdfkhgsdf
+    output: json
+
+    expected file: blank json
+    expected code: 200
