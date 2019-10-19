@@ -25,7 +25,6 @@ https://api-test.asf.alaska.edu/services/search/param?beamMode=Standard&maxresul
 https://api-test.asf.alaska.edu/services/search/param?bbox=-150.2,65.0,-150.1,65.5&maxresults=10&output=csv
 
 # collectionName + CSV output
-https://api-test.asf.alaska.edu/services/search/param?platform=UAVSAR&collectionName=Haiti&output=CSV
 https://api-test.asf.alaska.edu/services/search/param?platform=UAVSAR&collectionName=ABoVE&output=CSV
 https://api-test.asf.alaska.edu/services/search/param?platform=AIRSAR&collectionName=Almo&output=CSV
 https://api-test.asf.alaska.edu/services/search/param?platform=AIRSAR&collectionName=Almo+GA&output=CSV
@@ -45,10 +44,10 @@ https://api-test.asf.alaska.edu/services/search/param?flightDirection=dEsCeN&max
 https://api-test.asf.alaska.edu/services/search/param?flightLine=15302&maxresults=10&output=csv
 
 # frame + platform + MaxResults + CSV output
-https://api-test.asf.alaska.edu/services/search/param?frame=345&platform=R1&maxresults=10&output=csv
-https://api-test.asf.alaska.edu/services/search/param?frame=345,346,347&platform=R1&maxresults=10&output=csv
-https://api-test.asf.alaska.edu/services/search/param?frame=345-347&platform=R1&maxresults=10&output=csv
-https://api-test.asf.alaska.edu/services/search/param?frame=340,345-347&platform=R1&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?frame=2277&platform=R1&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?frame=1530-1532&platform=R1&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?frame=1531,1530,1532&platform=R1&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?frame=688,1530-1532&platform=R1&maxresults=10&output=csv
 https://api-test.asf.alaska.edu/services/search/param?frame=190-190&platform=ALOS&maxresults=10&output=csv
 https://api-test.asf.alaska.edu/services/search/param?frame=180-180,185&platform=ALOS&maxresults=10&output=csv
 
@@ -146,7 +145,7 @@ https://api-test.asf.alaska.edu/services/search/param?platform=RADARSAT-1,E1&pro
 https://api-test.asf.alaska.edu/services/search/param?platform=J1&polygon=-148.52,64.63,-150.41,64.64,-149.58,63.86,-148.52,64.63&maxResults=100&output=csv
 
 # platform + ProcessingLevel + Polygon + MaxResults 100 + CSV output
-https://api-test.asf.alaska.edu/services/search/param?platform=A3&processinglevel=L1.0polygon=-148.52,64.63,-150.41,64.64,-149.58,63.86,-148.52,64.63&maxResults=100&output=csv
+https://api-test.asf.alaska.edu/services/search/param?platform=A3&processinglevel=L1.0&polygon=-148.52,64.63,-150.41,64.64,-149.58,63.86,-148.52,64.63&maxResults=100&output=csv
 
 # platform aliases + count output
 https://api-test.asf.alaska.edu/services/search/param?platform=S1&start=2016-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
