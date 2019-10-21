@@ -68,8 +68,13 @@
 ####################
 ## ADVANCED TESTS ##
 ####################
+- scientific notation detailed point:
+    description: CMR doesn't handle "5e8" correctly. This tests the conversion to "500000000"
+    test wkt: POLYGON((20 0,46 -1.9e1,2.9e1 26,20 10,20 0))
+    expected wkt: POLYGON((20 0,46 -19,29 26,20 10,20 0))
+
 - two shapes touch at single point:
-    description: They touch at a literal *point*, so it shouldn't merge them. Zero point geometry error
+    description: They touch at a literal *point*, so it shouldn't merge them. (Should convex-hall whole shape as one)
     test wkt: GEOMETRYCOLLECTION(POLYGON((20 5, 24 5, 24 10, 20 10, 20 5)),POLYGON((20 0, 22 5, 24 0, 22 3, 20 0)))
     expected wkt: POLYGON ((20 0, 24 0, 24 10, 20 10, 20 0))
     repair:
