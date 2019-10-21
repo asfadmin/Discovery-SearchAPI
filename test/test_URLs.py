@@ -140,10 +140,10 @@ def test_EachURLInYaml(json_test, api, only_run):
     title = list(test_info.keys())[0]
     test_info = next(iter(test_info.values()))
     test_info["title"] = title
-    
-    if only_run != None:
-        if test_info["title"] != only_run:
-            pytest.mark.skip(reason="Title of test did not match --only-run param")
+
+    # If they passed '--only-run val', and val not in test title:
+    if only_run != None and only_run not in test_info["title"]:
+        pytest.skip("Title of test did not match --only-run param")
     api_url = api if api != None else json_test[1]
     if api_url == None or api_url.upper() == "TEST":
         if api_url == None:
