@@ -485,8 +485,6 @@ class simplifyWKT():
         wkt_obj_unwrapped = wkt.loads(self.wkt_unwrapped)
 
         cmr_coords = parse_wkt(wkt.dumps(wkt_obj_wrapped)).split(':')[1].split(',')
-        # IS a list of strings. Get rid of *literal* "5e06":
-        cmr_coords = ['{:.16f}'.format(float(cord)) for cord in cmr_coords]
         status_code, text = CMRSendRequest(cmr_coords)
         if status_code != 200:
             if 'Please check the order of your points.' in text:
