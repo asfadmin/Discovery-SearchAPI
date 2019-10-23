@@ -1,10 +1,12 @@
 
-import os, yaml, pytest
+import os, yaml
+import pytest, warnings
 import hashlib
 import requests
 import glob
 import itertools
 import argparse
+import conftest
 
 class RunSingleURLFromFile():
     def __init__(self, json_dict, url_api):
@@ -18,6 +20,13 @@ class RunSingleURLFromFile():
             # IF val is None, just add the key. Else add "key=val"
             if val == "None":
                 keywords.append(str(key))
+            # If you're testing multiple SAME params, add each key-val pair:
+            elif isinstance(val, type([])):
+                for sub_val in val:
+                    if sub_val == "None":
+                        keywords.append(str(key))
+                    else:
+                        keywords.append(str(key)+"="+str(sub_val))
             else:
                 keywords.append(str(key)+"="+str(val))
         self.query = url_api + "&".join(keywords)
@@ -57,7 +66,7 @@ class RunSingleURLFromFile():
         ## DOWNLOAD / PLAIN
         elif content_type == "plain":
             content_type = "download"
-            # Take out all of the timestamp stuff, hash the rest and see if it's the same as the empty hash:
+            # Take out all of the timestamp stuff, then hash the rest and see if it's the same as the empty hash:
             file_content = file_content[927:]
             # If the hash is equal to the empty-download-script hash:
             if hashlib.md5(file_content.encode()).hexdigest() == "3e4671accc22375e305bb8c6e5b61d57":
@@ -123,33 +132,24 @@ tests_root = os.path.join(project_root, "test","**","test_*.yaml")
 list_of_tests.extend(getTestsFromDirectory(tests_root))
 
 
-# Figure out which API to use:
-undeclared_api = 0
-for i, test in enumerate(list_of_tests):
-    # Default to test if api is not set, and count how many do this:
-    if test[1] == None or test[1].upper() == "TEST":
-        if test[1] == None:
-            undeclared_api += 1
-        list_of_tests[i] = (test[0],"https://api-test.asf.alaska.edu/services/search/param?")
-
-    elif test[1].upper() == "PROD":
-        list_of_tests[i] = (test[0],"https://api.daac.asf.alaska.edu/services/search/param?")
-
-    # Not yet tested. May need "services/search..." part:
-    elif test[1].upper() == "LOCAL":
-        list_of_tests[i] = (test[0],"http://127.0.0.1:5000/")
-    # Else leave whatever it is alone.
-
-if undeclared_api > 0:
-    print("\nWARNING: Api was not declared for {0} test(s). Defaulting to Test API.".format(undeclared_api))
-
-
 @pytest.mark.parametrize("json_test", list_of_tests)
-def test_EachURLInYaml(json_test):
+def test_EachURLInYaml(json_test, api, only_run):
+    # api = commandline override, --api
+    # only_run = commandline only run tests that begin with, --only-run
     test_info = json_test[0]
-    api_url = json_test[1]
-    
     title = list(test_info.keys())[0]
     test_info = next(iter(test_info.values()))
     test_info["title"] = title
+
+    # If they passed '--only-run val', and val not in test title:
+    if only_run != None and only_run not in test_info["title"]:
+        pytest.skip("Title of test did not match --only-run param")
+    api_url = api if api != None else json_test[1]
+    if api_url == None or api_url.upper() == "TEST":
+        if api_url == None:
+            warnings.warn(UserWarning("API not declared (DEV/TEST). Defaulting to Test."))
+        api_url = "https://api-test.asf.alaska.edu/services/search/param?"
+    elif api_url.upper() == "PROD":
+        api_url = "https://api.daac.asf.alaska.edu/services/search/param?"
+
     RunSingleURLFromFile(test_info, api_url)
