@@ -51,7 +51,7 @@ class RunSingleURLFromFile():
         # Take out the "csv; charset=utf-8", without crahsing on things without charset
         content_type = content_type.split(';')[0] if ';' in content_type else content_type
         file_content = requests.get(self.query).content.decode("utf-8")
-        print(file_content)
+        # print(file_content)
 
         ## COUNT / HTML:
         if content_type == "html":
