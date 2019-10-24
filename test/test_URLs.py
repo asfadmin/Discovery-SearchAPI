@@ -1,5 +1,5 @@
 
-import os, yaml
+import os, yaml, json
 import pytest, warnings
 import hashlib
 import requests
@@ -76,11 +76,21 @@ class RunSingleURLFromFile():
         elif content_type == "geojson":
             if file_content == '{\n  "features": [],\n  "type": "FeatureCollection"\n}':
                 content_type = "empty geojson"
-        ## JSON
+        ## JSON / JSONLITE
         elif content_type == "json":
+            file_content = json.loads(file_content)
+            ## ERROR
             if "error" in file_content:
                 content_type = "error json"
-            elif file_content == '[\n  []\n]':
+            ## JSONLITE
+            elif "results" in file_content:
+                num_results = len(file_content["results"])
+                if num_results > 0:
+                    content_type = "jsonlite"
+                else:
+                    content_type = "blank jsonlite"
+            ## JSON
+            elif file_content == [[]]:
                 content_type = "blank json"
         ## KML
         elif content_type == "vnd.google-earth.kml+xml":
