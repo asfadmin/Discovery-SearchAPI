@@ -9,6 +9,8 @@ project_root = os.path.realpath(os.path.join(os.path.dirname(__file__),".."))
 resources_root = os.path.join(project_root, "unit_tests", "Resources")
 sys.path.insert(0, project_root)
 import APIUtils as test_file
+import conftest as helpers
+
 
 
 # url = "https://api.daac.asf.alaska.edu/services/utils/files_to_wkt"
@@ -24,6 +26,11 @@ import APIUtils as test_file
 #   assert repaired("file_wkt") == wkt repaired wrapped/unwrapped
 #       (throw if they gave "")
 
+def sendFilesToWKTResponse(url, repair_files, repair_params={}):
+    r = requests.post(url, files=repair_files, params=repair_params) # 'repair': 'True'
+    if r.status_code != 200:
+        assert False, "API returned code {0}. Content: {1}".format(r.status_code, r.content)
+    return r.content.decode("utf-8").replace(" ", "").replace('"','')
 
 class RunSingleShapeFromYaml():
     def __init__(self, json_dict):
@@ -92,7 +99,7 @@ class RunSingleShapeFromYaml():
 
         # Check if you need to print the block:
         if test_dict["print"] == True:
-            print("-----")
+            print("\n#-#-#-#-#-#")
             print(" > Test: " + test_dict["title"])
             print(json.dumps(result, indent=4))
 
@@ -115,58 +122,76 @@ class RunSingleShapeFromYaml():
 # Can't do __name__ == __main__ trick. list_of_tests needs to be declared for the parametrize:
 yaml_name = os.path.splitext(os.path.basename(__file__))[0]+".yml"
 yaml_path = os.path.join(project_root, "unit_tests", yaml_name)
-if not os.path.exists(yaml_path):
-    print("File not Found: " + yaml_path)
-    exit(1)
-with open(yaml_path, "r") as yaml_file:
-    try:
-        yaml_dict = yaml.safe_load(yaml_file)
-    except yaml.YAMLError as e:
-        print("Failed to parse yaml: {0}".format(str(e)))
-        exit(2)
-
-# If the yml IS the list of tests
-if isinstance(yaml_dict, type([])):
-    list_of_tests = yaml_dict
-# If they gave the list of tests:
-elif "tests" in yaml_dict:
-    if isinstance(yaml_dict["tests"], type([])):
-        list_of_tests = yaml_dict["tests"]
-    else:
-        assert False, "Error loading tests: Found 'tests' keyword, but you must have a yaml list as it's value"
-else:
-    assert False, "Error loading tests: Couldn't find 'tests' keyword in {0}, and the file itself was not a list.".format(yaml_name)
+list_of_tests = helpers.loadTestsFromDirectory(yaml_path)
 
 @pytest.mark.parametrize("json_test", list_of_tests)
-def test_EachShapeInYaml(json_test):
-    # change from {"title_a" : {data1: 1,data2: 2}} to {title: "title_a", data1: 1, data2: 2}
-    title = list(json_test.keys())[0]
-    json_test = next(iter(json_test.values()))
-    json_test["title"] = title
-    if json_test["title"] != "local url debug":
-        pytest.skip("tmp skip")
+def test_EachShapeInYaml(json_test, api_cli, only_run_cli):
+    test_info = json_test[0]
+    api_file = json_test[1]
+
+    test_info = helpers.moveTitleIntoTest(test_info)
+    if test_info == None:
+        pytest.skip("Test does not have a title.")
+
+    # If they passed '--only-run val', and val not in test title:
+    if only_run_cli != None and only_run_cli not in test_info["title"]:
+        pytest.skip("Title of test did not match --only-run param")
 
     # If you have nothing to test...
-    if "test wkt" not in json_test:
+    if "test wkt" not in test_info:
         pytest.skip("Test does not have 'test wkt:' param. Nothing to do.")
 
-    if not isinstance(json_test["test wkt"], type([])):
-        json_test["test wkt"] = [json_test["test wkt"]]
+    # Figure out which api to use:
+    api_url = api_cli if api_cli != None else api_file
+    api_url = helpers.getAPI(api_url, params="/services/utils/files_to_wkt")
+
+    # If they only passed one 'test wkt', turn it to a list:
+    if not isinstance(test_info["test wkt"], type([])):
+        test_info["test wkt"] = [test_info["test wkt"]]
+
     test_files = []
     test_wkts = []
-    for test in json_test["test wkt"]:
-        path = os.path.join(resources_root, test)
-        if os.path.isfile(path):
-            test_files.append(('files', open(path, 'rb')))
+    for test in test_info["test wkt"]:
+        # If file, move to test_files. If WKT, move to test_wkts:
+        poss_path = os.path.join(resources_root, test)
+        if os.path.isfile(poss_path):
+            test_files.append(('files', open(poss_path, 'rb')))
         elif '/' in test:
-            warnings.warn(UserWarning("File not found: {0}. File paths start after: '{1}'.".format(path, resources_root)))
+            warnings.warn(UserWarning("File not found: {0}. File paths start after: '{1}'. (Test: {2})".format(poss_path, resources_root, test_info["title"])))
         else:
-            # Else it's a wkt:
             test_wkts.append(test)
+    # Split them to different keys:
+    test_info["test wkt"] = test_wkts
+    test_info["test file"] = test_files
+    
+    if len(test_info["test file"]) == 0 and "parsed wkt" in json_test:
+        warnings.warn(UserWarning("'parsed wkt' declared in {0} test, but no files were found to parse.".format(test_info["title"])))
+    # if len(test_info["test file"]) > 0:
 
-    r = requests.post("http://127.0.0.1:5000/services/utils/files_to_wkt", files=test_files)
-    print("#############")
-    print(r.status_code)
-    print(r.content)
-    print(test_files)
-    # RunSingleShapeFromYaml(json_test)
+    # APPLY DEFAULT PARAMS HERE <--
+    # THEN DO TEST FILE TESTS
+    # THEN DO TEST WKT TESTS
+    return
+
+
+
+
+
+
+
+    if len(test_files) > 0:
+        url = "http://127.0.0.1:5000/services/utils/files_to_wkt"
+        if "parsed wkt" in json_test:
+            parsed_wkt = sendFilesToWKTResponse(url, test_files, repair_params={'repair': 'False'})
+            assert parsed_wkt == json_test["parsed wkt"].replace(" ", ""), "Parsed WKT did not match what was returned. API {0}".format(url)
+        else:
+            parsed_wkt = sendFilesToWKTResponse(url, test_files)
+        test_wkts.append(parsed_wkt)
+
+        # if "parsed wkt" in 
+        # test_wkts.append()
+    if len(test_wkts) == 1:
+        json_test["test wkt"] = test_wkts[0]
+    elif len(tests_wkt) > 1:
+        json_test["test wkt"] = "GEOMETRYCOLLECTION("+",".join(test_wkts)+")"
+    RunSingleShapeFromYaml(json_test)
