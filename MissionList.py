@@ -43,8 +43,9 @@ class MissionList:
         except ET.ParseError as e:
             return {'error': {'type': 'CMR_ERROR', 'report': 'Error parsing XML from CMR: {0}'.format(e)}}
 
-        missions = [{'name': f.text, 'count': f.attrib['count']} for f in root.findall('.//facets/facet[@field="project"]/value')]
-        missions = sorted(missions, key=lambda s: s['name'].casefold())
+        missions = [f.text for f in root.findall('.//facets/facet[@field="project"]/value')]
+        missions = sorted(missions, key=lambda s: s.casefold())
+        logging.debug(missions)
 
         # All done
         return {
