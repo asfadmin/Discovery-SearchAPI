@@ -203,12 +203,20 @@ class Test_parseIntRange():
     def test_NegativeZeros(self):
         intRange = "-0-0"
         ints = test_file.parse_int_range(intRange)
-        assert ints[0] == 0
-        assert ints[1] == 0
+        assert ints == 0
 
         intRange = "0--0"
         ints = test_file.parse_int_range(intRange)
+        assert ints == 0
+
+        intRange = "-0-9"
+        ints = test_file.parse_int_range(intRange)
         assert ints[0] == 0
+        assert ints[1] == 9
+
+        intRange = "-9--0"
+        ints = test_file.parse_int_range(intRange)
+        assert ints[0] == -9
         assert ints[1] == 0
 
     def test_throwsIfNotSorted(self):
@@ -260,8 +268,7 @@ class Test_parseFloatRange():
 
         floatRange = "-0.0--0.0"
         floats = test_file.parse_float_range(floatRange)
-        assert floats[0] == 0
-        assert floats[1] == 0
+        assert floats == 0
 
 
 ## Tests for parse_list will go here, but same as above, I'm not sure exactly
