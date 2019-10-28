@@ -16,12 +16,11 @@ def pytest_addoption(parser):
         help = "Only run tests whos name begin with this parameter")
 
 @pytest.fixture
-def api_cli(request):
-    return request.config.getoption('--api')
-
-@pytest.fixture
-def only_run_cli(request):
-    return request.config.getoption('--only-run')
+def get_cli_args(request):
+    all_args = {}
+    all_args['api'] = request.config.getoption('--api')
+    all_args['only run'] = request.config.getoption('--only-run')
+    return all_args
 
 ############################
 ## BEGIN HELPER FUNCTIONS ##
@@ -72,8 +71,10 @@ def loadTestsFromDirectory(dir_path, recurse=False):
                 print("###########\n")
                 continue
             # Store the configs for each file:
-            api = yaml_dict["API"] if "API" in yaml_dict else None
-            tests = zip(tests, itertools.repeat(api))
+            file_config = {}
+            file_config['api'] = yaml_dict["api"] if "api" in yaml_dict else None
+            file_config['print'] = yaml_dict["print"] if "print" in yaml_dict else None
+            tests = zip(tests, itertools.repeat(file_config))
             list_of_tests.extend(tests)
     return list_of_tests
 
