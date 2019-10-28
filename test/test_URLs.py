@@ -1,7 +1,6 @@
 
-import os, sys, yaml, json
+import os, sys, yaml, json, re
 import pytest, warnings
-import hashlib
 import requests
 import glob
 import itertools
@@ -70,11 +69,13 @@ class RunSingleURLFromFile():
         ## DOWNLOAD / PLAIN
         elif content_type == "plain":
             content_type = "download"
-            # Take out all of the timestamp stuff, then hash the rest and see if it's the same as the empty hash:
-            file_content = file_content[927:]
-            # If the hash is equal to the empty-download-script hash:
-            if hashlib.md5(file_content.encode()).hexdigest() == "3e4671accc22375e305bb8c6e5b61d57":
-                content_type = "empty download"
+            # Check if download script contains this, without granuals in the list:
+            match = re.search(r'self\.files\s*=\s*\[\s*\]', str(file_content))
+            # If you find it, it's the blank script. If not, There's something there to be downloaded:
+            if match:
+                content_type = "blank download"
+            else:
+                content_type = "download"
 
         ## GEOJSON
         elif content_type == "geojson":
@@ -88,8 +89,7 @@ class RunSingleURLFromFile():
                 content_type = "error json"
             ## JSONLITE
             elif "results" in file_content:
-                num_results = len(file_content["results"])
-                if num_results > 0:
+                if len(file_content["results"]) > 0:
                     content_type = "jsonlite"
                 else:
                     content_type = "blank jsonlite"
@@ -133,6 +133,7 @@ def test_EachURLInYaml(json_test, api_cli, only_run_cli):
     api_file = json_test[1]
 
     test_info = helpers.moveTitleIntoTest(test_info)
+
     if test_info == None:
         pytest.skip("Test does not have a title.")
 
