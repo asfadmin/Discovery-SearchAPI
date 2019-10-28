@@ -1,12 +1,15 @@
 
-import os, yaml, json
+import os, sys, yaml, json, re
 import pytest, warnings
-import hashlib
 import requests
 import glob
 import itertools
 import argparse
 import conftest
+# Let python discover other modules, starting one dir behind this one (project root):
+project_root = os.path.realpath(os.path.join(os.path.dirname(__file__),".."))
+sys.path.insert(0, project_root)
+import conftest as helpers
 
 class RunSingleURLFromFile():
     def __init__(self, json_dict, url_api):
@@ -66,11 +69,13 @@ class RunSingleURLFromFile():
         ## DOWNLOAD / PLAIN
         elif content_type == "plain":
             content_type = "download"
-            # Take out all of the timestamp stuff, then hash the rest and see if it's the same as the empty hash:
-            file_content = file_content[927:]
-            # If the hash is equal to the empty-download-script hash:
-            if hashlib.md5(file_content.encode()).hexdigest() == "3e4671accc22375e305bb8c6e5b61d57":
-                content_type = "empty download"
+            # Check if download script contains this, without granuals in the list:
+            match = re.search(r'self\.files\s*=\s*\[\s*\]', str(file_content))
+            # If you find it, it's the blank script. If not, There's something there to be downloaded:
+            if match:
+                content_type = "blank download"
+            else:
+                content_type = "download"
 
         ## GEOJSON
         elif content_type == "geojson":
@@ -84,8 +89,7 @@ class RunSingleURLFromFile():
                 content_type = "error json"
             ## JSONLITE
             elif "results" in file_content:
-                num_results = len(file_content["results"])
-                if num_results > 0:
+                if len(file_content["results"]) > 0:
                     content_type = "jsonlite"
                 else:
                     content_type = "blank jsonlite"
@@ -107,25 +111,6 @@ class RunSingleURLFromFile():
 
         return h.status_code, content_type
 
-def getTestsFromDirectory(dir_path):
-    list_of_tests = []
-    for file in glob.glob(dir_path, recursive=True):
-        with open(file, "r") as yaml_file:
-            try:
-                yaml_dict = yaml.safe_load(yaml_file)
-                api = yaml_dict["API"] if "API" in yaml_dict else None
-                if "tests" in yaml_dict:
-                    # pair the test with what api the test is expected to use:
-                    tests = zip(yaml_dict["tests"], itertools.repeat(api))
-                    list_of_tests.extend(tests)
-                yaml_file.close()
-            except yaml.YAMLError as e:
-                print("###########")
-                print("Failed to parse yaml: {0}".format(str(e)))
-                print("###########")
-                continue
-    return list_of_tests
-
 
 
 
@@ -135,31 +120,29 @@ list_of_tests = []
 
 # Get the tests from all *yml* files:
 tests_root = os.path.join(project_root, "test","**","test_*.yml")
-print(tests_root)
-list_of_tests.extend(getTestsFromDirectory(tests_root))
+list_of_tests.extend(helpers.loadTestsFromDirectory(tests_root, recurse=True))
+
 # Same, but with *yaml* files now:
 tests_root = os.path.join(project_root, "test","**","test_*.yaml")
-list_of_tests.extend(getTestsFromDirectory(tests_root))
+list_of_tests.extend(helpers.loadTestsFromDirectory(tests_root, recurse=True))
 
 
 @pytest.mark.parametrize("json_test", list_of_tests)
-def test_EachURLInYaml(json_test, api, only_run):
-    # api = commandline override, --api
-    # only_run = commandline only run tests that begin with, --only-run
+def test_EachURLInYaml(json_test, api_cli, only_run_cli):
     test_info = json_test[0]
-    title = list(test_info.keys())[0]
-    test_info = next(iter(test_info.values()))
-    test_info["title"] = title
+    api_file = json_test[1]
+
+    test_info = helpers.moveTitleIntoTest(test_info)
+
+    if test_info == None:
+        pytest.skip("Test does not have a title.")
 
     # If they passed '--only-run val', and val not in test title:
-    if only_run != None and only_run not in test_info["title"]:
+    if only_run_cli != None and only_run_cli not in test_info["title"]:
         pytest.skip("Title of test did not match --only-run param")
-    api_url = api if api != None else json_test[1]
-    if api_url == None or api_url.upper() == "TEST":
-        if api_url == None:
-            warnings.warn(UserWarning("API not declared (DEV/TEST). Defaulting to Test."))
-        api_url = "https://api-test.asf.alaska.edu/services/search/param?"
-    elif api_url.upper() == "PROD":
-        api_url = "https://api.daac.asf.alaska.edu/services/search/param?"
+
+    api_url = api_cli if api_cli != None else api_file
+    # Change any keywords for api to the api's url itself:
+    api_url = helpers.getAPI(api_url, default="TEST", params="/services/search/param?")
 
     RunSingleURLFromFile(test_info, api_url)
