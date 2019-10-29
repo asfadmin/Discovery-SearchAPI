@@ -32,9 +32,9 @@ class RunSingleURLFromFile():
         status_code, returned_file = self.runQuery()
 
         if "expected code" in json_dict:
-            assert json_dict["expected code"] == status_code, "Status codes is different than expected. Test: {0}".format(json_dict["title"])
+            assert json_dict["expected code"] == status_code, "Status codes is different than expected. Test: {0}. URL: {1}.".format(json_dict["title"], self.query)
         if "expected file" in json_dict:
-            assert json_dict["expected file"] == returned_file, "Different file type returned than expected. Test: {0}".format(json_dict["title"])
+            assert json_dict["expected file"] == returned_file, "Different file type returned than expected. Test: {0}. URL: {1}.".format(json_dict["title"], self.query)
 
         if "expected file" not in json_dict and "expected code" not in json_dict:
             print()
