@@ -481,6 +481,30 @@ tests:
     expected file: error json
     expected code: 400
 
+- maxResults 0 jsonlite invalid:
+    platform: SENTINEL-1
+    maxResults: 0
+    output: jsonlite
+
+    expected file: error json
+    expected code: 400
+
+- maxResults a jsonlite invalid:
+    platform: SENTINEL-1
+    maxResults: a
+    output: jsonlite
+
+    expected file: error json
+    expected code: 400
+
+- maxResults specchar jsonlite invalid:
+    platform: SENTINEL-1
+    maxResults: +_
+    output: jsonlite
+
+    expected file: error json
+    expected code: 400
+
 - maxResults 0 geojson invalid:
     platform: SENTINEL-1
     maxResults: 0
