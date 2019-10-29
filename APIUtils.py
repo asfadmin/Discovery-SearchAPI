@@ -65,18 +65,11 @@ class simplifyWKT():
                 self.repairs.append(possible_repair)
                 logging.debug(self.repairs[-1])
 
-        # Quick sanity check. No clue if it's actually possible to hit this:
-        if single_wkt.geom_type.upper() not in ["POLYGON", "LINESTRING", "POINT"]:
-            self.error = {'error': {'type': 'VALUE', 'report': 'Could not simplify WKT down to single shape.'} }
-            return
-
-        # Simplify down to the number of points CMR can handle:
-        single_wkt = self.__simplifyPoints(single_wkt)
-        if single_wkt == None:
-            self.error = { 'error': {'type': 'SIMPLIFY', 'report': 'Could not simplify {0} past 300 points. (from {1} points)'.format(single_wkt.geom_type, self.__shapeLength(single_wkt))} }
-            return
-        # Convert that one shape into the strings:
-        self.wkt_unwrapped, self.wkt_wrapped = self.__clampAndWrapWKT(single_wkt)
+ 
+        self.wkt_unwrapped, self.wkt_wrapped = self.__repairMergedWKT(single_wkt)
+        # If the repairMergedWkt hit an error:
+        if self.error != None:
+            return        
 
         if single_wkt.geom_type.upper() == "POLYGON":
             # Uses/Modifies wkt_wrapped and wkt_unwrapped:
@@ -323,32 +316,6 @@ class simplifyWKT():
             print(union)
             return None
 
-    # shapely_wkt => Shapely object of type ["POLYGON", "LINESTRING", "POINT"]
-    def __simplifyPoints(self, shapely_wkt):
-        tolerance = 0.00001
-        attempts = 0
-        original_num_points = self.__shapeLength(shapely_wkt)
-        closest_distance = self.__getClosestPointDist(shapely_wkt)
-        while (self.__shapeLength(shapely_wkt) > 300 or closest_distance < 0.004) and attempts < 10:
-            attempts += 1
-            logging.debug('The shape\'s length is {0}, simplifying further with tolerance {1}'.format(self.__shapeLength(shapely_wkt), tolerance ))
-            shapely_wkt = shapely_wkt.simplify(tolerance, preserve_topology=True)
-            # Set the tolerance/closest_distance for the next loop around:
-            tolerance *= 5
-            closest_distance = self.__getClosestPointDist(shapely_wkt)
-
-        # The __init__ that calls this function will check if this returns 'None', and return an error to user: 
-        if self.__shapeLength(shapely_wkt) > 300:
-            return None
-        # Tack on the report if needed:
-        if attempts > 0:
-            self.repairs.append({
-                'type': 'SIMPLIFY',
-                'report': 'Simplified shape from {0} points to {1} points, after {2} iterations.'.format(original_num_points, self.__shapeLength(shapely_wkt), attempts)
-            })
-            logging.debug(self.repairs[-1])
-        return shapely_wkt
-
     # Takes either a list, or single geomet/shapely wkt, and returns a unique list of points:
     def __getAllCoords(self, wkt_obj):
         if not isinstance(wkt, type([])):
@@ -371,105 +338,143 @@ class simplifyWKT():
                 all_coords.append(this_coord)
         return all_coords
 
-
-    def __getClosestPointDist(self, shapely_wkt):
-        # Modified from: https://stackoverflow.com/questions/45127141/find-the-nearest-point-in-distance-for-all-the-points-in-the-dataset-python
-        points = self.__getAllCoords(shapely_wkt)
-        if len(points) < 2:
-            return float("inf")
-
-        def distance(p1, p2):
-            lon1, lat1 = p1
-            lon2, lat2 = p2
-            # Convert to radians:
-            lon1, lat1, lon2, lat2 = map(np.radians, [lon1, lat1, lon2, lat2])
-            # haversine formula
-            dlon = lon2 - lon1
-            dlat = lat2 - lat1
-            a = np.sin(dlat/2)**2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon/2)**2
-            c = 2 * np.arcsin(np.sqrt(a))
-            km = 6367 * c
-            return km
-        nbrs = NearestNeighbors(n_neighbors=2, metric=distance).fit(points)
-        distances, indices = nbrs.kneighbors(points)
-        distances = distances.tolist()
-        #Throw away unneeded data in distances:
-        for i, dist in enumerate(distances):
-            distances[i] = dist[1]
-        return min(distances)
-
-
-    # Do some shapely magic:
-    def __shapeLength(self, shp):
-        shp_type = shp.geom_type.upper()
-        if shp_type == 'POINT':
-            return 1
-        if shp_type == 'LINESTRING':
-            return len(shp.coords)
-        if shp_type == 'POLYGON':
-            return len(shp.exterior.coords)
-        return None
-
     # shapely_wkt => Shapely object of type ["POLYGON", "LINESTRING", "POINT"]
-    def __clampAndWrapWKT(self, shapely_wkt):
+    def __repairMergedWKT(self, single_wkt):
+        ## Helper functions (Code at end of these):
+        # First, it clamps the values, simplifies the points, THEN wraps and 
+        #       returns wrapped/unwrapped strings 
+        def getCoords(wkt_json):
+            # make coords of any shape the format of [[coord, coord],[coord,coord]]:
+            if wkt_json["type"].upper() == "POLYGON":
+                [coords] = wkt_json["coordinates"]
+            elif wkt_json["type"].upper() == "LINESTRING":
+                coords = wkt_json["coordinates"]
+            elif wkt_json["type"].upper() == "POINT":
+                coords = [wkt_json["coordinates"]]
+            return coords
+
+        def getJsonWKT(str_type, coords):
+            if str_type.upper() == "POLYGON":
+                new_shape = shapely.wkt.dumps(Polygon( coords ))
+            elif str_type.upper() == "LINESTRING":
+                new_shape = shapely.wkt.dumps(LineString( coords ))
+            elif str_type.upper() == "POINT":
+                new_shape = shapely.wkt.dumps(Point( coords[0] ))
+            return wkt.loads(new_shape)
+
+        def getClampedCoords(wkt_json):
+            # num_coords out of lat +/- 90
+            clamped = 0
+            new_coords = []
+            old_coords = getCoords(wkt_json)
+            for i in range(len(old_coords)):
+                x = old_coords[i][0]
+                y = old_coords[i][1]
+                if y > 90:
+                    y = 90
+                    clamped += 1
+                elif y < -90:
+                    y = -90
+                    clamped += 1
+                new_coords.append([x,y])
+            if clamped > 0:
+                self.repairs.append({
+                    'type': 'CLAMP',
+                    'report': 'Clamped {0} value(s) to +/-90 latitude'.format(clamped)
+                })
+                logging.debug(self.repairs[-1])
+            return getJsonWKT(wkt_json['type'], new_coords)
+
+        def getWrappedCoords(wkt_json):
+            # num_coords out of long +/- 90
+            wrapped = 0
+            new_coords = []
+            old_coords = getCoords(wkt_json)
+            for i in range(len(old_coords)):
+                x = old_coords[i][0]
+                y = old_coords[i][1]
+                if abs(x) > 180:
+                    wrapped += 1
+                    x = (x + 180) % 360 - 180
+                new_coords.append([x,y])
+            if wrapped > 0:
+                self.repairs.append({
+                    'type': 'WRAP',
+                    'report': 'Wrapped {0} value(s) to +/-180 longitude'.format(wrapped)
+                })
+                logging.debug(self.repairs[-1])
+            return getJsonWKT(wkt_json['type'], new_coords)
+
+        def simplifyPoints(wkt_json):
+            def getClosestPointDist(wkt_json):
+                # Modified from: https://stackoverflow.com/questions/45127141/find-the-nearest-point-in-distance-for-all-the-points-in-the-dataset-python
+                def distance(p1, p2):
+                    lon1, lat1 = p1
+                    lon2, lat2 = p2
+                    # Convert to radians:
+                    lon1, lat1, lon2, lat2 = map(np.radians, [lon1, lat1, lon2, lat2])
+                    # haversine formula
+                    dlon = lon2 - lon1
+                    dlat = lat2 - lat1
+                    a = np.sin(dlat/2)**2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon/2)**2
+                    c = 2 * np.arcsin(np.sqrt(a))
+                    km = 6367 * c
+                    return km
+
+                ## getClosestPointDist START:
+                points = self.__getAllCoords(wkt_json)
+                if len(points) < 2:
+                    return float("inf")
+                nbrs = NearestNeighbors(n_neighbors=2, metric=distance).fit(points)
+                distances, indices = nbrs.kneighbors(points)
+                distances = distances.tolist()
+                #Throw away unneeded data in distances:
+                for i, dist in enumerate(distances):
+                    distances[i] = dist[1]
+                return min(distances)
+
+            ## simplifyPoints START
+            tolerance = 0.00001
+            attempts = 0
+            org_num_points = len(getCoords(wkt_json))
+            current_num_points = org_num_points
+            closest_distance = getClosestPointDist(wkt_json)
+            wkt_shapely = shapely.wkt.loads(wkt.dumps(wkt_json))
+            while (current_num_points > 300 or closest_distance < 0.004) and attempts < 10:
+                # Set the tolerance/closest_distance for the next loop around:
+                logging.debug('The shape\'s length is {0}, simplifying further with tolerance {1}'.format(current_num_points, tolerance ))
+                attempts += 1
+                wkt_shapely = wkt_shapely.simplify(tolerance, preserve_topology=True)
+                tolerance *= 5
+                wkt_json = wkt.loads(shapely.wkt.dumps(wkt_shapely))
+                current_num_points = len(getCoords(wkt_json))
+                closest_distance = getClosestPointDist(wkt_json)
+            # If it couldn't simplify enough:
+            # Would add closest_dist check here, but it's unclear *exactly* what that distance is. Just hope CMR accept's it at this point:
+            if current_num_points > 300:
+                self.error = { 'error': {'type': 'SIMPLIFY', 'report': 'Could not simplify {0} past 300 points. (Got from {1}, to {2})'.format(wkt_shapely.geom_type, org_num_points, current_num_points)} }
+                return
+            if attempts > 0:
+                self.repairs.append({
+                    'type': 'SIMPLIFY',
+                    'report': 'Simplified shape from {0} points to {1} points, after {2} iterations.'.format(org_num_points, current_num_points, attempts)
+                })
+                logging.debug(self.repairs[-1])
+            return wkt.loads(shapely.wkt.dumps(wkt_shapely))
+
+        ## REPAIR MERGED WKT START:
+        # Quick sanity check. No clue if it's actually possible to hit this:
+        if single_wkt.geom_type.upper() not in ["POLYGON", "LINESTRING", "POINT"]:
+            self.error = {'error': {'type': 'VALUE', 'report': 'Could not simplify WKT down to single shape.'} }
+            return
         # You can't edit coords in shapely. You have to create a new shape w/ the new coords:
-        wkt_json = wkt.loads(shapely.wkt.dumps(shapely_wkt))
-        # make coords of any shape the format of [[coord, coord],[coord,coord]]:
-        if wkt_json["type"].upper() == "POLYGON":
-            [coords] = wkt_json["coordinates"]
-        elif wkt_json["type"].upper() == "LINESTRING":
-            coords = wkt_json["coordinates"]
-        elif wkt_json["type"].upper() == "POINT":
-            coords = [wkt_json["coordinates"]]
-
-        # num_coords out of lon +/- 180
-        wrapped = 0
-        # num_coords out of lat +/- 90
-        clamped = 0
-
-        new_coords = []
-        for i in range(len(coords)):
-            x = coords[i][0]
-            y = coords[i][1]
-            # Longitude:
-            if abs(x) > 180:
-                wrapped += 1
-                x = (coords[i][0] + 180) % 360 - 180
-            # Latitude:
-            if y > 90:
-                clamped += 1
-                y = 90
-            elif y < -90:
-                clamped += 1
-                y = -90
-            new_coords.append([x,y])
-        # Do the reporting:
-        if wrapped > 0:
-            self.repairs.append({
-                'type': 'WRAP',
-                'report': 'Wrapped {0} value(s) to +/-180 longitude'.format(wrapped)
-            })
-            logging.debug(self.repairs[-1])
-        if clamped > 0:
-            self.repairs.append({
-                'type': 'CLAMP',
-                'report': 'Clamped {0} value(s) to +/-90 latitude'.format(clamped)
-            })
-            logging.debug(self.repairs[-1])
-
-        wkt_unwrapped = shapely.wkt.dumps(shapely_wkt)
-
-        if wkt_json["type"].upper() == "POLYGON":
-            wkt_wrapped = shapely.wkt.dumps(Polygon( new_coords ))
-            return wkt_unwrapped, wkt_wrapped
-
-        elif wkt_json["type"].upper() == "LINESTRING":
-            wkt_wrapped = shapely.wkt.dumps(LineString( new_coords ))
-            return wkt_unwrapped, wkt_wrapped
-
-        elif wkt_json["type"].upper() == "POINT":
-            wkt_wrapped = shapely.wkt.dumps(Point( new_coords[0] ))
-            return wkt_unwrapped, wkt_wrapped
+        wkt_json = wkt.loads(shapely.wkt.dumps(single_wkt))
+        wkt_json = getClampedCoords(wkt_json)
+        wkt_json = simplifyPoints(wkt_json)
+        # Clamp, simplify, *then* wrap, to help simplify be more accuate w/ points outside of poles
+        wkt_unwrapped = wkt.dumps(wkt_json)
+        wkt_wrapped = wkt.dumps(getWrappedCoords(wkt_json))
+        return wkt_unwrapped, wkt_wrapped
 
     def __runWKTsAgainstCMR(self):
     

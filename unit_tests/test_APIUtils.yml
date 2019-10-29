@@ -33,15 +33,13 @@
 - clamp latitude:
     # Just noticed repaired wkt unwrapped values are not clamped. Should they be? (clamped vs wrapped independant?)
     test wkt: POLYGON((-9 6, 48 -20, 25 500, -9 6))
-    repaired wkt unwrapped: POLYGON((-9 6, 48 -20, 25 500, -9 6))
-    repaired wkt wrapped: POLYGON((-9 6, 48 -20, 25 90, -9 6))
+    repaired wkt: POLYGON((-9 6, 48 -20, 25 90, -9 6))
     repair: "Clamped 1 value(s) to +/-90 latitude"
     # print: True
 
 - clamp negative latitude:
     test wkt: POLYGON((-9 6, 25 -500, 48 -20, -9 6))
-    repaired wkt unwrapped: POLYGON((-9 6, 25 -500, 48 -20, -9 6))
-    repaired wkt wrapped: POLYGON((-9 6, 25 -90, 48 -20, -9 6))
+    repaired wkt: POLYGON((-9 6, 25 -90, 48 -20, -9 6))
     repair: "Clamped 1 value(s) to +/-90 latitude"
 
 - wrap longitude:
