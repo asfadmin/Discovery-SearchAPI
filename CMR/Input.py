@@ -165,10 +165,9 @@ def parse_point_string(v):
 # NOTE: If given an empty ("POINT EMPTY") shape, will return "point:". Should it throw instead?
 def parse_wkt(v):
     try:
-        wkt_json = wkt.loads(v)
-    except (ValueError, InvalidGeoJSONException) as e:
+        wkt_json = wkt.loads(str(v).upper())
+    except (ValueError, AttributeError, InvalidGeoJSONException) as e:
         raise ValueError('Cannot load WKT: {0}. Error: {1}'.format(v, str(e)))
-    
     # take note of the WKT type
     if wkt_json['type'].upper() not in ["POINT","LINESTRING", "POLYGON"]:
         raise ValueError('Unsupported WKT: {0}.'.format(v))
@@ -179,10 +178,8 @@ def parse_wkt(v):
         # (Also de-nest it in the process)
         if len(wkt_json['coordinates']) != 0:
             coords = coords[0]
-    
     elif wkt_json['type'].upper() == "LINESTRING":
         coords = wkt_json['coordinates']
-    
     else: # type == POINT
         coords = [wkt_json['coordinates']]
     # Turn [[x,y],[x,y]] to [x,y,x,y]:
