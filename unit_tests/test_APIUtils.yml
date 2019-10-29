@@ -1,11 +1,4 @@
 #################
-##  TMP TESTS  ##
-#################
-- local url debug:
-    test wkt: geojsons_valid/Basic_FC_1.geojson
-    
-
-#################
 ## BASIC TESTS ##
 #################
 # *always* check for repairs, unless "check repairs: False"?
@@ -106,14 +99,14 @@
 #################
 - Bad input: 
     test wkt: Totally a ligit poly....
-    expected error msg: "Could not parse WKT: Unsupported geometry type 'TOTALLY'."
+    repaired error msg: "Could not parse WKT: Unsupported geometry type 'TOTALLY'."
 
 - self intersectiong poly:
     test wkt: POLYGON((7 8, 36 38, 11 42, 48 -20,7 8))
-    expected error msg: "Self-intersecting polygon"
+    repaired error msg: "Self-intersecting polygon"
 
 - no valid shapes:
     test wkt: POLYGON EMPTY
-    expected error msg: "Could not parse WKT: No valid shapes found"
+    repaired error msg: "Could not parse WKT: No valid shapes found"
 
 # TODO: add "test path" that takes relative paths. Let FilesToWKT figure out which parser to use
