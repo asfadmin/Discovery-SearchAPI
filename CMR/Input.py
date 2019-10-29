@@ -186,4 +186,4 @@ def parse_wkt(v):
     coords = [x for x in sum(coords, [])]
     # Turn any "6e8" to a literal number. (As a sting):
     coords = ['{:.16f}'.format(float(cord)) for cord in coords]
-    return '{0}:{1}'.format(wkt_json['type'], ','.join(coords))
+    return '{0}:{1}'.format(wkt_json['type'].lower(), ','.join(coords))
