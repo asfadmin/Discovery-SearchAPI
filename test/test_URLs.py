@@ -5,7 +5,7 @@ import requests
 import glob
 import itertools
 import argparse
-import conftest
+
 # Let python discover other modules, starting one dir behind this one (project root):
 project_root = os.path.realpath(os.path.join(os.path.dirname(__file__),".."))
 sys.path.insert(0, project_root)
