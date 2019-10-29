@@ -25,11 +25,7 @@ class RunSingleURLFromFile():
                 keywords.append(str(key))
             # If you're testing multiple SAME params, add each key-val pair:
             elif isinstance(val, type([])):
-                for sub_val in val:
-                    if sub_val == "None":
-                        keywords.append(str(key))
-                    else:
-                        keywords.append(str(key)+"="+str(sub_val))
+                keywords.append(str(key)+"="+",".join(val))
             else:
                 keywords.append(str(key)+"="+str(val))
         self.query = url_api + "&".join(keywords)
@@ -128,9 +124,13 @@ list_of_tests.extend(helpers.loadTestsFromDirectory(tests_root, recurse=True))
 
 
 @pytest.mark.parametrize("json_test", list_of_tests)
-def test_EachURLInYaml(json_test, api_cli, only_run_cli):
+def test_EachURLInYaml(json_test, get_cli_args):
     test_info = json_test[0]
-    api_file = json_test[1]
+    file_config = json_test[1]
+
+    # Load command line args:
+    api_cli = get_cli_args["api"]
+    only_run_cli = get_cli_args["only run"]
 
     test_info = helpers.moveTitleIntoTest(test_info)
 
@@ -141,7 +141,7 @@ def test_EachURLInYaml(json_test, api_cli, only_run_cli):
     if only_run_cli != None and only_run_cli not in test_info["title"]:
         pytest.skip("Title of test did not match --only-run param")
 
-    api_url = api_cli if api_cli != None else api_file
+    api_url = api_cli if api_cli != None else file_config['api']
     # Change any keywords for api to the api's url itself:
     api_url = helpers.getAPI(api_url, default="TEST", params="/services/search/param?")
 
