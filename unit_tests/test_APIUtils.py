@@ -178,9 +178,13 @@ def test_EachShapeInYaml(json_test, get_cli_args):
 
     # Check if you need to print the start block:
     if test_info["print"]:
-        print("\n#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#")
+        print("\n#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#")
         print(" > Test: " + test_info["title"])
         print("    api: " + str(test_info['api']))
+        if len(test_info["test file"]) > 0:
+            print("    Found {0} file(s) in test config.".format(len(test_info["test file"])))
+        if len(test_info["test wkt"]) > 0:
+            print("    Found {0} wkt(s) in test config.".format(len(test_info["test wkt"])))
         print()
 
     # RUN PARSED WKT TEST:
