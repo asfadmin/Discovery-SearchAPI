@@ -48,8 +48,8 @@ class FilesToWKT:
         # KML
         elif ext == '.kml':
             parsed_kml = parse_kml(f)
-            if "error" in parse_kml or not should_repair:
-                return parse_kml
+            if "error" in parsed_kml or not should_repair:
+                return parsed_kml
             return repairWKT(parsed_kml)
         # SHP
         elif ext == '.shp':
@@ -127,7 +127,6 @@ def parse_kml(f):
     # All these BUT the type/value errors are for the md.parseString:
     except (DefusedXmlException, DTDForbidden, EntitiesForbidden, ExternalReferenceForbidden, NotSupportedError, TypeError, ValueError) as e:
         return {'error': {'type': 'VALUE', 'report': 'Could not parse kml: {0}'.format(str(e))}} 
-
     return json_to_wkt(wkt_json)
 
 
