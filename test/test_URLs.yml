@@ -60,14 +60,6 @@ tests:
     expected file: csv
     expected code: 200
 
-- absoluteOrbit zero range list:
-    absoluteOrbit: 27120-27120,27076
-    maxresults: 10
-    output: csv
-
-    expected file: csv
-    expected code: 200
-
 - asfframe R1 single:
     asfframe: 340
     platform: R1
@@ -423,7 +415,7 @@ tests:
     expected code: 200
 
 - frame single:
-    frame: 2277
+    frame: 581
     maxresults: 10
     output: csv
 
@@ -431,7 +423,7 @@ tests:
     expected code: 200
 
 - frame range:
-    frame: 1530-1532
+    frame: 580-585
     maxresults: 10
     output: csv
 
@@ -439,7 +431,7 @@ tests:
     expected code: 200
 
 - frame list:
-    frame: 1530,1531,1532
+    frame: 578,579,580
     maxresults: 10
     output: csv
 
@@ -455,8 +447,8 @@ tests:
     expected code: 200
 
 - frame zero range:
-    frame: 190-190
-    platform: ALOS
+    frame: 582-582
+    platform: SA,SB
     maxresults: 10
     output: csv
 
@@ -464,8 +456,8 @@ tests:
     expected code: 200
 
 - frame zero range list:
-    frame: 180-180,185
-    platform: ALOS
+    frame: 582-582,590
+    platform: SB
     maxresults: 10
     output: csv
 
@@ -657,6 +649,14 @@ tests:
 
 - linestring:
     linestring: -150.2,65.0,-150.1,65.5
+    maxResults: 10
+    output: CSV
+
+    expected file: csv
+    expected code: 200
+
+- linestring uppercase:
+    LINESTRING: -150.2,65.0,-150.1,65.5
     maxResults: 10
     output: CSV
 
@@ -1689,6 +1689,14 @@ tests:
     expected file: csv
     expected code: 200
 
+- point uppercase:
+    POINT: -150.2,65.0
+    maxResults: 10
+    output: CSV
+
+    expected file: csv
+    expected code: 200
+
 - polarization HH:
     polarization: HH
     platform: SB
@@ -1835,6 +1843,14 @@ tests:
     expected file: csv
     expected code: 200
 
+- polygon uppercase:
+    POLYGON: -148.52,64.63,-150.41,64.64,-149.58,63.86,-148.52,64.63
+    maxResults: 100
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
 - polygon multi:
     polygon: 12.13,41.74,13.4,41.74,13.4,42.75,12.13,42.75,12.13,41.74
     platform: Sentinel-1A,Sentinel-1B
@@ -1891,8 +1907,8 @@ tests:
     expected file: csv
     expected code: 200
 
-- processingLevel L1 L1.1:
-    processingLevel: L1.1,L1.0
+- processingLevel L1 L1.1 Metadata:
+    processingLevel: L1.1,L1.0,METADATA
     maxResults: 10
     output: csv
 
@@ -2036,21 +2052,20 @@ tests:
 
 - product_list mix:
     product_list:
-        - S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80-GRD_HD,S1B_IW_GRDH_1SDV_20190410T153301_20190410T153328_015746_01D8D2_0E9B-GRD_HD
-        - ALPSRP079300700-L1.1,ALPSRP079300700-L1.0,ALPSRP079300700-RTC_LOW_RES,ALPSRP079300670-L1.0
+        - S1B_S6_GRDH_1SDV_20190911T214309_20190911T214338_017995_021E10_5CCB-GRD_HD,S1B_EW_SLC__1SDH_20190813T071957_20190813T072100_017564_02108E_9322-SLC
+        - ts1902-PSTOKES,ts1902-PTIF,ts1888-LTIF
     output: json
 
     expected file: json
     expected code: 200
 
 - product_list multi:
-    #currently failing, try again with python script updates
     product_list: 
-        - S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80-GRD_HD
-        - ALPSRP079300700-L1.1
-        - UA_TXcoas_23905_11044_008_110630_L090_CX_02-COMPLEX
-        - R1_01509_ST6_F167-L0
-        - SIRC1_16_GRD_ALL_098_030_013_19940415T111359_19940415T111411-GRD
+        - S1B_EW_OCN__2SSH_20190808T030727_20190808T030837_017488_020E3B_D440-OCN
+        - ts1902-PTIF
+        - UA_SDelta_15502_17117_010_171026_L090_CX_01-PAULI
+        - SP_15079_D_005-L1A_Radar_RO_QA
+        - R1_68669_20081230_092353-L0
     output: json
 
     expected file: json
@@ -2058,8 +2073,8 @@ tests:
 
 - product_list multi list:
     product_list:
-        - S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80-GRD_HD
-        - ts726-CSTOKES,ts726-DEM,ts726-LSTOKES,ts726-LTIF,ts726-CTIF
+        - S1A_S4_SLC__1SDV_20190809T062903_20190809T062922_028488_03385D_2C10-SLC
+        - ts726-CSTOKES,ts726-DEM,ts726-LSTOKES,ts726-LTIF,ts726-CTIF,ts1721-LTIF,ts1733-PTIF
     output: json
 
     expected file: json
