@@ -1,244 +1,209 @@
-import sys, os
-from geomet import wkt
-
-
+import sys, os, yaml, json
+import pytest, warnings
+import geomet.wkt
+import shapely.wkt
+import requests
 # Let python discover other modules, starting one dir behind this one (project root):
 project_root = os.path.realpath(os.path.join(os.path.dirname(__file__),".."))
 resources_root = os.path.join(project_root, "unit_tests", "Resources")
 sys.path.insert(0, project_root)
 import APIUtils as test_file
-
-
-# Helper method. Used on tests that are expected to return legit responses
-def simplify_legit_wkt(test_wkt):
-    wkt_simplified = test_file.repairWKT(test_wkt)
-    try:
-        actual_wrapped = wkt_simplified["wkt"]["wrapped"]
-        actual_unwrapped = wkt_simplified["wkt"]["unwrapped"]
-        repairs = wkt_simplified["repairs"]
-    except KeyError:
-        # This means the parse function failed to load the file:
-        print( "Failed wkt: {0}".format(str(test_wkt)) )
-        # This WILL fail, but it shows the error on the test screen this way:
-        assert str(wkt_simplified) == None
-
-    actual_wrapped = wkt.loads(actual_wrapped)
-    actual_unwrapped = wkt.loads(actual_unwrapped)
-
-    return actual_wrapped, actual_unwrapped, repairs
-
-# Helper method. This one assumes something WILL go wrong.
-def simplify_NOT_legit_wkt(test_wkt):
-    wkt_simplified = test_file.repairWKT(test_wkt)
-    try:
-        error = wkt_simplified["error"]
-    except KeyError:
-        # If an error didn't happen, this will fail and print
-        # whatever the contents of "error" are:
-        assert error == None
-    return error
-
-
-class Test_repairWKT():
-    ###############################
-    #   STORAGE OF GENERIC WKT's  #
-    ###############################
-    # Random single wkt's:
-    long_forked_poly = "POLYGON ((58 35, 31 10, -1 15, 29 7.5, 5 -26, 65 39, -36 15, 58 35))"
-    long_forked_poly_unconnected = "POLYGON ((58 35, 31 10, -1 15, 29 7.5, 5 -26, 65 39, -36 15))"
-    mulidimentional_poly_1 = "POLYGON((27 25 0 0, 102 36 -96 83, 102 46 4 8, 92 61 15 16, 13 41 23 42, 16 30 -73 8, 27 25 0 0))"
-
-    # basics don't need ANY repair work done: (Others may need reversed winding order repair, for example)
-    basic_point = "POINT (30 10)"
-    basic_linestring = "LINESTRING(13 5, 30 25, 12 42, 22 38, -3 40, 45 -19)"
-    basic_poly = "POLYGON((30 10, 40 40, 20 40, 10 20, 30 10))"
-
-    # These merge to form a polygon w/ a hole between them, while the individual polygons don't have holes:
-    left_donut_side = "POLYGON((12 8,8 6,10 2,14 3,15 0,9 0,7 7,12 10,12 8))"
-    right_donut_side = "POLYGON((10 8,14 6,14 4,13 1,13 0,15 4,14.5 7,10 9,10 8))"  
-    test_donut = "GEOMETRYCOLLECTION ("+left_donut_side+", "+right_donut_side+")"
-
-
-    #############################
-    #  NO REPAIRS NEEDED TESTS  #
-    #############################
-    def test_basicPointWkt(self):
-        actual_wrapped, actual_unwrapped, repairs = simplify_legit_wkt(self.basic_point)
-        expected_result_wkt = wkt.loads(self.basic_point)
-
-        assert expected_result_wkt == actual_wrapped
-        assert expected_result_wkt == actual_unwrapped
-        assert len(repairs) == 0
-
-
-    def test_basicLineStringWKT(self):
-        actual_wrapped, actual_unwrapped, repairs = simplify_legit_wkt(self.basic_linestring)
-        expected_result_wkt = wkt.loads(self.basic_linestring)
-
-        assert expected_result_wkt == actual_wrapped
-        assert expected_result_wkt == actual_unwrapped
-        assert len(repairs) == 0
-
-
-    def test_basicPolyWKT(self):
-        actual_wrapped, actual_unwrapped, repairs = simplify_legit_wkt(self.basic_poly)
-        expected_result_wkt = wkt.loads(self.basic_poly)
-
-        assert expected_result_wkt == actual_wrapped
-        assert expected_result_wkt == actual_unwrapped
-        assert len(repairs) == 0
-
-
-    ##################
-    #  TEST REPAIRS  #
-    ##################
-    def test_REPAIR_unconnectedPolygon(self):
-        # Unconnected poly means the first set of coords do not match the last
-        actual_wrapped, actual_unwrapped, repairs = simplify_legit_wkt(self.long_forked_poly_unconnected)
-        # Load the connected poly, reverse the coords:
-        expected_result_wkt = wkt.loads(self.long_forked_poly)
-
-        assert expected_result_wkt == actual_wrapped
-        assert expected_result_wkt == actual_unwrapped
-        assert "Closed 1 open polygon(s)" in str(repairs)
-        assert len(repairs) == 1
-
-
-    def test_REPAIR_mergedByConvexHullingIndividual(self):
-        convex_hull_intersects = "MULTIPOLYGON((( 11 5, 16 40, 36 39, 13 43, 11 5)),(( 19 33, 32 25, 47 42, 31 29, 19 33)) )"
-        actual_wrapped, actual_unwrapped, repairs = simplify_legit_wkt(convex_hull_intersects)
-        expected_result_wkt = wkt.loads("POLYGON ((11 5, 27.6666666666666679 27.6666666666666679, 32 25, 47 42, 35.4841815680880330 38.2984869325997224, 36 39, 13 43, 11 5))")
-
-        assert expected_result_wkt == actual_wrapped
-        assert expected_result_wkt == actual_unwrapped
-        assert "Reversed polygon winding order" in str(repairs)
-        assert "Unconnected shapes: Convex-halled each INDIVIDUAL shape to merge them together" in str(repairs)
-        assert len(repairs) == 2
-
-
-    def test_REPAIR_wrapLongitude(self):
-        poly = "POLYGON ((22 22, 9000 8, 120 3, 22 22))"
-        actual_wrapped, actual_unwrapped, repairs = simplify_legit_wkt(poly)
-        expected_wrapped = wkt.loads("POLYGON ((22 22, 0 8, 120 3, 22 22))")
-        assert expected_wrapped == actual_wrapped
-        assert wkt.loads(poly) == actual_unwrapped
-        assert "Wrapped 1 value(s) to +/-180 longitude" in str(repairs)
-        assert len(repairs) == 1
-
-
-    def test_REPAIR_clampLatitudePositive(self):
-        poly = "POLYGON((-9 6, 48 -20, 25 500, -9 6))"
-        actual_wrapped, actual_unwrapped, repairs = simplify_legit_wkt(poly)
-        expected_wrapped = wkt.loads("POLYGON((-9 6, 48 -20, 25 90, -9 6))")
-        assert expected_wrapped == actual_wrapped
-        assert wkt.loads(poly) == actual_unwrapped
-        assert "Clamped 1 value(s) to +/-90 latitude" in str(repairs)
-        assert len(repairs) == 1
-
-
-    def test_REPAIR_clampLatitudeNegative(self):
-        poly = "POLYGON((-9 6, 25 -500, 48 -20, -9 6))"
-        actual_wrapped, actual_unwrapped, repairs = simplify_legit_wkt(poly)
-        expected_wrapped = wkt.loads("POLYGON((-9 6, 25 -90, 48 -20, -9 6))")
-        assert expected_wrapped == actual_wrapped
-        assert wkt.loads(poly) == actual_unwrapped
-        assert "Clamped 1 value(s) to +/-90 latitude" in str(repairs)
-        assert len(repairs) == 1
-
-    def test_REPAIR_multiDimentionalCoords(self):
-        poly = self.mulidimentional_poly_1
-        actual_wrapped, actual_unwrapped, repairs = simplify_legit_wkt(poly)
-        expected_unwrapped = wkt.loads("POLYGON((27 25,102 36,102 46,92 61,13 41,16 30,27 25))")
-        expected_wrapped = expected_unwrapped
-        assert expected_wrapped == actual_wrapped
-        assert expected_unwrapped == actual_unwrapped
-
-    ##### geomet.wkt fails to load this entirely. Opened a ticket: https://github.com/geomet/geomet/issues/49
-    # def test_REPAIR_removeEmptyShape(self):
-    #     empty_line = "LINESTRING EMPTY"
-    #     basic_poly = "POLYGON((27 25,102 36,102 46,92 61,13 41,16 30,27 25))"
-    #     geocolection = "GEOMETRYCOLLECTION("+basic_poly+","+empty_line+")"
-    #     actual_wrapped, actual_unwrapped, repairs = simplify_legit_wkt(geocolection)
-
-    #     expected_unwrapped = wkt.loads("POLYGON((27 25,102 36,102 46,92 61,13 41,16 30,27 25))")
-    #     expected_wrapped = expected_unwrapped
-    #     assert expected_wrapped == actual_wrapped
-    #     assert expected_unwrapped == actual_unwrapped
-    #     print(repairs)
-
-    ####################
-    #  ADVANCED TESTS  #
-    ####################
-
-    # When two shapes touch, but don't intersect. It shouldn't merge them
-    # Should simplify by convex_hulling the shapes together:
-    def test_zeroPointGeomerty_touchOnce(self):
-        poly1 = "POLYGON((20 5, 24 5, 24 10, 20 10, 20 5))"
-        poly2 = "POLYGON((20 0, 22 5, 24 0, 22 3, 20 0))"
-        two_touching_shapes = "GEOMETRYCOLLECTION("+poly1+","+poly2+")"
-        actual_wrapped, actual_unwrapped, repairs = simplify_legit_wkt(two_touching_shapes)
-        expected_result_wkt = wkt.loads("POLYGON ((20 0, 24 0, 24 10, 20 10, 20 0))")
-
-        assert expected_result_wkt == actual_wrapped
-        assert expected_result_wkt == actual_unwrapped
-        assert "Reversed polygon winding order" in str(repairs)
-        assert "Unconnected shapes: Convex-halled ALL the shapes together" in str(repairs)
-        assert len(repairs) == 2
-
-
-    # These shapes touch twice, but don't intersect at all. Convex_hulling
-    # the individual shapes lets the merge succeed, since both shapes then
-    # have a whole side touching. (versus the individual single-points):
-    def test_zeroPointGeomerty_touchTwice(self):
-        poly1 = "POLYGON((20 0, 21 5, 22 4, 23 5, 24 0, 22 2, 20 0))"
-        poly2 = "POLYGON((20 5, 24 5, 24 10, 20 10, 20 5))"
-        two_touching_shapes = "GEOMETRYCOLLECTION("+poly1+","+poly2+")"
-
-        actual_wrapped, actual_unwrapped, repairs = simplify_legit_wkt(two_touching_shapes)
-        expected_result_wkt = wkt.loads("POLYGON ((20 0, 24 0, 23 5, 24 5, 24 10, 20 10, 20 5, 21 5, 20 0))")
-
-        assert expected_result_wkt == actual_wrapped
-        assert expected_result_wkt == actual_unwrapped
-        assert "Reversed polygon winding order" in str(repairs)
-        assert "Unconnected shapes: Convex-halled each INDIVIDUAL shape to merge them together" in str(repairs)
-        assert len(repairs) == 2
-
-    def test_mergeTwoPolysToFormAHole(self):
-        # Get the response:
-        actual_wrapped, actual_unwrapped, repairs = simplify_legit_wkt(self.test_donut)
-        # Make both strings consistant by loading/dumping with same library:
-        expected_result_wkt = { 'type': 'Polygon', 'coordinates': [[[12.0, 8.11111111111111], [12.0, 10.0], [10.191489361702128, 8.914893617021276], [10.0, 9.0], [10.0, 8.8], [7.0, 7.0], [9.0, 0.0], [13.0, 0.0], [15.0, 0.0], [14.2, 2.4], [15.0, 4.0], [14.5, 7.0], [12.0, 8.11111111111111]]]}
-        assert expected_result_wkt == actual_wrapped
-        assert expected_result_wkt == actual_unwrapped
-        # Should removing the hole AFTER the merge be a repair?
-        assert "Reversed polygon winding order" in str(repairs)
-        assert len(repairs) == 1
+import conftest as helpers
 
 
 
-    #################
-    #  TEST ERRORS  #
-    #################
+# url = "https://api.daac.asf.alaska.edu/services/utils/files_to_wkt"
+# local_url = "http://127.0.0.1:5000/services/utils/files_to_wkt"
+# files = {'files': open('unit_tests/Resources/shps_valid/PIGSearch.shp', 'rb')}
+# r = requests.post(url, files=files)
 
-    def test_ERROR_dontPassWKT(self):
-        poly = "Totally a ligit poly...."
-        error = simplify_NOT_legit_wkt(poly)
-        assert "Could not parse WKT" in str(error)
+# FilesToWKT(request).get_response()
 
-    # Anything that intersects should throw an error.
-    # Here, the "22 5" point is duplicated:
-    def test_ERROR_duplicatePointsPoly(self):
-        poly = "POLYGON ((20 5, 20 10, 24 10, 24 5, 22 5, 24 0, 22 3, 20 0, 22 5, 20 5))"
-        error = simplify_NOT_legit_wkt(poly)
-        assert "Duplicated or too-close points" in str(error)
+# Add repair=False to make_response somehow, then:
+# {'repair'='False', files': open('unit_tests/Resources/shps_valid/PIGSearch.shp', 'rb')}
+#   assert "file_wkt" == wkt wrapped/unwrapped
+#   assert repaired("file_wkt") == wkt repaired wrapped/unwrapped
+#       (throw if they gave "")
+def applyDefaultValues(test_dict):
+    def applyIfNotExist(default, keys, test_dict):
+        if not isinstance(keys, type([])):
+            keys = [keys]
+        for key in keys:
+            if key not in test_dict:
+                test_dict[key] = default
+        return test_dict
 
-    def test_ERROR_selfIntersectingPoly(self):
-        poly = "POLYGON((7 8, 36 38, 11 42, 48 -20,7 8))"
-        error = simplify_NOT_legit_wkt(poly)
-        assert "Self-intersecting polygon" in str(error)
+    # Set 'repaired wkt' to the wrapped/unwrapped versions: 
+    if "repaired wkt" in test_dict:
+        default = test_dict["repaired wkt"]
+        replace = ["repaired wkt wrapped", "repaired wkt unwrapped"]
+        test_dict = applyIfNotExist(default, replace, test_dict)
+        del test_dict["repaired wkt"]
 
-    def test_ERROR_noValidShapes(self):
-        poly = "POLYGON EMPTY"
-        error = simplify_NOT_legit_wkt(poly)
-        assert "Could not parse WKT: No valid shapes found" in str(error)
+    # Figure out what test is expected to do:
+    pass_assertions = ["repaired wkt wrapped", "repaired wkt unwrapped", "repair", "parsed wkt"]
+    fail_assertions = ["parsed error msg","repaired error msg"]
+    # True if at least one of the above is used, False otherwise:
+    test_dict["asserts pass"] = 0 != len([k for k,_ in test_dict.items() if k in pass_assertions])
+    test_dict["asserts fail"] = 0 != len([k for k,_ in test_dict.items() if k in fail_assertions])
+    # NOTE: possible for both to be true. If you load a file, check it's parse (pass assertion),
+    #           then you check it's repair and expect it to error out.
 
+    # Default Print the result to screen if tester isn't asserting anything:
+    if "print" not in test_dict:
+        if test_dict["asserts pass"] or test_dict["asserts fail"]:
+            test_dict["print"] = False
+        else:
+            test_dict["print"] = True
+    if "check repair" not in test_dict:
+        if test_dict["asserts pass"]:
+            test_dict["check repair"] = True
+        else:
+            test_dict["check repair"] = False
+
+    # Add the repair if needed. Make sure it's a list:
+    if "repair" not in test_dict:
+        test_dict["repair"] = []
+    elif not isinstance(test_dict["repair"], type([])):
+        test_dict["repair"] = [test_dict["repair"]]
+
+    # If you have nothing to test, skip it.
+    if "test wkt" not in test_dict:
+        pytest.skip("Test does not have 'test wkt:' param. Nothing to do.")
+    # If they only passed one 'test wkt', turn it to a list:
+    elif not isinstance(test_dict["test wkt"], type([])):
+        test_dict["test wkt"] = [test_dict["test wkt"]]
+
+    # Split the 'test wkt' into a list of files, and list of wkt's
+    test_files = []
+    test_wkts = []
+    for test in test_dict["test wkt"]:
+        # If file, move to test_files. If WKT, move to test_wkts:
+        poss_path = os.path.join(resources_root, test)
+        if os.path.isfile(poss_path):
+            test_files.append(('files', open(poss_path, 'rb')))
+        elif '/' in test:
+            warnings.warn(UserWarning("File not found: {0}. File paths start after: '{1}'. (Test: {2})".format(poss_path, resources_root, test_info["title"])))
+        else:
+            test_wkts.append(test)
+    # Split them to different keys:
+    test_dict["test wkt"] = test_wkts
+    test_dict["test file"] = test_files
+    if len(test_dict["test file"]) == 0 and "parsed wkt" in test_dict:
+        assert False, "Test: {0}. 'parsed wkt' declared, but no files were found to parse. Did you mean 'repaired wkt'?".format(test_info["title"])
+
+    return test_dict
+
+class ParseFileManager():
+    def __init__(self, test_json):
+        url = test_json['api']
+        wkt_files = test_json['test file']
+        wkt_repair = { 'repair': False }
+        try:
+            r = requests.post(url, files=wkt_files, params=wkt_repair)
+        except (requests.ConnectionError, requests.Timeout, requests.TooManyRedirects) as e:
+            assert False, "Cannot connect to API: {0}.".format(url)
+
+        self.status_code = r.status_code
+        self.content = r.content.decode("utf-8").replace('"','')
+
+    def assert_wkt_equals(self, str_wkt):
+        assert self.status_code == 200, "API returned code: {0}".format(self.status_code)
+        lhs = geomet.wkt.loads(self.content)
+        rhs = geomet.wkt.loads(str_wkt)
+        assert lhs == rhs, "Parsed wkt returned from API did not match 'parsed wkt'."
+
+    def get_content(self):
+        return self.content
+
+class RepairWktManager():
+    def __init__(self, test_json):
+        num_shapes = len(test_json['test wkt'])
+        if num_shapes == 0:
+            return
+        elif num_shapes == 1:
+            test_shape = test_json['test wkt'][0]
+        else:
+            test_shape = "GEOMETRYCOLLECTION({0})".format(",".join(test_json['test wkt']))
+        self.response = test_file.repairWKT(test_shape)
+        self.test_json = test_json
+    
+    def run_assert_tests(self):
+        if "repaired wkt wrapped" in self.test_json:
+            assert shapely.wkt.loads(self.response["wkt"]["wrapped"]) == shapely.wkt.loads(self.test_json["repaired wkt wrapped"]), "WKT wrapped failed to match the result. Test: {0}".format(self.test_json["title"])
+        if "repaired wkt unwrapped" in self.test_json:
+            assert shapely.wkt.loads(self.response["wkt"]["unwrapped"]) == shapely.wkt.loads(self.test_json["repaired wkt unwrapped"]), "WKT unwrapped failed to match the result. Test: {0}".format(self.test_json["title"])
+        if self.test_json["check repair"]:
+            for repair in self.test_json["repair"]:
+                assert repair in str(self.response["repairs"]), "Expected repair was not found in results. Test: {0}. Repairs done: {1}".format(self.test_json["title"], self.response["repairs"])
+            assert len(self.response["repairs"]) == len(self.test_json["repair"]), "Number of repairs doesn't equal number of repaired repairs. Test: {0}. Repairs done: {1}.".format(self.test_json["title"],self.response["repairs"])
+        if "repaired error msg" in self.test_json:
+            assert self.test_json["repaired error msg"] in self.response["error"]["report"], "Got different error message than expected. Test: {0}.".format(self.test_json["title"])
+
+    def get_content(self):
+        return self.response
+
+
+# Can't do __name__ == __main__ trick. list_of_tests needs to be declared for the parametrize:
+yaml_name = os.path.splitext(os.path.basename(__file__))[0]+".yml"
+yaml_path = os.path.join(project_root, "unit_tests", yaml_name)
+list_of_tests = helpers.loadTestsFromDirectory(yaml_path)
+
+@pytest.mark.parametrize("json_test", list_of_tests)
+def test_EachShapeInYaml(json_test, get_cli_args):
+    # left = test itself, right = configs for ALL tests in that file
+    test_info = json_test[0]
+    file_config = json_test[1]
+
+    # Load the cli arguments:
+    api_cli = get_cli_args['api']
+    only_run_cli = get_cli_args['only run']
+
+    test_info = helpers.moveTitleIntoTest(test_info)
+    if test_info == None:
+        pytest.skip("Test does not have a title.")
+
+    # If they passed '--only-run val', and val not in test title:
+    if only_run_cli != None and only_run_cli not in test_info["title"]:
+        pytest.skip("Title of test did not match --only-run param");
+
+    # Apply default values to the test json:
+    # i.e. Save 'repair wkt' to both the wrapped/unwrapped versions if needed
+    test_info = applyDefaultValues(test_info)
+
+    # Figure out which api to use:
+    api_url = api_cli if api_cli != None else file_config['api']
+    api_url = helpers.getAPI(api_url, params="/services/utils/files_to_wkt")
+    test_info['api'] = api_url
+
+    # Check if you need to print the start block:
+    if test_info["print"]:
+        print("\n#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#")
+        print(" > Test: " + test_info["title"])
+        print("    api: " + str(test_info['api']))
+        if len(test_info["test file"]) > 0:
+            print("    Found {0} file(s) in test config.".format(len(test_info["test file"])))
+        if len(test_info["test wkt"]) > 0:
+            print("    Found {0} wkt(s) in test config.".format(len(test_info["test wkt"])))
+        print()
+
+    # RUN PARSED WKT TEST:
+    if len(test_info["test file"]) > 0:
+        parsed_info = ParseFileManager(test_info)
+        if test_info["print"]:
+            print("Parsed wkt before repair:")
+            print(parsed_info.get_content())
+            print()
+        if "parsed wkt" in test_info:
+            parsed_info.assert_wkt_equals(test_info["parsed wkt"])
+        test_info["test wkt"].append(parsed_info.get_content())
+ 
+    # RUN REPAIR WKT TEST:
+    if len(test_info["test wkt"]) > 0:
+        repair_info = RepairWktManager(test_info)
+        if test_info["print"]:
+            print("Repaired wkt json:")
+            print(json.dumps(repair_info.get_content(), indent=4))
+
+        repair_info.run_assert_tests()
+        

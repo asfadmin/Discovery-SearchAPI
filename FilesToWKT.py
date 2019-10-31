@@ -26,6 +26,9 @@ class FilesToWKT:
         return Response(json.dumps(resp_dict, sort_keys=True, indent=4), 200, headers=d)
 
     def make_response(self):
+        args = self.request.args.to_dict()
+        should_repair = False if "repair" in args and args['repair'].lower() == 'false' else True
+
         if 'files' not in self.request.files or len(list(self.request.files.getlist('files'))) < 1:
             return {'error': 'No files provided in files= parameter'}
 
@@ -36,14 +39,30 @@ class FilesToWKT:
         f = list(files.values())[0]
         filename = f.filename
         ext = os.path.splitext(filename)[1].lower()
+        # GEOJSON
         if ext == '.geojson':
-            return repairWKT(parse_geojson(f))
+            parsed_geo = parse_geojson(f)
+            if "error" in parsed_geo or not should_repair:
+                return parsed_geo
+            return repairWKT(parsed_geo)
+        # KML
         elif ext == '.kml':
-            return repairWKT(parse_kml(f))
+            parsed_kml = parse_kml(f)
+            if "error" in parsed_kml or not should_repair:
+                return parsed_kml
+            return repairWKT(parsed_kml)
+        # SHP
         elif ext == '.shp':
-            return repairWKT(parse_shp(f))
+            parsed_shp = parse_shp(f)
+            if "error" in parsed_shp or not should_repair:
+                return parsed_shp
+            return repairWKT(parsed_shp)
+
         elif ext == '.zip':
-            return repairWKT(parse_shapefile_zip(f))
+            parsed_zip = parse_shapefile_zip(f)
+            if "error" in parsed_zip or not should_repair:
+                return parsed_zip
+            return repairWKT(parsed_zip)
         else:
             return {'error': 'Unrecognized file type'}
     
@@ -92,9 +111,9 @@ def parse_geojson(f):
         data = f.read()
         geojson = json.loads(data)
     except json.JSONDecodeError as e:
-        return {'error': {'type': 'VALUE', 'report': 'Could not parse GeoJSON: {0}'.format(str(e))}}
+        return {'error': {'type': 'DECODE', 'report': 'Could not parse GeoJSON: {0}'.format(str(e))}}
     except KeyError as e:
-        return {'error': {'type': 'VALUE', 'report': 'Missing expected key: {0}'.format(str(e))}}
+        return {'error': {'type': 'KEY', 'report': 'Missing expected key: {0}'.format(str(e))}}
     except ValueError as e:
         return {'error': {'type': 'VALUE', 'report': 'Could not parse GeoJSON: {0}'.format(str(e))}}
     return json_to_wkt(geojson)
@@ -103,12 +122,11 @@ def parse_geojson(f):
 def parse_kml(f):
     kml_str = f.read()
     try:
-        kml_root = md.parseString(kml_str)
+        kml_root = md.parseString(kml_str, forbid_dtd=True)
         wkt_json = kml2json(kml_root)
     # All these BUT the type/value errors are for the md.parseString:
     except (DefusedXmlException, DTDForbidden, EntitiesForbidden, ExternalReferenceForbidden, NotSupportedError, TypeError, ValueError) as e:
         return {'error': {'type': 'VALUE', 'report': 'Could not parse kml: {0}'.format(str(e))}} 
-
     return json_to_wkt(wkt_json)
 
 

@@ -1,6 +1,6 @@
 import dateparser
 import re
-from geomet import wkt
+from geomet import wkt, InvalidGeoJSONException
 
 # Parse and validate a string: "abc"
 def parse_string(v):
@@ -162,16 +162,28 @@ def parse_point_string(v):
     return v
 
 # Parse a WKT and convert it to a coordinate string
+# NOTE: If given an empty ("POINT EMPTY") shape, will return "point:". Should it throw instead?
 def parse_wkt(v):
+    try:
+        wkt_json = wkt.loads(str(v).upper())
+    except (ValueError, AttributeError, InvalidGeoJSONException) as e:
+        raise ValueError('Cannot load WKT: {0}. Error: {1}'.format(v, str(e)))
     # take note of the WKT type
-    t = re.match(r'linestring|point|polygon', v.lower())
-    if t is None:
-        raise ValueError('Unsupported WKT: {0}'.format(v))
-    t = t.group(0)
-    p = wkt.loads(v.upper())['coordinates']
-    if t in ['polygon']:
-        p = p[0] # ignore any subsequent parts like holes, they aren't supported by CMR
-    if t in ['polygon', 'linestring']: # de-nest the coord list if needed
-        p = [x for x in sum(p, [])]
-    p = [str(x) for x in p]
-    return '{0}:{1}'.format(t, ','.join(p))
+    if wkt_json['type'].upper() not in ["POINT","LINESTRING", "POLYGON"]:
+        raise ValueError('Unsupported WKT: {0}.'.format(v))
+    
+    if wkt_json['type'].upper() == "POLYGON":
+        coords = wkt_json['coordinates']
+        # If not an empty poly, take out the hole:
+        # (Also de-nest it in the process)
+        if len(wkt_json['coordinates']) != 0:
+            coords = coords[0]
+    elif wkt_json['type'].upper() == "LINESTRING":
+        coords = wkt_json['coordinates']
+    else: # type == POINT
+        coords = [wkt_json['coordinates']]
+    # Turn [[x,y],[x,y]] to [x,y,x,y]:
+    coords = [x for x in sum(coords, [])]
+    # Turn any "6e8" to a literal number. (As a sting):
+    coords = ['{:.16f}'.format(float(cord)) for cord in coords]
+    return '{0}:{1}'.format(wkt_json['type'].lower(), ','.join(coords))
