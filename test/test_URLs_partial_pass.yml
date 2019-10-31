@@ -345,7 +345,7 @@ tests:
     expected code: 200
 
 - relativeOrbit blank:
-    relativeOrbit: 671
+    relativeOrbit: 6710
     output: csv
 
     expected file: blank csv
