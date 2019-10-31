@@ -97,6 +97,7 @@ def applyDefaultValues(test_dict):
 
 class ParseFileManager():
     def __init__(self, test_json):
+        self.test = test_json
         url = test_json['api']
         wkt_files = test_json['test file']
         wkt_repair = { 'repair': False }
@@ -108,11 +109,20 @@ class ParseFileManager():
         self.status_code = r.status_code
         self.content = r.content.decode("utf-8").replace('"','')
 
-    def assert_wkt_equals(self, str_wkt):
+    def run_assert_tests(self):
         assert self.status_code == 200, "API returned code: {0}".format(self.status_code)
-        lhs = geomet.wkt.loads(self.content)
-        rhs = geomet.wkt.loads(str_wkt)
-        assert lhs == rhs, "Parsed wkt returned from API did not match 'parsed wkt'."
+        if "parsed error msg" in self.test:
+            if "error" in self.content:
+                assert self.test["parsed error msg"] in str(self.content)
+            else:
+                assert False, "API did not return the expected message. Test: {0}.".format(self.test["title"])
+        if "parsed wkt" in self.test:
+            if self.content[0] != "{":
+                lhs = geomet.wkt.loads(self.content)
+                rhs = geomet.wkt.loads(self.test["parsed wkt"])
+                assert lhs == rhs, "Parsed wkt returned from API did not match 'parsed wkt'."
+            else:
+                assert False, "API did not return a WKT. Test: {0}".format(self.test["title"])
 
     def get_content(self):
         return self.content
@@ -210,9 +220,11 @@ def test_EachShapeInYaml(json_test, get_cli_args):
             print("Parsed wkt before repair:")
             print(parsed_info.get_content())
             print()
-        if "parsed wkt" in test_info:
-            parsed_info.assert_wkt_equals(test_info["parsed wkt"])
-        test_info["test wkt"].append(parsed_info.get_content())
+        # Does nothing if you don't assert anything:
+        parsed_info.run_assert_tests()
+        # Errors are json, wkt's are strings:
+        if parsed_info.get_content()[0] != '{':
+            test_info["test wkt"].append(parsed_info.get_content())
  
     # RUN REPAIR WKT TEST:
     if len(test_info["test wkt"]) > 0:
