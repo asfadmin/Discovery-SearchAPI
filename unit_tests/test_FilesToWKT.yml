@@ -97,6 +97,32 @@
     repair: "Shape(s) that used multidimentional coords: 1. Truncated to 2D"
 
 
+## KMLS INVALID:
+- BAD kml empty file:
+    test wkt: kmls_invalid/emptyfile.kml
+    parsed error msg: "Could not parse kml: no element found: line 1, column 0"
+- EXPLOIT kml billion laughs:
+    test wkt: kmls_invalid/BillionLaughs.kml
+    parsed error msg: "Could not parse kml: DTDForbidden(name='xmlbomb', system_id=None, public_id=None)"
+
+- EXPLOIT kml blowup:
+    test wkt: kmls_invalid/Blowup.kml
+    parsed error msg: "Could not parse kml: DTDForbidden(name='bomb', system_id=None, public_id=None)"
+
+- EXPLOIT kml remote entity expansion:
+    test wkt: kmls_invalid/RemoteEntityExpansion.kml
+    parsed error msg: "Could not parse kml: DTDForbidden(name='external', system_id=None, public_id=None)"
+
+- EXPLOIT kml local entity expansion:
+    test wkt: kmls_invalid/LocalEntityExpansion.kml
+    parsed error msg: "Could not parse kml: DTDForbidden(name='external', system_id=None, public_id=None)"
+
+- EXPLOIT kml dtd retrieval:
+    test wkt: kmls_invalid/RetrieveDTD.kml
+    parsed error msg: "Could not parse kml: DTDForbidden(name='html', system_id='http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd', public_id='-//W3C//DTD XHTML 1.0 Transitional//EN')"
+
+
+
 ## SHPS VALID:
 - FILE shp PIGSearch test:
     test wkt: shps_valid/PIGSearch.shp
