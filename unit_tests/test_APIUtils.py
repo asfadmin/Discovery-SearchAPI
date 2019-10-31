@@ -56,7 +56,8 @@ def applyDefaultValues(test_dict):
         else:
             test_dict["print"] = True
     if "check repair" not in test_dict:
-        if test_dict["asserts pass"]:
+        repair_if_used = ["repaired wkt wrapped", "repaired wkt unwrapped", "repair"]
+        if len([k for k,_ in test_dict.items() if k in repair_if_used]) > 0:
             test_dict["check repair"] = True
         else:
             test_dict["check repair"] = False
@@ -130,24 +131,39 @@ class RepairWktManager():
     
     def run_assert_tests(self):
         if "repaired wkt wrapped" in self.test_json:
-            assert shapely.wkt.loads(self.response["wkt"]["wrapped"]) == shapely.wkt.loads(self.test_json["repaired wkt wrapped"]), "WKT wrapped failed to match the result. Test: {0}".format(self.test_json["title"])
+            if "wkt" in self.response:
+                assert shapely.wkt.loads(self.response["wkt"]["wrapped"]) == shapely.wkt.loads(self.test_json["repaired wkt wrapped"]), "WKT wrapped failed to match the result. Test: {0}".format(self.test_json["title"])
+            else:
+                assert False, "WKT not found in response from API. Test: {0}. Response: {1}.".format(self.test_json["title"], self.response)
         if "repaired wkt unwrapped" in self.test_json:
-            assert shapely.wkt.loads(self.response["wkt"]["unwrapped"]) == shapely.wkt.loads(self.test_json["repaired wkt unwrapped"]), "WKT unwrapped failed to match the result. Test: {0}".format(self.test_json["title"])
-        if self.test_json["check repair"]:
-            for repair in self.test_json["repair"]:
-                assert repair in str(self.response["repairs"]), "Expected repair was not found in results. Test: {0}. Repairs done: {1}".format(self.test_json["title"], self.response["repairs"])
-            assert len(self.response["repairs"]) == len(self.test_json["repair"]), "Number of repairs doesn't equal number of repaired repairs. Test: {0}. Repairs done: {1}.".format(self.test_json["title"],self.response["repairs"])
-        if "repaired error msg" in self.test_json:
-            assert self.test_json["repaired error msg"] in self.response["error"]["report"], "Got different error message than expected. Test: {0}.".format(self.test_json["title"])
+            if "wkt" in self.response:
+                assert shapely.wkt.loads(self.response["wkt"]["unwrapped"]) == shapely.wkt.loads(self.test_json["repaired wkt unwrapped"]), "WKT unwrapped failed to match the result. Test: {0}".format(self.test_json["title"])
+            else:
+                assert False, "WKT not found in response from API. Test: {0}. Response: {1}.".format(self.test_json["title"], self.response)
 
+        if self.test_json["check repair"]:
+            if "repairs" in self.response:
+                for repair in self.test_json["repair"]:
+                    assert repair in str(self.response["repairs"]), "Expected repair was not found in results. Test: {0}. Repairs done: {1}".format(self.test_json["title"], self.response["repairs"])
+                assert len(self.response["repairs"]) == len(self.test_json["repair"]), "Number of repairs doesn't equal number of repaired repairs. Test: {0}. Repairs done: {1}.".format(self.test_json["title"],self.response["repairs"])
+            else:
+                assert False, "Unexpected WKT returned: {0}. Test: {1}".format(self.response, self.test_json["title"])
+        if "repaired error msg" in self.test_json:
+            if "error" in self.response:
+                assert self.test_json["repaired error msg"] in self.response["error"]["report"], "Got different error message than expected. Test: {0}.".format(self.test_json["title"])
+            else:
+                assert False, "Unexpected WKT returned: {0}. Test: {1}".format(self.response, self.test_json["title"])
     def get_content(self):
         return self.response
 
 
 # Can't do __name__ == __main__ trick. list_of_tests needs to be declared for the parametrize:
-yaml_name = os.path.splitext(os.path.basename(__file__))[0]+".yml"
-yaml_path = os.path.join(project_root, "unit_tests", yaml_name)
-list_of_tests = helpers.loadTestsFromDirectory(yaml_path)
+list_of_tests = []
+yaml_path = os.path.join(project_root, "unit_tests", "test_APIUtils.yml")
+list_of_tests.extend(helpers.loadTestsFromDirectory(yaml_path))
+yaml_path = os.path.join(project_root, "unit_tests", "test_FilesToWKT.yml")
+list_of_tests.extend(helpers.loadTestsFromDirectory(yaml_path))
+
 
 @pytest.mark.parametrize("json_test", list_of_tests)
 def test_EachShapeInYaml(json_test, get_cli_args):
@@ -206,4 +222,4 @@ def test_EachShapeInYaml(json_test, get_cli_args):
             print(json.dumps(repair_info.get_content(), indent=4))
 
         repair_info.run_assert_tests()
-        
+
