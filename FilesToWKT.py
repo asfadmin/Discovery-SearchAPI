@@ -125,7 +125,8 @@ def parse_kml(f):
         kml_root = md.parseString(kml_str, forbid_dtd=True)
         wkt_json = kml2json(kml_root)
     # All these BUT the type/value errors are for the md.parseString:
-    except (DefusedXmlException, DTDForbidden, EntitiesForbidden, ExternalReferenceForbidden, NotSupportedError, TypeError, ValueError) as e:
+    # except (DefusedXmlException, DTDForbidden, EntitiesForbidden, ExternalReferenceForbidden, NotSupportedError, TypeError, ValueError) as e:
+    except Exception as e:  
         return {'error': {'type': 'VALUE', 'report': 'Could not parse kml: {0}'.format(str(e))}} 
     return json_to_wkt(wkt_json)
 
