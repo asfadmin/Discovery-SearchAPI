@@ -1,5 +1,5 @@
 
-api: tEsT
+api: Test
 
 
 tests:
@@ -513,8 +513,9 @@ tests:
     expected file: download
     expected code: 200
 
+#In CMR reporting script, we report groupid as null on most datasets. Some datasets updated to expect blank file & moved to partial pass yaml
 - groupid Sentinel:
-    groupid: S1B_S6DV_0541_0543_017561_035
+    groupid: S1B_S1DV_0492_0497_017567_041
     output: json
 
     expected file: json
@@ -542,7 +543,7 @@ tests:
     expected code: 200
 
 - groupid ALOS:
-    groupid: ALPSRP278477070
+    groupid: ALPSRP279071100
     output: json
 
     expected file: json
@@ -550,34 +551,6 @@ tests:
 
 - groupid AIRSAR:
     groupid: ts1902
-    output: json
-
-    expected file: json
-    expected code: 200
-
-- groupid Radarsat:
-    groupid: R1_63781_FN1_F277
-    output: json
-
-    expected file: json
-    expected code: 200
-
-- groupid ERS:
-    groupid: E1_08794_STD_F267
-    output: json
-
-    expected file: json
-    expected code: 200
-
-- groupid JERS:
-    groupid: J1_01508_STD_F315
-    output: json
-
-    expected file: json
-    expected code: 200
-
-- groupid Seasat:
-    groupid: SS_01499_STD_F1200
     output: json
 
     expected file: json
@@ -982,6 +955,7 @@ tests:
     start: 2015-01-01T00:00:00Z
     end: 2016-01-02T00:00:00Z
     output: csv
+    maxResults: 2000
 
     expected file: csv
     expected code: 200
@@ -2417,6 +2391,7 @@ tests:
     start: 2015-06-01
     end: 2019-05-30
     output: csv
+    maxResults: 500
 
     expected file: csv
     expected code: 200
@@ -2428,6 +2403,7 @@ tests:
     start: 2015-06-01
     end: 2019-05-30
     output: csv
+    maxResults: 500
 
     expected file: csv
     expected code: 200
@@ -2437,6 +2413,7 @@ tests:
     platform: Sentinel-1A
     start: 2017-05-30
     end: 2018-05-31%22
+    maxResults: 1000
 
     expected file: csv
     expected code: 200
