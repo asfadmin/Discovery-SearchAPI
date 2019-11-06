@@ -2,9 +2,9 @@
 import os, sys, re
 from io import StringIO
 import csv
-from csv import Error
+# from csv import Error
 import json
-from json import JSONDecodeError
+# from json import JSONDecodeError
 import pytest, warnings
 import requests
 import glob
