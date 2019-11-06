@@ -21,28 +21,52 @@ from CMR import Input
 class RunSingleURLFromFile():
     def __init__(self, json_dict, url_api):
         self.query, assert_used = self.getUrlFromParams(json_dict, url_api)
-        # parsed_dict = self.parseInputValues(json_dict)
         status_code, file_type, file_content = self.runQuery()
+
+        if "print" not in json_dict:
+            json_dict["print"] = False if assert_used else True
 
 
         if assert_used:
             if "expected code" in json_dict:
                 assert json_dict["expected code"] == status_code, "Status codes is different than expected. Test: {0}. URL: {1}.".format(json_dict["title"], self.query)
             if "expected file" in json_dict:
-                assert json_dict["expected file"] == file_type, "Different file type returned than expected. Test: {0}. URL: {1}.".format(json_dict["title"], self.query)
-            ### BEGIN TESTING FILE CONTENTS:
-            file_content = self.renameKeysToStandard(file_content)
-            file_content = self.renameValsToStandard(file_content)
-            json_dict = self.parseInputValues(json_dict)
-            # IF used in url, IF contained in file's content, check if they match
-            if "Platform" in json_dict and "Platform" in file_content:
-                for platform in file_content["Platform"]:
-                    assert platform in json_dict["Platform"], "Platform declared, but not found in file. Test: {0}".format(json_dict["title"])
-            if "absoluteOrbit" in json_dict and "absoluteOrbit" in file_content:
-                for orbit in file_content["absoluteOrbit"]:
-                    assert int(orbit) in json_dict["absoluteOrbit"], "absoluteOrbit declared, but not found in file. Test: {0}".format(json_dict["title"])
-        # Else they didn't assert anything:
-        else:
+                    assert json_dict["expected file"] == file_type, "Different file type returned than expected. Test: {0}. URL: {1}.".format(json_dict["title"], self.query)
+                    # If you expect it to be a ligit file, and 'file_content' was converted from str to dict:
+                    if file_type[0:5] not in ["error", "blank"] and isinstance(file_content, type({})):
+                        ### BEGIN TESTING FILE CONTENTS:
+                        json_dict = self.parseTestValues(json_dict)
+                        file_content = self.renameKeysToStandard(file_content)
+                        file_content = self.renameValsToStandard(file_content)
+                        # print(json.dumps(json_dict, indent=4, default=str))
+                        # IF used in url, IF contained in file's content, check if they match
+                        def checkFileContainsExpected(key, url_dict, file_dict):
+                            if key in url_dict and key in file_dict:
+                                found_in_list = False
+                                for found_param in file_dict[key]:
+                                    for poss_list in url_dict[key]:
+                                        if isinstance(poss_list, type([])):
+                                            expect_type = type(poss_list[0])
+                                            # "found_param" is always a string. Convert it to match
+                                            if expect_type(found_param) >= poss_list[0] and expect_type(found_param) <= poss_list[1]:
+                                                found_in_list = True
+                                                break
+                                        else:
+                                            expect_type = type(poss_list)
+                                            if expect_type(found_param) == poss_list:
+                                                found_in_list = True
+                                                break
+                                    # If inner for-loop found it, break out of this one too:
+                                    if found_in_list == True:
+                                        break
+                                assert found_in_list, key + " declared, but not found in file. Test: {0}".format(json_dict["title"])
+                        
+                        checkFileContainsExpected("Platform", json_dict, file_content)
+                        checkFileContainsExpected("absoluteOrbit", json_dict, file_content)
+                        checkFileContainsExpected("asfframe", json_dict, file_content)
+
+        # If print wasn't declared, it gets set in parseTestValues:
+        if json_dict["print"] == True:
             print()
             print("URL: {0}".format(self.query))
             print("Status Code: {0}. File returned: {1}".format(status_code, file_type))
@@ -71,16 +95,22 @@ class RunSingleURLFromFile():
         return query, assert_used
 
 
-    def parseInputValues(self, json_test):
+    def parseTestValues(self, json_test):
         # Turn string values to lists:
         mutatable_dict = deepcopy(json_test)
         try:
+            # Dictionary changes sizes, so check one dict, and make  thechanges to other
             for key, val in json_test.items():
-                if key == "absoluteOrbit":
+                if key.lower() == "absoluteorbit":
+                    del mutatable_dict[key]
                     mutatable_dict["absoluteOrbit"] = Input.parse_int_or_range_list(val)
-                elif key == "platform":
+                elif key.lower() == "platform":
+                    del mutatable_dict[key]
                     mutatable_dict["Platform"] = Input.parse_string_list(val)
-                # elif key == "asfframe":
+                elif key.lower() in ["frame", "asfframe"]:
+                    del mutatable_dict[key]
+                    mutatable_dict["asfframe"] = Input.parse_int_or_range_list(val)
+
         except ValueError as e:
             assert False, "Test: {0}. Incorrect parameter: {1}".format(json_test["title"], str(e))
         json_test = mutatable_dict
@@ -92,12 +122,20 @@ class RunSingleURLFromFile():
         ### absoluteOrbit:
         if "Orbit" in json_dict:
             json_dict["absoluteOrbit"] = json_dict.pop("Orbit")
+        ### asfframe:
+        for key in ["frame", "frameNumber", "Frame Number"]:
+            if key in json_dict:
+                json_dict["asfframe"] = json_dict.pop(key)
         return json_dict
 
     # assumes values are in the form of {key: [value1,value2]}
     def renameValsToStandard(self, json_dict):
         if "Platform" in json_dict:
-            for i, platform in enumerate(json_dict["Platform"]):
+            itter_copy = deepcopy(json_dict)
+            for i, platform in enumerate(itter_copy["Platform"]):
+                #####
+                # NOTE: UPPER for when adding platforms in future:
+                platform = platform.upper()
                 # ALOS
                 if platform in ["ALOS", "A3"]:
                     json_dict["Platform"][i] = "ALOS"
@@ -123,13 +161,15 @@ class RunSingleURLFromFile():
                 elif platform in ["SEASAT", "SS"]:
                     json_dict["Platform"][i] = "SEASAT"
                 # Sentinel-1:
-                elif platform in ["S1", "Sentinel-1", "Sentinel"]:
-                    json_dict["Platform"][i] = "Sentinel-1"
+                elif platform in ["S1", "SENTINEL-1", "SENTINEL"]:
+                    del json_dict["Platform"][i]
+                    json_dict["Platform"].append("Sentinel-1A")
+                    json_dict["Platform"].append("Sentinel-1B")
                 # Sentinel-1A
-                elif platform in ["Sentinel-1A", "SA"]:
+                elif platform in ["SENTINEL-1A", "SA"]:
                     json_dict["Platform"][i] = "Sentinel-1A"
                 # Sentinel-1B
-                elif platform in ["Sentinel-1B", "SB"]:
+                elif platform in ["SENTINEL-1B", "SB"]:
                     json_dict["Platform"][i] = "Sentinel-1B"
                 # SMAP
                 elif platform in ["SMAP", "SP"]:
