@@ -302,6 +302,7 @@ def test_EachURLInYaml(json_test, get_cli_args):
     # Load command line args:
     api_cli = get_cli_args["api"]
     only_run_cli = get_cli_args["only run"]
+    dont_run_cli = get_cli_args["dont run"]
 
     test_info = helpers.moveTitleIntoTest(test_info)
 
@@ -309,8 +310,11 @@ def test_EachURLInYaml(json_test, get_cli_args):
         pytest.skip("Test does not have a title.")
 
     # If they passed '--only-run val', and val not in test title:
-    if only_run_cli != None and only_run_cli not in test_info["title"]:
-        pytest.skip("Title of test did not match --only-run param")
+    if only_run_cli != None and only_run_cli.lower() not in test_info["title"].lower():
+        pytest.skip("Title of test did not contain --only-run param (case insensitive)")
+    # Same, but reversed for '--dont-run':
+    if dont_run_cli != None and dont_run_cli.lower() in test_info["title"].lower():
+        pytest.skip("Title of test contained --dont-run param (case insensitive)")
 
 
     # Default to command line if they used it, else check in the file. (can still be None)

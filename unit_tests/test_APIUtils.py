@@ -184,14 +184,19 @@ def test_EachShapeInYaml(json_test, get_cli_args):
     # Load the cli arguments:
     api_cli = get_cli_args['api']
     only_run_cli = get_cli_args['only run']
+    dont_run_cli = get_cli_args['dont run']
 
     test_info = helpers.moveTitleIntoTest(test_info)
     if test_info == None:
         pytest.skip("Test does not have a title.")
 
     # If they passed '--only-run val', and val not in test title:
-    if only_run_cli != None and only_run_cli not in test_info["title"]:
-        pytest.skip("Title of test did not match --only-run param");
+    if only_run_cli != None and only_run_cli.lower() not in test_info["title"].lower():
+        pytest.skip("Title of test did not contain --only-run param (case insensitive)")
+    # Same, but reversed for '--dont-run':
+    if dont_run_cli != None and dont_run_cli.lower() in test_info["title"].lower():
+        pytest.skip("Title of test contained --dont-run param (case insensitive)")
+
 
     # Apply default values to the test json:
     # i.e. Save 'repair wkt' to both the wrapped/unwrapped versions if needed
