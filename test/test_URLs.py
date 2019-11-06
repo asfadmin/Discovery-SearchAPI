@@ -101,6 +101,8 @@ class RunSingleURLFromFile():
         try:
             # Dictionary changes sizes, so check one dict, and make  thechanges to other
             for key, val in json_test.items():
+                # The Input.parse* methods all expect a string:
+                val = str(val)
                 if key.lower() == "absoluteorbit":
                     del mutatable_dict[key]
                     mutatable_dict["absoluteOrbit"] = Input.parse_int_or_range_list(val)
