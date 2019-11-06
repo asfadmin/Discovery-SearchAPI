@@ -10,7 +10,7 @@ import os
 from APIUtils import repairWKT
 from kml2geojson import build_feature_collection as kml2json
 import defusedxml.minidom as md
-from defusedxml import DefusedXmlException, DTDForbidden, EntitiesForbidden, ExternalReferenceForbidden, NotSupportedError
+# from defusedxml import DefusedXmlException, DTDForbidden, EntitiesForbidden, ExternalReferenceForbidden, NotSupportedError
 
 
 class FilesToWKT:

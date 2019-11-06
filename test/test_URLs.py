@@ -1,5 +1,5 @@
 
-import os, sys, yaml, re
+import os, sys, re
 from io import StringIO
 import csv
 from csv import Error
