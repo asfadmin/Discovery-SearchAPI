@@ -1,5 +1,5 @@
 
-api: Prod
+api: Test
 
 
 tests:
@@ -148,7 +148,7 @@ tests:
     expected code: 400
 
 - end specchar invalid:
-    end: -+
+    end: ~
     output: count
 
     expected file: error json
@@ -649,8 +649,8 @@ tests:
     expected file: error json
     expected code: 400
 
-- processingDate specchar blank:
-    processingDate: ~#
+- processingDate specchar invalid:
+    processingDate: ~
     maxResults: 1200
     output: csv
 
