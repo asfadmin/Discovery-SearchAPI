@@ -41,12 +41,8 @@ class RunSingleURLFromFile():
                         # print(json.dumps(json_dict, indent=4, default=str))
                         # IF used in url, IF contained in file's content, check if they match
                         def checkFileContainsExpected(key, url_dict, file_dict):
-                            print("HERE?")
-                            # print(url_dict)
-                            print(file_dict)
                             if key in url_dict and key in file_dict:
                                 found_in_list = False
-                                print("HITTTTT")
                                 for found_param in file_dict[key]:
                                     for poss_list in url_dict[key]:
                                         if isinstance(poss_list, type([])):
@@ -65,10 +61,10 @@ class RunSingleURLFromFile():
                                         break
                                 assert found_in_list, key + " declared, but not found in file. Test: {0}".format(json_dict["title"])
                         
-                        # checkFileContainsExpected("Platform", json_dict, file_content)
-                        # checkFileContainsExpected("absoluteOrbit", json_dict, file_content)
-                        # checkFileContainsExpected("asfframe", json_dict, file_content)
-                        # checkFileContainsExpected("granule_list", json_dict, file_content)
+                        checkFileContainsExpected("Platform", json_dict, file_content)
+                        checkFileContainsExpected("absoluteOrbit", json_dict, file_content)
+                        checkFileContainsExpected("asfframe", json_dict, file_content)
+                        checkFileContainsExpected("granule_list", json_dict, file_content)
                         checkFileContainsExpected("groupid", json_dict, file_content)
 
         # If print wasn't declared, it gets set in parseTestValues:
@@ -140,7 +136,6 @@ class RunSingleURLFromFile():
         for key in ["frame", "frameNumber", "Frame Number"]:
             if key in json_dict:
                 json_dict["asfframe"] = json_dict.pop(key)
-        print(json_dict)
         ### granule_list:
         for key in ["granuleName", "Granule Name"]:
             if key in json_dict:
