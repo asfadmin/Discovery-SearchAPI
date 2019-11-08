@@ -1,5 +1,5 @@
 
-api: Test
+api: Prod
 
 
 tests:
@@ -2300,6 +2300,33 @@ tests:
     output: count
 
     expected file: count
+    expected code: 200
+
+- start backwards reversed:
+    start: now
+    end: 1+year+ago
+    output: csv
+    maxResults: 10
+
+    expected file: csv
+    expected code: 200
+
+- start tomorrow reversed:
+    start: tomorrow
+    end: 1+year+ago
+    output: csv
+    maxResults: 10
+
+    expected file: csv
+    expected code: 200
+
+- start now end yesterday reversed:
+    start: now
+    end: yesterday
+    output: csv
+    maxResults: 10
+
+    expected file: csv
     expected code: 200
 
 - realworld 1:
