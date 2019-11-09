@@ -18,7 +18,7 @@ tests:
     expected code: 200
 
 - beamMode specchar blank:
-    beamMode: ~
+    beamMode: $~
     output: csv
 
     expected file: blank csv
@@ -39,7 +39,7 @@ tests:
     expected code: 200
 
 - beamSwath specchar blank:
-    beamSwath: ~
+    beamSwath: ~!
     output: csv
 
     expected file: blank csv
@@ -150,7 +150,7 @@ tests:
     expected code: 200
 
 - flightLine AIRSAR specchar blank:
-    flightLine: ~
+    flightLine: ~&
     platform: AIRSAR
     output: csv
 
@@ -165,7 +165,7 @@ tests:
     expected code: 200
 
 - granule_list specchar blank:
-    granule_list: ~
+    granule_list: ~&
     output: csv
 
     expected file: blank csv
@@ -193,7 +193,7 @@ tests:
     expected code: 200
 
 - groupid specchar blank:
-    groupid: ~
+    groupid: ~+
     output: csv
 
     expected file: blank csv
@@ -328,12 +328,12 @@ tests:
     expected code: 200
 
 - polarization specchar 2 blank:
-    polarization: ~#
+    polarization: +!
     platform: E1
     maxResults: 1000
     output: csv
 
-    expected file: blank metalink
+    expected file: blank csv
     expected code: 200
 
 - processingLevel specchar blank:
@@ -375,33 +375,6 @@ tests:
 - relativeOrbit blank:
     relativeOrbit: 6710
     output: csv
-
-    expected file: blank csv
-    expected code: 200
-
-- start backwards blank:
-    start: now
-    end: 1+year+ago
-    output: csv
-    maxResults: 10
-
-    expected file: blank csv
-    expected code: 200
-
-- start tomorrow blank:
-    start: tomorrow
-    end: 1+year+ago
-    output: csv
-    maxResults: 10
-
-    expected file: blank csv
-    expected code: 200
-
-- start now end yesterday blank:
-    start: now
-    end: yesterday
-    output: csv
-    maxResults: 10
 
     expected file: blank csv
     expected code: 200
