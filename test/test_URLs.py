@@ -41,8 +41,13 @@ class RunSingleURLFromFile():
                         # print(json.dumps(json_dict, indent=4, default=str))
                         # IF used in url, IF contained in file's content, check if they match
                         def checkFileContainsExpected(key, url_dict, file_dict):
+                            print(url_dict)
+                            print("CHECKING FILE HERE")
+                            print(file_dict)
                             if key in url_dict and key in file_dict:
+                                print("HEREEEEEEEEEE")
                                 found_in_list = False
+                                print("FINDS AND VALIDATES VALUE IN FILE!!!!!")
                                 for found_param in file_dict[key]:
                                     for poss_list in url_dict[key]:
                                         if isinstance(poss_list, type([])):
@@ -66,6 +71,7 @@ class RunSingleURLFromFile():
                         checkFileContainsExpected("asfframe", json_dict, file_content)
                         checkFileContainsExpected("granule_list", json_dict, file_content)
                         checkFileContainsExpected("groupid", json_dict, file_content)
+                        checkFileContainsExpected("flightdirection", json_dict, file_content)
 
         # If print wasn't declared, it gets set in parseTestValues:
         if json_dict["print"] == True:
@@ -120,6 +126,9 @@ class RunSingleURLFromFile():
                 elif key.lower() == "groupid":
                     del mutatable_dict[key]
                     mutatable_dict["groupid"] = Input.parse_string_list(val)
+                elif key.lower() == "flightdirection":
+                    del mutatable_dict[key]
+                    mutatable_dict["flightdirection"] = Input.parse_string_list(val)
 
         except ValueError as e:
             assert False, "Test: {0}. Incorrect parameter: {1}".format(json_test["title"], str(e))
@@ -195,6 +204,18 @@ class RunSingleURLFromFile():
                 # UAVSAR
                 elif platform in ["UAVSAR", "UA"]:
                     json_dict["Platform"][i] = "UAVSAR"
+        if "Ascending or Descending?" in json_dict:
+            itter_copy = deepcopy(json_dict)
+            for i, flightdirection in enumerate(itter_copy["Ascending or Descending?"]):
+                #flightdirection in UPPER
+                flightdirection = flightdirection.upper()
+                #DESCENDING
+                print("DO YOU SEE ME?")
+                if flightdirection in ["D", "DESC", "DESCENDING"]:
+                    json_dict["Ascending or Descending?"][i] = "DESCENDING"
+                #ASCENDING
+                elif flightdirection in ["A", "ASC", "ASCENDING"]:
+                    json_dict["Ascending or Descending?"][i] = "ASCENDING"
         return json_dict
 
     def runQuery(self):
