@@ -11,6 +11,7 @@ tests:
     expected file: csv
     expected code: 200
 
+#DS-2766 open bug for absoluteOrbit - GRFN scenes search correct range, but file returns different value for absoluteOrbit
 - absoluteOrbit range:
     absoluteOrbit: 5000-6000
     maxresults: 10
@@ -44,6 +45,7 @@ tests:
     expected file: csv
     expected code: 200
 
+#DS-2766 open bug for absoluteOrbit - GRFN scenes search correct range, but file returns different value for absoluteOrbit
 - absoluteOrbit zero range:
     absoluteOrbit: 17545-17545
     maxresults: 10
@@ -60,6 +62,7 @@ tests:
     expected file: csv
     expected code: 200
 
+#WEB2-1956 open bug for asfframe - for R1, frame in file will not match frame in query
 - asfframe R1 single:
     asfframe: 340
     platform: R1
@@ -414,6 +417,8 @@ tests:
     expected file: csv
     expected code: 200
 
+#DS-2772 open bug for frame + platform
+#frame queries with no platform will search centerESAframe & return asfframe in file - file validation will fail
 - frame single:
     frame: 581
     maxresults: 10
