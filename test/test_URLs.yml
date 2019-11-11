@@ -96,18 +96,18 @@ tests:
     expected file: csv
     expected code: 200
 
-- asfframe R1 zero range:
+- asfframe ALOS zero range:
     asfframe: 340-340
-    platform: R1
+    platform: ALOS
     maxresults: 10
     output: csv
 
     expected file: csv
     expected code: 200
 
-- asfframe R1 zero range list:
+- asfframe ALOS zero range list:
     asfframe: 340-340,345
-    platform: R1
+    platform: ALOS
     maxresults: 10
     output: csv
 
