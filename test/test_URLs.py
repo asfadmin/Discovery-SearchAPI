@@ -207,7 +207,7 @@ class RunSingleURLFromFile():
                 # UAVSAR
                 elif platform in ["UAVSAR", "UA"]:
                     json_dict["Platform"][i] = "UAVSAR"
-        if "Ascending or Descending?" in json_dict:
+        if "flightdirection" in json_dict:
             itter_copy = deepcopy(json_dict)
             for i, flightdirection in enumerate(itter_copy["flightdirection"]):
                 #flightdirection in UPPER
