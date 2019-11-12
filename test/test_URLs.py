@@ -43,7 +43,7 @@ class RunSingleURLFromFile():
                         def checkFileContainsExpected(key, url_dict, file_dict):
                             print(url_dict)
                             print("CHECKING FILE HERE")
-                            print(file_dict)
+                            print(json.dumps(file_dict, indent=4, default=str))
                             if key in url_dict and key in file_dict:
                                 print("HEREEEEEEEEEE")
                                 found_in_list = False
@@ -152,6 +152,9 @@ class RunSingleURLFromFile():
         ### groupid:
         if "groupID" in json_dict:
             json_dict["groupid"] = json_dict.pop("groupID")
+        ### flightDirection
+        if "Ascending or Descending?" in json_dict:
+            json_dict["flightdirection"] = json_dict.pop("Ascending or Descending?")
         return json_dict
 
 
@@ -206,16 +209,16 @@ class RunSingleURLFromFile():
                     json_dict["Platform"][i] = "UAVSAR"
         if "Ascending or Descending?" in json_dict:
             itter_copy = deepcopy(json_dict)
-            for i, flightdirection in enumerate(itter_copy["Ascending or Descending?"]):
+            for i, flightdirection in enumerate(itter_copy["flightdirection"]):
                 #flightdirection in UPPER
                 flightdirection = flightdirection.upper()
                 #DESCENDING
                 print("DO YOU SEE ME?")
                 if flightdirection in ["D", "DESC", "DESCENDING"]:
-                    json_dict["Ascending or Descending?"][i] = "DESCENDING"
+                    json_dict["flightdirection"][i] = "DESCENDING"
                 #ASCENDING
                 elif flightdirection in ["A", "ASC", "ASCENDING"]:
-                    json_dict["Ascending or Descending?"][i] = "ASCENDING"
+                    json_dict["flightdirection"][i] = "ASCENDING"
         return json_dict
 
     def runQuery(self):
