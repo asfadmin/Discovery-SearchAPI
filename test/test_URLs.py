@@ -77,6 +77,7 @@ class RunSingleURLFromFile():
                         checkFileContainsExpected("offnadirangle", json_dict, file_content)
                         checkFileContainsExpected("polarization", json_dict, file_content)
                         checkFileContainsExpected("relativeorbit", json_dict, file_content)
+                        checkFileContainsExpected("collectionname", json_dict, file_content)
 
         # If print wasn't declared, it gets set in parseTestValues:
         if json_dict["print"] == True:
@@ -144,6 +145,10 @@ class RunSingleURLFromFile():
                 elif key.lower() == "relativeorbit":
                     del mutatable_dict[key]
                     mutatable_dict["relativeorbit"] = Input.parse_int_or_range_list(val)
+                elif key.lower() == "collectionname":
+                    del mutatable_dict[key]
+                    val = urllib.parse.unquote_plus(val)
+                    mutatable_dict["collectionname"] = Input.parse_string_list(val)
 
 
         except ValueError as e:
@@ -183,6 +188,9 @@ class RunSingleURLFromFile():
         for key in ["relativeOrbit", "Path Number"]:
             if key in json_dict:
                 json_dict["relativeorbit"] = json_dict.pop(key)
+        ### collectionName:
+        if "collectionName" in json_dict:
+            json_dict["collectionname"] = json_dict.pop("collectionName")
         return json_dict
 
 
@@ -238,9 +246,9 @@ class RunSingleURLFromFile():
         if "flightdirection" in json_dict:
             itter_copy = deepcopy(json_dict)
             for i, flightdirection in enumerate(itter_copy["flightdirection"]):
-                #flightdirection in UPPER
+                # flightdirection in UPPER
                 flightdirection = flightdirection.upper()
-                #DESCENDING
+                # DESCENDING
                 if flightdirection in ["D", "DESC", "DESCENDING"]:
                     json_dict["flightdirection"][i] = "DESCENDING"
                 #ASCENDING
@@ -249,12 +257,23 @@ class RunSingleURLFromFile():
         if "polarization" in json_dict:
             itter_copy = deepcopy(json_dict)
             for i, polarization in enumerate(itter_copy["polarization"]):
-                #making all results UPPER case, except Dual
+                # making all results UPPER case, except Dual
                 if polarization[0:4].upper() == "DUAL":
                     polarization = "Dual" + polarization[4:].upper()
                 else:                
                     polarization = polarization.upper()
                 json_dict["polarization"][i] = polarization
+        if "collectionname" in json_dict:
+            itter_copy = deepcopy(json_dict)
+            for i, collectionname in enumerate(itter_copy["collectionname"]):
+                # Note: in url_dict, string is separated by comma: 'Big Island', ' HI'
+                # Using the below to match the url string to file string
+                # Big Island, HI
+                if collectionname in ["Big Island", " HI"]:
+                    json_dict["collectionname"][i] = "Big Island, HI"
+                # Cascade Volcanoes, CA/OR/WA
+                elif collectionname in ["Cascade Volcanoes", " CA/OR/WA"]:
+                    json_dict["collectionname"][i] = "Cascade Volcanoes, CA/OR/WA"
         return json_dict
 
     def runQuery(self):
