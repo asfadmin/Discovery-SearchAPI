@@ -76,6 +76,7 @@ class RunSingleURLFromFile():
                         checkFileContainsExpected("flightdirection", json_dict, file_content)
                         checkFileContainsExpected("offnadirangle", json_dict, file_content)
                         checkFileContainsExpected("polarization", json_dict, file_content)
+                        checkFileContainsExpected("relativeorbit", json_dict, file_content)
 
         # If print wasn't declared, it gets set in parseTestValues:
         if json_dict["print"] == True:
@@ -140,6 +141,9 @@ class RunSingleURLFromFile():
                     del mutatable_dict[key]
                     val = urllib.parse.unquote_plus(val)
                     mutatable_dict["polarization"] = Input.parse_string_list(val)
+                elif key.lower() == "relativeorbit":
+                    del mutatable_dict[key]
+                    mutatable_dict["relativeorbit"] = Input.parse_int_or_range_list(val)
 
 
         except ValueError as e:
@@ -175,6 +179,10 @@ class RunSingleURLFromFile():
         ### polarization:
         if "polarization" in json_dict:
             json_dict["polarization"] = json_dict.pop("polarization")
+        ### relativeOrbit:
+        for key in ["relativeOrbit", "Path Number"]:
+            if key in json_dict:
+                json_dict["relativeorbit"] = json_dict.pop(key)
         return json_dict
 
 
@@ -242,7 +250,6 @@ class RunSingleURLFromFile():
             itter_copy = deepcopy(json_dict)
             for i, polarization in enumerate(itter_copy["polarization"]):
                 #making all results UPPER case, except Dual
-                print(polarization)
                 if polarization[0:4].upper() == "DUAL":
                     polarization = "Dual" + polarization[4:].upper()
                 else:                
