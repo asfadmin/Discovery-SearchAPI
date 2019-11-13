@@ -11,6 +11,7 @@ import glob
 import itertools
 import argparse
 from copy import deepcopy
+import urllib.parse
 
 # Let python discover other modules, starting one dir behind this one (project root):
 project_root = os.path.realpath(os.path.join(os.path.dirname(__file__),".."))
@@ -43,7 +44,8 @@ class RunSingleURLFromFile():
                         def checkFileContainsExpected(key, url_dict, file_dict):
                             print(url_dict)
                             print("CHECKING FILE HERE")
-                            print(json.dumps(file_dict, indent=4, default=str))
+                            print(file_dict)
+                            # print(json.dumps(file_dict, indent=4, default=str))
                             if key in url_dict and key in file_dict:
                                 print("HEREEEEEEEEEE")
                                 found_in_list = False
@@ -72,6 +74,8 @@ class RunSingleURLFromFile():
                         checkFileContainsExpected("granule_list", json_dict, file_content)
                         checkFileContainsExpected("groupid", json_dict, file_content)
                         checkFileContainsExpected("flightdirection", json_dict, file_content)
+                        checkFileContainsExpected("offnadirangle", json_dict, file_content)
+                        checkFileContainsExpected("polarization", json_dict, file_content)
 
         # If print wasn't declared, it gets set in parseTestValues:
         if json_dict["print"] == True:
@@ -129,6 +133,14 @@ class RunSingleURLFromFile():
                 elif key.lower() == "flightdirection":
                     del mutatable_dict[key]
                     mutatable_dict["flightdirection"] = Input.parse_string_list(val)
+                elif key.lower() == "offnadirangle":
+                    del mutatable_dict[key]
+                    mutatable_dict["offnadirangle"] = Input.parse_float_or_range_list(val)
+                elif key.lower() == "polarization":
+                    del mutatable_dict[key]
+                    val = urllib.parse.unquote_plus(val)
+                    mutatable_dict["polarization"] = Input.parse_string_list(val)
+
 
         except ValueError as e:
             assert False, "Test: {0}. Incorrect parameter: {1}".format(json_test["title"], str(e))
@@ -153,8 +165,16 @@ class RunSingleURLFromFile():
         if "groupID" in json_dict:
             json_dict["groupid"] = json_dict.pop("groupID")
         ### flightDirection
-        if "Ascending or Descending?" in json_dict:
-            json_dict["flightdirection"] = json_dict.pop("Ascending or Descending?")
+        for key in ["Ascending or Descending?", "flightDirection"]:
+            if key in json_dict:
+                json_dict["flightdirection"] = json_dict.pop(key)
+        ### offNadirAngle:
+        for key in ["Off Nadir Angle", "offNadirAngle"]:
+            if key in json_dict:
+                json_dict["offnadirangle"] = json_dict.pop(key)
+        ### polarization:
+        if "polarization" in json_dict:
+            json_dict["polarization"] = json_dict.pop("polarization")
         return json_dict
 
 
@@ -213,12 +233,21 @@ class RunSingleURLFromFile():
                 #flightdirection in UPPER
                 flightdirection = flightdirection.upper()
                 #DESCENDING
-                print("DO YOU SEE ME?")
                 if flightdirection in ["D", "DESC", "DESCENDING"]:
                     json_dict["flightdirection"][i] = "DESCENDING"
                 #ASCENDING
                 elif flightdirection in ["A", "ASC", "ASCENDING"]:
                     json_dict["flightdirection"][i] = "ASCENDING"
+        if "polarization" in json_dict:
+            itter_copy = deepcopy(json_dict)
+            for i, polarization in enumerate(itter_copy["polarization"]):
+                #making all results UPPER case, except Dual
+                print(polarization)
+                if polarization[0:4].upper() == "DUAL":
+                    polarization = "Dual" + polarization[4:].upper()
+                else:                
+                    polarization = polarization.upper()
+                json_dict["polarization"][i] = polarization
         return json_dict
 
     def runQuery(self):
