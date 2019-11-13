@@ -1,5 +1,5 @@
 
-api: Test
+api: Prod
 
 
 tests:
@@ -295,25 +295,25 @@ tests:
 - collectionName Iceland 100:
     collectionName: Iceland
     maxresults: 100
-    output: csv
+    output: json
 
-    expected file: csv
+    expected file: json
     expected code: 200
 
 - collectionName Big Island 100:
     collectionName: Big+Island,+HI
     maxresults: 100
-    output: csv
+    output: json
 
-    expected file: csv
+    expected file: json
     expected code: 200
 
 - collectionName Cascade 100:
     collectionName: Cascade%20Volcanoes,%20CA/OR/WA
     maxresults: 100
-    output: csv
+    output: json
 
-    expected file: csv
+    expected file: json
     expected code: 200
 
 - end count:
