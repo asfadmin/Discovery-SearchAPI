@@ -44,13 +44,16 @@ class RunSingleURLFromFile():
                             if key in url_dict and key in file_dict:
                                 found_in_list = False
                                 for found_param in file_dict[key]:
+                                    # poss_list is either single "i", or range "[i,j]":
                                     for poss_list in url_dict[key]:
+                                        # If it's a list, then it is a range of numbers:
                                         if isinstance(poss_list, type([])):
                                             expect_type = type(poss_list[0])
                                             # "found_param" is always a string. Convert it to match
                                             if expect_type(found_param) >= poss_list[0] and expect_type(found_param) <= poss_list[1]:
                                                 found_in_list = True
                                                 break
+                                        # This part gets hit for single numbers, and strings. (ie "Platform"):
                                         else:
                                             expect_type = type(poss_list)
                                             if expect_type(found_param) == poss_list:
