@@ -78,6 +78,7 @@ class RunSingleURLFromFile():
                         checkFileContainsExpected("polarization", json_dict, file_content)
                         checkFileContainsExpected("relativeorbit", json_dict, file_content)
                         checkFileContainsExpected("collectionname", json_dict, file_content)
+                        checkFileContainsExpected("beammode", json_dict, file_content)
 
         # If print wasn't declared, it gets set in parseTestValues:
         if json_dict["print"] == True:
@@ -149,6 +150,9 @@ class RunSingleURLFromFile():
                     del mutatable_dict[key]
                     val = urllib.parse.unquote_plus(val)
                     mutatable_dict["collectionname"] = Input.parse_string_list(val)
+                elif key.lower() in ["beammode", "beamswath"]:
+                    del mutatable_dict[key]
+                    mutatable_dict["beammode"] = Input.parse_string_list(val)
 
 
         except ValueError as e:
@@ -191,6 +195,10 @@ class RunSingleURLFromFile():
         ### collectionName:
         if "collectionName" in json_dict:
             json_dict["collectionname"] = json_dict.pop("collectionName")
+        ### beamMode:
+        for key in ["beamswath", "beamMode", "Beam Mode"]:
+            if key in json_dict:
+                json_dict["beammode"] = json_dict.pop(key)
         return json_dict
 
 
@@ -241,7 +249,7 @@ class RunSingleURLFromFile():
                 elif platform in ["SMAP", "SP"]:
                     json_dict["Platform"][i] = "SMAP"
                 # UAVSAR
-                elif platform in ["UAVSAR", "UA"]:
+                elif platform in ["UAVSAR", "UA", "AIRMOSS"]:
                     json_dict["Platform"][i] = "UAVSAR"
         if "flightdirection" in json_dict:
             itter_copy = deepcopy(json_dict)
@@ -274,6 +282,17 @@ class RunSingleURLFromFile():
                 # Cascade Volcanoes, CA/OR/WA
                 elif collectionname in ["Cascade Volcanoes", " CA/OR/WA"]:
                     json_dict["collectionname"][i] = "Cascade Volcanoes, CA/OR/WA"
+        if "beammode" in json_dict:
+            itter_copy = deepcopy(json_dict)
+            for i, beammode in enumerate(itter_copy["beammode"]):
+                # beammode in UPPER case
+                beammode = beammode.upper()
+                # STANDARD
+                if beammode in ["STANDARD"]:
+                    json_dict["beammode"][i] = "STD"
+                # Standard is different for Radarsat
+                elif beammode in ["STD"] and platform == "RADARSAT-1":
+                    json_dict["beammode"][i] = "ST3"
         return json_dict
 
     def runQuery(self):

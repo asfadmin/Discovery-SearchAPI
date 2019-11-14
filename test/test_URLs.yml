@@ -241,7 +241,7 @@ tests:
 - beamSwath R1 SW 100:
     beamSwath: SWA,SWB
     platform: RADARSAT-1
-    maxresults: 100
+    maxresults: 1
     output: csv
 
     expected file: csv
@@ -250,15 +250,6 @@ tests:
 - beamSwath R1 list FN 100:
     beamSwath: FN1,FN2
     platform: RADARSAT-1
-    maxresults: 100
-    output: csv
-
-    expected file: csv
-    expected code: 200
-
-- beamSwath UA list 100:
-    beamSwath: POL,RPI
-    platform: UAVSAR
     maxresults: 100
     output: csv
 
@@ -286,7 +277,7 @@ tests:
 - beamSwath UA list 100:
     beamSwath: POL,RPI
     platform: UAVSAR
-    maxresults: 100
+    maxresults: 1
     output: csv
 
     expected file: csv
