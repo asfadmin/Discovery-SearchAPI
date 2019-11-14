@@ -18,7 +18,7 @@ tests:
     expected code: 200
 
 - beamMode specchar blank:
-    beamMode: ~
+    beamMode: $~
     output: csv
 
     expected file: blank csv
@@ -39,7 +39,7 @@ tests:
     expected code: 200
 
 - beamSwath specchar blank:
-    beamSwath: ~
+    beamSwath: ~!
     output: csv
 
     expected file: blank csv
@@ -150,7 +150,7 @@ tests:
     expected code: 200
 
 - flightLine AIRSAR specchar blank:
-    flightLine: ~
+    flightLine: ~&
     platform: AIRSAR
     output: csv
 
@@ -165,7 +165,7 @@ tests:
     expected code: 200
 
 - granule_list specchar blank:
-    granule_list: ~
+    granule_list: ~&
     output: csv
 
     expected file: blank csv
@@ -193,10 +193,38 @@ tests:
     expected code: 200
 
 - groupid specchar blank:
-    groupid: ~
+    groupid: ~+
     output: csv
 
     expected file: blank csv
+    expected code: 200
+
+- groupid Radarsat blank not in CMR:
+    groupid: R1_57704_ST7_F173
+    output: json
+
+    expected file: blank json
+    expected code: 200
+
+- groupid ERS blank not in CMR:
+    groupid: E2_84699_STD_F309
+    output: json
+
+    expected file: blank json
+    expected code: 200
+
+- groupid JERS blank not in CMR:
+    groupid: J1_36436_STD_F278
+    output: json
+
+    expected file: blank json
+    expected code: 200
+
+- groupid Seasat blank not in CMR:
+    groupid: SS_01502_STD_F2536
+    output: json
+
+    expected file: blank json
     expected code: 200
 
 - output test:
@@ -218,7 +246,7 @@ tests:
 
 - platform count RADARSAT-1 blank:
     platform: RADARSAT-1
-    start: 2016-01-01T00:00:00Z
+    start: 2017-01-01T00:00:00Z
     end: 2018-01-01T00:00:00Z
     output: count
 
@@ -300,12 +328,12 @@ tests:
     expected code: 200
 
 - polarization specchar 2 blank:
-    polarization: ~#
+    polarization: +!
     platform: E1
     maxResults: 1000
     output: csv
 
-    expected file: blank metalink
+    expected file: blank csv
     expected code: 200
 
 - processingLevel specchar blank:
@@ -345,31 +373,7 @@ tests:
     expected code: 200
 
 - relativeOrbit blank:
-    relativeOrbit: 671
-    output: csv
-
-    expected file: blank csv
-    expected code: 200
-
-- start backwards blank:
-    start: now
-    end: 1+year+ago
-    output: csv
-
-    expected file: blank csv
-    expected code: 200
-
-- start tomorrow blank:
-    start: tomorrow
-    end: 1+year+ago
-    output: csv
-
-    expected file: blank csv
-    expected code: 200
-
-- start now end yesterday blank:
-    start: now
-    end: yesterday
+    relativeOrbit: 6710
     output: csv
 
     expected file: blank csv
