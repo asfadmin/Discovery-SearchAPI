@@ -42,9 +42,9 @@ class RunSingleURLFromFile():
                         # print(json.dumps(json_dict, indent=4, default=str))
                         # IF used in url, IF contained in file's content, check if they match
                         def checkFileContainsExpected(key, url_dict, file_dict):
-                            print(url_dict)
-                            print("CHECKING FILE HERE")
-                            print(file_dict)
+                            # print(url_dict)
+                            # print("CHECKING FILE HERE")
+                            # print(file_dict)
                             # print(json.dumps(file_dict, indent=4, default=str))
                             if key in url_dict and key in file_dict:
                                 print("HEREEEEEEEEEE")
@@ -68,6 +68,22 @@ class RunSingleURLFromFile():
                                         break
                                 assert found_in_list, key + " declared, but not found in file. Test: {0}".format(json_dict["title"])
                         
+                        def checkMinMax(key, url_dict, file_dict):
+                            if "min"+key in url_dict and key in file_dict:
+                                for value in file_dict[key]:
+                                    number_type = type(url_dict["min"+key])
+                                    assert number_type(value) >= url_dict["min"+key], "TESTING"
+                            if "max"+key in url_dict and key in file_dict:
+                                for value in file_dict[key]:
+                                    number_type = type(url_dict["max"+key])
+                                    assert number_type(value) <= url_dict["max"+key], "TESTING"
+
+                            # elif key[0:4].lower() == "min":
+                            #     print("HIT MIN")
+                            # elif key[0:4].lower() == "max":
+                            #     print("HIT MAX")
+
+
                         checkFileContainsExpected("Platform", json_dict, file_content)
                         checkFileContainsExpected("absoluteOrbit", json_dict, file_content)
                         checkFileContainsExpected("asfframe", json_dict, file_content)
@@ -79,6 +95,8 @@ class RunSingleURLFromFile():
                         checkFileContainsExpected("relativeorbit", json_dict, file_content)
                         checkFileContainsExpected("collectionname", json_dict, file_content)
                         checkFileContainsExpected("beammode", json_dict, file_content)
+
+                        checkMinMax("baselineperp", json_dict, file_content)
 
         # If print wasn't declared, it gets set in parseTestValues:
         if json_dict["print"] == True:
@@ -153,7 +171,11 @@ class RunSingleURLFromFile():
                 elif key.lower() in ["beammode", "beamswath"]:
                     del mutatable_dict[key]
                     mutatable_dict["beammode"] = Input.parse_string_list(val)
-
+                # MIN/MAX veriants
+                elif key.lower()[3:] == "baselineperp":
+                    del mutatable_dict[key]
+                    # Save the min/max key, all lower
+                    mutatable_dict[key.lower()[0:3]+"baselineperp"] = Input.parse_float(val)
 
         except ValueError as e:
             assert False, "Test: {0}. Incorrect parameter: {1}".format(json_test["title"], str(e))
@@ -199,6 +221,9 @@ class RunSingleURLFromFile():
         for key in ["beamswath", "beamMode", "Beam Mode"]:
             if key in json_dict:
                 json_dict["beammode"] = json_dict.pop(key)
+        for key in ["Baseline Perp.", "baselinePerp"]:
+            if key in json_dict:
+                json_dict["baselineperp"] = json_dict.pop(key)
         return json_dict
 
 
@@ -252,8 +277,7 @@ class RunSingleURLFromFile():
                 elif platform in ["UAVSAR", "UA", "AIRMOSS"]:
                     json_dict["Platform"][i] = "UAVSAR"
         if "flightdirection" in json_dict:
-            itter_copy = deepcopy(json_dict)
-            for i, flightdirection in enumerate(itter_copy["flightdirection"]):
+            for i, flightdirection in enumerate(json_dict["flightdirection"]):
                 # flightdirection in UPPER
                 flightdirection = flightdirection.upper()
                 # DESCENDING
@@ -263,8 +287,7 @@ class RunSingleURLFromFile():
                 elif flightdirection in ["A", "ASC", "ASCENDING"]:
                     json_dict["flightdirection"][i] = "ASCENDING"
         if "polarization" in json_dict:
-            itter_copy = deepcopy(json_dict)
-            for i, polarization in enumerate(itter_copy["polarization"]):
+            for i, polarization in enumerate(json_dict["polarization"]):
                 # making all results UPPER case, except Dual
                 if polarization[0:4].upper() == "DUAL":
                     polarization = "Dual" + polarization[4:].upper()
@@ -272,8 +295,7 @@ class RunSingleURLFromFile():
                     polarization = polarization.upper()
                 json_dict["polarization"][i] = polarization
         if "collectionname" in json_dict:
-            itter_copy = deepcopy(json_dict)
-            for i, collectionname in enumerate(itter_copy["collectionname"]):
+            for i, collectionname in enumerate(json_dict["collectionname"]):
                 # Note: in url_dict, string is separated by comma: 'Big Island', ' HI'
                 # Using the below to match the url string to file string
                 # Big Island, HI
@@ -283,16 +305,15 @@ class RunSingleURLFromFile():
                 elif collectionname in ["Cascade Volcanoes", " CA/OR/WA"]:
                     json_dict["collectionname"][i] = "Cascade Volcanoes, CA/OR/WA"
         if "beammode" in json_dict:
-            itter_copy = deepcopy(json_dict)
-            for i, beammode in enumerate(itter_copy["beammode"]):
+            for i, beammode in enumerate(json_dict["beammode"]):
                 # beammode in UPPER case
                 beammode = beammode.upper()
                 # STANDARD
-                if beammode in ["STANDARD"]:
+                if beammode[0:2] == "ST":
                     json_dict["beammode"][i] = "STD"
                 # Standard is different for Radarsat
-                elif beammode in ["STD"] and platform == "RADARSAT-1":
-                    json_dict["beammode"][i] = "ST3"
+                # elif beammode in ["STANDARD", "STD"]:
+                #     json_dict["beammode"][i] = "STD"
         return json_dict
 
     def runQuery(self):
