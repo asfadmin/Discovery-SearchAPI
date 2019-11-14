@@ -1,5 +1,5 @@
 
-api: tEsT
+api: Test
 
 
 tests:
@@ -45,7 +45,7 @@ tests:
     expected code: 200
 
 - absoluteOrbit zero range:
-    absoluteOrbit: 27601-27601
+    absoluteOrbit: 17545-17545
     maxresults: 10
     output: csv
 
@@ -53,15 +53,7 @@ tests:
     expected code: 200
 
 - absoluteOrbit zero range list:
-    absoluteOrbit: 27120-27120,27076
-    maxresults: 10
-    output: csv
-
-    expected file: csv
-    expected code: 200
-
-- absoluteOrbit zero range list:
-    absoluteOrbit: 27120-27120,27076
+    absoluteOrbit: 17545-17545,17560
     maxresults: 10
     output: csv
 
@@ -423,7 +415,7 @@ tests:
     expected code: 200
 
 - frame single:
-    frame: 2277
+    frame: 581
     maxresults: 10
     output: csv
 
@@ -431,7 +423,7 @@ tests:
     expected code: 200
 
 - frame range:
-    frame: 1530-1532
+    frame: 580-585
     maxresults: 10
     output: csv
 
@@ -439,7 +431,7 @@ tests:
     expected code: 200
 
 - frame list:
-    frame: 1530,1531,1532
+    frame: 578,579,580
     maxresults: 10
     output: csv
 
@@ -455,8 +447,8 @@ tests:
     expected code: 200
 
 - frame zero range:
-    frame: 190-190
-    platform: ALOS
+    frame: 582-582
+    platform: SA,SB
     maxresults: 10
     output: csv
 
@@ -464,8 +456,8 @@ tests:
     expected code: 200
 
 - frame zero range list:
-    frame: 180-180,185
-    platform: ALOS
+    frame: 582-582,590
+    platform: SB
     maxresults: 10
     output: csv
 
@@ -521,8 +513,9 @@ tests:
     expected file: download
     expected code: 200
 
+#In CMR reporting script, we report groupid as null on most datasets. Some datasets updated to expect blank file & moved to partial pass yaml
 - groupid Sentinel:
-    groupid: S1A_IWDV_0382_0387_019686_014
+    groupid: S1B_S1DV_0492_0497_017567_041
     output: json
 
     expected file: json
@@ -550,7 +543,7 @@ tests:
     expected code: 200
 
 - groupid ALOS:
-    groupid: ALPSRP278477070
+    groupid: ALPSRP279071100
     output: json
 
     expected file: json
@@ -558,34 +551,6 @@ tests:
 
 - groupid AIRSAR:
     groupid: ts1902
-    output: json
-
-    expected file: json
-    expected code: 200
-
-- groupid Radarsat:
-    groupid: R1_63781_FN1_F277
-    output: json
-
-    expected file: json
-    expected code: 200
-
-- groupid ERS:
-    groupid: E1_08794_STD_F267
-    output: json
-
-    expected file: json
-    expected code: 200
-
-- groupid JERS:
-    groupid: J1_01508_STD_F315
-    output: json
-
-    expected file: json
-    expected code: 200
-
-- groupid Seasat:
-    groupid: SS_01499_STD_F1200
     output: json
 
     expected file: json
@@ -631,8 +596,40 @@ tests:
     expected file: csv
     expected code: 200
 
+- intersectsWith POINT uppercase:
+    intersectsWith: POINT(-119.543 37.925)
+    maxResults: 100
+    output: CSV
+
+    expected file: csv
+    expected code: 200
+
+- intersectsWith POLYGON uppercase:
+    intersectsWith: POLYGON((-119.543 37.925, -118.443 37.7421, -118.682 36.8525, -119.77 37.0352, -119.543 37.925))
+    maxResults: 100
+    output: CSV
+
+    expected file: csv
+    expected code: 200
+
+- intersectsWith LINESTRING uppercase:
+    intersectsWith: LINESTRING(-119.543 37.925, -118.443 37.7421)
+    maxResults: 100
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
 - linestring:
     linestring: -150.2,65.0,-150.1,65.5
+    maxResults: 10
+    output: CSV
+
+    expected file: csv
+    expected code: 200
+
+- linestring uppercase:
+    LINESTRING: -150.2,65.0,-150.1,65.5
     maxResults: 10
     output: CSV
 
@@ -716,10 +713,19 @@ tests:
     expected file: csv
     expected code: 200
 
-- min and max Doppler:
+- min and max Doppler R1:
     minDoppler: -20000
     maxDoppler: 2000
     platform: R1
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- min and max Doppler negative:
+    minDoppler: -20000
+    maxDoppler: -1
     maxResults: 10
     output: csv
 
@@ -769,8 +775,8 @@ tests:
     expected code: 200
 
 - max and min InsarStackSize:
-    minInsarStackSize: 80
-    maxInsarStackSize: 100
+    minInsarStackSize: 70
+    maxInsarStackSize: 120
     maxResults: 10
     output: csv
 
@@ -791,14 +797,6 @@ tests:
     output: csv
 
     expected file: csv
-    expected code: 200
-
-- maxResults 1 json:
-    platform: SENTINEL-1
-    maxResults: 1
-    output: json
-
-    expected file: json
     expected code: 200
 
 - maxResults 1 json:
@@ -831,6 +829,22 @@ tests:
     output: geojson
 
     expected file: geojson
+    expected code: 200
+
+- maxResults 1 jsonlite:
+    platform: SENTINEL-1
+    maxResults: 1
+    output: jsonlite
+
+    expected file: jsonlite
+    expected code: 200
+
+- maxResults 2 jsonlite:
+    platform: SENTINEL-1
+    maxResults: 2
+    output: jsonlite
+
+    expected file: jsonlite
     expected code: 200
 
 - offNadirAngle single:
@@ -912,6 +926,14 @@ tests:
     expected file: json
     expected code: 200
 
+- output jsonlite:
+    platform: SB
+    maxResults: 2000
+    output: jsonlite
+
+    expected file: jsonlite
+    expected code: 200 
+
 - output kml:
     platform: SB
     maxResults: 2000
@@ -930,9 +952,10 @@ tests:
 
 - platform SA:
     platform: SA
-    start: 2016-01-01T00:00:00Z
+    start: 2015-01-01T00:00:00Z
     end: 2016-01-02T00:00:00Z
     output: csv
+    maxResults: 2000
 
     expected file: csv
     expected code: 200
@@ -1640,6 +1663,14 @@ tests:
     expected file: csv
     expected code: 200
 
+- point uppercase:
+    POINT: -150.2,65.0
+    maxResults: 10
+    output: CSV
+
+    expected file: csv
+    expected code: 200
+
 - polarization HH:
     polarization: HH
     platform: SB
@@ -1786,11 +1817,19 @@ tests:
     expected file: csv
     expected code: 200
 
+- polygon uppercase:
+    POLYGON: -148.52,64.63,-150.41,64.64,-149.58,63.86,-148.52,64.63
+    maxResults: 100
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
 - polygon multi:
     polygon: 12.13,41.74,13.4,41.74,13.4,42.75,12.13,42.75,12.13,41.74
     platform: Sentinel-1A,Sentinel-1B
     processingLevel: SLC
-    start: 2017-05-01T00:00:00UTC
+    start: 2015-05-01T00:00:00UTC
     output: csv
 
     expected file: csv
@@ -1800,7 +1839,7 @@ tests:
     polygon: 12.13,41.74,13.4,41.74,13.4,42.75,12.13,42.75
     platform: Sentinel-1A,Sentinel-1B
     processingLevel: SLC
-    start: 2017-05-01T00:00:00UTC
+    start: 2015-05-01T00:00:00UTC
     output: csv
 
     expected file: csv
@@ -1810,7 +1849,7 @@ tests:
     polygon: 12.13,41.74,13.4,41.74,13.4,42.75,12.13,42.75,12.13,41.74
     platform: Sentinel-1A,Sentinel-1B
     processingLevel: SLC
-    start: 2017-05-01T00:00:00UTC
+    start: 2015-05-01T00:00:00UTC
     output: csv
 
     expected file: csv
@@ -1820,7 +1859,7 @@ tests:
     polygon: 12.13,41.74,12.13,42.75,13.4,42.75,13.4,41.74,12.13,41.74
     platform: Sentinel-1A,Sentinel-1B
     processingLevel: SLC
-    start: 2017-05-01T00:00:00UTC
+    start: 2015-05-01T00:00:00UTC
     output: csv
 
     expected file: csv
@@ -1842,8 +1881,8 @@ tests:
     expected file: csv
     expected code: 200
 
-- processingLevel L1 L1.1:
-    processingLevel: L1.1,L1.0
+- processingLevel L1 L1.1 Metadata:
+    processingLevel: L1.1,L1.0,METADATA
     maxResults: 10
     output: csv
 
@@ -1987,21 +2026,20 @@ tests:
 
 - product_list mix:
     product_list:
-        - S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80-GRD_HD,S1B_IW_GRDH_1SDV_20190410T153301_20190410T153328_015746_01D8D2_0E9B-GRD_HD
-        - ALPSRP079300700-L1.1,ALPSRP079300700-L1.0,ALPSRP079300700-RTC_LOW_RES,ALPSRP079300670-L1.0
+        - S1B_S6_GRDH_1SDV_20190911T214309_20190911T214338_017995_021E10_5CCB-GRD_HD,S1B_EW_SLC__1SDH_20190813T071957_20190813T072100_017564_02108E_9322-SLC
+        - ts1902-PSTOKES,ts1902-PTIF,ts1888-LTIF
     output: json
 
     expected file: json
     expected code: 200
 
 - product_list multi:
-    #currently failing, try again with python script updates
     product_list: 
-        - S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80-GRD_HD
-        - ALPSRP079300700-L1.1
-        - UA_TXcoas_23905_11044_008_110630_L090_CX_02-COMPLEX
-        - R1_01509_ST6_F167-L0
-        - SIRC1_16_GRD_ALL_098_030_013_19940415T111359_19940415T111411-GRD
+        - S1B_EW_OCN__2SSH_20190808T030727_20190808T030837_017488_020E3B_D440-OCN
+        - ts1902-PTIF
+        - UA_SDelta_15502_17117_010_171026_L090_CX_01-PAULI
+        - SP_15079_D_005-L1A_Radar_RO_QA
+        - R1_68669_20081230_092353-L0
     output: json
 
     expected file: json
@@ -2009,8 +2047,8 @@ tests:
 
 - product_list multi list:
     product_list:
-        - S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80-GRD_HD
-        - ts726-CSTOKES,ts726-DEM,ts726-LSTOKES,ts726-LTIF,ts726-CTIF
+        - S1A_S4_SLC__1SDV_20190809T062903_20190809T062922_028488_03385D_2C10-SLC
+        - ts726-CSTOKES,ts726-DEM,ts726-LSTOKES,ts726-LTIF,ts726-CTIF,ts1721-LTIF,ts1733-PTIF
     output: json
 
     expected file: json
@@ -2264,7 +2302,34 @@ tests:
     expected file: count
     expected code: 200
 
-- start realworld 1:
+- start backwards reversed:
+    start: now
+    end: 1+year+ago
+    output: csv
+    maxResults: 10
+
+    expected file: csv
+    expected code: 200
+
+- start tomorrow reversed:
+    start: tomorrow
+    end: 1+year+ago
+    output: csv
+    maxResults: 10
+
+    expected file: csv
+    expected code: 200
+
+- start now end yesterday reversed:
+    start: now
+    end: yesterday
+    output: csv
+    maxResults: 10
+
+    expected file: csv
+    expected code: 200
+
+- realworld 1:
     intersectsWith: point(-168.0380672+53.9279675)
     platform: Sentinel-1A,Sentinel-1B
     processingLevel: GRD_HS,GRD_HD
@@ -2274,7 +2339,17 @@ tests:
     expected file: count
     expected code: 200
 
-- start realworld 2:
+- realworld 1 modified:
+    intersectsWith: point(-162.4535+61.4945)
+    platform: Sentinel-1A,Sentinel-1B
+    processingLevel: GRD_HS,GRD_HD
+    beamMode: IW
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- realworld 2:
     intersectsWith: linestring(-102+37.59,-94+37,-94+39,-102+39)
     platform: Sentinel-1A,Sentinel-1B
     processingLevel: GRD_HS,GRD_HD
@@ -2284,7 +2359,17 @@ tests:
     expected file: count
     expected code: 200
 
-- start realworld 3:
+- realworld 2 modified:
+    intersectsWith: linestring(-94.1995+42.3741,-88.2384+42.2475,-88.166+40.56,-93.9793+41.1938)
+    platform: Sentinel-1A,Sentinel-1B
+    processingLevel: GRD_HS,GRD_HD
+    beamMode: S4
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- realworld 3:
     intersectsWith: polygon((-102+37.59,-94+37,-94+39,-102+39,-102+37.59))
     platform: Sentinel-1A,Sentinel-1B
     processingLevel: GRD_HS,GRD_HD
@@ -2294,55 +2379,68 @@ tests:
     expected file: count
     expected code: 200
 
-- start realworld 4:
+- realworld 3 modified:
+    intersectsWith: polygon((-91.1083+41.7191,-83.9568+41.4233,-83.9916+43.9781,-91.7194+42.8556,-91.1083+41.7191))
+    platform: Sentinel-1A,Sentinel-1B
+    processingLevel: GRD_HS,GRD_HD
+    beamMode: EW,S1,S4
     output: count
-    frame: 587%2C588%2C589%2C590%2C591%2C592%2C593
-    processingLevel: L0%2CL1.0%2CSLC
-    platform: SENTINEL-1A%2CSENTINEL-1B
-    maxResults: 1000
-    relativeOrbit: 128
 
     expected file: count
     expected code: 200
 
-- start realworld 5:
+- realworld 4:
     output: count
-    asfframe: 587%2C588%2C589%2C590%2C591%2C592%2C593
+    frame: 580%2C581%2C582%2C583%2C585
     processingLevel: L0%2CL1.0%2CSLC
     platform: SENTINEL-1A%2CSENTINEL-1B
     maxResults: 1000
-    relativeOrbit: 128
+    relativeOrbit: 1-1000
 
     expected file: count
     expected code: 200
 
-- start realworld 6:
+- realworld 5:
+    output: count
+    asfframe: 580%2C581%2C582%2C583%2C585
+    processingLevel: L0%2CL1.0%2CSLC
+    platform: SENTINEL-1A%2CSENTINEL-1B
+    maxResults: 1000
+    relativeOrbit: 100-1000
+
+    expected file: count
+    expected code: 200
+
+- realworld 6:
     platform: SA,SB
-    relativeOrbit: 128
-    asfframe: 587-593
-    start: 2017-06-01
-    end: 2018-05-30
+    relativeOrbit: 100-500
+    asfframe: 550-600
+    start: 2015-06-01
+    end: 2019-05-30
     output: csv
+    maxResults: 500
 
     expected file: csv
     expected code: 200
 
-- start realworld 7:
+- realworld 7:
     platform: SA,SB
-    relativeOrbit: 128
-    frame: 587-593
-    start: 2017-06-01
-    end: 2018-05-30
+    relativeOrbit: 100-200
+    frame: 580-585
+    start: 2015-06-01
+    end: 2019-05-30
     output: csv
+    maxResults: 500
 
     expected file: csv
     expected code: 200
 
-- start realworld 8:
+- realworld 8:
     output: csv
     platform: Sentinel-1A
     start: 2017-05-30
     end: 2018-05-31%22
+    maxResults: 1000
 
     expected file: csv
     expected code: 200

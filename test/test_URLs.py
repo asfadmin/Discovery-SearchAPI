@@ -67,6 +67,8 @@ class RunSingleURLFromFile():
                         checkFileContainsExpected("Platform", json_dict, file_content)
                         checkFileContainsExpected("absoluteOrbit", json_dict, file_content)
                         checkFileContainsExpected("asfframe", json_dict, file_content)
+                        checkFileContainsExpected("granule_list", json_dict, file_content)
+                        checkFileContainsExpected("groupid", json_dict, file_content)
 
         # If print wasn't declared, it gets set in parseTestValues:
         if json_dict["print"] == True:
@@ -115,6 +117,12 @@ class RunSingleURLFromFile():
                 elif key.lower() in ["frame", "asfframe"]:
                     del mutatable_dict[key]
                     mutatable_dict["asfframe"] = Input.parse_int_or_range_list(val)
+                elif key.lower() == "granule_list":
+                    del mutatable_dict[key]
+                    mutatable_dict["granule_list"] = Input.parse_string_list(val)
+                elif key.lower() == "groupid":
+                    del mutatable_dict[key]
+                    mutatable_dict["groupid"] = Input.parse_string_list(val)
 
         except ValueError as e:
             assert False, "Test: {0}. Incorrect parameter: {1}".format(json_test["title"], str(e))
@@ -131,7 +139,15 @@ class RunSingleURLFromFile():
         for key in ["frame", "frameNumber", "Frame Number"]:
             if key in json_dict:
                 json_dict["asfframe"] = json_dict.pop(key)
+        ### granule_list:
+        for key in ["granuleName", "Granule Name"]:
+            if key in json_dict:
+                json_dict["granule_list"] = json_dict.pop(key)
+        ### groupid:
+        if "groupID" in json_dict:
+            json_dict["groupid"] = json_dict.pop("groupID")
         return json_dict
+
 
     # assumes values are in the form of {key: [value1,value2]}
     def renameValsToStandard(self, json_dict):
