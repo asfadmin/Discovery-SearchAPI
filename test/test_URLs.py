@@ -97,6 +97,9 @@ class RunSingleURLFromFile():
                         checkFileContainsExpected("beammode", json_dict, file_content)
 
                         checkMinMax("baselineperp", json_dict, file_content)
+                        checkMinMax("doppler", json_dict, file_content)
+                        checkMinMax("insarstacksize", json_dict, file_content)
+                        checkMinMax("faradayrotation", json_dict, file_content)
 
         # If print wasn't declared, it gets set in parseTestValues:
         if json_dict["print"] == True:
@@ -171,11 +174,24 @@ class RunSingleURLFromFile():
                 elif key.lower() in ["beammode", "beamswath"]:
                     del mutatable_dict[key]
                     mutatable_dict["beammode"] = Input.parse_string_list(val)
-                # MIN/MAX veriants
+                # MIN/MAX variants
+                # min/max BaselinePerp
                 elif key.lower()[3:] == "baselineperp":
                     del mutatable_dict[key]
                     # Save the min/max key, all lower
                     mutatable_dict[key.lower()[0:3]+"baselineperp"] = Input.parse_float(val)
+                # min/max Doppler:
+                elif key.lower()[3:] == "doppler":
+                    del mutatable_dict[key]
+                    mutatable_dict[key.lower()[0:3]+"doppler"] = Input.parse_float(val)
+                # min/max InsarStackSize:
+                elif key.lower()[3:] == "insarstacksize":
+                    del mutatable_dict[key]
+                    mutatable_dict[key.lower()[0:3]+"insarstacksize"] = Input.parse_int(val)
+                #min/max FaradayRotation:
+                elif key.lower()[3:] == "faradayrotation":
+                    del mutatable_dict[key]
+                    mutatable_dict[key.lower()[0:3]+"faradayrotation"] = Input.parse_float(val)
 
         except ValueError as e:
             assert False, "Test: {0}. Incorrect parameter: {1}".format(json_test["title"], str(e))
@@ -221,9 +237,21 @@ class RunSingleURLFromFile():
         for key in ["beamswath", "beamMode", "Beam Mode"]:
             if key in json_dict:
                 json_dict["beammode"] = json_dict.pop(key)
+        ### min/max BaselinePerp:
         for key in ["Baseline Perp.", "baselinePerp"]:
             if key in json_dict:
                 json_dict["baselineperp"] = json_dict.pop(key)
+        ### min/max Doppler:
+        for key in ["doppler", "Doppler"]:
+            if key in json_dict:
+                json_dict["doppler"] = json_dict.pop(key)
+        ### min/max InsarStackSize:
+        for key in ["insarStackSize", "Stack Size"]:
+            if key in json_dict:
+                json_dict["insarstacksize"] = json_dict.pop(key)
+        for key in ["faradayRotation", "Faraday Rotation"]:
+            if key in json_dict:
+                json_dict["faradayrotation"] = json_dict.pop(key)
         return json_dict
 
 
@@ -311,9 +339,6 @@ class RunSingleURLFromFile():
                 # STANDARD
                 if beammode[0:2] == "ST":
                     json_dict["beammode"][i] = "STD"
-                # Standard is different for Radarsat
-                # elif beammode in ["STANDARD", "STD"]:
-                #     json_dict["beammode"][i] = "STD"
         return json_dict
 
     def runQuery(self):
