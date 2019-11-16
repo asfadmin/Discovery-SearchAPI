@@ -47,9 +47,7 @@ class RunSingleURLFromFile():
                             # print(file_dict)
                             # print(json.dumps(file_dict, indent=4, default=str))
                             if key in url_dict and key in file_dict:
-                                print("HEREEEEEEEEEE")
                                 found_in_list = False
-                                print("FINDS AND VALIDATES VALUE IN FILE!!!!!")
                                 for found_param in file_dict[key]:
                                     for poss_list in url_dict[key]:
                                         if isinstance(poss_list, type([])):
@@ -77,11 +75,6 @@ class RunSingleURLFromFile():
                                 for value in file_dict[key]:
                                     number_type = type(url_dict["max"+key])
                                     assert number_type(value) <= url_dict["max"+key], "TESTING"
-
-                            # elif key[0:4].lower() == "min":
-                            #     print("HIT MIN")
-                            # elif key[0:4].lower() == "max":
-                            #     print("HIT MAX")
 
 
                         checkFileContainsExpected("Platform", json_dict, file_content)
