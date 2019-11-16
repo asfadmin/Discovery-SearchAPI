@@ -11,6 +11,7 @@ tests:
     expected file: csv
     expected code: 200
 
+#DS-2766 open bug for absoluteOrbit - GRFN scenes search correct range, but file returns different value for absoluteOrbit
 - absoluteOrbit range:
     absoluteOrbit: 5000-6000
     maxresults: 10
@@ -44,6 +45,7 @@ tests:
     expected file: csv
     expected code: 200
 
+#DS-2766 open bug for absoluteOrbit - GRFN scenes search correct range, but file returns different value for absoluteOrbit
 - absoluteOrbit zero range:
     absoluteOrbit: 17545-17545
     maxresults: 10
@@ -60,6 +62,7 @@ tests:
     expected file: csv
     expected code: 200
 
+#WEB2-1956 open bug for asfframe - for R1, frame in file will not match frame in query
 - asfframe R1 single:
     asfframe: 340
     platform: R1
@@ -96,18 +99,18 @@ tests:
     expected file: csv
     expected code: 200
 
-- asfframe R1 zero range:
+- asfframe ALOS zero range:
     asfframe: 340-340
-    platform: R1
+    platform: ALOS
     maxresults: 10
     output: csv
 
     expected file: csv
     expected code: 200
 
-- asfframe R1 zero range list:
+- asfframe ALOS zero range list:
     asfframe: 340-340,345
-    platform: R1
+    platform: ALOS
     maxresults: 10
     output: csv
 
@@ -238,7 +241,7 @@ tests:
 - beamSwath R1 SW 100:
     beamSwath: SWA,SWB
     platform: RADARSAT-1
-    maxresults: 100
+    maxresults: 1
     output: csv
 
     expected file: csv
@@ -247,15 +250,6 @@ tests:
 - beamSwath R1 list FN 100:
     beamSwath: FN1,FN2
     platform: RADARSAT-1
-    maxresults: 100
-    output: csv
-
-    expected file: csv
-    expected code: 200
-
-- beamSwath UA list 100:
-    beamSwath: POL,RPI
-    platform: UAVSAR
     maxresults: 100
     output: csv
 
@@ -283,7 +277,7 @@ tests:
 - beamSwath UA list 100:
     beamSwath: POL,RPI
     platform: UAVSAR
-    maxresults: 100
+    maxresults: 1
     output: csv
 
     expected file: csv
@@ -292,25 +286,25 @@ tests:
 - collectionName Iceland 100:
     collectionName: Iceland
     maxresults: 100
-    output: csv
+    output: json
 
-    expected file: csv
+    expected file: json
     expected code: 200
 
 - collectionName Big Island 100:
     collectionName: Big+Island,+HI
     maxresults: 100
-    output: csv
+    output: json
 
-    expected file: csv
+    expected file: json
     expected code: 200
 
 - collectionName Cascade 100:
     collectionName: Cascade%20Volcanoes,%20CA/OR/WA
     maxresults: 100
-    output: csv
+    output: json
 
-    expected file: csv
+    expected file: json
     expected code: 200
 
 - end count:
@@ -414,6 +408,8 @@ tests:
     expected file: csv
     expected code: 200
 
+#DS-2772 open bug for frame + platform
+#frame queries with no platform will search centerESAframe & return asfframe in file - file validation will fail
 - frame single:
     frame: 581
     maxresults: 10
@@ -1675,138 +1671,138 @@ tests:
     polarization: HH
     platform: SB
     maxResults: 10
-    output: csv
+    output: json
 
-    expected file: csv
+    expected file: json
     expected code: 200
 
 - polarization VV:
     polarization: VV
     platform: SA
     maxResults: 10
-    output: csv
+    output: json
 
-    expected file: csv
+    expected file: json
     expected code: 200
 
 - polarization HH HV:
     polarization: HH%2bHV
     maxResults: 10
-    output: csv
+    output: json
 
-    expected file: csv
+    expected file: json
     expected code: 200
 
 - polarization Dual VV:
     polarization: Dual+VV
     maxResults: 10
-    output: csv
+    output: json
 
-    expected file: csv
+    expected file: json
     expected code: 200
 
 - polarization QUADRATURE:
     polarization: QUADRATURE
     maxResults: 10
-    output: csv
+    output: json
 
-    expected file: csv
+    expected file: json
     expected code: 200
 
 - polarization VV VH:
     polarization: VV%2bVH
     maxResults: 10
-    output: csv
+    output: jsonlite
 
-    expected file: csv
+    expected file: jsonlite
     expected code: 200
 
 - polarization Dual HV:
     polarization: Dual+HV
     maxResults: 10
-    output: csv
+    output: json
 
-    expected file: csv
+    expected file: json
     expected code: 200
 
 - polarization Dual VH:
     polarization: Dual+VH
     maxResults: 10
-    output: csv
+    output: json
 
-    expected file: csv
+    expected file: json
     expected code: 200
 
 - polarization hH:
     polarization: hH
     maxResults: 10
-    output: csv
+    output: json
 
-    expected file: csv
+    expected file: json
     expected code: 200
 
 - polarization Vv:
     polarization: Vv
     maxResults: 10
-    output: csv
+    output: json
 
-    expected file: csv
+    expected file: json
     expected code: 200
 
 - polarization Hh hV:
     polarization: Hh%2bhV
     maxResults: 10
-    output: csv
+    output: json
 
-    expected file: csv
+    expected file: json
     expected code: 200
 
 - polarization Dual vv:
     polarization: Dual+vv
     maxResults: 10
-    output: csv
+    output: json
 
-    expected file: csv
+    expected file: json
     expected code: 200
 
 - polarization quadrature:
     polarization: quadrature
     maxResults: 10
-    output: csv
+    output: json
 
-    expected file: csv
+    expected file: json
     expected code: 200
 
 - polarization vv VH:
     polarization: vv%2bVH
     maxResults: 10
-    output: csv
+    output: json
 
-    expected file: csv
+    expected file: json
     expected code: 200
 
 - polarization Dual hv:
     polarization: Dual+hv
     maxResults: 10
-    output: csv
+    output: json
 
-    expected file: csv
+    expected file: json
     expected code: 200
 
 - polarization dual VH:
     polarization: dual+VH
     maxResults: 10
-    output: csv
+    output: json
 
-    expected file: csv
+    expected file: json
     expected code: 200
 
 - polarization dual vh:
     polarization: dual+vh
     maxResults: 10
-    output: csv
+    output: jsonlite
 
-    expected file: csv
+    expected file: jsonlite
     expected code: 200
 
 - polygon:
