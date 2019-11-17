@@ -122,7 +122,7 @@ def parse_int_or_range_list(v):
     except ValueError as e:
         raise ValueError('Invalid int or range list: {0}'.format(e))
 
-# Parse and validate a list of integers or integer ranges: "1,2,3-5"
+# Parse and validate a list of float or float ranges: "1.0,2.0,3.0-5.0"
 def parse_float_or_range_list(v):
     try:
         return parse_number_or_range_list(v, parse_float)
