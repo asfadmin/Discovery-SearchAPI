@@ -11,6 +11,7 @@ import glob
 import itertools
 import argparse
 from copy import deepcopy
+import urllib.parse
 
 # Let python discover other modules, starting one dir behind this one (project root):
 project_root = os.path.realpath(os.path.join(os.path.dirname(__file__),".."))
@@ -41,6 +42,10 @@ class RunSingleURLFromFile():
                         # print(json.dumps(json_dict, indent=4, default=str))
                         # IF used in url, IF contained in file's content, check if they match
                         def checkFileContainsExpected(key, url_dict, file_dict):
+                            # print(url_dict)
+                            # print("CHECKING FILE HERE")
+                            # print(file_dict)
+                            # print(json.dumps(file_dict, indent=4, default=str))
                             if key in url_dict and key in file_dict:
                                 found_in_list = False
                                 for found_param in file_dict[key]:
@@ -61,11 +66,33 @@ class RunSingleURLFromFile():
                                         break
                                 assert found_in_list, key + " declared, but not found in file. Test: {0}".format(json_dict["title"])
                         
+                        def checkMinMax(key, url_dict, file_dict):
+                            if "min"+key in url_dict and key in file_dict:
+                                for value in file_dict[key]:
+                                    number_type = type(url_dict["min"+key])
+                                    assert number_type(value) >= url_dict["min"+key], "TESTING"
+                            if "max"+key in url_dict and key in file_dict:
+                                for value in file_dict[key]:
+                                    number_type = type(url_dict["max"+key])
+                                    assert number_type(value) <= url_dict["max"+key], "TESTING"
+
+
                         checkFileContainsExpected("Platform", json_dict, file_content)
                         checkFileContainsExpected("absoluteOrbit", json_dict, file_content)
                         checkFileContainsExpected("asfframe", json_dict, file_content)
                         checkFileContainsExpected("granule_list", json_dict, file_content)
                         checkFileContainsExpected("groupid", json_dict, file_content)
+                        checkFileContainsExpected("flightdirection", json_dict, file_content)
+                        checkFileContainsExpected("offnadirangle", json_dict, file_content)
+                        checkFileContainsExpected("polarization", json_dict, file_content)
+                        checkFileContainsExpected("relativeorbit", json_dict, file_content)
+                        checkFileContainsExpected("collectionname", json_dict, file_content)
+                        checkFileContainsExpected("beammode", json_dict, file_content)
+
+                        checkMinMax("baselineperp", json_dict, file_content)
+                        checkMinMax("doppler", json_dict, file_content)
+                        checkMinMax("insarstacksize", json_dict, file_content)
+                        checkMinMax("faradayrotation", json_dict, file_content)
 
         # If print wasn't declared, it gets set in parseTestValues:
         if json_dict["print"] == True:
@@ -120,6 +147,44 @@ class RunSingleURLFromFile():
                 elif key.lower() == "groupid":
                     del mutatable_dict[key]
                     mutatable_dict["groupid"] = Input.parse_string_list(val)
+                elif key.lower() == "flightdirection":
+                    del mutatable_dict[key]
+                    mutatable_dict["flightdirection"] = Input.parse_string_list(val)
+                elif key.lower() == "offnadirangle":
+                    del mutatable_dict[key]
+                    mutatable_dict["offnadirangle"] = Input.parse_float_or_range_list(val)
+                elif key.lower() == "polarization":
+                    del mutatable_dict[key]
+                    val = urllib.parse.unquote_plus(val)
+                    mutatable_dict["polarization"] = Input.parse_string_list(val)
+                elif key.lower() == "relativeorbit":
+                    del mutatable_dict[key]
+                    mutatable_dict["relativeorbit"] = Input.parse_int_or_range_list(val)
+                elif key.lower() == "collectionname":
+                    del mutatable_dict[key]
+                    val = urllib.parse.unquote_plus(val)
+                    mutatable_dict["collectionname"] = Input.parse_string_list(val)
+                elif key.lower() in ["beammode", "beamswath"]:
+                    del mutatable_dict[key]
+                    mutatable_dict["beammode"] = Input.parse_string_list(val)
+                # MIN/MAX variants
+                # min/max BaselinePerp
+                elif key.lower()[3:] == "baselineperp":
+                    del mutatable_dict[key]
+                    # Save the min/max key, all lower
+                    mutatable_dict[key.lower()[0:3]+"baselineperp"] = Input.parse_float(val)
+                # min/max Doppler:
+                elif key.lower()[3:] == "doppler":
+                    del mutatable_dict[key]
+                    mutatable_dict[key.lower()[0:3]+"doppler"] = Input.parse_float(val)
+                # min/max InsarStackSize:
+                elif key.lower()[3:] == "insarstacksize":
+                    del mutatable_dict[key]
+                    mutatable_dict[key.lower()[0:3]+"insarstacksize"] = Input.parse_int(val)
+                #min/max FaradayRotation:
+                elif key.lower()[3:] == "faradayrotation":
+                    del mutatable_dict[key]
+                    mutatable_dict[key.lower()[0:3]+"faradayrotation"] = Input.parse_float(val)
 
         except ValueError as e:
             assert False, "Test: {0}. Incorrect parameter: {1}".format(json_test["title"], str(e))
@@ -143,6 +208,43 @@ class RunSingleURLFromFile():
         ### groupid:
         if "groupID" in json_dict:
             json_dict["groupid"] = json_dict.pop("groupID")
+        ### flightDirection
+        for key in ["Ascending or Descending?", "flightDirection"]:
+            if key in json_dict:
+                json_dict["flightdirection"] = json_dict.pop(key)
+        ### offNadirAngle:
+        for key in ["Off Nadir Angle", "offNadirAngle"]:
+            if key in json_dict:
+                json_dict["offnadirangle"] = json_dict.pop(key)
+        ### polarization:
+        if "polarization" in json_dict:
+            json_dict["polarization"] = json_dict.pop("polarization")
+        ### relativeOrbit:
+        for key in ["relativeOrbit", "Path Number"]:
+            if key in json_dict:
+                json_dict["relativeorbit"] = json_dict.pop(key)
+        ### collectionName:
+        if "collectionName" in json_dict:
+            json_dict["collectionname"] = json_dict.pop("collectionName")
+        ### beamMode:
+        for key in ["beamswath", "beamMode", "Beam Mode"]:
+            if key in json_dict:
+                json_dict["beammode"] = json_dict.pop(key)
+        ### min/max BaselinePerp:
+        for key in ["Baseline Perp.", "baselinePerp"]:
+            if key in json_dict:
+                json_dict["baselineperp"] = json_dict.pop(key)
+        ### min/max Doppler:
+        for key in ["doppler", "Doppler"]:
+            if key in json_dict:
+                json_dict["doppler"] = json_dict.pop(key)
+        ### min/max InsarStackSize:
+        for key in ["insarStackSize", "Stack Size"]:
+            if key in json_dict:
+                json_dict["insarstacksize"] = json_dict.pop(key)
+        for key in ["faradayRotation", "Faraday Rotation"]:
+            if key in json_dict:
+                json_dict["faradayrotation"] = json_dict.pop(key)
         return json_dict
 
 
@@ -193,8 +295,43 @@ class RunSingleURLFromFile():
                 elif platform in ["SMAP", "SP"]:
                     json_dict["Platform"][i] = "SMAP"
                 # UAVSAR
-                elif platform in ["UAVSAR", "UA"]:
+                elif platform in ["UAVSAR", "UA", "AIRMOSS"]:
                     json_dict["Platform"][i] = "UAVSAR"
+        if "flightdirection" in json_dict:
+            for i, flightdirection in enumerate(json_dict["flightdirection"]):
+                # flightdirection in UPPER
+                flightdirection = flightdirection.upper()
+                # DESCENDING
+                if flightdirection in ["D", "DESC", "DESCENDING"]:
+                    json_dict["flightdirection"][i] = "DESCENDING"
+                #ASCENDING
+                elif flightdirection in ["A", "ASC", "ASCENDING"]:
+                    json_dict["flightdirection"][i] = "ASCENDING"
+        if "polarization" in json_dict:
+            for i, polarization in enumerate(json_dict["polarization"]):
+                # making all results UPPER case, except Dual
+                if polarization[0:4].upper() == "DUAL":
+                    polarization = "Dual" + polarization[4:].upper()
+                else:                
+                    polarization = polarization.upper()
+                json_dict["polarization"][i] = polarization
+        if "collectionname" in json_dict:
+            for i, collectionname in enumerate(json_dict["collectionname"]):
+                # Note: in url_dict, string is separated by comma: 'Big Island', ' HI'
+                # Using the below to match the url string to file string
+                # Big Island, HI
+                if collectionname in ["Big Island", " HI"]:
+                    json_dict["collectionname"][i] = "Big Island, HI"
+                # Cascade Volcanoes, CA/OR/WA
+                elif collectionname in ["Cascade Volcanoes", " CA/OR/WA"]:
+                    json_dict["collectionname"][i] = "Cascade Volcanoes, CA/OR/WA"
+        if "beammode" in json_dict:
+            for i, beammode in enumerate(json_dict["beammode"]):
+                # beammode in UPPER case
+                beammode = beammode.upper()
+                # STANDARD
+                if beammode[0:2] == "ST":
+                    json_dict["beammode"][i] = "STD"
         return json_dict
 
     def runQuery(self):
