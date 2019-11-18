@@ -1,0 +1,10 @@
+tests:
+- basic parse test one:
+    parser: parse_string
+    string: asdf
+    expected: asdf
+
+- basic range test one:
+    parser: parse_int_range
+    string: 8-9
+    expected: [8,9]
