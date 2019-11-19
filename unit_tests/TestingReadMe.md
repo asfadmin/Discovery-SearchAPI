@@ -17,7 +17,7 @@ pytest <pytest args> test_mainManager.py <custom args>
    + All **Custom args**:
         --api [DEV|TEST|PROD]: Run against that api. If value doesn't match
                     these three options, it assumes the value IS the url to use.
-        --only-run <SomeTitle>: Only runs tests that contains this string.
+        --only-run <SomeTitle>: Only run tests that contain this string.
         --dont-run <SomeTitle>: Dont run tests that contain this string.
         --only-run-file <File>: Only run yamls that contain this in their name.
         --dont-run-file <File>: Dont run yamls that contain this in their name.
@@ -44,7 +44,7 @@ tests:      (<- or 'url tests' if testing urls)
 
 #### All Yaml Tests:
    + Custom Global Tags at top of Yaml:
-    (These get overriden if the custom arguments are used in command)
+    (These get overridden if the custom arguments are used in command)
         'api: [DEV|TEST|PROD]' => set default api for all tests in file.
         (More coming soon...)
 
