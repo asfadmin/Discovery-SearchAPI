@@ -1,0 +1,380 @@
+
+api: Test
+
+
+url tests:
+- beamMode test blank:
+    beamMode: TEST
+    output: csv
+
+    expected file: blank csv
+    expected code: 200
+
+- beamMode test count blank:
+    beamMode: TEST
+    output: csv,count
+
+    expected file: blank metalink
+    expected code: 200
+
+- beamMode specchar blank:
+    beamMode: $~
+    output: csv
+
+    expected file: blank csv
+    expected code: 200
+
+- beamSwath test blank:
+    beamSwath: TEST
+    output: csv
+
+    expected file: blank csv
+    expected code: 200
+
+- beamSwath test count blank:
+    beamSwath: TEST
+    output: csv,count
+
+    expected file: blank metalink
+    expected code: 200
+
+- beamSwath specchar blank:
+    beamSwath: ~!
+    output: csv
+
+    expected file: blank csv
+    expected code: 200
+
+- beamSwath 1 not recorded in CMR blank:
+    beamSwath: 1
+    maxResults: 100
+    output: csv
+
+    expected file: blank csv
+    expected code: 200
+
+- beamSwath ALOS list not recorded in CMR blank:
+    beamSwath: 1,2,3,4,5,6,7,8,9,10,11,12,15,16,17,18,19,20
+    platform: ALOS
+    maxResults: 100
+    output: csv
+
+    expected file: blank csv
+    expected code: 200
+
+- collectionName Haiti partial name blank:
+    collectionName: Haiti
+    maxResults: 100
+    output: csv
+
+    expected file: blank csv
+    expected code: 200
+
+- collectionName earthquake wrong name blank:
+    collectionName: earthquake
+    maxResults: 100
+    output: csv
+
+    expected file: blank csv
+    expected code: 200
+
+- collectionName AIRSAR wrong name blank:
+    collectionName: AIRSAR
+    maxResults: 100
+    output: csv
+
+    expected file: blank csv
+    expected code: 200
+
+- collectionName Denali wrong name blank:
+    collectionName: Denali
+    maxResults: 100
+    output: csv
+
+    expected file: blank csv
+    expected code: 200
+
+- collectionName ALOS Test blank:
+    collectionName: Test
+    platform: ALOS
+    output: csv
+
+    expected file: blank csv
+    expected code: 200
+
+- collectionName UAVSAR Test blank:
+    collectionName: Test
+    platform: UAVSAR
+    output: csv
+
+    expected file: blank csv
+    expected code: 200
+
+- collectionName S1A ABoVE blank:
+    collectionName: ABoVE
+    platform: SENTINEL-1A
+    output: csv
+
+    expected file: blank csv
+    expected code: 200
+
+- collectionName S1A Alaska blank:
+    collectionName: Alaska
+    platform: SENTINEL-1A
+    output: csv
+
+    expected file: blank csv
+    expected code: 200
+
+- collectionName specchar blank:
+    collectionName: ~+
+    output: count
+
+    expected file: blank count
+    expected code: 200
+
+- flightLine UAVSAR Test blank:
+    flightLine: Test
+    platform: UAVSAR
+    output: csv
+
+    expected file: blank csv
+    expected code: 200
+
+- flightLine AIRSAR Test blank:
+    flightLine: Test
+    platform: AIRSAR
+    output: csv
+
+    expected file: blank csv
+    expected code: 200
+
+- flightLine AIRSAR specchar blank:
+    flightLine: ~&
+    platform: AIRSAR
+    output: csv
+
+    expected file: blank csv
+    expected code: 200
+
+- granule_list TEST blank:
+    granule_list: TEST
+    output: csv
+
+    expected file: blank csv
+    expected code: 200
+
+- granule_list specchar blank:
+    granule_list: ~&
+    output: csv
+
+    expected file: blank csv
+    expected code: 200
+
+- groupid number blank:
+    groupid: 12345
+    output: json
+
+    expected file: blank json
+    expected code: 200
+
+- groupid hash blank:
+    groupid: sdfkhgsdfkhgsdf
+    output: json
+
+    expected file: blank json
+    expected code: 200
+
+- groupid TEST blank:
+    groupid: TEST
+    output: csv
+
+    expected file: blank csv
+    expected code: 200
+
+- groupid specchar blank:
+    groupid: ~+
+    output: csv
+
+    expected file: blank csv
+    expected code: 200
+
+- groupid Radarsat blank not in CMR:
+    groupid: R1_57704_ST7_F173
+    output: json
+
+    expected file: blank json
+    expected code: 200
+
+- groupid ERS blank not in CMR:
+    groupid: E2_84699_STD_F309
+    output: json
+
+    expected file: blank json
+    expected code: 200
+
+- groupid JERS blank not in CMR:
+    groupid: J1_36436_STD_F278
+    output: json
+
+    expected file: blank json
+    expected code: 200
+
+- groupid Seasat blank not in CMR:
+    groupid: SS_01502_STD_F2536
+    output: json
+
+    expected file: blank json
+    expected code: 200
+
+- output test:
+    platform: UAVSAR
+    relativeOrbit: 05905-05906
+    output: TEST
+
+    expected file: metalink
+    expected code: 200
+
+- output csc:
+    platform: UAVSAR
+    relativeOrbit: 05905-05906
+    maxResults: 1
+    output: CSC
+
+    expected file: metalink
+    expected code: 200
+
+- platform count RADARSAT-1 blank:
+    platform: RADARSAT-1
+    start: 2017-01-01T00:00:00Z
+    end: 2018-01-01T00:00:00Z
+    output: count
+
+    expected file: blank count
+    expected code: 200
+
+- platform count Radarsat-1 blank:
+    platform: Radarsat-1
+    start: 2016-01-01T00:00:00Z
+    end: 2018-01-01T00:00:00Z
+    output: count
+
+    expected file: blank count
+    expected code: 200
+
+- platform specchar count blank:
+    platform: +_
+    output: count
+
+    expected file: blank count
+    expected code: 200
+
+- platform TEST count blank:
+    platform: TEST
+    output: count
+
+    expected file: blank count
+    expected code: 200
+
+- platform specchar blank:
+    platform: ~!
+    output: csv
+
+    expected file: blank csv
+    expected code: 200
+
+- platform wrong name blank:
+    platform: S2
+    start: 2016-01-01T00:00:00Z
+    end: 2016-01-02T00:00:00Z
+    output: csv
+
+    expected file: blank csv
+    expected code: 200
+
+- platform partial name blank:
+    platform: SENTI
+    start: 3+year+ago
+    end: now
+    maxResults: 2000
+    output: csv
+
+    expected file: blank csv
+    expected code: 200
+
+- platform TEST blank:
+    platform: TEST
+    start: 2011-01-01T00:00:00Z
+    end: 2016-01-02T00:00:00Z
+    output: csv
+
+    expected file: blank csv
+    expected code: 200
+
+- polarization number blank:
+    polarization: 12
+    platform: AIRSAR
+    output: csv
+
+    expected file: blank csv
+    expected code: 200
+
+- polarization specchar blank:
+    polarization: +&
+    platform: AIRSAR
+    output: csv
+
+    expected file: blank csv
+    expected code: 200
+
+- polarization specchar 2 blank:
+    polarization: +!
+    platform: E1
+    maxResults: 1000
+    output: csv
+
+    expected file: blank csv
+    expected code: 200
+
+- processingLevel specchar blank:
+    processingLevel: $$$
+    maxResults: 1000
+    output: csv
+
+    expected file: blank csv
+    expected code: 200
+
+- processingLevel LSTOKETS count blank:
+    processingLevel: LSTOKETS
+    output: count
+
+    expected file: blank count
+    expected code: 200
+
+- product_list number blank:
+    product_list: 1,2,3,4,5
+    output: csv
+
+    expected file: blank csv
+    expected code: 200
+
+- product_list alpha blank:
+    product_list: a,b,c,d
+    output: csv
+
+    expected file: blank csv
+    expected code: 200
+
+- product_list TEST blank:
+    product_list: TEST,INVALID
+    output: csv
+
+    expected file: blank csv
+    expected code: 200
+
+- relativeOrbit blank:
+    relativeOrbit: 6710
+    output: csv
+
+    expected file: blank csv
+    expected code: 200

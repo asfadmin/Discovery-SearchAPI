@@ -1,0 +1,2442 @@
+
+api: Test
+
+
+url tests:
+- absoluteOrbit single:
+    absoluteOrbit: 5000
+    maxresults: 10
+    output: CSV
+
+    expected file: csv
+    expected code: 200
+
+#DS-2766 open bug for absoluteOrbit - GRFN scenes search correct range, but file returns different value for absoluteOrbit
+- absoluteOrbit range:
+    absoluteOrbit: 5000-6000
+    maxresults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- absoluteOrbit list:
+    absoluteOrbit: 5000,5001,5002
+    maxresults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- absoluteOrbit list range:
+    absoluteOrbit: 5000,5100-5200
+    maxresults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- absoluteOrbit list R1:
+    absoluteOrbit: 65215,65217,65129
+    platform: R1
+    maxresults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+#DS-2766 open bug for absoluteOrbit - GRFN scenes search correct range, but file returns different value for absoluteOrbit
+- absoluteOrbit zero range:
+    absoluteOrbit: 17545-17545
+    maxresults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- absoluteOrbit zero range list:
+    absoluteOrbit: 17545-17545,17560
+    maxresults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+#WEB2-1956 open bug for asfframe - for R1, frame in file will not match frame in query
+- asfframe R1 single:
+    asfframe: 340
+    platform: R1
+    maxresults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- asfframe R1 list:
+    asfframe: 340,346,347
+    platform: R1
+    maxresults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- asfframe R1 range:
+    asfframe: 340-347
+    platform: R1
+    maxresults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- asfframe R1 list range:
+    asfframe: 340,345-347
+    platform: R1
+    maxresults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- asfframe ALOS zero range:
+    asfframe: 340-340
+    platform: ALOS
+    maxresults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- asfframe ALOS zero range list:
+    asfframe: 340-340,345
+    platform: ALOS
+    maxresults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- bbox:
+    bbox: -150.2,65.0,-150.1,65.5
+    maxresults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- beamMode list 100:
+    beamMode: FBD,FBS,Standard
+    maxresults: 100
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- beamMode standard 10:
+    beamMode: Standard
+    maxresults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- beamMode list R1 100:
+    beamMode: Standard,STD,Fine,High,Low,Wide,Narrow,ScanSAR+Wide,ScanSAR+Narrow
+    platform: RADARSAT-1
+    maxresults: 100
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- beamMode list S1A 100:
+    beamMode: EW,IW,S1,S2,S3,S4,S5,S6,WV
+    platform: Sentinel-1A
+    maxresults: 100
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- beamMode list S1B 100:
+    beamMode: EW,IW,S1,S2,S3,S4,S5,S6,WV
+    platform: Sentinel-1B
+    maxresults: 100
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- beamMode POL RPI 100:
+    beamMode: POL,RPI
+    maxresults: 100
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- beamSwath Airsar list 100:
+    beamSwath: 3FP,ATI,XTI
+    platform: AIRSAR
+    maxresults: 100
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- beamSwath list 100:
+    beamSwath: FN1,FN2,FN3,FN4,FN5
+    maxresults: 100
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- beamSwath STD ERS1 100:
+    beamSwath: STD
+    platform: ERS-1
+    maxresults: 100
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- beamSwath STD ERS2 100:
+    beamSwath: STD
+    platform: ERS-2
+    maxresults: 100
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- beamSwath STD JERS 100:
+    beamSwath: STD
+    platform: JERS-1
+    maxresults: 100
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- beamSwath STD SS 100:
+    beamSwath: STD
+    platform: SEASAT
+    maxresults: 100
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- beamSwath R1 list 100:
+    beamSwath: SNA,SNB,ST1,ST2,ST3,ST4,ST5,ST6,ST7
+    platform: RADARSAT-1
+    maxresults: 100
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- beamSwath R1 SW 100:
+    beamSwath: SWA,SWB
+    platform: RADARSAT-1
+    maxresults: 1
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- beamSwath R1 list FN 100:
+    beamSwath: FN1,FN2
+    platform: RADARSAT-1
+    maxresults: 100
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- beamSwath SA list 100:
+    beamSwath: EW,IW,S1,S2,S3,S4,S5,S6,WV
+    platform: Sentinel-1A
+    maxresults: 100
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- beamSwath SB list 100:
+    beamSwath: EW,IW,S1,S2,S3,S4,S5,S6,WV
+    platform: SB
+    maxresults: 100
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- beamSwath UA list 100:
+    beamSwath: POL,RPI
+    platform: UAVSAR
+    maxresults: 1
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- collectionName Iceland 100:
+    collectionName: Iceland
+    maxresults: 100
+    output: json
+
+    expected file: json
+    expected code: 200
+
+- collectionName Big Island 100:
+    collectionName: Big+Island,+HI
+    maxresults: 100
+    output: json
+
+    expected file: json
+    expected code: 200
+
+- collectionName Cascade 100:
+    collectionName: Cascade%20Volcanoes,%20CA/OR/WA
+    maxresults: 100
+    output: json
+
+    expected file: json
+    expected code: 200
+
+- end count:
+    end: 2005-01-01T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- end now count:
+    end: now
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- end future count:
+    end: 2025-01-01T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- flightDirection A:
+    flightDirection: A
+    maxresults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- flightDirection Asc:
+    flightDirection: ASC
+    maxresults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- flightDirection Ascending:
+    flightDirection: ASCENDING
+    maxresults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- flightDirection D:
+    flightDirection: D
+    maxresults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- flightDirection Desc:
+    flightDirection: DESC
+    maxresults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- flightDirection Descending:
+    flightDirection: DESCENDING
+    maxresults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- flightDirection asCEndInG:
+    flightDirection: asCEndInG
+    maxresults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- flightDirection dEsCeNding:
+    flightDirection: dEsCeNding
+    maxresults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- flightLine:
+    flightLine: 15302
+    maxresults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- flightLine Gilmore Creek:
+    flightLine: gilmorecreek045-1.93044
+    maxresults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+#DS-2772 open bug for frame + platform
+#frame queries with no platform will search centerESAframe & return asfframe in file - file validation will fail
+- frame single:
+    frame: 581
+    maxresults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- frame range:
+    frame: 580-585
+    maxresults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- frame list:
+    frame: 578,579,580
+    maxresults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- frame list range:
+    frame: 688,1530-1532
+    maxresults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- frame zero range:
+    frame: 582-582
+    platform: SA,SB
+    maxresults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- frame zero range list:
+    frame: 582-582,590
+    platform: SB
+    maxresults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- granule_list single csv:
+    granule_list: S1B_S6_GRDH_1SDV_20190911T214309_20190911T214338_017995_021E10_5CCB
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- granule_list single count:
+    granule_list: S1B_S6_GRDH_1SDV_20190911T214309_20190911T214338_017995_021E10_5CCB
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- granule_list single metalink:
+    granule_list: S1B_S6_GRDH_1SDV_20190911T214309_20190911T214338_017995_021E10_5CCB
+    output: metalink
+
+    expected file: metalink
+    expected code: 200
+
+- granule_list single kml:
+    granule_list: S1B_S6_GRDH_1SDV_20190911T214309_20190911T214338_017995_021E10_5CCB
+    output: kml
+
+    expected file: kml
+    expected code: 200
+
+- granule_list single json:
+    granule_list: S1B_S6_GRDH_1SDV_20190911T214309_20190911T214338_017995_021E10_5CCB
+    output: json
+
+    expected file: json
+    expected code: 200
+
+- granule_list single geojson:
+    granule_list: S1B_S6_GRDH_1SDV_20190911T214309_20190911T214338_017995_021E10_5CCB
+    output: geojson
+
+    expected file: geojson
+    expected code: 200
+
+- granule_list single download:
+    granule_list: S1B_S6_GRDH_1SDV_20190911T214309_20190911T214338_017995_021E10_5CCB
+    output: download
+
+    expected file: download
+    expected code: 200
+
+#In CMR reporting script, we report groupid as null on most datasets. Some datasets updated to expect blank file & moved to partial pass yaml
+- groupid Sentinel:
+    groupid: S1B_S1DV_0492_0497_017567_041
+    output: json
+
+    expected file: json
+    expected code: 200
+
+- groupid S1 Insar:
+    groupid: S1-GUNW-D-R-087-tops-20190816_20190804-161614-19149N_17138N-PP-fee7-v2_0_2
+    output: json
+
+    expected file: json
+    expected code: 200
+
+- groupid SMAP:
+    groupid: SP_15077_D_005
+    output: json
+
+    expected file: json
+    expected code: 200
+
+- groupid UAVSAR:
+    groupid: UA_EcuVol_17700_15024_006_150319_L090_CX_01
+    output: json
+
+    expected file: json
+    expected code: 200
+
+- groupid ALOS:
+    groupid: ALPSRP279071100
+    output: json
+
+    expected file: json
+    expected code: 200
+
+- groupid AIRSAR:
+    groupid: ts1902
+    output: json
+
+    expected file: json
+    expected code: 200
+
+- intersectsWith point:
+    intersectsWith: point%28-119.543+37.925%29
+    maxResults: 100
+    output: CSV
+
+    expected file: csv
+    expected code: 200
+
+- intersectsWith polygon:
+    intersectsWith: polygon%28%28-119.543 37.925+ -118.443 37.7421+ -118.682 36.8525+ -119.77 37.0352+ -119.543 37.925%29%29
+    maxResults: 100
+    output: CSV
+
+    expected file: csv
+    expected code: 200
+
+- intersectsWith linestring:
+    intersectsWith: linestring(-119.543 37.925, -118.443 37.7421)
+    maxResults: 1000
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- intersectsWith point 1000:
+    intersectsWith: point(-119.543 37.925)
+    maxResults: 1000
+    output: CSV
+
+    expected file: csv
+    expected code: 200
+
+- intersectsWith polygon 1000:
+    intersectsWith: polygon((-119.543 37.925, -118.443 37.7421, -118.682 36.8525, -119.77 37.0352, -119.543 37.925))
+    maxResults: 1000
+    output: CSV
+
+    expected file: csv
+    expected code: 200
+
+- intersectsWith POINT uppercase:
+    intersectsWith: POINT(-119.543 37.925)
+    maxResults: 100
+    output: CSV
+
+    expected file: csv
+    expected code: 200
+
+- intersectsWith POLYGON uppercase:
+    intersectsWith: POLYGON((-119.543 37.925, -118.443 37.7421, -118.682 36.8525, -119.77 37.0352, -119.543 37.925))
+    maxResults: 100
+    output: CSV
+
+    expected file: csv
+    expected code: 200
+
+- intersectsWith LINESTRING uppercase:
+    intersectsWith: LINESTRING(-119.543 37.925, -118.443 37.7421)
+    maxResults: 100
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- linestring:
+    linestring: -150.2,65.0,-150.1,65.5
+    maxResults: 10
+    output: CSV
+
+    expected file: csv
+    expected code: 200
+
+- linestring uppercase:
+    LINESTRING: -150.2,65.0,-150.1,65.5
+    maxResults: 10
+    output: CSV
+
+    expected file: csv
+    expected code: 200
+
+- lookDirection LEFT:
+    lookDirection: LEFT
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- lookDirection L:
+    lookDirection: L
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- lookDirection RIGHT:
+    lookDirection: RIGHT
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- lookDirection R:
+    lookDirection: R
+    maxResults: 10
+    output: CSV
+
+    expected file: csv
+    expected code: 200
+
+- maxBaselinePerp:
+    maxBaselinePerp: 150
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- minBaselinePerp:
+    minBaselinePerp: 150
+    platform: R1
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200 
+
+- min and max BaselinePerp:
+    minBaselinePerp: 100
+    maxBaselinePerp: 150
+    platform: R1
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200 
+
+- maxDoppler:
+    maxDoppler: 2000
+    platform: R1
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- minDoppler:
+    minDoppler: -20000
+    platform: R1
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- min and max Doppler R1:
+    minDoppler: -20000
+    maxDoppler: 2000
+    platform: R1
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- min and max Doppler negative:
+    minDoppler: -20000
+    maxDoppler: -1
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+#DS-1945 open bug for this
+- maxFaradayRotation:
+    maxFaradayRotation: 3
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- minFaradayRotation:
+    minFaradayRotation: 3
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- min and max FaradayRotation:
+    minFaradayRotation: 2
+    maxFaradayRotation: 3
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- maxInsarStackSize:
+    maxInsarStackSize: 50
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- minInsarStackSize:
+    minInsarStackSize: 50
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- max and min InsarStackSize:
+    minInsarStackSize: 70
+    maxInsarStackSize: 120
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- maxResults 1 csv:
+    platform: SENTINEL-1
+    maxResults: 1
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- maxResults 2 csv:
+    platform: SENTINEL-1
+    maxResults: 2
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- maxResults 1 json:
+    platform: SENTINEL-1
+    maxResults: 1
+    output: json
+
+    expected file: json
+    expected code: 200
+
+- maxResults 2 json:
+    platform: SENTINEL-1
+    maxResults: 2
+    output: json
+
+    expected file: json
+    expected code: 200
+
+- maxResults 1 geojson:
+    platform: SENTINEL-1
+    maxResults: 1
+    output: geojson
+
+    expected file: geojson
+    expected code: 200
+
+- maxResults 2 geojson:
+    platform: SENTINEL-1
+    maxResults: 2
+    output: geojson
+
+    expected file: geojson
+    expected code: 200
+
+- maxResults 1 jsonlite:
+    platform: SENTINEL-1
+    maxResults: 1
+    output: jsonlite
+
+    expected file: jsonlite
+    expected code: 200
+
+- maxResults 2 jsonlite:
+    platform: SENTINEL-1
+    maxResults: 2
+    output: jsonlite
+
+    expected file: jsonlite
+    expected code: 200
+
+- offNadirAngle single:
+    offNadirAngle: 21.5
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- offNadirAngle list:
+    offNadirAngle: 21.5,23.1,27.1
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- offNadirAngle range:
+    offNadirAngle: 20-30
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- offNadirAngle zero range:
+    offNadirAngle: 21.5-21.5
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- offNadirAngle zero range list:
+    offNadirAngle: 34.3-34.3,20-25
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- output csv:
+    platform: SB
+    maxResults: 2000
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- output count:
+    platform: SB
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- output download:
+    platform: SB
+    maxResults: 2000
+    output: download
+
+    expected file: download
+    expected code: 200
+
+- output geojson:
+    platform: SB
+    maxResults: 2000
+    output: geojson
+
+    expected file: geojson
+    expected code: 200
+
+- output json:
+    platform: SB
+    maxResults: 2000
+    output: json
+
+    expected file: json
+    expected code: 200
+
+- output jsonlite:
+    platform: SB
+    maxResults: 2000
+    output: jsonlite
+
+    expected file: jsonlite
+    expected code: 200 
+
+- output kml:
+    platform: SB
+    maxResults: 2000
+    output: kml
+
+    expected file: kml
+    expected code: 200
+
+- output metalink:
+    platform: SB
+    maxResults: 2000
+    output: metalink
+
+    expected file: metalink
+    expected code: 200
+
+- platform SA:
+    platform: SA
+    start: 2015-01-01T00:00:00Z
+    end: 2016-01-02T00:00:00Z
+    output: csv
+    maxResults: 2000
+
+    expected file: csv
+    expected code: 200
+
+- platform SB:
+    platform: SB
+    start: 1+year+ago
+    end: now
+    maxResults: 2000
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- platform J1:
+    platform: J1
+    polygon: -148.52,64.63,-150.41,64.64,-149.58,63.86,-148.52,64.63
+    maxResults: 100
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- platform A3:
+    platform: A3
+    processingLevel: L1.0
+    polygon: -148.52,64.63,-150.41,64.64,-149.58,63.86,-148.52,64.63
+    maxResults: 100
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- platform Sentinel-1A:
+    platform: Sentinel-1A
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- platform R1 E1:
+    platform: R1,E1
+    maxResults: 10
+    output: jSoN
+
+    expected file: json
+    expected code: 200
+
+- platform R1 E1 2:
+    platform: RADARSAT-1,E1
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- platform R1 E1 Level:
+    platform: RADARSAT-1,E1
+    processingLevel: L0,L1
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- platform SP:
+    platform: SP
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- platform UA:
+    platform: UA
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- platform E1 E2:
+    platform: E1,E2
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- platform Sir-C:
+    platform: SIR-C
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- platform Sirc 2:
+    platform: STS-59
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- platform Sirc 3:
+    platform: STS
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- platform Sirc 4:
+    platform: STS-68,STS-59
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- platform count S1:
+    platform: S1
+    start: 2016-01-01T00:00:00Z
+    end: 2018-01-02T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count SENTINEL-1-1:
+    platform: SENTINEL-1
+    start: 2016-01-01T00:00:00Z
+    end: 2018-01-02T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count Sentinel-1:
+    platform: Sentinel-1
+    start: 2016-01-01T00:00:00Z
+    end: 2018-01-02T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count s1:
+    platform: s1
+    start: 2016-01-01T00:00:00Z
+    end: 2018-01-02T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count Sentinel-1A:
+    platform: Sentinel-1A
+    start: 2016-01-01T00:00:00Z
+    end: 2018-01-02T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count sa:
+    platform: sa
+    start: 1978-01-01T00:00:00Z
+    end: 2019-01-02T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count SA:
+    platform: SA
+    start: 1978-01-01T00:00:00Z
+    end: 2019-01-02T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count sentinel-1a:
+    platform: sentinel-1a
+    start: 1978-01-01T00:00:00Z
+    end: 2019-01-02T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count SENTINEL-1A:
+    platform: SENTINEL-1A
+    start: 1978-01-01T00:00:00Z
+    end: 2019-01-02T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count sb:
+    platform: sb
+    start: 1978-01-01T00:00:00Z
+    end: 2019-01-02T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count SB:
+    platform: SB
+    start: 1978-01-01T00:00:00Z
+    end: 2019-01-02T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count Sentinel-1B:
+    platform: Sentinel-1B
+    start: 1978-01-01T00:00:00Z
+    end: 2019-01-02T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count SENTINEL-1B:
+    platform: SENTINEL-1B
+    start: 1978-01-01T00:00:00Z
+    end: 2019-01-02T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count Sirc STS-59:
+    platform: STS-59
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count Sirc STS-68:
+    platform: STS-68
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count Sirc STS-59-68:
+    platform: STS-59,STS-68
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count Sirc sts-59:
+    platform: sts-59
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count Sirc StS-68:
+    platform: StS-68
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count Sirc Sts-59 StS-68:
+    platform: Sts-59,StS-68
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count sir-c:
+    platform: sir-c
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count SIR-C:
+    platform: SIR-C
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count SMAP:
+    platform: SMAP
+    start: 2015-01-01T00:00:00Z
+    end: 2019-01-02T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count Smap:
+    platform: Smap
+    start: 2015-01-01T00:00:00Z
+    end: 2019-01-02T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count smap:
+    platform: smap
+    start: 2015-01-01T00:00:00Z
+    end: 2019-01-02T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count SMAP SP:
+    platform: SP
+    start: 2015-01-01T00:00:00Z
+    end: 2019-01-02T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count SMAP Sp:
+    platform: Sp
+    start: 2015-01-01T00:00:00Z
+    end: 2019-01-02T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count SMAP sp:
+    platform: sp
+    start: 2015-01-01T00:00:00Z
+    end: 2019-01-02T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count UAVSAR:
+    platform: UAVSAR
+    start: 2008-04-28T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count UAvSAR:
+    platform: UAvSAR
+    start: 2008-04-28T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count UA:
+    platform: UA
+    start: 2008-04-28T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count ua:
+    platform: ua
+    start: 2008-04-28T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count Ua:
+    platform: Ua
+    start: 2008-04-28T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count UAVSAR G-III:
+    platform: G-III
+    start: 2008-04-28T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count UAVSAR g-iii:
+    platform: g-iii
+    start: 2008-04-28T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count ALOS:
+    platform: ALOS
+    start: 2006-01-01T00:00:00Z
+    end: 2012-01-01T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count Alos:
+    platform: Alos
+    start: 2006-01-01T00:00:00Z
+    end: 2012-01-01T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count alos:
+    platform: alos
+    start: 2006-01-01T00:00:00Z
+    end: 2012-01-01T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count ALOS A3:
+    platform: A3
+    start: 2006-01-01T00:00:00Z
+    end: 2012-01-01T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count ALOS a3:
+    platform: a3
+    start: 2006-01-01T00:00:00Z
+    end: 2012-01-01T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count radarsat-1:
+    platform: radarsat-1
+    start: 1990-01-01T00:00:00Z
+    end: 2019-01-01T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count r1:
+    platform: r1
+    start: 1990-01-01T00:00:00Z
+    end: 2019-01-01T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count R1:
+    platform: R1
+    start: 1990-01-01T00:00:00Z
+    end: 2019-01-01T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count ERS:
+    platform: ERS
+    start: 1990-01-01T00:00:00Z
+    end: 2012-01-01T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count erS:
+    platform: erS
+    start: 1990-01-01T00:00:00Z
+    end: 2012-01-01T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count E1:
+    platform: E1
+    start: 1990-01-01T00:00:00Z
+    end: 2012-01-01T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count ERS-1:
+    platform: ERS-1
+    start: 1990-01-01T00:00:00Z
+    end: 2012-01-01T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count Ers-1:
+    platform: Ers-1
+    start: 1990-01-01T00:00:00Z
+    end: 2012-01-01T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count E2:
+    platform: E2
+    start: 1990-01-01T00:00:00Z
+    end: 2012-01-01T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count ERS-2:
+    platform: ERS-2
+    start: 1990-01-01T00:00:00Z
+    end: 2012-01-01T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count e2:
+    platform: e2
+    start: 1990-01-01T00:00:00Z
+    end: 2012-01-01T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count ers-2:
+    platform: ers-2
+    start: 1990-01-01T00:00:00Z
+    end: 2012-01-01T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count JERS-1:
+    platform: JERS-1
+    start: 1990-01-01T00:00:00Z
+    end: 2000-01-01T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count Jers-1:
+    platform: Jers-1
+    start: 1990-01-01T00:00:00Z
+    end: 2000-01-01T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count J1:
+    platform: J1
+    start: 1990-01-01T00:00:00Z
+    end: 2000-01-01T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count j1:
+    platform: j1
+    start: 1990-01-01T00:00:00Z
+    end: 2000-01-01T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count AIRSAR:
+    platform: AIRSAR
+    start: 1990-01-01T00:00:00Z
+    end: 2019-01-01T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count Airsar:
+    platform: Airsar
+    start: 1990-01-01T00:00:00Z
+    end: 2019-01-01T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count AirSar:
+    platform: AirSar
+    start: 1990-01-01T00:00:00Z
+    end: 2019-01-01T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count AIRSAR as:
+    platform: as
+    start: 1990-01-01T00:00:00Z
+    end: 2019-01-01T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count AIRSAR AS:
+    platform: AS
+    start: 1990-01-01T00:00:00Z
+    end: 2019-01-01T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count AIRSAR DC-8:
+    platform: DC-8
+    start: 1990-01-01T00:00:00Z
+    end: 2019-01-01T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count AIRSAR dc-8:
+    platform: dc-8
+    start: 1990-01-01T00:00:00Z
+    end: 2019-01-01T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count SEASAT:
+    platform: SEASAT
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count SEASAT-1:
+    platform: SEASAT%201
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count SEASAT SS:
+    platform: SS
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count SEASAT ss:
+    platform: ss
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count SeaSat:
+    platform: SeaSat
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count SeaSAT-1:
+    platform: SeaSAT%201
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- point:
+    point: -150.2,65.0
+    maxResults: 10
+    output: CSV
+
+    expected file: csv
+    expected code: 200
+
+- point uppercase:
+    POINT: -150.2,65.0
+    maxResults: 10
+    output: CSV
+
+    expected file: csv
+    expected code: 200
+
+- polarization HH:
+    polarization: HH
+    platform: SB
+    maxResults: 10
+    output: json
+
+    expected file: json
+    expected code: 200
+
+- polarization VV:
+    polarization: VV
+    platform: SA
+    maxResults: 10
+    output: json
+
+    expected file: json
+    expected code: 200
+
+- polarization HH HV:
+    polarization: HH%2bHV
+    maxResults: 10
+    output: json
+
+    expected file: json
+    expected code: 200
+
+- polarization Dual VV:
+    polarization: Dual+VV
+    maxResults: 10
+    output: json
+
+    expected file: json
+    expected code: 200
+
+- polarization QUADRATURE:
+    polarization: QUADRATURE
+    maxResults: 10
+    output: json
+
+    expected file: json
+    expected code: 200
+
+- polarization VV VH:
+    polarization: VV%2bVH
+    maxResults: 10
+    output: jsonlite
+
+    expected file: jsonlite
+    expected code: 200
+
+- polarization Dual HV:
+    polarization: Dual+HV
+    maxResults: 10
+    output: json
+
+    expected file: json
+    expected code: 200
+
+- polarization Dual VH:
+    polarization: Dual+VH
+    maxResults: 10
+    output: json
+
+    expected file: json
+    expected code: 200
+
+- polarization hH:
+    polarization: hH
+    maxResults: 10
+    output: json
+
+    expected file: json
+    expected code: 200
+
+- polarization Vv:
+    polarization: Vv
+    maxResults: 10
+    output: json
+
+    expected file: json
+    expected code: 200
+
+- polarization Hh hV:
+    polarization: Hh%2bhV
+    maxResults: 10
+    output: json
+
+    expected file: json
+    expected code: 200
+
+- polarization Dual vv:
+    polarization: Dual+vv
+    maxResults: 10
+    output: json
+
+    expected file: json
+    expected code: 200
+
+- polarization quadrature:
+    polarization: quadrature
+    maxResults: 10
+    output: json
+
+    expected file: json
+    expected code: 200
+
+- polarization vv VH:
+    polarization: vv%2bVH
+    maxResults: 10
+    output: json
+
+    expected file: json
+    expected code: 200
+
+- polarization Dual hv:
+    polarization: Dual+hv
+    maxResults: 10
+    output: json
+
+    expected file: json
+    expected code: 200
+
+- polarization dual VH:
+    polarization: dual+VH
+    maxResults: 10
+    output: json
+
+    expected file: json
+    expected code: 200
+
+- polarization dual vh:
+    polarization: dual+vh
+    maxResults: 10
+    output: jsonlite
+
+    expected file: jsonlite
+    expected code: 200
+
+- polygon:
+    polygon: -148.52,64.63,-150.41,64.64,-149.58,63.86,-148.52,64.63
+    maxResults: 100
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- polygon uppercase:
+    POLYGON: -148.52,64.63,-150.41,64.64,-149.58,63.86,-148.52,64.63
+    maxResults: 100
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- polygon multi:
+    polygon: 12.13,41.74,13.4,41.74,13.4,42.75,12.13,42.75,12.13,41.74
+    platform: Sentinel-1A,Sentinel-1B
+    processingLevel: SLC
+    start: 2015-05-01T00:00:00UTC
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- polygon closure 1:
+    polygon: 12.13,41.74,13.4,41.74,13.4,42.75,12.13,42.75
+    platform: Sentinel-1A,Sentinel-1B
+    processingLevel: SLC
+    start: 2015-05-01T00:00:00UTC
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- polygon closure 2:
+    polygon: 12.13,41.74,13.4,41.74,13.4,42.75,12.13,42.75,12.13,41.74
+    platform: Sentinel-1A,Sentinel-1B
+    processingLevel: SLC
+    start: 2015-05-01T00:00:00UTC
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- polygon closure 3:
+    polygon: 12.13,41.74,12.13,42.75,13.4,42.75,13.4,41.74,12.13,41.74
+    platform: Sentinel-1A,Sentinel-1B
+    processingLevel: SLC
+    start: 2015-05-01T00:00:00UTC
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- polygon closure 4:
+    polygon: -155.08,65.82,-153.5,61.91,-149.50,63.07,-149.94,64.55
+    maxResults: 1000
+    output: Csv
+
+    expected file: csv
+    expected code: 200
+
+- processingLevel L1.1:
+    processingLevel: L1.1
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- processingLevel L1 L1.1 Metadata:
+    processingLevel: L1.1,L1.0,METADATA
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- processingLevel list:
+    processingLevel: 3FP,ATI,LTIF,PTIF,CTIF,PSTOKES,BROWSE,DEM,CSTOKES,JPG,LSTOKES,THUMBNAIL
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- processingLevel RTC:
+    processingLevel: RTC_LOW_RES,RTC_HI_RES
+    platform: ALOS
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- processingLevel ERS:
+    processingLevel: L0,L1,BROWSE,THUMBNAIL
+    platform: ERS-1,ERS-2
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200    
+
+- processingLevel Jers-1:
+    processingLevel: L0,L1,BROWSE,THUMBNAIL
+    platform: Jers-1
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- processingLevel RadarSat:
+    processingLevel: L0,L1,BROWSE,THUMBNAIL
+    platform: RadarSat-1
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- processingLevel SEASAT:
+    processingLevel: L1,BROWSE,THUMBNAIL
+    platform: SEASAT
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- processingLevel S1:
+    processingLevel: METADATA_GRD,GRD_HS,GRD_HD,GRD_MS,GRD_MD,GRD_FS,GRD_FD,SLC,RAW,OCN,METADATA_RAW,METADATA,METADATA_SLC, THUMBNAIL
+    platform: Sentinel-1A,Sentinel-1B
+    maxResults: 100
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- processingLevel SMAP:
+    processingLevel: L1A_Radar_RO_QA,L1B_S0_LoRes_HDF5,L1B_S0_LoRes_QA,L1B_S0_LoRes_ISO_XML,L1A_Radar_QA,L1A_Radar_RO_ISO_XML, L1C_S0_HiRes_ISO_XML,L1C_S0_HiRes_QA,L1C_S0_HiRes_HDF5,L1A_Radar_HDF5
+    platform: SMAP
+    maxResults: 100
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- processingLevel UAVSAR:
+    processingLevel: KMZ,PROJECTED,PAULI,PROJECTED_ML5X5,STOKES,AMPLITUDE,BROWSE,COMPLEX,DEM_TIFF,PROJECTED_ML3X3,METADATA,AMPLITUDE_GRD,INTERFEROMETRY,INTERFEROMETRY_GRD,THUMBNAIL
+    platform: UAVSAR
+    maxResults: 100
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- processingDate Z:
+    processingDate: 2018-01-01T00:00:00Z
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- processingDate yesterday:
+    processingDate: yesterday
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- processingDate 1weekago:
+    processingDate: 1+week+ago
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- processingDate today:
+    processingDate: today
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- processingDate a+monthago:
+    processingDate: a+month+ago
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- processingDate 2monthago:
+    processingDate: 2+month+ago
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- product_list S1:
+    product_list: S1B_IW_GRDH_1SDV_20190410T153301_20190410T153328_015746_01D8D2_0E9B-GRD_HD,S1B_S6_GRDH_1SDV_20190911T214309_20190911T214338_017995_021E10_5CCB-GRD_HD,S1B_IW_SLC__1SDV_20180517T005744_20180517T005757_010954_0140DF_9891-SLC,S1B_WV_OCN__2SSV_20180513T055028_20180513T062610_010898_013F0C_059A-METADATA_OCN
+    output: json
+
+    expected file: json
+    expected code: 200
+
+- product_list mix:
+    product_list:
+        - S1B_S6_GRDH_1SDV_20190911T214309_20190911T214338_017995_021E10_5CCB-GRD_HD,S1B_EW_SLC__1SDH_20190813T071957_20190813T072100_017564_02108E_9322-SLC
+        - ts1902-PSTOKES,ts1902-PTIF,ts1888-LTIF
+    output: json
+
+    expected file: json
+    expected code: 200
+
+- product_list multi:
+    product_list: 
+        - S1B_EW_OCN__2SSH_20190808T030727_20190808T030837_017488_020E3B_D440-OCN
+        - ts1902-PTIF
+        - UA_SDelta_15502_17117_010_171026_L090_CX_01-PAULI
+        - SP_15079_D_005-L1A_Radar_RO_QA
+        - R1_68669_20081230_092353-L0
+    output: json
+
+    expected file: json
+    expected code: 200
+
+- product_list multi list:
+    product_list:
+        - S1A_S4_SLC__1SDV_20190809T062903_20190809T062922_028488_03385D_2C10-SLC
+        - ts726-CSTOKES,ts726-DEM,ts726-LSTOKES,ts726-LTIF,ts726-CTIF,ts1721-LTIF,ts1733-PTIF
+    output: json
+
+    expected file: json
+    expected code: 200
+
+- relativeOrbit single:
+    relativeOrbit: 20
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- relativeOrbit range:
+    relativeOrbit: 20-22
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- relativeOrbit list:
+    relativeOrbit: 20,21,22
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- relativeOrbit list range:
+    relativeOrbit: 20,23-24
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- relativeOrbit list R1:
+    relativeOrbit: 20,23,25
+    platform: R1
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- relativeOrbit zero range:
+    relativeOrbit: 16-16
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- relativeOrbit zero range list:
+    relativeOrbit: 16-16,17
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- relativeOrbit zero range list reverse:
+    relativeOrbit: 17,16-16
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- season 32-90 S1:
+    season: 32,90
+    platform: SA,SB
+    maxResults: 1000
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- season 1-100 S1:
+    season: 1,100
+    platform: sa,sb
+    maxResults: 1000
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- season 1-175 UAVSAR:
+    season: 1,175
+    platform: UA
+    maxResults: 1000
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- season 32-90 S1 Start End:
+    season: 32,90
+    platform: SA,SB
+    start: 2017-01-01T00:00:00Z
+    end: 2019-01-01T01:00:00Z
+    maxResults: 1000
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- season 1-100 S1 Start End:
+    season: 1,100
+    platform: sa,sb
+    start: 2015-01-01T00:00:00Z
+    end: 2018-01-01T01:00:00Z
+    maxResults: 1000
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- season 1-175 UAVSAR Start End:
+    season: 1,175
+    platform: Ua
+    start: 2005-01-01T00:00:00Z
+    end: 2019-01-01T01:00:00Z
+    maxResults: 1000
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- season 32-90 S1 2years:
+    season: 32,90
+    platform: SA,SB
+    start: 2+year+ago
+    end: now
+    maxResults: 1000
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- season 1-100 S1 2years:
+    season: 1,100
+    platform: sa,sb
+    start: 2+year+ago
+    end: now
+    maxResults: 1000
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- season 1-175 UAVSAR July 2015-now:
+    season: 1,175
+    platform: Ua
+    start: 2015-July-15
+    end: now
+    maxResults: 1000
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- season 32-90 S1 July 2018-now:
+    season: 32,90
+    platform: SA,SB
+    start: 2018-July-15
+    end: now
+    maxResults: 1000
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- season 1-100 S1 1year:
+    season: 1,100
+    platform: SA,Sb
+    start: 1+year+ago
+    end: now
+    maxResults: 1000
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- season 1-175 UAVSAR 3year:
+    season: 1,175
+    platform: UA
+    start: 3+year+ago
+    end: now
+    maxResults: 1000
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- start Zdate count:
+    start: 2005-01-01T00:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- start Zdate end count:
+    start: 2005-01-01T00:00:00Z
+    end: 2005-01-01T01:00:00Z
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- start 3monthagoplus1day count:
+    start: 3+months+and+a+day+ago
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- start june302018 count:
+    start: June+30,+2018
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- start 1weekago count:
+    start: 1+week+ago
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- start 1dayago count:
+    start: 1+day+ago
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- start today count:
+    start: today
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- start yesterday count:
+    start: yesterday
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- start backwards reversed:
+    start: now
+    end: 1+year+ago
+    output: csv
+    maxResults: 10
+
+    expected file: csv
+    expected code: 200
+
+- start tomorrow reversed:
+    start: tomorrow
+    end: 1+year+ago
+    output: csv
+    maxResults: 10
+
+    expected file: csv
+    expected code: 200
+
+- start now end yesterday reversed:
+    start: now
+    end: yesterday
+    output: csv
+    maxResults: 10
+
+    expected file: csv
+    expected code: 200
+
+- realworld 1:
+    intersectsWith: point(-168.0380672+53.9279675)
+    platform: Sentinel-1A,Sentinel-1B
+    processingLevel: GRD_HS,GRD_HD
+    beamMode: IW
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- realworld 1 modified:
+    intersectsWith: point(-162.4535+61.4945)
+    platform: Sentinel-1A,Sentinel-1B
+    processingLevel: GRD_HS,GRD_HD
+    beamMode: IW
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- realworld 2:
+    intersectsWith: linestring(-102+37.59,-94+37,-94+39,-102+39)
+    platform: Sentinel-1A,Sentinel-1B
+    processingLevel: GRD_HS,GRD_HD
+    beamMode: IW
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- realworld 2 modified:
+    intersectsWith: linestring(-94.1995+42.3741,-88.2384+42.2475,-88.166+40.56,-93.9793+41.1938)
+    platform: Sentinel-1A,Sentinel-1B
+    processingLevel: GRD_HS,GRD_HD
+    beamMode: S4
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- realworld 3:
+    intersectsWith: polygon((-102+37.59,-94+37,-94+39,-102+39,-102+37.59))
+    platform: Sentinel-1A,Sentinel-1B
+    processingLevel: GRD_HS,GRD_HD
+    beamMode: IW
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- realworld 3 modified:
+    intersectsWith: polygon((-91.1083+41.7191,-83.9568+41.4233,-83.9916+43.9781,-91.7194+42.8556,-91.1083+41.7191))
+    platform: Sentinel-1A,Sentinel-1B
+    processingLevel: GRD_HS,GRD_HD
+    beamMode: EW,S1,S4
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- realworld 4:
+    output: count
+    frame: 580%2C581%2C582%2C583%2C585
+    processingLevel: L0%2CL1.0%2CSLC
+    platform: SENTINEL-1A%2CSENTINEL-1B
+    maxResults: 1000
+    relativeOrbit: 1-1000
+
+    expected file: count
+    expected code: 200
+
+- realworld 5:
+    output: count
+    asfframe: 580%2C581%2C582%2C583%2C585
+    processingLevel: L0%2CL1.0%2CSLC
+    platform: SENTINEL-1A%2CSENTINEL-1B
+    maxResults: 1000
+    relativeOrbit: 100-1000
+
+    expected file: count
+    expected code: 200
+
+- realworld 6:
+    platform: SA,SB
+    relativeOrbit: 100-500
+    asfframe: 550-600
+    start: 2015-06-01
+    end: 2019-05-30
+    output: csv
+    maxResults: 500
+
+    expected file: csv
+    expected code: 200
+
+- realworld 7:
+    platform: SA,SB
+    relativeOrbit: 100-200
+    frame: 580-585
+    start: 2015-06-01
+    end: 2019-05-30
+    output: csv
+    maxResults: 500
+
+    expected file: csv
+    expected code: 200
+
+- realworld 8:
+    output: csv
+    platform: Sentinel-1A
+    start: 2017-05-30
+    end: 2018-05-31%22
+    maxResults: 1000
+
+    expected file: csv
+    expected code: 200
