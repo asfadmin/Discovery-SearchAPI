@@ -84,7 +84,7 @@ def loadTestsFromDirectory(dir_path, recurse=False):
                     continue
                 if "test wkt" in test:
                     test["type"] = "WKT"
-                elif "parser" in test:
+                elif "parser" in test and "input" in test:
                     test["type"] = "INPUT"
                 else:
                     print("\nUnknownTest: {0}\n".format(test))
@@ -103,7 +103,9 @@ def loadTestsFromDirectory(dir_path, recurse=False):
             print("\n###########")
             print("No tests found in Yaml: {0}. Needs 'tests' key with a list as the value, or JUST a yml list.".format(dir_path))
             print("###########\n")
-        # print(yaml_dict)
+        #############################
+        # READING FILE CONFIGS HERE #
+        #############################
         # Store the configs for each file:
         file_config = {}
         file_config['yml name'] = os.path.basename(file)
@@ -114,27 +116,24 @@ def loadTestsFromDirectory(dir_path, recurse=False):
     return list_of_tests
 
 def setupTestFromConfig(test_info, file_config, cli_args):
-    def getAPI(str_api, params="", default="DEV"):
+    def getAPI(str_api, default="DEV"):
         # Stop 'http://str_api/params' from becoming 'http://str_api//params'
-        if params[0:1] == '/':
-            params = params[1:]
         if str_api == None:
             str_api = default
 
         # Check if a keyword:
         if str_api.upper() == "PROD":
-            return "https://api.daac.asf.alaska.edu/" + params
+            return "https://api.daac.asf.alaska.edu/"
         elif str_api.upper() == "TEST":
-            return "https://api-test.asf.alaska.edu/" + params
+            return "https://api-test.asf.alaska.edu/"
         elif str_api.upper() == "DEV":
-            return "http://127.0.0.1:5000/" + params
+            return "http://127.0.0.1:5000/"
         # Else assume it IS a url:
         else:
-            return str_api + params
+            return str_api
     # Figure out which api to use:
     api_url = cli_args['api'] if cli_args['api'] != None else file_config['api']
-    api_url = getAPI(api_url, params="/services/utils/files_to_wkt")
-    test_info['api'] = api_url
+    test_info['api'] = getAPI(api_url)
 
     return test_info
 
