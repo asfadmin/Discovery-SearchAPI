@@ -23,7 +23,7 @@ tests:
     expected code: 400
 
 - blank keyword invalid:
-    platform: None
+    platform: null
     output: csv
     maxresults: 10
 
@@ -32,7 +32,7 @@ tests:
 
 - blank output invalid:
     platform: SA
-    output: None
+    output: null
     maxresults: 10
 
     expected file: error json
@@ -362,7 +362,7 @@ tests:
     expected code: 400
 
 - maxFaradayRotation empty invalid:
-    maxFaradayRotation: None
+    maxFaradayRotation: null
     platform: Sentinel
     output: csv
 
@@ -370,7 +370,7 @@ tests:
     expected code: 400
 
 - minFaradayRotation empty invalid:
-    minFaradayRotation: None
+    minFaradayRotation: null
     platform: Sentinel
     output: csv
 
@@ -649,8 +649,8 @@ tests:
     expected file: error json
     expected code: 400
 
-- processingDate specchar blank:
-    processingDate: ~#
+- processingDate specchar invalid:
+    processingDate: ~
     maxResults: 1200
     output: csv
 

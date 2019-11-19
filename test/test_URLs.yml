@@ -1,5 +1,5 @@
 
-api: tEsT
+api: Test
 
 
 tests:
@@ -513,8 +513,9 @@ tests:
     expected file: download
     expected code: 200
 
+#In CMR reporting script, we report groupid as null on most datasets. Some datasets updated to expect blank file & moved to partial pass yaml
 - groupid Sentinel:
-    groupid: S1B_S6DV_0541_0543_017561_035
+    groupid: S1B_S1DV_0492_0497_017567_041
     output: json
 
     expected file: json
@@ -542,7 +543,7 @@ tests:
     expected code: 200
 
 - groupid ALOS:
-    groupid: ALPSRP278477070
+    groupid: ALPSRP279071100
     output: json
 
     expected file: json
@@ -550,34 +551,6 @@ tests:
 
 - groupid AIRSAR:
     groupid: ts1902
-    output: json
-
-    expected file: json
-    expected code: 200
-
-- groupid Radarsat:
-    groupid: R1_63781_FN1_F277
-    output: json
-
-    expected file: json
-    expected code: 200
-
-- groupid ERS:
-    groupid: E1_08794_STD_F267
-    output: json
-
-    expected file: json
-    expected code: 200
-
-- groupid JERS:
-    groupid: J1_01508_STD_F315
-    output: json
-
-    expected file: json
-    expected code: 200
-
-- groupid Seasat:
-    groupid: SS_01499_STD_F1200
     output: json
 
     expected file: json
@@ -982,6 +955,7 @@ tests:
     start: 2015-01-01T00:00:00Z
     end: 2016-01-02T00:00:00Z
     output: csv
+    maxResults: 2000
 
     expected file: csv
     expected code: 200
@@ -2328,7 +2302,34 @@ tests:
     expected file: count
     expected code: 200
 
-- start realworld 1:
+- start backwards reversed:
+    start: now
+    end: 1+year+ago
+    output: csv
+    maxResults: 10
+
+    expected file: csv
+    expected code: 200
+
+- start tomorrow reversed:
+    start: tomorrow
+    end: 1+year+ago
+    output: csv
+    maxResults: 10
+
+    expected file: csv
+    expected code: 200
+
+- start now end yesterday reversed:
+    start: now
+    end: yesterday
+    output: csv
+    maxResults: 10
+
+    expected file: csv
+    expected code: 200
+
+- realworld 1:
     intersectsWith: point(-168.0380672+53.9279675)
     platform: Sentinel-1A,Sentinel-1B
     processingLevel: GRD_HS,GRD_HD
@@ -2338,7 +2339,17 @@ tests:
     expected file: count
     expected code: 200
 
-- start realworld 2:
+- realworld 1 modified:
+    intersectsWith: point(-162.4535+61.4945)
+    platform: Sentinel-1A,Sentinel-1B
+    processingLevel: GRD_HS,GRD_HD
+    beamMode: IW
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- realworld 2:
     intersectsWith: linestring(-102+37.59,-94+37,-94+39,-102+39)
     platform: Sentinel-1A,Sentinel-1B
     processingLevel: GRD_HS,GRD_HD
@@ -2348,7 +2359,17 @@ tests:
     expected file: count
     expected code: 200
 
-- start realworld 3:
+- realworld 2 modified:
+    intersectsWith: linestring(-94.1995+42.3741,-88.2384+42.2475,-88.166+40.56,-93.9793+41.1938)
+    platform: Sentinel-1A,Sentinel-1B
+    processingLevel: GRD_HS,GRD_HD
+    beamMode: S4
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- realworld 3:
     intersectsWith: polygon((-102+37.59,-94+37,-94+39,-102+39,-102+37.59))
     platform: Sentinel-1A,Sentinel-1B
     processingLevel: GRD_HS,GRD_HD
@@ -2358,7 +2379,17 @@ tests:
     expected file: count
     expected code: 200
 
-- start realworld 4:
+- realworld 3 modified:
+    intersectsWith: polygon((-91.1083+41.7191,-83.9568+41.4233,-83.9916+43.9781,-91.7194+42.8556,-91.1083+41.7191))
+    platform: Sentinel-1A,Sentinel-1B
+    processingLevel: GRD_HS,GRD_HD
+    beamMode: EW,S1,S4
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- realworld 4:
     output: count
     frame: 580%2C581%2C582%2C583%2C585
     processingLevel: L0%2CL1.0%2CSLC
@@ -2369,7 +2400,7 @@ tests:
     expected file: count
     expected code: 200
 
-- start realworld 5:
+- realworld 5:
     output: count
     asfframe: 580%2C581%2C582%2C583%2C585
     processingLevel: L0%2CL1.0%2CSLC
@@ -2380,33 +2411,36 @@ tests:
     expected file: count
     expected code: 200
 
-- start realworld 6:
+- realworld 6:
     platform: SA,SB
     relativeOrbit: 100-500
     asfframe: 550-600
     start: 2015-06-01
     end: 2019-05-30
     output: csv
+    maxResults: 500
 
     expected file: csv
     expected code: 200
 
-- start realworld 7:
+- realworld 7:
     platform: SA,SB
     relativeOrbit: 100-200
     frame: 580-585
     start: 2015-06-01
     end: 2019-05-30
     output: csv
+    maxResults: 500
 
     expected file: csv
     expected code: 200
 
-- start realworld 8:
+- realworld 8:
     output: csv
     platform: Sentinel-1A
     start: 2017-05-30
     end: 2018-05-31%22
+    maxResults: 1000
 
     expected file: csv
     expected code: 200

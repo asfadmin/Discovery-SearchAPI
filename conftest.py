@@ -13,13 +13,16 @@ def pytest_addoption(parser):
     parser.addoption("--api", action="store", default=None,
         help = "Override which api ALL .yml tests use with this. (DEV/PROD or SOME-URL)")
     parser.addoption("--only-run", action="store", default=None,
-        help = "Only run tests whos name begin with this parameter")
+        help = "Only run tests that contains this param in their name")
+    parser.addoption("--dont-run", action="store", default=None,
+        help = "Dont run tests that contains this param in their name")
 
 @pytest.fixture
 def get_cli_args(request):
     all_args = {}
     all_args['api'] = request.config.getoption('--api')
     all_args['only run'] = request.config.getoption('--only-run')
+    all_args['dont run'] = request.config.getoption('--dont-run')
     return all_args
 
 ############################
