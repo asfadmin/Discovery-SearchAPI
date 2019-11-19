@@ -1,8 +1,10 @@
-import os
-import pytest
+import os, re
+import pytest, warnings
 import requests
 import geomet, shapely
-import json
+import json, csv
+from copy import deepcopy
+from io import StringIO
 
 import conftest as helpers
 import APIUtils as test_repair
@@ -333,57 +335,57 @@ class URL_Manager():
                 val = str(val)
                 if key.lower() == "absoluteorbit":
                     del mutatable_dict[key]
-                    mutatable_dict["absoluteOrbit"] = Input.parse_int_or_range_list(val)
+                    mutatable_dict["absoluteOrbit"] = test_input.parse_int_or_range_list(val)
                 elif key.lower() == "platform":
                     del mutatable_dict[key]
-                    mutatable_dict["Platform"] = Input.parse_string_list(val)
+                    mutatable_dict["Platform"] = test_input.parse_string_list(val)
                 elif key.lower() in ["frame", "asfframe"]:
                     del mutatable_dict[key]
-                    mutatable_dict["asfframe"] = Input.parse_int_or_range_list(val)
+                    mutatable_dict["asfframe"] = test_input.parse_int_or_range_list(val)
                 elif key.lower() == "granule_list":
                     del mutatable_dict[key]
-                    mutatable_dict["granule_list"] = Input.parse_string_list(val)
+                    mutatable_dict["granule_list"] = test_input.parse_string_list(val)
                 elif key.lower() == "groupid":
                     del mutatable_dict[key]
-                    mutatable_dict["groupid"] = Input.parse_string_list(val)
+                    mutatable_dict["groupid"] = test_input.parse_string_list(val)
                 elif key.lower() == "flightdirection":
                     del mutatable_dict[key]
-                    mutatable_dict["flightdirection"] = Input.parse_string_list(val)
+                    mutatable_dict["flightdirection"] = test_input.parse_string_list(val)
                 elif key.lower() == "offnadirangle":
                     del mutatable_dict[key]
-                    mutatable_dict["offnadirangle"] = Input.parse_float_or_range_list(val)
+                    mutatable_dict["offnadirangle"] = test_input.parse_float_or_range_list(val)
                 elif key.lower() == "polarization":
                     del mutatable_dict[key]
                     val = urllib.parse.unquote_plus(val)
-                    mutatable_dict["polarization"] = Input.parse_string_list(val)
+                    mutatable_dict["polarization"] = test_input.parse_string_list(val)
                 elif key.lower() == "relativeorbit":
                     del mutatable_dict[key]
-                    mutatable_dict["relativeorbit"] = Input.parse_int_or_range_list(val)
+                    mutatable_dict["relativeorbit"] = test_input.parse_int_or_range_list(val)
                 elif key.lower() == "collectionname":
                     del mutatable_dict[key]
                     val = urllib.parse.unquote_plus(val)
-                    mutatable_dict["collectionname"] = Input.parse_string_list(val)
+                    mutatable_dict["collectionname"] = test_input.parse_string_list(val)
                 elif key.lower() in ["beammode", "beamswath"]:
                     del mutatable_dict[key]
-                    mutatable_dict["beammode"] = Input.parse_string_list(val)
+                    mutatable_dict["beammode"] = test_input.parse_string_list(val)
                 # MIN/MAX variants
                 # min/max BaselinePerp
                 elif key.lower()[3:] == "baselineperp":
                     del mutatable_dict[key]
                     # Save the min/max key, all lower
-                    mutatable_dict[key.lower()[0:3]+"baselineperp"] = Input.parse_float(val)
+                    mutatable_dict[key.lower()[0:3]+"baselineperp"] = test_input.parse_float(val)
                 # min/max Doppler:
                 elif key.lower()[3:] == "doppler":
                     del mutatable_dict[key]
-                    mutatable_dict[key.lower()[0:3]+"doppler"] = Input.parse_float(val)
+                    mutatable_dict[key.lower()[0:3]+"doppler"] = test_input.parse_float(val)
                 # min/max InsarStackSize:
                 elif key.lower()[3:] == "insarstacksize":
                     del mutatable_dict[key]
-                    mutatable_dict[key.lower()[0:3]+"insarstacksize"] = Input.parse_int(val)
+                    mutatable_dict[key.lower()[0:3]+"insarstacksize"] = test_input.parse_int(val)
                 #min/max FaradayRotation:
                 elif key.lower()[3:] == "faradayrotation":
                     del mutatable_dict[key]
-                    mutatable_dict[key.lower()[0:3]+"faradayrotation"] = Input.parse_float(val)
+                    mutatable_dict[key.lower()[0:3]+"faradayrotation"] = test_input.parse_float(val)
 
         except ValueError as e:
             assert False, "Test: {0}. Incorrect parameter: {1}".format(test_dict["title"], str(e))
@@ -452,6 +454,8 @@ class URL_Manager():
         if "Platform" in json_dict:
             itter_copy = deepcopy(json_dict)
             for i, platform in enumerate(itter_copy["Platform"]):
+                if platform == None:
+                    continue
                 #####
                 # NOTE: UPPER for when adding platforms in future:
                 platform = platform.upper()
@@ -498,6 +502,8 @@ class URL_Manager():
                     json_dict["Platform"][i] = "UAVSAR"
         if "flightdirection" in json_dict:
             for i, flightdirection in enumerate(json_dict["flightdirection"]):
+                if flightdirection == None:
+                    continue
                 # flightdirection in UPPER
                 flightdirection = flightdirection.upper()
                 # DESCENDING
@@ -508,6 +514,8 @@ class URL_Manager():
                     json_dict["flightdirection"][i] = "ASCENDING"
         if "polarization" in json_dict:
             for i, polarization in enumerate(json_dict["polarization"]):
+                if polarization == None:
+                    continue
                 # making all results UPPER case, except Dual
                 if polarization[0:4].upper() == "DUAL":
                     polarization = "Dual" + polarization[4:].upper()
@@ -516,6 +524,8 @@ class URL_Manager():
                 json_dict["polarization"][i] = polarization
         if "collectionname" in json_dict:
             for i, collectionname in enumerate(json_dict["collectionname"]):
+                if collectionname == None:
+                    continue
                 # Note: in url_dict, string is separated by comma: 'Big Island', ' HI'
                 # Using the below to match the url string to file string
                 # Big Island, HI
@@ -526,6 +536,8 @@ class URL_Manager():
                     json_dict["collectionname"][i] = "Cascade Volcanoes, CA/OR/WA"
         if "beammode" in json_dict:
             for i, beammode in enumerate(json_dict["beammode"]):
+                if beammode == None:
+                    continue
                 # beammode in UPPER case
                 beammode = beammode.upper()
                 # STANDARD
