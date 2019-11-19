@@ -13,7 +13,7 @@ pytest <pytest args> test_mainManager.py <custom args>
         -s: If python has print statements, this lets you see them.
         -x: Quit as soon as the first test fails
         -rs: (by itself) Print *why* each test was skipped to screen.
-        -n INT: Number of tests to run at once. (Default = 1, USE THIS!!)
+        -n INT: (by itself) Number of tests to run at once. (Default = 1, USE THIS!!)
 
    + All **Custom args**:
         --api [DEV|TEST|PROD]: Run against that api. If value doesn't match
