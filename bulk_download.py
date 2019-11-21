@@ -37,6 +37,8 @@ import getpass
 import ssl
 import signal
 
+import socket
+
 import xml.etree.ElementTree as ET
 
 #############
@@ -404,6 +406,10 @@ class bulk_downloader:
           if "ssl.c" in "{0}".format(e.reason):
               print ("IMPORTANT: Remote location may not be accepting your SSL configuration. This is a terminal error.")
           return False,None
+
+       except socket.timeout as e:
+           print (" > timeout requesting: {0}; {1}".format(url, e))
+           return False,None
 
        except ssl.CertificateError as e:
           print (" > ERROR: {0}".format(e))
