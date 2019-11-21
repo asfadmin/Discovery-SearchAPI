@@ -36,7 +36,6 @@ import time
 import getpass
 import ssl
 import signal
-
 import socket
 
 import xml.etree.ElementTree as ET
