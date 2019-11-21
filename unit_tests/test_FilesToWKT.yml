@@ -2,7 +2,7 @@
 ################
 ## FILE TESTS ##
 ################
-
+tests:
 ## GEOJSONS VALID:
 - FILE geojson AoI basic test:
     test wkt: geojsons_valid/AoI.geojson
