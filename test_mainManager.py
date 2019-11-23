@@ -1,10 +1,20 @@
-import os, re
+import os, sys, re
 import pytest, warnings
-import requests
+import requests, urllib
 import geomet, shapely
-import json, csv
+import json, csv, yaml
+
+
+import pexpect
+import subprocess
+from subprocess import PIPE, run
+
+
+
 from copy import deepcopy
 from io import StringIO
+from types import ModuleType
+
 
 import conftest as helpers
 import APIUtils as test_repair
@@ -667,6 +677,82 @@ class URL_Manager():
 
 
 
+
+
+
+################################
+## BULK DOWNLOAD SCRIPT TESTS ##
+################################
+class BULK_DOWNLOAD_SCRIPT_Manager():
+    def __init__(self, test_info, bulk_download_path):
+        self.test_info = test_info
+        cred_path = "unit_tests/creds_earthdata.yml"
+        username, password = self.get_test_creds(cred_path)
+        cookie_jar_path = os.path.join( os.path.expanduser('~'), ".bulk_download_cookiejar.txt")
+
+        # Take out any cookies, make things consistant:
+        if os.path.isfile(cookie_jar_path):
+            os.remove(cookie_jar_path)
+
+        bulk_process = pexpect.spawn("python3 {0}".format(bulk_download_path), encoding='utf-8', timeout=10)
+
+        print()
+        # bulk_process.logfile = sys.stdout
+        bulk_process.expect(r"Username:")
+        bulk_process.sendline(username)
+        bulk_process.expect(r"Password \(will not be displayed\):")
+        bulk_process.sendline(password)
+        try:
+            print("READ INFO HERE:")
+            info = bulk_process.read()
+            print(type(info))
+        except pexpect.TIMEOUT:
+            bad_creds = True if "bad_creds" in test_info and test_info["bad_creds"] == True else False
+            assert bad_creds, "Bad username/password used, and 'bad_creds' was not set to True in test: {0}.".format(test_info["title"])
+
+        # bulk_process.expect(['No existing URS cookie found, please enter Earthdata username & password:'])
+
+        # bulk_process.sendline('my_username')
+
+
+
+        # bulk_process = subprocess.Popen(["python3", "-c", bulk_download_code], stdout=PIPE, stdin=PIPE)
+        # bulk_process = run(["python3", "-c", bulk_download_code], stdout=PIPE, input="user\npass\n\n", encoding="ascii")
+
+        # I don't know why this first one is needed, but it is:
+        # bulk_process.communicate(input=b"")
+        # Send the user/pass:
+        # bulk_process.communicate(input=b"some_usersome_pass")
+        # bulk_process.communicate(input="some_user")
+
+
+
+        # bulk_download.bulk_downloader(creds=(user,passwd), args=[])
+
+    def get_test_creds(self, cred_path):
+        # Try to open the file, and save the yml:
+        try:
+            yml_file = open(cred_path, "r")
+            accounts_dict = yaml.safe_load(yml_file)
+        except (OSError, IOError):
+            assert False, "Error opening yaml {0}. Does it exist?".format(cred_path)
+        except (yaml.YAMLError, yaml.MarkedYAMLError) as e:
+            assert False, "Error parsing yaml {0}. Error: {1}.".format(cred_path, str(e))
+        
+        # Check if account in yml:
+        account = self.test_info["account"]
+        if account in accounts_dict:
+            try:
+                username = accounts_dict[account]["user"]
+                password = accounts_dict[account]["pass"]
+            except KeyError as e:
+                assert False, "Test {0} is not formatted correctly. No user/pass. Error: {1}.".format(test_info["title"], str(e))
+        else:
+            assert False, "Account {0} not found in {1}.".format(account, cred_path)
+        # Success! heres your user/pass
+        return username, password
+
+
 ################
 ## START MAIN ##
 ################
@@ -684,6 +770,11 @@ list_of_tests.extend(helpers.loadTestsFromDirectory(tests_root, recurse=True))
 tests_root = os.path.join(project_root, "**", "test_*.yaml")
 list_of_tests.extend(helpers.loadTestsFromDirectory(tests_root, recurse=True))
 
+
+## Stop every bulk_download test from re-requesting the *same* bulk download file fo every test.
+# Set key=val as: api_url=script_path for first call, then reuse it:
+bulk_download_storage = {}
+
 @pytest.mark.parametrize("test_dict", list_of_tests)
 def test_MainManager(test_dict, cli_args):
     test_info = test_dict[0]
@@ -700,3 +791,23 @@ def test_MainManager(test_dict, cli_args):
     elif test_info['type'] == 'URL':
         test_info['api'] = test_info['api'] + "services/search/param?"
         URL_Manager(test_info)
+    elif test_info['type'] == 'BULK_DOWNLOAD':
+        # If you already got the script once, don't do it again:
+        if test_info['api'] in bulk_download_storage:
+            bulk_download_path = bulk_download_storage[test_info['api']]
+        else:
+            try:
+                url = test_info['api'] + "?filename=Testing"
+                r = requests.get(url)
+            except (requests.ConnectionError, requests.Timeout, requests.TooManyRedirects) as e:
+                assert False, "Cannot connect to API: {0}.".format(url)
+            bulk_download_code = r.content.decode("utf-8")
+            # file_name = base_url + ".py" (ie: 127.0.0.1.py)
+            bulk_download_path = urllib.parse.urlsplit(test_info['api']).netloc + ".py"
+            with open(bulk_download_path, "w+") as f:
+                f.write(bulk_download_code)
+
+            # Store it for next time around
+            bulk_download_storage[test_info['api']] = bulk_download_path
+
+        BULK_DOWNLOAD_SCRIPT_Manager(test_info, bulk_download_path)
