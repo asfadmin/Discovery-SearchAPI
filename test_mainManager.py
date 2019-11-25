@@ -1,4 +1,4 @@
-import os, re
+import os, sys, re
 import pytest, warnings
 import requests
 import geomet, shapely
@@ -6,6 +6,7 @@ import json, csv
 from copy import deepcopy
 from io import StringIO
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import conftest as helpers
 import APIUtils as test_repair
 import CMR.Input as test_input
