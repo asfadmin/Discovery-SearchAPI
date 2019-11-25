@@ -1,0 +1,18 @@
+tests:
+- basic parse test one:
+    parser: parse_string
+    input: asdf
+    expected: asdf
+    # print: True
+
+- basic range test one:
+    parser: parse_int_range
+    input: 8-9
+    expected: [8,9]
+    # print: True
+
+- testing out error:
+    parser: parse_int_range
+    input: Good luck parsing this!
+    expected error: Invalid int range
+    # print: True

@@ -2,7 +2,7 @@
 api: Test
 
 
-tests:
+url tests:
 - absoluteOrbit single:
     absoluteOrbit: 5000
     maxresults: 10
