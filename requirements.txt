@@ -41,8 +41,10 @@ more-itertools==4.3.0
 numpy==1.17.2
 packaging==19.2
 pathlib2==2.3.3
+pexpect==4.7.0
 placebo==0.8.2
 pluggy==0.13.0
+ptyprocess==0.6.0
 py==1.7.0
 pycparser==2.19
 PyGithub==1.43.5
