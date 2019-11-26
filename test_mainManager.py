@@ -1,8 +1,10 @@
 import os, sys, re
 import pytest, warnings
-import requests
+import requests, urllib
 import geomet, shapely
-import json, csv
+import json, csv, yaml
+import pexpect
+
 from copy import deepcopy
 from io import StringIO
 
@@ -668,6 +670,125 @@ class URL_Manager():
 
 
 
+
+
+
+################################
+## BULK DOWNLOAD SCRIPT TESTS ##
+################################
+class BULK_DOWNLOAD_SCRIPT_Manager():
+    def __init__(self, test_info, bulk_download_path):
+        self.test_info = self.applyDefaultValues(test_info)
+        self.bulk_download_path = bulk_download_path
+        self.cred_path = "unit_tests/creds_earthdata.yml"
+        self.cwd = os.path.dirname(os.path.abspath(__file__))
+
+        cookie_jar_path = os.path.join( os.path.expanduser('~'), ".bulk_download_cookiejar.txt")
+
+        # Take out any cookies, make things consistant:
+        if os.path.isfile(cookie_jar_path):
+            os.remove(cookie_jar_path)
+
+        if test_info["print"]:
+            print("\n Test: {0}".format(test_info["title"]))
+
+        for version in self.test_info["python_version"]:
+            if test_info["print"]:
+                print()
+            cmd = "python{0} {1} {2}".format(str(version), self.bulk_download_path, self.test_info["args"])
+            if test_info["print"]:
+                print("    cmd: {0}".format(cmd))
+            bulk_process = pexpect.spawn(cmd, encoding='utf-8', timeout=10, cwd=self.cwd)
+            self.run_process_tests(bulk_process)
+            if test_info["print"]:
+                print()
+
+
+    def applyDefaultValues(self, test_info):
+        # args:
+        if "args" not in test_info:
+            test_info["args"] = ""
+        # python_version:
+        if "python_version" not in test_info:
+            test_info["python_version"] = [2, 3]
+        elif not isinstance(test_info["python_version"], type([])):
+            test_info["python_version"] = [ test_info["python_version"] ]
+        # print:
+        if "print" not in test_info:
+            test_info["print"] = False if "expected_outcome" in test_info else True
+
+        return test_info
+
+
+
+
+    def run_process_tests(self, bulk_process):
+        username, password = self.get_test_creds()
+        
+        # if self.test_info["print"]:
+        #     bulk_process.logfile = sys.stdout
+
+        # cookie_exists = (int) which element was hit in list:
+        cookie_exists = bulk_process.expect([r"No existing URS cookie found, please enter Earthdata username & password:", \
+                                             r"Re-using previous cookie jar."])
+        # No cookie found:
+        if cookie_exists == 0:
+            bulk_process.expect(r"Username:")
+            bulk_process.sendline(username)
+            bulk_process.expect(r"Password \(will not be displayed\):")
+            bulk_process.sendline(password)
+
+            # creds_success = (int) which element was hit in list:
+            creds_success = bulk_process.expect([r"Username and Password combo was not successful\. Please try again\.", \
+                                                 r"New users: you must first log into Vertex and accept the EULA\.", \
+                                                 r"attempting to download https:\/\/urs\.earthdata\.nasa\.gov\/profile"])
+            if creds_success == 0:
+                if self.test_info["print"]:
+                    print("RESULT: Invalid Username Password combo")
+                if "expected_outcome" in self.test_info:
+                    bad_pass_error_msg = "Bad username/password. EarthData Account: {0}. Test: {1}.".format(self.test_info["account"], self.test_info["title"])
+                    assert self.test_info["expected_outcome"] == "bad_creds", bad_pass_error_msg
+                # No valid cookie, no point on continuing:
+                return
+            elif creds_success == 1:
+                if self.test_info["print"]:
+                    print("RESULT: Eula for {0} not checked.".format(self.test_info['account']))
+                if "expected_outcome" in self.test_info:
+                    bad_eula_error_msg = "Bad Eula's checked. EarthData Account: {0}. Test: {1}.".format(self.test_info["account"], self.test_info["title"])
+                    assert self.test_info["expected_outcome"] == "bad_eula", bad_eula_error_msg
+                # No way to download data, no point on continuing:
+                return
+        # Cookie found, but not valid:
+        elif cookie_exists == 1:
+            bulk_process.expect(r"Download Summary")
+        # Valid cookie, check download here:
+
+
+
+    def get_test_creds(self):
+        # Try to open the file, and save the yml:
+        try:
+            yml_file = open(self.cred_path, "r")
+            accounts_dict = yaml.safe_load(yml_file)
+        except (OSError, IOError):
+            assert False, "Error opening yaml {0}. Does it exist?".format(self.cred_path)
+        except (yaml.YAMLError, yaml.MarkedYAMLError) as e:
+            assert False, "Error parsing yaml {0}. Error: {1}.".format(self.cred_path, str(e))
+        
+        # Check if account in yml:
+        account = self.test_info["account"]
+        if account in accounts_dict:
+            try:
+                username = accounts_dict[account]["user"]
+                password = accounts_dict[account]["pass"]
+            except KeyError as e:
+                assert False, "Test {0} is not formatted correctly. No user/pass. Error: {1}.".format(self.test_info["title"], str(e))
+        else:
+            assert False, "Account {0} not found in {1}.".format(account, self.cred_path)
+        # Success! heres your user/pass
+        return username, password
+
+
 ################
 ## START MAIN ##
 ################
@@ -685,6 +806,11 @@ list_of_tests.extend(helpers.loadTestsFromDirectory(tests_root, recurse=True))
 tests_root = os.path.join(project_root, "**", "test_*.yaml")
 list_of_tests.extend(helpers.loadTestsFromDirectory(tests_root, recurse=True))
 
+
+## Stop every bulk_download test from re-requesting the *same* bulk download file fo every test.
+# Set key=val as: api_url=script_path for first call, then reuse it:
+bulk_download_storage = {}
+
 @pytest.mark.parametrize("test_dict", list_of_tests)
 def test_MainManager(test_dict, cli_args):
     test_info = test_dict[0]
@@ -701,3 +827,23 @@ def test_MainManager(test_dict, cli_args):
     elif test_info['type'] == 'URL':
         test_info['api'] = test_info['api'] + "services/search/param?"
         URL_Manager(test_info)
+    elif test_info['type'] == 'BULK_DOWNLOAD':
+        # If you already got the script once, don't do it again:
+        if test_info['api'] in bulk_download_storage:
+            bulk_download_path = bulk_download_storage[test_info['api']]
+        else:
+            try:
+                url = test_info['api'] + "?filename=Testing"
+                r = requests.get(url)
+            except (requests.ConnectionError, requests.Timeout, requests.TooManyRedirects) as e:
+                assert False, "Cannot connect to API: {0}. Error: {1}.".format(url, str(e))
+            bulk_download_code = r.content.decode("utf-8")
+            # file_name = base_url + ".py" (ie: 127.0.0.1.py)
+            bulk_download_path = urllib.parse.urlsplit(test_info['api']).netloc + ".py"
+            with open(bulk_download_path, "w+") as f:
+                f.write(bulk_download_code)
+
+            # Store it for next time around
+            bulk_download_storage[test_info['api']] = bulk_download_path
+
+        BULK_DOWNLOAD_SCRIPT_Manager(test_info, bulk_download_path)

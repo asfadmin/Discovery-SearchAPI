@@ -1,0 +1,40 @@
+tests:
+- test full access account:
+    account: FullAccess
+    python_version: [2,3] # <- Default
+    args: ""  # <- Default
+    expected_outcome: success
+    # print: True
+
+- test bad user pass:
+    account: DoesntExist
+    python_version: 3
+    expected_outcome: bad_creds
+    # print: True
+
+- test minimal eulas checked account:
+    account: MinimalEulas
+    python_version: 3
+    expected_outcome: bad_eula
+    # print: True
+
+
+# # - test no eula account:
+# #     account: MinimalEulas
+# # - test incorrect user/pass:
+#       # which one for bad user/pass?:
+# #     account: [DoesntExist, FullAccess]
+#       # or just?:
+# #     account: DoesntExist
+# #     invalid_creds: True
+# #     bad_creds: True
+#       # or maybe?:
+# #     end_goal: bad_pass, success, bad_eula, etc...
+#       expected_outcome: bad_creds, success, bad_eula, etc...
+
+#       account: FullAccess
+#       add_cookie_before: "This will replace the real cookie BEFORE it checks it"
+#       add_cookie_after: "After script verifies cookie, it gets replaced with this"
+#       expected_outcome: [bad_cookie, success]
+
+

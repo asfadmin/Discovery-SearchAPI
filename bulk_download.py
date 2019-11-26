@@ -75,6 +75,11 @@ def signal_handler(sig, frame):
 
 class bulk_downloader:
     def __init__(self):
+        # # If you're running an unsupported version of python, quit. 0 = major, 1 = minor:
+        # if sys.version_info[0] < 3 and sys.version_info[1] < 7:
+        #     print("Unsupported version of python. Must be >2.7")
+        #     exit(-1)
+
         # List of files to download
         self.files = [ 'REPLACE_PRODUCT_LIST' ]
 
@@ -254,7 +259,7 @@ class bulk_downloader:
        try:
           response = opener.open(request)
        except HTTPError as e:
-          if e.code == 401:
+          if "WWW-Authenticate" in e.headers and "Please enter your Earthdata Login credentials" in e.headers["WWW-Authenticate"]:
              print (" > Username and Password combo was not successful. Please try again.")
              return False
           else:

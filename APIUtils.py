@@ -472,6 +472,8 @@ class simplifyWKT():
         wkt_json = getClampedCoords(wkt_json)
         wkt_json = simplifyPoints(wkt_json)
         # Clamp, simplify, *then* wrap, to help simplify be more accuate w/ points outside of poles
+        if self.error != None:
+            return
         wkt_unwrapped = wkt.dumps(wkt_json)
         wkt_wrapped = wkt.dumps(getWrappedCoords(wkt_json))
         return wkt_unwrapped, wkt_wrapped
