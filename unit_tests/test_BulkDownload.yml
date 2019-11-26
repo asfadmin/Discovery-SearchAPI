@@ -37,4 +37,4 @@ tests:
 #       add_cookie_after: "After script verifies cookie, it gets replaced with this"
 #       expected_outcome: [bad_cookie, success]
 
- 
+

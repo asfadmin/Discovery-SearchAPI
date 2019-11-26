@@ -3,17 +3,10 @@ import pytest, warnings
 import requests, urllib
 import geomet, shapely
 import json, csv, yaml
-
-
 import pexpect
-import subprocess
-from subprocess import PIPE, run
-
-
 
 from copy import deepcopy
 from io import StringIO
-from types import ModuleType
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import conftest as helpers
@@ -711,36 +704,6 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
                 print()
 
 
-        return
-
-        try:
-            print("READ INFO HERE:")
-            info = bulk_process.read()
-            print(type(info))
-        except pexpect.TIMEOUT:
-            bad_creds = True if "bad_creds" in test_info and test_info["bad_creds"] == True else False
-            assert bad_creds, "Bad username/password used, and 'bad_creds' was not set to True in test: {0}.".format(test_info["title"])
-
-        # bulk_process.expect(['No existing URS cookie found, please enter Earthdata username & password:'])
-
-        # bulk_process.sendline('my_username')
-
-
-
-        # bulk_process = subprocess.Popen(["python3", "-c", bulk_download_code], stdout=PIPE, stdin=PIPE)
-        # bulk_process = run(["python3", "-c", bulk_download_code], stdout=PIPE, input="user\npass\n\n", encoding="ascii")
-
-        # I don't know why this first one is needed, but it is:
-        # bulk_process.communicate(input=b"")
-        # Send the user/pass:
-        # bulk_process.communicate(input=b"some_usersome_pass")
-        # bulk_process.communicate(input="some_user")
-
-
-
-        # bulk_download.bulk_downloader(creds=(user,passwd), args=[])
-
-
     def applyDefaultValues(self, test_info):
         # args:
         if "args" not in test_info:
@@ -819,7 +782,7 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
                 username = accounts_dict[account]["user"]
                 password = accounts_dict[account]["pass"]
             except KeyError as e:
-                assert False, "Test {0} is not formatted correctly. No user/pass. Error: {1}.".format(test_info["title"], str(e))
+                assert False, "Test {0} is not formatted correctly. No user/pass. Error: {1}.".format(self.test_info["title"], str(e))
         else:
             assert False, "Account {0} not found in {1}.".format(account, self.cred_path)
         # Success! heres your user/pass
@@ -873,7 +836,7 @@ def test_MainManager(test_dict, cli_args):
                 url = test_info['api'] + "?filename=Testing"
                 r = requests.get(url)
             except (requests.ConnectionError, requests.Timeout, requests.TooManyRedirects) as e:
-                assert False, "Cannot connect to API: {0}.".format(url)
+                assert False, "Cannot connect to API: {0}. Error: {1}.".format(url, str(e))
             bulk_download_code = r.content.decode("utf-8")
             # file_name = base_url + ".py" (ie: 127.0.0.1.py)
             bulk_download_path = urllib.parse.urlsplit(test_info['api']).netloc + ".py"
