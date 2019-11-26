@@ -323,6 +323,9 @@ class URL_Manager():
                 checkFileContainsExpected("relativeorbit", test_dict, file_content)
                 checkFileContainsExpected("collectionname", test_dict, file_content)
                 checkFileContainsExpected("beammode", test_dict, file_content)
+                checkFileContainsExpected("processinglevel", test_dict, file_content)
+                checkFileContainsExpected("flightline", test_dict, file_content)
+                checkFileContainsExpected("lookdirection", test_dict, file_content)
 
                 checkMinMax("baselineperp", test_dict, file_content)
                 checkMinMax("doppler", test_dict, file_content)
@@ -371,6 +374,15 @@ class URL_Manager():
                 elif key.lower() in ["beammode", "beamswath"]:
                     del mutatable_dict[key]
                     mutatable_dict["beammode"] = test_input.parse_string_list(val)
+                elif key.lower() == "processinglevel":
+                    del mutatable_dict[key]
+                    mutatable_dict["processinglevel"] = test_input.parse_string_list(val)
+                elif key.lower() == "flightline":
+                    del mutatable_dict[key]
+                    mutatable_dict["flightline"] = test_input.parse_string_list(val)
+                elif key.lower() == "lookdirection":
+                    del mutatable_dict[key]
+                    mutatable_dict["lookdirection"] = test_input.parse_string_list(val)
                 # MIN/MAX variants
                 # min/max BaselinePerp
                 elif key.lower()[3:] == "baselineperp":
@@ -446,9 +458,20 @@ class URL_Manager():
         for key in ["insarStackSize", "Stack Size"]:
             if key in json_dict:
                 json_dict["insarstacksize"] = json_dict.pop(key)
+        ### min/max FaradayRotation:
         for key in ["faradayRotation", "Faraday Rotation"]:
             if key in json_dict:
                 json_dict["faradayrotation"] = json_dict.pop(key)
+        ### processingLevel:
+        for key in ["Processing Level", "processingLevel"]:
+            if key in json_dict:
+                json_dict["processinglevel"] = json_dict.pop(key)
+        ### flightLine:
+        if "flightLine" in json_dict:
+            json_dict["flightline"] = json_dict.pop("flightLine")
+        ### lookDirection:
+        if "lookDirection" in json_dict:
+            json_dict["lookdirection"] = json_dict.pop("lookDirection")
         return json_dict
 
 
@@ -497,6 +520,11 @@ class URL_Manager():
                 # Sentinel-1B
                 elif platform in ["SENTINEL-1B", "SB"]:
                     json_dict["Platform"][i] = "Sentinel-1B"
+                # Sir-C
+                elif platform in ["SIR-C"]:
+                    del json_dict["Platform"][i]
+                    json_dict["Platform"].append("STS-59")
+                    json_dict["Platform"].append("STS-68")
                 # SMAP
                 elif platform in ["SMAP", "SP"]:
                     json_dict["Platform"][i] = "SMAP"
@@ -515,6 +543,17 @@ class URL_Manager():
                 #ASCENDING
                 elif flightdirection in ["A", "ASC", "ASCENDING"]:
                     json_dict["flightdirection"][i] = "ASCENDING"
+        if "lookdirection" in json_dict:
+            for i, lookdirection in enumerate(json_dict["lookdirection"]):
+                if lookdirection == None:
+                    continue
+                lookdirection = lookdirection.upper()
+                #LEFT
+                if lookdirection in ["L", "LEFT"]:
+                    json_dict["lookdirection"][i] = "LEFT"
+                #RIGHT
+                elif lookdirection in ["R", "RIGHT"]:
+                    json_dict["lookdirection"][i] = "RIGHT"
         if "polarization" in json_dict:
             for i, polarization in enumerate(json_dict["polarization"]):
                 if polarization == None:
