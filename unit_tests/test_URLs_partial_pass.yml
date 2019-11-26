@@ -214,30 +214,30 @@ url tests:
     expected code: 200
 
 - groupid JERS blank not in CMR:
-    groupid: J1_36436_STD_F278
+    groupid: J1_36439_STD_F268
     output: json
 
     expected file: blank json
     expected code: 200
 
 - groupid Seasat blank not in CMR:
-    groupid: SS_01502_STD_F2536
+    groupid: SS_01502_STD
     output: json
 
     expected file: blank json
     expected code: 200
 
 - output test:
-    platform: UAVSAR
-    relativeOrbit: 05905-05906
+    platform: S1
+    relativeOrbit: 85-90
     output: TEST
 
     expected file: metalink
     expected code: 200
 
 - output csc:
-    platform: UAVSAR
-    relativeOrbit: 05905-05906
+    platform: S1
+    relativeOrbit: 85-90
     maxResults: 1
     output: CSC
 
