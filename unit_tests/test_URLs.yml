@@ -90,9 +90,8 @@ url tests:
     expected file: csv
     expected code: 200
 
-- asfframe R1 list range:
-    asfframe: 340,345-347
-    platform: R1
+- asfframe list range:
+    asfframe: 300-345,2120
     maxresults: 10
     output: csv
 
@@ -292,7 +291,7 @@ url tests:
     expected code: 200
 
 - collectionName Big Island 100:
-    collectionName: Big+Island,+HI
+    collectionName: Big+Island,+HI  Permafrost+Sites,+AK
     maxresults: 100
     output: json
 
@@ -301,6 +300,14 @@ url tests:
 
 - collectionName Cascade 100:
     collectionName: Cascade%20Volcanoes,%20CA/OR/WA
+    maxresults: 100
+    output: json
+
+    expected file: json
+    expected code: 200
+
+- collectionName Permafrost Sites Only in Test:
+    collectionName: Permafrost+Sites,+AK
     maxresults: 100
     output: json
 
@@ -400,8 +407,8 @@ url tests:
     expected file: json
     expected code: 200
 
-- flightLine Gilmore Creek:
-    flightLine: gilmorecreek045-1.93044
+- flightLine Bonanza Creek:
+    flightLine: bonanzacreek359-1.04061
     maxresults: 10
     output: json
 
@@ -968,7 +975,7 @@ url tests:
 
 - platform J1:
     platform: J1
-    polygon: -148.52,64.63,-150.41,64.64,-149.58,63.86,-148.52,64.63
+    polygon: -141.7461,64.8261,-140.3172,63.5722,-137.8891,64.7214,-141.7461,64.8261
     maxResults: 100
     output: csv
 
@@ -2023,11 +2030,11 @@ url tests:
 
 - product_list multi:
     product_list: 
-        - S1B_EW_OCN__2SSH_20190808T030727_20190808T030837_017488_020E3B_D440-OCN
-        - ts1902-PTIF
-        - UA_SDelta_15502_17117_010_171026_L090_CX_01-PAULI
-        - SP_15079_D_005-L1A_Radar_RO_QA
-        - R1_68669_20081230_092353-L0
+        - S1B_S6_GRDH_1SDV_20190911T214309_20190911T214338_017995_021E10_5CCB-GRD_HD
+        - ALPSRP279070820-RTC_HI_RES
+        - J1_36272_STD_F249-L1
+        - E1_08261_STD_F273-L0
+        - ts1899
     output: json
 
     expected file: json
@@ -2074,9 +2081,9 @@ url tests:
     expected file: csv
     expected code: 200
 
-- relativeOrbit list R1:
+- relativeOrbit list S1:
     relativeOrbit: 20,23,25
-    platform: R1
+    platform: S1
     maxResults: 10
     output: csv
 
@@ -2125,9 +2132,9 @@ url tests:
     expected file: csv
     expected code: 200
 
-- season 1-175 UAVSAR:
+- season 1-175 AIRSAR:
     season: 1,175
-    platform: UA
+    platform: AS
     maxResults: 1000
     output: csv
 
@@ -2189,9 +2196,9 @@ url tests:
     expected file: csv
     expected code: 200
 
-- season 1-175 UAVSAR July 2015-now:
+- season 1-175 SMAP July 2015-now:
     season: 1,175
-    platform: Ua
+    platform: SP
     start: 2015-July-15
     end: now
     maxResults: 1000
@@ -2222,9 +2229,9 @@ url tests:
     expected file: csv
     expected code: 200
 
-- season 1-175 UAVSAR 3year:
+- season 1-175 SMAP 3year:
     season: 1,175
-    platform: UA
+    platform: SP
     start: 3+year+ago
     end: now
     maxResults: 1000

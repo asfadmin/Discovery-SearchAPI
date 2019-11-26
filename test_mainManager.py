@@ -576,6 +576,9 @@ class URL_Manager():
                 # Cascade Volcanoes, CA/OR/WA
                 elif collectionname in ["Cascade Volcanoes", " CA/OR/WA"]:
                     json_dict["collectionname"][i] = "Cascade Volcanoes, CA/OR/WA"
+                # Permafrost Sites, AK
+                elif collectionname in ["Permafrost Sites", "AK"]:
+                    json_dict["collectionname"][i] = "Permafrost Sites, AK"
         if "beammode" in json_dict:
             for i, beammode in enumerate(json_dict["beammode"]):
                 if beammode == None:
