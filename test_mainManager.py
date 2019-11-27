@@ -678,16 +678,15 @@ class URL_Manager():
 ################################
 class BULK_DOWNLOAD_SCRIPT_Manager():
     def __init__(self, test_info, bulk_download_path):
+        self.cwd = os.path.dirname(os.path.abspath(__file__))
         self.test_info = self.applyDefaultValues(test_info)
+        print()
+        print(self.test_info["args"])
+        print()
         self.bulk_download_path = bulk_download_path
         self.cred_path = "unit_tests/creds_earthdata.yml"
-        self.cwd = os.path.dirname(os.path.abspath(__file__))
 
         cookie_jar_path = os.path.join( os.path.expanduser('~'), ".bulk_download_cookiejar.txt")
-
-        # Take out any cookies, make things consistant:
-        if os.path.isfile(cookie_jar_path):
-            os.remove(cookie_jar_path)
 
         if test_info["print"]:
             print("\n Test: {0}".format(test_info["title"]))
@@ -695,28 +694,45 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
         for version in self.test_info["python_version"]:
             if test_info["print"]:
                 print()
+
+            # Take out any cookies, make things consistant:
+            if os.path.isfile(cookie_jar_path):
+                os.remove(cookie_jar_path)
+
             cmd = "python{0} {1} {2}".format(str(version), self.bulk_download_path, self.test_info["args"])
             if test_info["print"]:
                 print("    cmd: {0}".format(cmd))
             bulk_process = pexpect.spawn(cmd, encoding='utf-8', timeout=10, cwd=self.cwd)
             self.run_process_tests(bulk_process)
-            if test_info["print"]:
-                print()
 
 
     def applyDefaultValues(self, test_info):
+        def turnValueIntoList(key, test_info, default=[]):
+            # if it doesn't even exist, make it the default:
+            if key not in test_info:
+                test_info[key] = default
+            # if it's just one val, turn into a list of that val:
+            elif not isinstance(test_info[key], type([])):
+                test_info[key] = [ test_info[key] ]
+            return test_info
+
         # args:
         if "args" not in test_info:
             test_info["args"] = ""
-        # python_version:
-        if "python_version" not in test_info:
-            test_info["python_version"] = [2, 3]
-        elif not isinstance(test_info["python_version"], type([])):
-            test_info["python_version"] = [ test_info["python_version"] ]
+        else:
+            args = test_info["args"].split(" ")
+            for i, arg in enumerate(args):
+                if arg.endswith('.metalink') or arg.endswith('.csv'):
+                    args[i] = os.path.join(self.cwd, "unit_tests", "Resources", "bulk_download_input", arg)
+                    print(args[i])
+            test_info["args"] = " ".join(args)
+        # expect_in_output:
+        test_info = turnValueIntoList("expect_in_output", test_info)
         # print:
         if "print" not in test_info:
             test_info["print"] = False if "expected_outcome" in test_info else True
-
+        # python_version:
+        test_info = turnValueIntoList("python_version", test_info, default=[2, 3])
         return test_info
 
 
@@ -725,12 +741,35 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
     def run_process_tests(self, bulk_process):
         username, password = self.get_test_creds()
         
-        # if self.test_info["print"]:
-        #     bulk_process.logfile = sys.stdout
+        if self.test_info["print"]:
+            bulk_process.logfile = sys.stdout
 
-        # cookie_exists = (int) which element was hit in list:
-        cookie_exists = bulk_process.expect([r"No existing URS cookie found, please enter Earthdata username & password:", \
-                                             r"Re-using previous cookie jar."])
+        finished_parsing_commands = False
+        file_not_found_hit = False
+        unknown_arg_hit = False
+        while not finished_parsing_commands:
+            # script_output = (int) which element was hit in list:
+            script_output = bulk_process.expect([r"No existing URS cookie found, please enter Earthdata username & password:", \
+                                                 r"Re-using previous cookie jar.", \
+                                                 r"I cannot find the input file you specified", \
+                                                 r"Command line argument .* makes no sense, ignoring\."])
+            # These could get hit if you pass args to the script, before it finds the cookie:
+            if script_output in [0, 1]:
+                cookie_exists = script_output
+                finished_parsing_commands = True
+            elif script_output == 2:
+                assert "file_not_found" in self.test_info["expect_in_output"], "Cannot find specified file. Add 'file_not_found' to expect_in_output to pass this check. Test: {0}.".format(self.test_info["title"])
+                file_not_found_hit = True
+            elif script_output == 3:
+                assert "unknown_arg" in self.test_info["expect_in_output"], "Argument(s) make no sense. Add 'unknown_arg' to expect_in_output to pass this check. Test: {0}.".format(self.test_info["title"])
+                unknown_arg_hit = True
+        # If you state it in expect_in_output, make sure it actually got hit:
+        if "file_not_found" in self.test_info["expect_in_output"]:
+            assert file_not_found_hit, "'file_not_found' declared in 'expect_in_output', but all the files were found... Test: {0}.".format(self.test_info["title"])
+        if "unknown_arg" in self.test_info["expect_in_output"]:
+            assert unknown_arg_hit, "'unknown_arg' declared in 'expect_in_output', but all the files were found... Test: {0}.".format(self.test_info["title"])
+
+
         # No cookie found:
         if cookie_exists == 0:
             bulk_process.expect(r"Username:")
@@ -740,7 +779,7 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
 
             # creds_success = (int) which element was hit in list:
             creds_success = bulk_process.expect([r"Username and Password combo was not successful\. Please try again\.", \
-                                                 r"New users: you must first log into Vertex and accept the EULA\.", \
+                                                 r"New users: you must first log into Vertex and accept the EULA\. In addition, your Study Area must be set", \
                                                  r"attempting to download https:\/\/urs\.earthdata\.nasa\.gov\/profile"])
             if creds_success == 0:
                 if self.test_info["print"]:
@@ -754,13 +793,18 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
                 if self.test_info["print"]:
                     print("RESULT: Eula for {0} not checked.".format(self.test_info['account']))
                 if "expected_outcome" in self.test_info:
-                    bad_eula_error_msg = "Bad Eula's checked. EarthData Account: {0}. Test: {1}.".format(self.test_info["account"], self.test_info["title"])
-                    assert self.test_info["expected_outcome"] == "bad_eula", bad_eula_error_msg
+                    # Note: Same header gets returned for both of these. No way to tell them apart atm
+                    error_msg = "Cannot download data: Study area / Eula isn't set in profile. EarthData Account: {0}. Test: {1}.".format(self.test_info["account"], self.test_info["title"])
+                    assert self.test_info["expected_outcome"] in ["bad_eula", "bad_study_area"], error_msg
                 # No way to download data, no point on continuing:
+                bulk_process.expect(pexpect.EOF)
                 return
-        # Cookie found, but not valid:
-        elif cookie_exists == 1:
-            bulk_process.expect(r"Download Summary")
+        # From here on, you have a cookie:
+        # elif cookie_exists == 1:
+        if self.test_info["print"]:
+            print("RESULT: Able to download data!!")
+        bulk_process.expect(r"Download Summary")
+        bulk_process.expect(pexpect.EOF)
         # Valid cookie, check download here:
 
 
