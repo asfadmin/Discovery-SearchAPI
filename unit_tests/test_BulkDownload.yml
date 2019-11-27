@@ -1,23 +1,49 @@
 tests:
-- test full access account:
+- full access account:
     account: FullAccess
     python_version: [2,3] # <- Default
     args: ""  # <- Default
     expected_outcome: success
     # print: True
 
-- test bad user pass:
+- bad user pass:
     account: DoesntExist
     python_version: 3
     expected_outcome: bad_creds
     # print: True
 
-- test minimal eulas checked account:
+- minimal eulas checked account:
     account: MinimalEulas
     python_version: 3
     expected_outcome: bad_eula
     # print: True
 
+- asf eulas checked, but not earthdatas:
+    account: OnlyEulaASF
+    python_version: 3
+    expected_outcome: success # for now? Check again w/ input tests...
+    # print: True
+
+- no study area account:
+    account: NoStudyArea
+    python_version: 3
+    expected_outcome: bad_study_area
+    # print: True
+
+- incorrect file input doesn't stop download:
+    account: FullAccess
+    args: "PleaseDontAddAFileWithThisName.csv"
+    # Things that might go wrong, but not fatal:
+    expect_in_output: file_not_found
+    # The very-end goal of the test:
+    expected_outcome: success
+
+
+- input metalink file:
+    account: FullAccess
+    # python_version: 3
+    args: "SE_Alaska_1.metalink"
+    # print: True
 
 # # - test no eula account:
 # #     account: MinimalEulas
