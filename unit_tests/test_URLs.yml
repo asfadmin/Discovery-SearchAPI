@@ -291,7 +291,7 @@ url tests:
     expected code: 200
 
 - collectionName Big Island 100:
-    collectionName: Big+Island,+HI  Permafrost+Sites,+AK
+    collectionName: Big+Island,+HI
     maxresults: 100
     output: json
 
