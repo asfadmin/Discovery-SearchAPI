@@ -2,7 +2,7 @@
 api: Test
 
 
-tests:
+url tests:
 - beamMode test blank:
     beamMode: TEST
     output: csv

@@ -2,7 +2,7 @@
 api: Test
 
 
-tests:
+url tests:
 - invalid query:
     output: csv
     maxresults: 10
