@@ -263,6 +263,8 @@ class URL_Manager():
     def runAssertTests(self, test_dict, status_code, content_type, file_content):
         if "expected code" in test_dict:
             assert test_dict["expected code"] == status_code, "Status codes is different than expected. Test: {0}. URL: {1}.".format(test_dict["title"], self.query)
+        if "maxResults" in test_dict:
+            assert test_dict["maxResults"] >= file_content["count"], "API returned too many results. Test: {0}. URL: {1}.".format(test_dict["title"], self.query)
         if "expected file" in test_dict:
             assert test_dict["expected file"] == content_type, "Different file type returned than expected. Test: {0}. URL: {1}.".format(test_dict["title"], self.query)
             # If you expect it to be a ligit file, and 'file_content' was converted from str to dict:
@@ -620,12 +622,15 @@ class URL_Manager():
             file_content = {}
             for column in rotated_content:
                 file_content[column[0]] = column[1:]
+            file_content["count"] = len(file_content["Platform"])
             return file_content
 
         def jsonToDict(json_data):
             # Combine all matching key-value pairs, to-> key: [list of vals]
             file_content = {}
+            count = 0
             for result in json_data:
+                count += 1
                 for key,val in result.items():
                     # Break apart nested lists if needed, (alows to forloop val):
                     val = [val] if not isinstance(val, type([])) else val
@@ -636,6 +641,7 @@ class URL_Manager():
                         file_content[key] = []
                         for inner_val in val:
                             file_content[key].append(inner_val)
+            file_content["count"] = count
             return file_content
 
         h = requests.head(self.query)
