@@ -6,7 +6,7 @@ from CMR.Translate import parse_cmr_response
 from CMR.Exceptions import CMRError
 from Analytics import analytics_events
 from asf_env import get_config
-from time import time, sleep
+from time import time, sleep, perf_counter
 
 class CMRSubQuery:
 
@@ -100,7 +100,17 @@ class CMRSubQuery:
         cfg = get_config()
         max_retry = 3
         for attempt in range(max_retry): # Sometimes CMR is on the fritz, retry for a bit
+            q_start = perf_counter()
             r = s.post(cfg['cmr_base'] + cfg['cmr_api'], data=self.params)
+            q_duration = perf_counter() - q_start
+            logging.debug('CMR query time: {0}'.format(q_duration))
+            if(q_duration > 5):
+                logging.error('Slow CMR response: {0} seconds'.format(q_duration))
+                logging.error('Params sent to CMR:')
+                logging.error(self.params)
+                logging.error('Headers sent to CMR:')
+                logging.error(s.headers)
+                logging.error('Response code: {0}'.format(r.status_code))
             if self.analytics:
                 analytics_events(events=[{'ec': 'CMR API Status', 'ea': r.status_code}])
             if r.status_code != 200:
