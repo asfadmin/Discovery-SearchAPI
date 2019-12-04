@@ -7,6 +7,7 @@ import pexpect
 
 from copy import deepcopy
 from io import StringIO
+from datetime import datetime
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import conftest as helpers
@@ -313,6 +314,11 @@ class URL_Manager():
                             number_type = type(url_dict["max"+key])
                             assert number_type(value) <= url_dict["max"+key], "TESTING"
 
+                def checkDate(key, url_dict, file_dict):
+                    if key in url_dict and key in file_dict:
+                        for date in file_dict[key]:
+                            assert datetime(file_dict[key]) >= datetime(url_dict)
+
 
                 checkFileContainsExpected("Platform", test_dict, file_content)
                 checkFileContainsExpected("absoluteOrbit", test_dict, file_content)
@@ -328,6 +334,8 @@ class URL_Manager():
                 checkFileContainsExpected("processinglevel", test_dict, file_content)
                 checkFileContainsExpected("flightline", test_dict, file_content)
                 checkFileContainsExpected("lookdirection", test_dict, file_content)
+
+                checkDate("processingdate", test_dict, file_content)
 
                 checkMinMax("baselineperp", test_dict, file_content)
                 checkMinMax("doppler", test_dict, file_content)
@@ -385,6 +393,9 @@ class URL_Manager():
                 elif key.lower() == "lookdirection":
                     del mutatable_dict[key]
                     mutatable_dict["lookdirection"] = test_input.parse_string_list(val)
+                elif key.lower() == "processingdate":
+                    del mutatable_dict[key]
+                    mutatable_dict["processingdate"] = test_input.parse_date(val)
                 # MIN/MAX variants
                 # min/max BaselinePerp
                 elif key.lower()[3:] == "baselineperp":
@@ -474,6 +485,10 @@ class URL_Manager():
         ### lookDirection:
         if "lookDirection" in json_dict:
             json_dict["lookdirection"] = json_dict.pop("lookDirection")
+        ### processingDate:
+        for key in ["Processing Date", "processingDate"]:
+            if key in json_dict:
+                json_dict["processingdate"] = json_dict.pop(key)
         return json_dict
 
 
