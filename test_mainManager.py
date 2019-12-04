@@ -1,4 +1,4 @@
-import os, sys, re, glob
+import os, sys, re, glob, operator
 import pytest, warnings
 import requests, urllib
 import geomet, shapely
@@ -315,10 +315,31 @@ class URL_Manager():
                             number_type = type(url_dict["max"+key])
                             assert number_type(value) <= url_dict["max"+key], "TESTING"
 
-                def checkDate(key, url_dict, file_dict):
+                def checkDate(key, url_dict, file_dict, larger="url"):
+                    if larger == "url":
+                        less_than_file = False
+                    elif larger == "file":
+                        less_than_file = True
+                    else:
+                        assert False, "You must pass either 'url' or 'file' to say which is larger"
                     if key in url_dict and key in file_dict:
-                        for date in file_dict[key]:
-                            assert datetime(file_dict[key]) >= datetime(url_dict)
+                        for file_date in file_dict[key]:
+                            file_date = file_date.split(".")[0]
+                            file_date = file_date if file_date[-1:] == "Z" else file_date + "Z"
+                            file_date = datetime.strptime(file_date, "%Y-%m-%dT%H:%M:%SZ")
+                            
+
+                            url_date = url_dict[key]
+                            url_date = url_date.split(".")[0]
+
+                            url_date = url_date if url_date[-1:] == "Z" else url_date + "Z"
+                            url_date = datetime.strptime(url_date, "%Y-%m-%dT%H:%M:%SZ")
+                            if less_than_file:
+                                comp = operator.lt
+                            else:
+                                comp = operator.gt
+                            assert comp(url_date, file_date), "Key: {0} is {1} than expected. Test: {2}.".format(key, "larger" if less_than_file else "smaller", url_dict["title"])
+                            # assert datetime(date) >= datetime(url_dict)
 
 
                 checkFileContainsExpected("Platform", test_dict, file_content)
@@ -336,7 +357,7 @@ class URL_Manager():
                 checkFileContainsExpected("flightline", test_dict, file_content)
                 checkFileContainsExpected("lookdirection", test_dict, file_content)
 
-                checkDate("processingdate", test_dict, file_content)
+                checkDate("processingdate", test_dict, file_content, larger="file")
 
                 checkMinMax("baselineperp", test_dict, file_content)
                 checkMinMax("doppler", test_dict, file_content)
