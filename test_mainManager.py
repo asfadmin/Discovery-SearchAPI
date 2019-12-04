@@ -1,4 +1,4 @@
-import os, sys, re
+import os, sys, re, glob
 import pytest, warnings
 import requests, urllib
 import geomet, shapely
@@ -7,6 +7,7 @@ import pexpect
 
 from copy import deepcopy
 from io import StringIO
+from shutil import copyfile
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import conftest as helpers
@@ -677,15 +678,14 @@ class URL_Manager():
 ## BULK DOWNLOAD SCRIPT TESTS ##
 ################################
 class BULK_DOWNLOAD_SCRIPT_Manager():
-    def __init__(self, test_info, bulk_download_path):
-        self.cwd = os.path.dirname(os.path.abspath(__file__))
+    def __init__(self, test_info):
+        self.root_dir = os.path.dirname(os.path.abspath(__file__))
+        self.output_dir = os.path.join(self.root_dir, "unit_tests", "Resources", "bulk_download_output")
+        # also populates self.bulk_download_code:
         self.test_info = self.applyDefaultValues(test_info)
-        print()
-        print(self.test_info["args"])
-        print()
-        self.bulk_download_path = bulk_download_path
-        self.cred_path = "unit_tests/creds_earthdata.yml"
+        bulk_download_path = self.getBulkDownloadFromAPI(test_info)
 
+        self.cred_path = os.path.join(self.root_dir, "unit_tests", "creds_earthdata.yml")
         cookie_jar_path = os.path.join( os.path.expanduser('~'), ".bulk_download_cookiejar.txt")
 
         if test_info["print"]:
@@ -695,15 +695,19 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
             if test_info["print"]:
                 print()
 
-            # Take out any cookies, make things consistant:
+            # Take out any files from last test, make things consistant:
             if os.path.isfile(cookie_jar_path):
                 os.remove(cookie_jar_path)
+            for file in os.listdir(self.output_dir):
+                file = os.path.join(self.output_dir, file)
+                os.remove(file)
 
-            cmd = "python{0} {1} {2}".format(str(version), self.bulk_download_path, self.test_info["args"])
+            cmd = "python{0} {1} {2}".format(str(version), bulk_download_path, self.test_info["args"])
             if test_info["print"]:
                 print("    cmd: {0}".format(cmd))
-            bulk_process = pexpect.spawn(cmd, encoding='utf-8', timeout=10, cwd=self.cwd)
+            bulk_process = pexpect.spawn(cmd, encoding='utf-8', timeout=test_info["timeout"], cwd=self.output_dir)
             self.run_process_tests(bulk_process)
+        os.remove(bulk_download_path)
 
 
     def applyDefaultValues(self, test_info):
@@ -723,19 +727,41 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
             args = test_info["args"].split(" ")
             for i, arg in enumerate(args):
                 if arg.endswith('.metalink') or arg.endswith('.csv'):
-                    args[i] = os.path.join(self.cwd, "unit_tests", "Resources", "bulk_download_input", arg)
+                    args[i] = os.path.join(self.root_dir, "unit_tests", "Resources", "bulk_download_input", arg)
                     print(args[i])
             test_info["args"] = " ".join(args)
         # expect_in_output:
         test_info = turnValueIntoList("expect_in_output", test_info)
+        # expected_files:
+        expected_files = turnValueIntoList("expected_files", test_info)
         # print:
         if "print" not in test_info:
             test_info["print"] = False if "expected_outcome" in test_info else True
+        # products:
+        test_info = turnValueIntoList("products", test_info)
         # python_version:
         test_info = turnValueIntoList("python_version", test_info, default=[2, 3])
+        # timeout:
+        if "timeout" not in test_info:
+            test_info["timeout"] = 10
+        elif test_info["timeout"] == "None": # elif they passed the string "None" instead of Null in yml
+            test_info["timeout"] = None
         return test_info
 
+    def getBulkDownloadFromAPI(self, test_info):
+        url = test_info['api'] + "?filename=Testing"
+        if len(test_info["products"]) > 0:
+            url += "&products=" + ",".join(test_info["products"])
+        try:
+            r = requests.get(url)
+        except (requests.ConnectionError, requests.Timeout, requests.TooManyRedirects) as e:
+            assert False, "Cannot connect to API: {0}. Error: {1}.".format(url, str(e))
+        self.bulk_download_code = r.content.decode("utf-8")   
+        tmp_bulk_download_path = os.path.join(self.root_dir, "TEST_bulk_download.py")
+        with open(tmp_bulk_download_path, "w+") as f:
+            f.write(self.bulk_download_code)
 
+        return tmp_bulk_download_path
 
 
     def run_process_tests(self, bulk_process):
@@ -743,6 +769,10 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
         
         if self.test_info["print"]:
             bulk_process.logfile = sys.stdout
+
+        if len(self.test_info["products"]) > 0:
+            for product in self.test_info["products"]:
+                assert product in self.bulk_download_code, "Product {0} was not found inside bulk download script. Test: {1}.".format(product, self.test_info["title"])
 
         finished_parsing_commands = False
         file_not_found_hit = False
@@ -805,8 +835,16 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
             print("RESULT: Able to download data!!")
         bulk_process.expect(r"Download Summary")
         bulk_process.expect(pexpect.EOF)
-        # Valid cookie, check download here:
 
+        # Script complete, check your downloads:
+
+        # get all files from the output dir:
+        downloaded_files = os.path.join(self.output_dir, "*")
+        downloaded_files = glob.glob(downloaded_files)
+        downloaded_files = [os.path.basename(file) for file in downloaded_files]
+
+        for file in self.test_info["expected_files"]:
+            assert file in downloaded_files, "Product: {0} Not found in downloaded files dir. Test: {1}.".format(file,self.test_info["title"])
 
 
     def get_test_creds(self):
@@ -833,6 +871,7 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
         return username, password
 
 
+
 ################
 ## START MAIN ##
 ################
@@ -851,10 +890,6 @@ tests_root = os.path.join(project_root, "**", "test_*.yaml")
 list_of_tests.extend(helpers.loadTestsFromDirectory(tests_root, recurse=True))
 
 
-## Stop every bulk_download test from re-requesting the *same* bulk download file fo every test.
-# Set key=val as: api_url=script_path for first call, then reuse it:
-bulk_download_storage = {}
-
 @pytest.mark.parametrize("test_dict", list_of_tests)
 def test_MainManager(test_dict, cli_args):
     test_info = test_dict[0]
@@ -872,22 +907,4 @@ def test_MainManager(test_dict, cli_args):
         test_info['api'] = test_info['api'] + "services/search/param?"
         URL_Manager(test_info)
     elif test_info['type'] == 'BULK_DOWNLOAD':
-        # If you already got the script once, don't do it again:
-        if test_info['api'] in bulk_download_storage:
-            bulk_download_path = bulk_download_storage[test_info['api']]
-        else:
-            try:
-                url = test_info['api'] + "?filename=Testing"
-                r = requests.get(url)
-            except (requests.ConnectionError, requests.Timeout, requests.TooManyRedirects) as e:
-                assert False, "Cannot connect to API: {0}. Error: {1}.".format(url, str(e))
-            bulk_download_code = r.content.decode("utf-8")
-            # file_name = base_url + ".py" (ie: 127.0.0.1.py)
-            bulk_download_path = urllib.parse.urlsplit(test_info['api']).netloc + ".py"
-            with open(bulk_download_path, "w+") as f:
-                f.write(bulk_download_code)
-
-            # Store it for next time around
-            bulk_download_storage[test_info['api']] = bulk_download_path
-
-        BULK_DOWNLOAD_SCRIPT_Manager(test_info, bulk_download_path)
+        BULK_DOWNLOAD_SCRIPT_Manager(test_info)
