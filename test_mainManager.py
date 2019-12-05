@@ -278,16 +278,16 @@ class URL_Manager():
                 file_content = self.renameValsToStandard(file_content)
                 # print(json.dumps(test_dict, indent=4, default=str))
                 # IF used in url, IF contained in file's content, check if they match
-                def checkFileContainsExpected(key, url_dict, file_dict):
-                    # print(url_dict)
+                def checkFileContainsExpected(key, test_dict, file_dict):
+                    # print(test_dict)
                     # print("CHECKING FILE HERE")
                     # print(file_dict)
                     # print(json.dumps(file_dict, indent=4, default=str))
-                    if key in url_dict and key in file_dict:
+                    if key in test_dict and key in file_dict:
                         found_in_list = False
                         for found_param in file_dict[key]:
                             # poss_list is either single "i", or range "[i,j]":
-                            for poss_list in url_dict[key]:
+                            for poss_list in test_dict[key]:
                                 # If it's a list, then it is a range of numbers:
                                 if isinstance(poss_list, type([])):
                                     expect_type = type(poss_list[0])
@@ -306,41 +306,39 @@ class URL_Manager():
                                 break
                         assert found_in_list, key + " declared, but not found in file. Test: {0}".format(test_dict["title"])
                 
-                def checkMinMax(key, url_dict, file_dict):
-                    if "min"+key in url_dict and key in file_dict:
+                def checkMinMax(key, test_dict, file_dict):
+                    if "min"+key in test_dict and key in file_dict:
                         for value in file_dict[key]:
-                            number_type = type(url_dict["min"+key])
-                            assert number_type(value) >= url_dict["min"+key], "TESTING"
-                    if "max"+key in url_dict and key in file_dict:
+                            number_type = type(test_dict["min"+key])
+                            assert number_type(value) >= test_dict["min"+key], "TESTING"
+                    if "max"+key in test_dict and key in file_dict:
                         for value in file_dict[key]:
-                            number_type = type(url_dict["max"+key])
-                            assert number_type(value) <= url_dict["max"+key], "TESTING"
+                            number_type = type(test_dict["max"+key])
+                            assert number_type(value) <= test_dict["max"+key], "TESTING"
 
-                def checkDate(key, url_dict, file_dict, larger="url"):
-                    if larger == "url":
-                        less_than_file = False
-                    elif larger == "file":
-                        less_than_file = True
-                    else:
-                        assert False, "You must pass either 'url' or 'file' to say which is larger"
-                    if key in url_dict and key in file_dict:
-                        for file_date in file_dict[key]:
-                            file_date = file_date.split(".")[0]
-                            file_date = file_date if file_date[-1:] == "Z" else file_date + "Z"
-                            file_date = datetime.strptime(file_date, "%Y-%m-%dT%H:%M:%SZ")
-                            
 
-                            url_date = url_dict[key]
-                            url_date = url_date.split(".")[0]
+                def checkDate(title, larger=None, smaller=None):
+                    def runAssertTest(larger, smaller):
+                        # Make them both into "year-month-day T hour:min:sec" formats, and
+                        #     remove anything after the sec:
+                        def makeDate(theDate):
+                            theDate = theDate.split(".")[0] # take of any milliseconds. Normally sec.000000
+                            theDate = theDate[:-1] if theDate.endswith("Z") else theDate # take off the 'Z' if it's on the end
+                            theDate = theDate[:-3] if theDate.endswith("UTC") else theDate # take off the 'UTC' if it's on the end
+                            theDate = datetime.strptime(theDate, "%Y-%m-%dT%H:%M:%S")
+                            return theDate
+                        return makeDate(larger) >= makeDate(smaller)
 
-                            url_date = url_date if url_date[-1:] == "Z" else url_date + "Z"
-                            url_date = datetime.strptime(url_date, "%Y-%m-%dT%H:%M:%SZ")
-                            if less_than_file:
-                                comp = operator.lt
-                            else:
-                                comp = operator.gt
-                            assert comp(url_date, file_date), "Key: {0} is {1} than expected. Test: {2}.".format(key, "larger" if less_than_file else "smaller", url_dict["title"])
-
+                    # Figure out which is the list of dates:
+                    # (assuming whichever is the list, is loaded from downloads. The other is from yml file)
+                    if isinstance(larger, type([])):
+                        for theDate in larger:
+                            assert runAssertTest(theDate, smaller), "File has too small of a date. File: {0}, smaller than test date: {1}. Test: {2}.".format(theDate, smaller, title)
+                    elif isinstance(smaller, type([])):
+                        for theDate in smaller:
+                            assert runAssertTest(larger, theDate), "File has too large of a date. File: {0}, larger than test date: {1}. Test: {2}.".format(larger, theDate, title)
+                    else: # Else they both are a single date. Not sure if this is needed, but...
+                        runAssertTest(larger, smaller), "Date: {0} is smaller than date {1}. Test: {2}".format(larger, smaller, title)
 
                 checkFileContainsExpected("Platform", test_dict, file_content)
                 checkFileContainsExpected("absoluteOrbit", test_dict, file_content)
@@ -357,9 +355,13 @@ class URL_Manager():
                 checkFileContainsExpected("flightline", test_dict, file_content)
                 checkFileContainsExpected("lookdirection", test_dict, file_content)
 
-                checkDate("processingdate", test_dict, file_content, larger="file")
-                checkDate("start", test_dict, file_content, larger="file")
-                checkDate("end", test_dict, file_content, larger="url")
+
+                if "processingdate" in file_content and "processingdate" in test_dict:
+                    checkDate(test_dict["title"], larger=file_content["processingdate"], smaller=test_dict["processingdate"])
+                if "starttime" in file_content and "start" in test_dict:
+                    checkDate(test_dict["title"], larger=file_content["starttime"], smaller=test_dict["start"])
+                if "starttime" in file_content and "end" in test_dict:
+                    checkDate(test_dict["title"], larger=test_dict["end"], smaller=file_content["starttime"])
 
                 checkMinMax("baselineperp", test_dict, file_content)
                 checkMinMax("doppler", test_dict, file_content)
@@ -519,19 +521,10 @@ class URL_Manager():
         for key in ["Processing Date", "processingDate"]:
             if key in json_dict:
                 json_dict["processingdate"] = json_dict.pop(key)
-        ### start
+        ### start & end
         for key in ["Start Time", "startTime"]:
             if key in json_dict:
-                json_dict["start"] = json_dict.pop(key)
-        # start & end - WIP!!!!!!
-        for key in ["Start Time", "startTime"]:
-            print(11111111111111111111111111111111)
-            if url_dict(key) == "start":
-                print(222222222222222222222222222)
-                json_dict["start"] = json_dict.pop(key)
-            elif url_dict(key) == "end":
-                print(3333333333333333333333333)
-                json_dict["end"] = json_dict.pop(key)
+                json_dict["starttime"] = json_dict.pop(key)
         return json_dict
 
 
@@ -628,7 +621,7 @@ class URL_Manager():
             for i, collectionname in enumerate(json_dict["collectionname"]):
                 if collectionname == None:
                     continue
-                # Note: in url_dict, string is separated by comma: 'Big Island', ' HI'
+                # Note: in test_dict, string is separated by comma: 'Big Island', ' HI'
                 # Using the below to match the url string to file string
                 # Big Island, HI
                 if collectionname in ["Big Island", " HI"]:
