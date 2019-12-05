@@ -278,9 +278,9 @@ class URL_Manager():
                 # print(json.dumps(test_dict, indent=4, default=str))
                 # IF used in url, IF contained in file's content, check if they match
                 def checkFileContainsExpected(key, url_dict, file_dict):
-                    # print(url_dict)
-                    # print("CHECKING FILE HERE")
-                    # print(file_dict)
+                    print(url_dict)
+                    print("CHECKING FILE HERE")
+                    print(file_dict)
                     # print(json.dumps(file_dict, indent=4, default=str))
                     if key in url_dict and key in file_dict:
                         found_in_list = False
@@ -357,8 +357,14 @@ class URL_Manager():
                 checkFileContainsExpected("lookdirection", test_dict, file_content)
 
                 checkDate("processingdate", test_dict, file_content, larger="file")
-                checkDate("start", test_dict, file_content, larger="file")
-                checkDate("end", test_dict, file_content, larger="url")
+                # if ("start" in test_dict and "start" in file_content) or ("end" in test_dict and "end" in file_content):
+                if "start" in test_dict:
+                    print(111111111111111111111)
+                    checkDate("start", test_dict, file_content, larger="file")
+                if "end" in test_dict:
+                    print(22222222222222222222222222)
+                    checkDate("end", test_dict, file_content, larger="file")
+
 
                 checkMinMax("baselineperp", test_dict, file_content)
                 checkMinMax("doppler", test_dict, file_content)
@@ -518,19 +524,10 @@ class URL_Manager():
         for key in ["Processing Date", "processingDate"]:
             if key in json_dict:
                 json_dict["processingdate"] = json_dict.pop(key)
-        ### start
-        for key in ["Start Time", "startTime"]:
+        ### start & end
+        for key in ["start", "end", "Start Time", "startTime"]:
             if key in json_dict:
-                json_dict["start"] = json_dict.pop(key)
-        # start & end - WIP!!!!!!
-        for key in ["Start Time", "startTime"]:
-            print(11111111111111111111111111111111)
-            if url_dict(key) == "start":
-                print(222222222222222222222222222)
-                json_dict["start"] = json_dict.pop(key)
-            elif url_dict(key) == "end":
-                print(3333333333333333333333333)
-                json_dict["end"] = json_dict.pop(key)
+                json_dict["start/end"] = json_dict.pop(key)
         return json_dict
 
 
