@@ -339,7 +339,6 @@ class URL_Manager():
                             else:
                                 comp = operator.gt
                             assert comp(url_date, file_date), "Key: {0} is {1} than expected. Test: {2}.".format(key, "larger" if less_than_file else "smaller", url_dict["title"])
-                            # assert datetime(date) >= datetime(url_dict)
 
 
                 checkFileContainsExpected("Platform", test_dict, file_content)
@@ -358,6 +357,8 @@ class URL_Manager():
                 checkFileContainsExpected("lookdirection", test_dict, file_content)
 
                 checkDate("processingdate", test_dict, file_content, larger="file")
+                checkDate("start", test_dict, file_content, larger="file")
+                checkDate("end", test_dict, file_content, larger="url")
 
                 checkMinMax("baselineperp", test_dict, file_content)
                 checkMinMax("doppler", test_dict, file_content)
@@ -418,6 +419,12 @@ class URL_Manager():
                 elif key.lower() == "processingdate":
                     del mutatable_dict[key]
                     mutatable_dict["processingdate"] = test_input.parse_date(val)
+                elif key.lower() == "start":
+                    del mutatable_dict[key]
+                    mutatable_dict["start"] = test_input.parse_date(val)
+                elif key.lower() == "end":
+                    del mutatable_dict[key]
+                    mutatable_dict["end"] = test_input.parse_date(val)
                 # MIN/MAX variants
                 # min/max BaselinePerp
                 elif key.lower()[3:] == "baselineperp":
@@ -511,6 +518,19 @@ class URL_Manager():
         for key in ["Processing Date", "processingDate"]:
             if key in json_dict:
                 json_dict["processingdate"] = json_dict.pop(key)
+        ### start
+        for key in ["Start Time", "startTime"]:
+            if key in json_dict:
+                json_dict["start"] = json_dict.pop(key)
+        # start & end - WIP!!!!!!
+        for key in ["Start Time", "startTime"]:
+            print(11111111111111111111111111111111)
+            if url_dict(key) == "start":
+                print(222222222222222222222222222)
+                json_dict["start"] = json_dict.pop(key)
+            elif url_dict(key) == "end":
+                print(3333333333333333333333333)
+                json_dict["end"] = json_dict.pop(key)
         return json_dict
 
 
