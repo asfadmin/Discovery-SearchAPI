@@ -314,6 +314,14 @@ url tests:
     expected file: json
     expected code: 200
 
+- end csv:
+    end: 2010-01-01T00:00:00Z
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
 - end count:
     end: 2005-01-01T00:00:00Z
     output: count
@@ -2235,6 +2243,40 @@ url tests:
     start: 3+year+ago
     end: now
     maxResults: 1000
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- start Zdate:
+    start: 2005-01-01T00:00:00Z
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- start UTC date end:
+    start: 2008-01-01T00:00:00UTC
+    end: 2008-05-01T01:00:00UTC
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- start june302018:
+    start: June+30,+2018
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- start end 1monthago:
+    start: 1+month+ago
+    end: now
+    maxResults: 10
     output: csv
 
     expected file: csv
