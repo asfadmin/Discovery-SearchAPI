@@ -9,6 +9,7 @@ from copy import deepcopy
 from io import StringIO
 from shutil import copyfile
 from datetime import datetime
+import defusedxml.minidom as md
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import conftest as helpers
@@ -778,6 +779,12 @@ class URL_Manager():
 
 
 
+
+
+
+
+
+
 ################################
 ## BULK DOWNLOAD SCRIPT TESTS ##
 ################################
@@ -798,6 +805,9 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
         for version in self.test_info["python_version"]:
             if test_info["print"]:
                 print()
+
+            # HERE: something like if "setup_account: FullAccess", or "setup_download: blah", do things
+            # in one script, and call it again to test multiple uses...
 
             # Take out any files from last test, make things consistant:
             if os.path.isfile(cookie_jar_path):
@@ -827,12 +837,14 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
         # args:
         if "args" not in test_info:
             test_info["args"] = ""
+            test_info["files"] = []
         else:
             args = test_info["args"].split(" ")
+            test_info["files"] = []
             for i, arg in enumerate(args):
                 if arg.endswith('.metalink') or arg.endswith('.csv'):
                     args[i] = os.path.join(self.root_dir, "unit_tests", "Resources", "bulk_download_input", arg)
-                    print(args[i])
+                    test_info["files"].extend(self.getProductNamesFromFile(args[i]))
             test_info["args"] = " ".join(args)
         # expect_in_output:
         test_info = turnValueIntoList("expect_in_output", test_info)
@@ -843,14 +855,43 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
             test_info["print"] = False if "expected_outcome" in test_info else True
         # products:
         test_info = turnValueIntoList("products", test_info)
+        # each product is in the form: "http://foo.com/bar.txt", JUST get the bar.txt and extend the list:
+        test_info["files"].extend([product.split("/")[-1] for product in test_info["products"]])
         # python_version:
         test_info = turnValueIntoList("python_version", test_info, default=[2, 3])
         # timeout:
         if "timeout" not in test_info:
             test_info["timeout"] = 10
-        elif test_info["timeout"] == "None": # elif they passed the string "None" instead of Null in yml
+        elif isinstance(test_info["timeout"], type("")) and test_info["timeout"].lower() == "none": # elif they passed the string "None" instead of Null in yml
             test_info["timeout"] = None
         return test_info
+
+    def getProductNamesFromFile(self, path):
+        if not os.path.isfile(path):
+            return []
+        if path.endswith('.metalink'):
+            with open(path, "r") as file:
+                xml_str = file.read()
+            try:
+                xml_root = md.parseString(xml_str, forbid_dtd=True)
+            except Exception as e:  
+                return []
+            products = xml_root.getElementsByTagName("file")
+            products = [product.getAttribute("name") for product in products]
+        elif path.endswith('.csv'):
+            with open(path, "r") as file:
+                csv_str = file.read()
+            csv_obj = csv.reader(StringIO(csv_str), delimiter=',')
+            csv_obj = [a for a in csv_obj]
+            csv_obj = list(map(type([]), zip(*csv_obj)))
+            file_content = {}
+            for column in csv_obj:
+                file_content[column[0]] = column[1:]
+            products = file_content["URL"]
+            # turn http://foo.com/bar.txt to bar.txt
+            products = [product.split("/")[-1] for product in products]
+        return products
+
 
     def getBulkDownloadFromAPI(self, test_info):
         url = test_info['api'] + "?filename=Testing"
@@ -933,6 +974,9 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
                 # No way to download data, no point on continuing:
                 bulk_process.expect(pexpect.EOF)
                 return
+            elif creds_success == 2:
+                # You got a cookie, good to go
+                pass
         # From here on, you have a cookie:
         # elif cookie_exists == 1:
         if self.test_info["print"]:
@@ -942,13 +986,15 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
 
         # Script complete, check your downloads:
 
-        # get all files from the output dir:
+        # get all files from the output dir into one list:
         downloaded_files = os.path.join(self.output_dir, "*")
         downloaded_files = glob.glob(downloaded_files)
         downloaded_files = [os.path.basename(file) for file in downloaded_files]
 
-        for file in self.test_info["expected_files"]:
-            assert file in downloaded_files, "Product: {0} Not found in downloaded files dir. Test: {1}.".format(file,self.test_info["title"])
+        for file in self.test_info["files"]:
+            assert file in downloaded_files, "File not found. File: {0}, Test: {1}".format(file, self.test_info["title"])
+        # for file in self.test_info["expected_files"]:
+        #     assert file in downloaded_files, "Product: {0} Not found in downloaded files dir. Test: {1}.".format(file,self.test_info["title"])
 
 
     def get_test_creds(self):
