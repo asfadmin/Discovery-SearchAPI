@@ -421,13 +421,13 @@ class URL_Manager():
                     mutatable_dict["lookdirection"] = test_input.parse_string_list(val)
                 elif key.lower() == "processingdate":
                     del mutatable_dict[key]
-                    mutatable_dict["processingdate"] = test_input.parse_date(val)
+                    mutatable_dict["processingdate"] = test_input.parse_date(val.replace("+", " "))
                 elif key.lower() == "start":
                     del mutatable_dict[key]
-                    mutatable_dict["start"] = test_input.parse_date(val)
+                    mutatable_dict["start"] = test_input.parse_date(val.replace("+", " "))
                 elif key.lower() == "end":
                     del mutatable_dict[key]
-                    mutatable_dict["end"] = test_input.parse_date(val)
+                    mutatable_dict["end"] = test_input.parse_date(val.replace("+", " "))
                 # MIN/MAX variants
                 # min/max BaselinePerp
                 elif key.lower()[3:] == "baselineperp":
