@@ -972,22 +972,30 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
                 pass
         # From here on, you have a cookie:
         # elif cookie_exists == 1:
-        if self.test_info["print"]:
-            print("RESULT: Able to download data!!")
-        bulk_process.expect(r"Download Summary")
-        bulk_process.expect(pexpect.EOF)
+        
+        downloadable = bulk_process.expect([r"IMPORTANT: Your user does not have permission to download this type of data!", \
+                                            r"Download Summary"])
+        if downloadable == 0:
+            if self.test_info["print"]:
+                print("RESULT: Bad permissions to download data!")
+            if "expected_outcome" in self.test_info:
+                assert self.test_info["expected_outcome"] == "bad_download_perms", "Account: {0}, lacks the permissions to download this data. Change 'expected_outcome' to 'bad_download_perms' to pass. Test: {1}.".format(self.test_info["account"], self.test_info["title"])
+        elif downloadable == 1:
+            if self.test_info["print"]:
+                print("RESULT: Able to download data!!")
 
-        # Script complete, check your downloads:
+            # Script complete, check your downloads:
 
-        # get all files from the output dir into one list:
-        downloaded_files = os.path.join(self.output_dir, "*")
-        downloaded_files = glob.glob(downloaded_files)
-        downloaded_files = [os.path.basename(file) for file in downloaded_files]
+            # get all files from the output dir into one list:
+            downloaded_files = os.path.join(self.output_dir, "*")
+            downloaded_files = glob.glob(downloaded_files)
+            downloaded_files = [os.path.basename(file) for file in downloaded_files]
 
-        for file in self.test_info["files"]:
-            assert file in downloaded_files, "File not found. File: {0}, Test: {1}".format(file, self.test_info["title"])
+            for file in self.test_info["files"]:
+                assert file in downloaded_files, "File not found. File: {0}, Test: {1}".format(file, self.test_info["title"])
         # for file in self.test_info["expected_files"]:
         #     assert file in downloaded_files, "Product: {0} Not found in downloaded files dir. Test: {1}.".format(file,self.test_info["title"])
+        bulk_process.expect(pexpect.EOF)
 
 
     def get_test_creds(self):
