@@ -1,4 +1,4 @@
-import os, sys, re, glob, operator
+import os, sys, re, glob
 import pytest, warnings
 import requests, urllib
 import geomet, shapely
@@ -232,18 +232,21 @@ class INPUT_Manager():
         parser = self.test_dict["parser"]
         test_input = self.test_dict["input"]
         try:
+            hit_exception = False
             val = self.parsers[parser](test_input)
         except Exception as e:
+            hit_exception = True
             val = str(e)
 
         if self.should_print:
             print(val)
+            print("hit_exception: " + str(hit_exception))
             print()
 
         if "expected" in self.test_dict:
-            assert self.test_dict["expected"] == val, "CMR INPUT: expected doesn't match output. Test: {0}.".format(self.test_dict["title"])
+            assert (self.test_dict["expected"] == val) and (not hit_exception), "CMR INPUT: expected doesn't match output. Test: {0}.".format(self.test_dict["title"])
         if "expected error" in self.test_dict:
-            assert self.test_dict["expected error"] in val, "CMR INPUT: expected error doesn't match output error. Test: {0}.".format(self.test_dict["title"])
+            assert (self.test_dict["expected error"] in val) and hit_exception, "CMR INPUT: expected error doesn't match output error. Test: {0}.".format(self.test_dict["title"])
 
 
 ###############
@@ -983,6 +986,8 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
         elif downloadable == 1:
             if self.test_info["print"]:
                 print("RESULT: Able to download data!!")
+            if "expected_outcome" in self.test_info:
+                assert self.test_info["expected_outcome"] == "success", "Test was not supposed to pass. Account: {0}. Test: {1}.".format(self.test_info["account"], self.test_info["title"])
 
             # Script complete, check your downloads:
 
