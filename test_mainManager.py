@@ -1,4 +1,4 @@
-import os, sys, re, glob, operator
+import os, sys, re, glob
 import pytest, warnings
 import requests, urllib
 import geomet, shapely
@@ -9,6 +9,7 @@ from copy import deepcopy
 from io import StringIO
 from shutil import copyfile
 from datetime import datetime
+import defusedxml.minidom as md
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import conftest as helpers
@@ -231,18 +232,21 @@ class INPUT_Manager():
         parser = self.test_dict["parser"]
         test_input = self.test_dict["input"]
         try:
+            hit_exception = False
             val = self.parsers[parser](test_input)
         except Exception as e:
+            hit_exception = True
             val = str(e)
 
         if self.should_print:
             print(val)
+            print("hit_exception: " + str(hit_exception))
             print()
 
         if "expected" in self.test_dict:
-            assert self.test_dict["expected"] == val, "CMR INPUT: expected doesn't match output. Test: {0}.".format(self.test_dict["title"])
+            assert (self.test_dict["expected"] == val) and (not hit_exception), "CMR INPUT: expected doesn't match output. Test: {0}.".format(self.test_dict["title"])
         if "expected error" in self.test_dict:
-            assert self.test_dict["expected error"] in val, "CMR INPUT: expected error doesn't match output error. Test: {0}.".format(self.test_dict["title"])
+            assert (self.test_dict["expected error"] in val) and hit_exception, "CMR INPUT: expected error doesn't match output error. Test: {0}.".format(self.test_dict["title"])
 
 
 ###############
@@ -277,16 +281,17 @@ class URL_Manager():
                 file_content = self.renameValsToStandard(file_content)
                 # print(json.dumps(test_dict, indent=4, default=str))
                 # IF used in url, IF contained in file's content, check if they match
-                def checkFileContainsExpected(key, url_dict, file_dict):
-                    print(url_dict)
-                    print("CHECKING FILE HERE")
-                    print(file_dict)
+
+                def checkFileContainsExpected(key, test_dict, file_dict):
+                    # print(test_dict)
+                    # print("CHECKING FILE HERE")
+                    # print(file_dict)
                     # print(json.dumps(file_dict, indent=4, default=str))
-                    if key in url_dict and key in file_dict:
+                    if key in test_dict and key in file_dict:
                         found_in_list = False
                         for found_param in file_dict[key]:
                             # poss_list is either single "i", or range "[i,j]":
-                            for poss_list in url_dict[key]:
+                            for poss_list in test_dict[key]:
                                 # If it's a list, then it is a range of numbers:
                                 if isinstance(poss_list, type([])):
                                     expect_type = type(poss_list[0])
@@ -305,41 +310,39 @@ class URL_Manager():
                                 break
                         assert found_in_list, key + " declared, but not found in file. Test: {0}".format(test_dict["title"])
                 
-                def checkMinMax(key, url_dict, file_dict):
-                    if "min"+key in url_dict and key in file_dict:
+                def checkMinMax(key, test_dict, file_dict):
+                    if "min"+key in test_dict and key in file_dict:
                         for value in file_dict[key]:
-                            number_type = type(url_dict["min"+key])
-                            assert number_type(value) >= url_dict["min"+key], "TESTING"
-                    if "max"+key in url_dict and key in file_dict:
+                            number_type = type(test_dict["min"+key])
+                            assert number_type(value) >= test_dict["min"+key], "TESTING"
+                    if "max"+key in test_dict and key in file_dict:
                         for value in file_dict[key]:
-                            number_type = type(url_dict["max"+key])
-                            assert number_type(value) <= url_dict["max"+key], "TESTING"
+                            number_type = type(test_dict["max"+key])
+                            assert number_type(value) <= test_dict["max"+key], "TESTING"
 
-                def checkDate(key, url_dict, file_dict, larger="url"):
-                    if larger == "url":
-                        less_than_file = False
-                    elif larger == "file":
-                        less_than_file = True
-                    else:
-                        assert False, "You must pass either 'url' or 'file' to say which is larger"
-                    if key in url_dict and key in file_dict:
-                        for file_date in file_dict[key]:
-                            file_date = file_date.split(".")[0]
-                            file_date = file_date if file_date[-1:] == "Z" else file_date + "Z"
-                            file_date = datetime.strptime(file_date, "%Y-%m-%dT%H:%M:%SZ")
-                            
 
-                            url_date = url_dict[key]
-                            url_date = url_date.split(".")[0]
+                def checkDate(title, larger=None, smaller=None):
+                    def runAssertTest(larger, smaller):
+                        # Make them both into "year-month-day T hour:min:sec" formats, and
+                        #     remove anything after the sec:
+                        def makeDate(theDate):
+                            theDate = theDate.split(".")[0] # take of any milliseconds. Normally sec.000000
+                            theDate = theDate[:-1] if theDate.endswith("Z") else theDate # take off the 'Z' if it's on the end
+                            theDate = theDate[:-3] if theDate.endswith("UTC") else theDate # take off the 'UTC' if it's on the end
+                            theDate = datetime.strptime(theDate, "%Y-%m-%dT%H:%M:%S")
+                            return theDate
+                        return makeDate(larger) >= makeDate(smaller)
 
-                            url_date = url_date if url_date[-1:] == "Z" else url_date + "Z"
-                            url_date = datetime.strptime(url_date, "%Y-%m-%dT%H:%M:%SZ")
-                            if less_than_file:
-                                comp = operator.lt
-                            else:
-                                comp = operator.gt
-                            assert comp(url_date, file_date), "Key: {0} is {1} than expected. Test: {2}.".format(key, "larger" if less_than_file else "smaller", url_dict["title"])
-
+                    # Figure out which is the list of dates:
+                    # (assuming whichever is the list, is loaded from downloads. The other is from yml file)
+                    if isinstance(larger, type([])):
+                        for theDate in larger:
+                            assert runAssertTest(theDate, smaller), "File has too small of a date. File: {0}, smaller than test date: {1}. Test: {2}.".format(theDate, smaller, title)
+                    elif isinstance(smaller, type([])):
+                        for theDate in smaller:
+                            assert runAssertTest(larger, theDate), "File has too large of a date. File: {0}, larger than test date: {1}. Test: {2}.".format(larger, theDate, title)
+                    else: # Else they both are a single date. Not sure if this is needed, but...
+                        runAssertTest(larger, smaller), "Date: {0} is smaller than date {1}. Test: {2}".format(larger, smaller, title)
 
                 checkFileContainsExpected("Platform", test_dict, file_content)
                 checkFileContainsExpected("absoluteOrbit", test_dict, file_content)
@@ -356,15 +359,12 @@ class URL_Manager():
                 checkFileContainsExpected("flightline", test_dict, file_content)
                 checkFileContainsExpected("lookdirection", test_dict, file_content)
 
-                checkDate("processingdate", test_dict, file_content, larger="file")
-                # if ("start" in test_dict and "start" in file_content) or ("end" in test_dict and "end" in file_content):
-                if "start" in test_dict:
-                    print(111111111111111111111)
-                    checkDate("start", test_dict, file_content, larger="file")
-                if "end" in test_dict:
-                    print(22222222222222222222222222)
-                    checkDate("end", test_dict, file_content, larger="file")
-
+                if "processingdate" in file_content and "processingdate" in test_dict:
+                    checkDate(test_dict["title"], larger=file_content["processingdate"], smaller=test_dict["processingdate"])
+                if "starttime" in file_content and "start" in test_dict:
+                    checkDate(test_dict["title"], larger=file_content["starttime"], smaller=test_dict["start"])
+                if "starttime" in file_content and "end" in test_dict:
+                    checkDate(test_dict["title"], larger=test_dict["end"], smaller=file_content["starttime"])
 
                 checkMinMax("baselineperp", test_dict, file_content)
                 checkMinMax("doppler", test_dict, file_content)
@@ -424,13 +424,13 @@ class URL_Manager():
                     mutatable_dict["lookdirection"] = test_input.parse_string_list(val)
                 elif key.lower() == "processingdate":
                     del mutatable_dict[key]
-                    mutatable_dict["processingdate"] = test_input.parse_date(val)
+                    mutatable_dict["processingdate"] = test_input.parse_date(val.replace("+", " "))
                 elif key.lower() == "start":
                     del mutatable_dict[key]
-                    mutatable_dict["start"] = test_input.parse_date(val)
+                    mutatable_dict["start"] = test_input.parse_date(val.replace("+", " "))
                 elif key.lower() == "end":
                     del mutatable_dict[key]
-                    mutatable_dict["end"] = test_input.parse_date(val)
+                    mutatable_dict["end"] = test_input.parse_date(val.replace("+", " "))
                 # MIN/MAX variants
                 # min/max BaselinePerp
                 elif key.lower()[3:] == "baselineperp":
@@ -525,9 +525,9 @@ class URL_Manager():
             if key in json_dict:
                 json_dict["processingdate"] = json_dict.pop(key)
         ### start & end
-        for key in ["start", "end", "Start Time", "startTime"]:
+        for key in ["Start Time", "startTime"]:
             if key in json_dict:
-                json_dict["start/end"] = json_dict.pop(key)
+                json_dict["starttime"] = json_dict.pop(key)
         return json_dict
 
 
@@ -624,7 +624,7 @@ class URL_Manager():
             for i, collectionname in enumerate(json_dict["collectionname"]):
                 if collectionname == None:
                     continue
-                # Note: in url_dict, string is separated by comma: 'Big Island', ' HI'
+                # Note: in test_dict, string is separated by comma: 'Big Island', ' HI'
                 # Using the below to match the url string to file string
                 # Big Island, HI
                 if collectionname in ["Big Island", " HI"]:
@@ -775,6 +775,12 @@ class URL_Manager():
 
 
 
+
+
+
+
+
+
 ################################
 ## BULK DOWNLOAD SCRIPT TESTS ##
 ################################
@@ -795,6 +801,9 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
         for version in self.test_info["python_version"]:
             if test_info["print"]:
                 print()
+
+            # HERE: something like if "setup_account: FullAccess", or "setup_download: blah", do things
+            # in one script, and call it again to test multiple uses...
 
             # Take out any files from last test, make things consistant:
             if os.path.isfile(cookie_jar_path):
@@ -824,12 +833,14 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
         # args:
         if "args" not in test_info:
             test_info["args"] = ""
+            test_info["files"] = []
         else:
             args = test_info["args"].split(" ")
+            test_info["files"] = []
             for i, arg in enumerate(args):
                 if arg.endswith('.metalink') or arg.endswith('.csv'):
                     args[i] = os.path.join(self.root_dir, "unit_tests", "Resources", "bulk_download_input", arg)
-                    print(args[i])
+                    test_info["files"].extend(self.getProductNamesFromFile(args[i]))
             test_info["args"] = " ".join(args)
         # expect_in_output:
         test_info = turnValueIntoList("expect_in_output", test_info)
@@ -840,14 +851,43 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
             test_info["print"] = False if "expected_outcome" in test_info else True
         # products:
         test_info = turnValueIntoList("products", test_info)
+        # each product is in the form: "http://foo.com/bar.txt", JUST get the bar.txt and extend the list:
+        test_info["files"].extend([product.split("/")[-1] for product in test_info["products"]])
         # python_version:
         test_info = turnValueIntoList("python_version", test_info, default=[2, 3])
         # timeout:
         if "timeout" not in test_info:
             test_info["timeout"] = 10
-        elif test_info["timeout"] == "None": # elif they passed the string "None" instead of Null in yml
+        elif isinstance(test_info["timeout"], type("")) and test_info["timeout"].lower() == "none": # elif they passed the string "None" instead of Null in yml
             test_info["timeout"] = None
         return test_info
+
+    def getProductNamesFromFile(self, path):
+        if not os.path.isfile(path):
+            return []
+        if path.endswith('.metalink'):
+            with open(path, "r") as file:
+                xml_str = file.read()
+            try:
+                xml_root = md.parseString(xml_str, forbid_dtd=True)
+            except Exception as e:  
+                return []
+            products = xml_root.getElementsByTagName("file")
+            products = [product.getAttribute("name") for product in products]
+        elif path.endswith('.csv'):
+            with open(path, "r") as file:
+                csv_str = file.read()
+            csv_obj = csv.reader(StringIO(csv_str), delimiter=',')
+            csv_obj = [a for a in csv_obj]
+            csv_obj = list(map(type([]), zip(*csv_obj)))
+            file_content = {}
+            for column in csv_obj:
+                file_content[column[0]] = column[1:]
+            products = file_content["URL"]
+            # turn http://foo.com/bar.txt to bar.txt
+            products = [product.split("/")[-1] for product in products]
+        return products
+
 
     def getBulkDownloadFromAPI(self, test_info):
         url = test_info['api'] + "?filename=Testing"
@@ -930,22 +970,37 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
                 # No way to download data, no point on continuing:
                 bulk_process.expect(pexpect.EOF)
                 return
+            elif creds_success == 2:
+                # You got a cookie, good to go
+                pass
         # From here on, you have a cookie:
         # elif cookie_exists == 1:
-        if self.test_info["print"]:
-            print("RESULT: Able to download data!!")
-        bulk_process.expect(r"Download Summary")
+        
+        downloadable = bulk_process.expect([r"IMPORTANT: Your user does not have permission to download this type of data!", \
+                                            r"Download Summary"])
+        if downloadable == 0:
+            if self.test_info["print"]:
+                print("RESULT: Bad permissions to download data!")
+            if "expected_outcome" in self.test_info:
+                assert self.test_info["expected_outcome"] == "bad_download_perms", "Account: {0}, lacks the permissions to download this data. Change 'expected_outcome' to 'bad_download_perms' to pass. Test: {1}.".format(self.test_info["account"], self.test_info["title"])
+        elif downloadable == 1:
+            if self.test_info["print"]:
+                print("RESULT: Able to download data!!")
+            if "expected_outcome" in self.test_info:
+                assert self.test_info["expected_outcome"] == "success", "Test was not supposed to pass. Account: {0}. Test: {1}.".format(self.test_info["account"], self.test_info["title"])
+
+            # Script complete, check your downloads:
+
+            # get all files from the output dir into one list:
+            downloaded_files = os.path.join(self.output_dir, "*")
+            downloaded_files = glob.glob(downloaded_files)
+            downloaded_files = [os.path.basename(file) for file in downloaded_files]
+
+            for file in self.test_info["files"]:
+                assert file in downloaded_files, "File not found. File: {0}, Test: {1}".format(file, self.test_info["title"])
+        # for file in self.test_info["expected_files"]:
+        #     assert file in downloaded_files, "Product: {0} Not found in downloaded files dir. Test: {1}.".format(file,self.test_info["title"])
         bulk_process.expect(pexpect.EOF)
-
-        # Script complete, check your downloads:
-
-        # get all files from the output dir:
-        downloaded_files = os.path.join(self.output_dir, "*")
-        downloaded_files = glob.glob(downloaded_files)
-        downloaded_files = [os.path.basename(file) for file in downloaded_files]
-
-        for file in self.test_info["expected_files"]:
-            assert file in downloaded_files, "Product: {0} Not found in downloaded files dir. Test: {1}.".format(file,self.test_info["title"])
 
 
     def get_test_creds(self):
