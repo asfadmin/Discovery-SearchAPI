@@ -281,6 +281,7 @@ class URL_Manager():
                 file_content = self.renameValsToStandard(file_content)
                 # print(json.dumps(test_dict, indent=4, default=str))
                 # IF used in url, IF contained in file's content, check if they match
+
                 def checkFileContainsExpected(key, test_dict, file_dict):
                     # print(test_dict)
                     # print("CHECKING FILE HERE")
@@ -357,7 +358,6 @@ class URL_Manager():
                 checkFileContainsExpected("processinglevel", test_dict, file_content)
                 checkFileContainsExpected("flightline", test_dict, file_content)
                 checkFileContainsExpected("lookdirection", test_dict, file_content)
-
 
                 if "processingdate" in file_content and "processingdate" in test_dict:
                     checkDate(test_dict["title"], larger=file_content["processingdate"], smaller=test_dict["processingdate"])
