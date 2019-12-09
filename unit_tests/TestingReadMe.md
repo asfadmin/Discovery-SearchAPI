@@ -3,7 +3,7 @@
 (follow readme in root of project on setting up environment first)
 
 ## How to Run Tests:
-(paths assume you're in root of project, but should work from anywhere)
+(paths here assume you're in root of project, but should work from anywhere)
 ```bash
 pytest <pytest args> test_mainManager.py <custom args>
 ```
@@ -13,7 +13,7 @@ pytest <pytest args> test_mainManager.py <custom args>
         -s: If python has print statements, this lets you see them.
         -x: Quit as soon as the first test fails
         -rs: (by itself) Print *why* each test was skipped to screen.
-        -n INT: Number of tests to run at once. (Default = 1, USE THIS!!)
+        -n INT: (by itself) Number of tests to run at once. (Default = 1, USE THIS!!)
 
    + All **Custom args**:
         --api [DEV|TEST|PROD]: Run against that api. If value doesn't match
@@ -76,10 +76,23 @@ tests:      (<- or 'url tests' if testing urls)
         Keywords get joined as key=value, and added to the end of the api query.
 
 #### CMR Input Test Params:
-   + 'parser': (Required) Which parser to use. All *single* param parsers 
+   + 'parser': (Required) Which parser to use. All **single** param parsers 
                 in CMR/Input.py are added.
    + 'input': (Required) Input to send through the parser
    + 'expected': What you expect to return. (very literal, you 
                 can have lists in lists).
    + 'expected error': Asserts the error message thrown contains this msg.
 
+#### BulkDownload Test Params:
+   + 'account': (Required) Which account inside creds_earthdata.yml to use.
+                To add a new account, just add it to the list in that yml.
+   + 'python_version': Which python version(s) to run the test under. (Default, both 2 and 3).
+   + 'args': Args to pass onto the bulk_download script itself. Default = ""
+     ( See: https://bulk-download.asf.alaska.edu/help)
+   + 'expected_outcome': How you expect the test to finish running. Possible outcomes:
+     ['success', 'bad_creds', 'bad_study_area', 'bad_download_perms']
+   + 'timeout': How long to wait until the test auto-fails, in seconds. Default = 10.
+     Can also pass null/None to have it never fail. Also includes time to download the data.
+   + 'products': What to add to self.files inside the bulk_download script. Can 
+     be a list, or single product.
+   
