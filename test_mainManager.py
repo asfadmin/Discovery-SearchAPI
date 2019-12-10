@@ -7,7 +7,7 @@ import pexpect
 
 from copy import deepcopy
 from io import StringIO
-from shutil import copyfile
+from shutil import copyfile, rmtree
 from datetime import datetime
 import defusedxml.minidom as md
 
@@ -104,12 +104,12 @@ class WKT_Manager():
             if os.path.isfile(poss_path):
                 test_files.append(('files', open(poss_path, 'rb')))
             elif '/' in test:
-                warnings.warn(UserWarning("File not found: {0}. File paths start after: '{1}'. (Test: {2})".format(poss_path, resources_root, test_dict["title"])))
+                warnings.warn(UserWarning("File not found: {0}. File paths start after: '{1}'. (Test: '{2}')".format(poss_path, resources_root, test_dict["title"])))
             else:
                 test_wkts.append(test)
         # If you expect to test a file parse, but no files were given:
         if len(test_files) == 0 and "parsed wkt" in test_dict:
-            assert False, "Test: {0}. 'parsed wkt' declared, but no files were found to parse. Did you mean 'repaired wkt'?".format(test_info["title"])
+            assert False, "Test: '{0}'. 'parsed wkt' declared, but no files were found to parse. Did you mean 'repaired wkt'?".format(test_info["title"])
         # Split them to different keys, (BOTH are lists at this point too):
         test_dict["test wkt"] = test_wkts
         test_dict["test file"] = test_files
@@ -138,14 +138,14 @@ class WKT_Manager():
                 if "error" in self.content:
                     assert self.test_dict["parsed error msg"] in str(self.content)
                 else:
-                    assert False, "API did not return the expected message. Test: {0}.".format(self.test_dict["title"])
+                    assert False, "API did not return the expected message. Test: '{0}'.".format(self.test_dict["title"])
             if "parsed wkt" in self.test_dict:
                 if self.content[0] != "{":
                     lhs = geomet.wkt.loads(self.content)
                     rhs = geomet.wkt.loads(self.test_dict["parsed wkt"])
                     assert lhs == rhs, "Parsed wkt returned from API did not match 'parsed wkt'."
                 else:
-                    assert False, "API did not return a WKT. Test: {0}".format(self.test_dict["title"])
+                    assert False, "API did not return a WKT. Test: '{0}'".format(self.test_dict["title"])
 
     class RepairWKTManager():
         def __init__(self, test_dict):
@@ -165,27 +165,27 @@ class WKT_Manager():
         def runAssertTests(self):
             if "repaired wkt wrapped" in self.test_dict:
                 if "wkt" in self.content:
-                    assert shapely.wkt.loads(self.content["wkt"]["wrapped"]) == shapely.wkt.loads(self.test_dict["repaired wkt wrapped"]), "WKT wrapped failed to match the result. Test: {0}".format(self.test_dict["title"])
+                    assert shapely.wkt.loads(self.content["wkt"]["wrapped"]) == shapely.wkt.loads(self.test_dict["repaired wkt wrapped"]), "WKT wrapped failed to match the result. Test: '{0}'".format(self.test_dict["title"])
                 else:
-                    assert False, "WKT not found in response from API. Test: {0}. Response: {1}.".format(self.test_dict["title"], self.content)
+                    assert False, "WKT not found in response from API. Test: '{0}'. Response: {1}.".format(self.test_dict["title"], self.content)
             if "repaired wkt unwrapped" in self.test_dict:
                 if "wkt" in self.content:
-                    assert shapely.wkt.loads(self.content["wkt"]["unwrapped"]) == shapely.wkt.loads(self.test_dict["repaired wkt unwrapped"]), "WKT unwrapped failed to match the result. Test: {0}".format(self.test_dict["title"])
+                    assert shapely.wkt.loads(self.content["wkt"]["unwrapped"]) == shapely.wkt.loads(self.test_dict["repaired wkt unwrapped"]), "WKT unwrapped failed to match the result. Test: '{0}'".format(self.test_dict["title"])
                 else:
-                    assert False, "WKT not found in response from API. Test: {0}. Response: {1}.".format(self.test_dict["title"], self.content)
+                    assert False, "WKT not found in response from API. Test: '{0}'. Response: {1}.".format(self.test_dict["title"], self.content)
 
             if self.test_dict["check repair"]:
                 if "repairs" in self.content:
                     for repair in self.test_dict["repair"]:
-                        assert repair in str(self.content["repairs"]), "Expected repair was not found in results. Test: {0}. Repairs done: {1}".format(self.test_dict["title"], self.content["repairs"])
-                    assert len(self.content["repairs"]) == len(self.test_dict["repair"]), "Number of repairs doesn't equal number of repaired repairs. Test: {0}. Repairs done: {1}.".format(self.test_dict["title"],self.content["repairs"])
+                        assert repair in str(self.content["repairs"]), "Expected repair was not found in results. Test: '{0}'. Repairs done: {1}".format(self.test_dict["title"], self.content["repairs"])
+                    assert len(self.content["repairs"]) == len(self.test_dict["repair"]), "Number of repairs doesn't equal number of repaired repairs. Test: '{0}'. Repairs done: {1}.".format(self.test_dict["title"],self.content["repairs"])
                 else:
-                    assert False, "Unexpected WKT returned: {0}. Test: {1}".format(self.content, self.test_dict["title"])
+                    assert False, "Unexpected WKT returned: {0}. Test: '{1}'".format(self.content, self.test_dict["title"])
             if "repaired error msg" in self.test_dict:
                 if "error" in self.content:
-                    assert self.test_dict["repaired error msg"] in self.content["error"]["report"], "Got different error message than expected. Test: {0}.".format(self.test_dict["title"])
+                    assert self.test_dict["repaired error msg"] in self.content["error"]["report"], "Got different error message than expected. Test: '{0}'.".format(self.test_dict["title"])
                 else:
-                    assert False, "Unexpected WKT returned: {0}. Test: {1}".format(self.content, self.test_dict["title"])
+                    assert False, "Unexpected WKT returned: {0}. Test: '{1}'".format(self.content, self.test_dict["title"])
 
 
 #################
@@ -244,9 +244,9 @@ class INPUT_Manager():
             print()
 
         if "expected" in self.test_dict:
-            assert (self.test_dict["expected"] == val) and (not hit_exception), "CMR INPUT: expected doesn't match output. Test: {0}.".format(self.test_dict["title"])
+            assert (self.test_dict["expected"] == val) and (not hit_exception), "CMR INPUT: expected doesn't match output. Test: '{0}'.".format(self.test_dict["title"])
         if "expected error" in self.test_dict:
-            assert (self.test_dict["expected error"] in val) and hit_exception, "CMR INPUT: expected error doesn't match output error. Test: {0}.".format(self.test_dict["title"])
+            assert (self.test_dict["expected error"] in val) and hit_exception, "CMR INPUT: expected error doesn't match output error. Test: '{0}'.".format(self.test_dict["title"])
 
 
 ###############
@@ -268,11 +268,11 @@ class URL_Manager():
 
     def runAssertTests(self, test_dict, status_code, content_type, file_content):
         if "expected code" in test_dict:
-            assert test_dict["expected code"] == status_code, "Status codes is different than expected. Test: {0}. URL: {1}.".format(test_dict["title"], self.query)
+            assert test_dict["expected code"] == status_code, "Status codes is different than expected. Test: '{0}'. URL: {1}.".format(test_dict["title"], self.query)
         if "maxResults" in test_dict:
-            assert test_dict["maxResults"] >= file_content["count"], "API returned too many results. Test: {0}. URL: {1}.".format(test_dict["title"], self.query)
+            assert test_dict["maxResults"] >= file_content["count"], "API returned too many results. Test: '{0}'. URL: {1}.".format(test_dict["title"], self.query)
         if "expected file" in test_dict:
-            assert test_dict["expected file"] == content_type, "Different file type returned than expected. Test: {0}. URL: {1}.".format(test_dict["title"], self.query)
+            assert test_dict["expected file"] == content_type, "Different file type returned than expected. Test: '{0}'. URL: {1}.".format(test_dict["title"], self.query)
             # If you expect it to be a ligit file, and 'file_content' was converted from str to dict:
             if content_type[0:5] not in ["error", "blank"] and isinstance(file_content, type({})):
                 ### BEGIN TESTING FILE CONTENTS:
@@ -307,7 +307,7 @@ class URL_Manager():
                             # If inner for-loop found it, break out of this one too:
                             if found_in_list == True:
                                 break
-                        assert found_in_list, key + " declared, but not found in file. Test: {0}".format(test_dict["title"])
+                        assert found_in_list, key + " declared, but not found in file. Test: '{0}'".format(test_dict["title"])
                 
                 def checkMinMax(key, test_dict, file_dict):
                     if "min"+key in test_dict and key in file_dict:
@@ -336,12 +336,12 @@ class URL_Manager():
                     # (assuming whichever is the list, is loaded from downloads. The other is from yml file)
                     if isinstance(larger, type([])):
                         for theDate in larger:
-                            assert runAssertTest(theDate, smaller), "File has too small of a date. File: {0}, smaller than test date: {1}. Test: {2}.".format(theDate, smaller, title)
+                            assert runAssertTest(theDate, smaller), "File has too small of a date. File: {0}, smaller than test date: {1}. Test: '{2}'.".format(theDate, smaller, title)
                     elif isinstance(smaller, type([])):
                         for theDate in smaller:
-                            assert runAssertTest(larger, theDate), "File has too large of a date. File: {0}, larger than test date: {1}. Test: {2}.".format(larger, theDate, title)
+                            assert runAssertTest(larger, theDate), "File has too large of a date. File: {0}, larger than test date: {1}. Test: '{2}'.".format(larger, theDate, title)
                     else: # Else they both are a single date. Not sure if this is needed, but...
-                        runAssertTest(larger, smaller), "Date: {0} is smaller than date {1}. Test: {2}".format(larger, smaller, title)
+                        runAssertTest(larger, smaller), "Date: {0} is smaller than date {1}. Test: '{2}'".format(larger, smaller, title)
 
                 checkFileContainsExpected("Platform", test_dict, file_content)
                 checkFileContainsExpected("absoluteOrbit", test_dict, file_content)
@@ -451,7 +451,7 @@ class URL_Manager():
                     mutatable_dict[key.lower()[0:3]+"faradayrotation"] = test_input.parse_float(val)
 
         except ValueError as e:
-            assert False, "Test: {0}. Incorrect parameter: {1}".format(test_dict["title"], str(e))
+            assert False, "Test: '{0}'. Incorrect parameter: {1}".format(test_dict["title"], str(e))
         test_dict = mutatable_dict
         # Make each possible value line up with what the files returns:
         test_dict = self.renameValsToStandard(test_dict)
@@ -796,7 +796,7 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
         cookie_jar_path = os.path.join( os.path.expanduser('~'), ".bulk_download_cookiejar.txt")
 
         if test_info["print"]:
-            print("\n Test: {0}".format(test_info["title"]))
+            print("\n Test: '{0}'".format(test_info["title"]))
 
         for version in self.test_info["python_version"]:
             if test_info["print"]:
@@ -812,12 +812,18 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
                 file = os.path.join(self.output_dir, file)
                 os.remove(file)
 
-            cmd = "python{0} {1} {2}".format(str(version), bulk_download_path, self.test_info["args"])
+            cmd = 'python{0} "{1}" {2}'.format(str(version), bulk_download_path, self.test_info["args"])
             if test_info["print"]:
                 print("    cmd: {0}".format(cmd))
             bulk_process = pexpect.spawn(cmd, encoding='utf-8', timeout=test_info["timeout"], cwd=self.output_dir)
             self.run_process_tests(bulk_process)
+
+            if test_info["test_on_second_run"]:
+                bulk_process = pexpect.spawn(cmd, encoding='utf-8', timeout=test_info["timeout"], cwd=self.output_dir)
+                self.run_process_tests(bulk_process, second_time=True)
+        
         os.remove(bulk_download_path)
+
 
 
     def applyDefaultValues(self, test_info):
@@ -839,13 +845,11 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
             test_info["files"] = []
             for i, arg in enumerate(args):
                 if arg.endswith('.metalink') or arg.endswith('.csv'):
-                    args[i] = os.path.join(self.root_dir, "unit_tests", "Resources", "bulk_download_input", arg)
+                    args[i] = '"' + os.path.join(self.root_dir, "unit_tests", "Resources", "bulk_download_input", arg) + '"'
                     test_info["files"].extend(self.getProductNamesFromFile(args[i]))
             test_info["args"] = " ".join(args)
         # expect_in_output:
         test_info = turnValueIntoList("expect_in_output", test_info)
-        # expected_files:
-        expected_files = turnValueIntoList("expected_files", test_info)
         # print:
         if "print" not in test_info:
             test_info["print"] = False if "expected_outcome" in test_info else True
@@ -855,6 +859,9 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
         test_info["files"].extend([product.split("/")[-1] for product in test_info["products"]])
         # python_version:
         test_info = turnValueIntoList("python_version", test_info, default=[2, 3])
+        # test_on_second_run:
+        if "test_on_second_run" not in test_info:
+            test_info["test_on_second_run"] = False
         # timeout:
         if "timeout" not in test_info:
             test_info["timeout"] = 10
@@ -897,15 +904,15 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
             r = requests.get(url)
         except (requests.ConnectionError, requests.Timeout, requests.TooManyRedirects) as e:
             assert False, "Cannot connect to API: {0}. Error: {1}.".format(url, str(e))
-        self.bulk_download_code = r.content.decode("utf-8")   
-        tmp_bulk_download_path = os.path.join(self.root_dir, "TEST_bulk_download.py")
+        self.bulk_download_code = r.content.decode("utf-8")
+        tmp_bulk_download_path = os.path.join(self.root_dir, "bulk_download_testing.py")
         with open(tmp_bulk_download_path, "w+") as f:
             f.write(self.bulk_download_code)
 
         return tmp_bulk_download_path
 
 
-    def run_process_tests(self, bulk_process):
+    def run_process_tests(self, bulk_process, second_time=False):
         username, password = self.get_test_creds()
         
         if self.test_info["print"]:
@@ -913,7 +920,7 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
 
         if len(self.test_info["products"]) > 0:
             for product in self.test_info["products"]:
-                assert product in self.bulk_download_code, "Product {0} was not found inside bulk download script. Test: {1}.".format(product, self.test_info["title"])
+                assert product in self.bulk_download_code, "Product {0} was not found inside bulk download script. Test: '{1}'.".format(product, self.test_info["title"])
 
         finished_parsing_commands = False
         file_not_found_hit = False
@@ -925,24 +932,31 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
                                                  r"I cannot find the input file you specified", \
                                                  r"Command line argument .* makes no sense, ignoring\."])
             # These could get hit if you pass args to the script, before it finds the cookie:
-            if script_output in [0, 1]:
-                cookie_exists = script_output
+            if script_output == 0:
+                cookie_exists = False
                 finished_parsing_commands = True
+            elif script_output == 1:
+                cookie_exists = True
+                finished_parsing_commands = True
+                assert second_time == True, "Found cookie, but this is the first time the script ran... Test: '{0}'.".format(test_info["title"])
+                assert "expect_in_output" in self.test_info and "cookie_exists" in self.test_info["expect_in_output"], "Cookie found. You need to add 'cookie_exists' to 'expect_in_output' to say this is expected. Test: '{0}'.".format(self.test_info["title"])
+            # These mean you're not done with the input, do another loop around:
             elif script_output == 2:
-                assert "file_not_found" in self.test_info["expect_in_output"], "Cannot find specified file. Add 'file_not_found' to expect_in_output to pass this check. Test: {0}.".format(self.test_info["title"])
+                assert "file_not_found" in self.test_info["expect_in_output"], "Cannot find specified file. Add 'file_not_found' to expect_in_output to pass this check. Test: '{0}'.".format(self.test_info["title"])
                 file_not_found_hit = True
             elif script_output == 3:
-                assert "unknown_arg" in self.test_info["expect_in_output"], "Argument(s) make no sense. Add 'unknown_arg' to expect_in_output to pass this check. Test: {0}.".format(self.test_info["title"])
+                assert "unknown_arg" in self.test_info["expect_in_output"], "Argument(s) make no sense. Add 'unknown_arg' to expect_in_output to pass this check. Test: '{0}'.".format(self.test_info["title"])
                 unknown_arg_hit = True
+
         # If you state it in expect_in_output, make sure it actually got hit:
         if "file_not_found" in self.test_info["expect_in_output"]:
-            assert file_not_found_hit, "'file_not_found' declared in 'expect_in_output', but all the files were found... Test: {0}.".format(self.test_info["title"])
+            assert file_not_found_hit, "'file_not_found' declared in 'expect_in_output', but all the files were found... Test: '{0}'.".format(self.test_info["title"])
         if "unknown_arg" in self.test_info["expect_in_output"]:
-            assert unknown_arg_hit, "'unknown_arg' declared in 'expect_in_output', but all the files were found... Test: {0}.".format(self.test_info["title"])
+            assert unknown_arg_hit, "'unknown_arg' declared in 'expect_in_output', but all the files were found... Test: '{0}'.".format(self.test_info["title"])
 
 
         # No cookie found:
-        if cookie_exists == 0:
+        if cookie_exists == False:
             bulk_process.expect(r"Username:")
             bulk_process.sendline(username)
             bulk_process.expect(r"Password \(will not be displayed\):")
@@ -956,7 +970,7 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
                 if self.test_info["print"]:
                     print("RESULT: Invalid Username Password combo")
                 if "expected_outcome" in self.test_info:
-                    bad_pass_error_msg = "Bad username/password. EarthData Account: {0}. Test: {1}.".format(self.test_info["account"], self.test_info["title"])
+                    bad_pass_error_msg = "Bad username/password. EarthData Account: {0}. Test: '{1}'.".format(self.test_info["account"], self.test_info["title"])
                     assert self.test_info["expected_outcome"] == "bad_creds", bad_pass_error_msg
                 # No valid cookie, no point on continuing:
                 return
@@ -965,7 +979,7 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
                     print("RESULT: Eula for {0} not checked.".format(self.test_info['account']))
                 if "expected_outcome" in self.test_info:
                     # Note: Same header gets returned for both of these. No way to tell them apart atm
-                    error_msg = "Cannot download data: Study area / Eula isn't set in profile. EarthData Account: {0}. Test: {1}.".format(self.test_info["account"], self.test_info["title"])
+                    error_msg = "Cannot download data: Study area / Eula isn't set in profile. EarthData Account: {0}. Test: '{1}'.".format(self.test_info["account"], self.test_info["title"])
                     assert self.test_info["expected_outcome"] in ["bad_eula", "bad_study_area"], error_msg
                 # No way to download data, no point on continuing:
                 bulk_process.expect(pexpect.EOF)
@@ -975,20 +989,33 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
                 pass
         # From here on, you have a cookie:
         # elif cookie_exists == 1:
-        
-        downloadable = bulk_process.expect([r"IMPORTANT: Your user does not have permission to download this type of data!", \
-                                            r"Download Summary"])
-        if downloadable == 0:
-            if self.test_info["print"]:
-                print("RESULT: Bad permissions to download data!")
-            if "expected_outcome" in self.test_info:
-                assert self.test_info["expected_outcome"] == "bad_download_perms", "Account: {0}, lacks the permissions to download this data. Change 'expected_outcome' to 'bad_download_perms' to pass. Test: {1}.".format(self.test_info["account"], self.test_info["title"])
-        elif downloadable == 1:
-            if self.test_info["print"]:
-                print("RESULT: Able to download data!!")
-            if "expected_outcome" in self.test_info:
-                assert self.test_info["expected_outcome"] == "success", "Test was not supposed to pass. Account: {0}. Test: {1}.".format(self.test_info["account"], self.test_info["title"])
-
+        end_of_output = False
+        download_existed = False
+        download_incomplete = False
+        while not end_of_output:
+            output = bulk_process.expect([r"Download file .* exists!", \
+                                          r"Found .* but it wasn't fully downloaded\. Removing file and downloading again\.", \
+                                          r"IMPORTANT: Your user does not have permission to download this type of data!", \
+                                          r"Download Summary"])
+            if output == 0:
+                assert "expect_in_output" in self.test_info and "file_exists" in self.test_info["expect_in_output"], "File already exists, but it's not supposed to. Test: '{0}'.".format(self.test_info["title"])
+                download_existed = True
+            elif output == 1:
+                assert "expect_in_output" in self.test_info and "file_incomplete" in self.test_info["expect_in_output"], "File is complete. It's not supposed to be. Test: '{0}'.".format(self.test_info["title"])
+            elif output == 2:
+                if self.test_info["print"]:
+                    print("RESULT: Bad permissions to download data!")
+                if "expected_outcome" in self.test_info:
+                    assert self.test_info["expected_outcome"] == "bad_download_perms", "Account: {0}, lacks the permissions to download this data. Change 'expected_outcome' to 'bad_download_perms' to pass. Test: '{1}'.".format(self.test_info["account"], self.test_info["title"])
+                # Bad account hit. No files to test. Just return:
+                bulk_process.expect(pexpect.EOF)
+                return
+            elif output == 3:
+                if self.test_info["print"]:
+                    print("RESULT: Able to download data!!")
+                if "expected_outcome" in self.test_info:
+                    assert self.test_info["expected_outcome"] == "success", "Test was not supposed to pass. Account: {0}. Test: '{1}'.".format(self.test_info["account"], self.test_info["title"])
+                end_of_output = True
             # Script complete, check your downloads:
 
             # get all files from the output dir into one list:
@@ -997,9 +1024,9 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
             downloaded_files = [os.path.basename(file) for file in downloaded_files]
 
             for file in self.test_info["files"]:
-                assert file in downloaded_files, "File not found. File: {0}, Test: {1}".format(file, self.test_info["title"])
+                assert file in downloaded_files, "File not found. File: {0}, Test: '{1}'".format(file, self.test_info["title"])
         # for file in self.test_info["expected_files"]:
-        #     assert file in downloaded_files, "Product: {0} Not found in downloaded files dir. Test: {1}.".format(file,self.test_info["title"])
+        #     assert file in downloaded_files, "Product: {0} Not found in downloaded files dir. Test: '{1}'.".format(file,self.test_info["title"])
         bulk_process.expect(pexpect.EOF)
 
 
