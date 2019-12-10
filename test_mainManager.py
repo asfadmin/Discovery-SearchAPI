@@ -1,10 +1,15 @@
-import os, sys, re
+import os, sys, re, glob
 import pytest, warnings
-import requests
+import requests, urllib
 import geomet, shapely
-import json, csv
+import json, csv, yaml
+import pexpect
+
 from copy import deepcopy
 from io import StringIO
+from shutil import copyfile
+from datetime import datetime
+import defusedxml.minidom as md
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import conftest as helpers
@@ -227,18 +232,21 @@ class INPUT_Manager():
         parser = self.test_dict["parser"]
         test_input = self.test_dict["input"]
         try:
+            hit_exception = False
             val = self.parsers[parser](test_input)
         except Exception as e:
+            hit_exception = True
             val = str(e)
 
         if self.should_print:
             print(val)
+            print("hit_exception: " + str(hit_exception))
             print()
 
         if "expected" in self.test_dict:
-            assert self.test_dict["expected"] == val, "CMR INPUT: expected doesn't match output. Test: {0}.".format(self.test_dict["title"])
+            assert (self.test_dict["expected"] == val) and (not hit_exception), "CMR INPUT: expected doesn't match output. Test: {0}.".format(self.test_dict["title"])
         if "expected error" in self.test_dict:
-            assert self.test_dict["expected error"] in val, "CMR INPUT: expected error doesn't match output error. Test: {0}.".format(self.test_dict["title"])
+            assert (self.test_dict["expected error"] in val) and hit_exception, "CMR INPUT: expected error doesn't match output error. Test: {0}.".format(self.test_dict["title"])
 
 
 ###############
@@ -261,6 +269,8 @@ class URL_Manager():
     def runAssertTests(self, test_dict, status_code, content_type, file_content):
         if "expected code" in test_dict:
             assert test_dict["expected code"] == status_code, "Status codes is different than expected. Test: {0}. URL: {1}.".format(test_dict["title"], self.query)
+        if "maxResults" in test_dict:
+            assert test_dict["maxResults"] >= file_content["count"], "API returned too many results. Test: {0}. URL: {1}.".format(test_dict["title"], self.query)
         if "expected file" in test_dict:
             assert test_dict["expected file"] == content_type, "Different file type returned than expected. Test: {0}. URL: {1}.".format(test_dict["title"], self.query)
             # If you expect it to be a ligit file, and 'file_content' was converted from str to dict:
@@ -271,16 +281,17 @@ class URL_Manager():
                 file_content = self.renameValsToStandard(file_content)
                 # print(json.dumps(test_dict, indent=4, default=str))
                 # IF used in url, IF contained in file's content, check if they match
-                def checkFileContainsExpected(key, url_dict, file_dict):
-                    # print(url_dict)
+
+                def checkFileContainsExpected(key, test_dict, file_dict):
+                    # print(test_dict)
                     # print("CHECKING FILE HERE")
                     # print(file_dict)
                     # print(json.dumps(file_dict, indent=4, default=str))
-                    if key in url_dict and key in file_dict:
+                    if key in test_dict and key in file_dict:
                         found_in_list = False
                         for found_param in file_dict[key]:
                             # poss_list is either single "i", or range "[i,j]":
-                            for poss_list in url_dict[key]:
+                            for poss_list in test_dict[key]:
                                 # If it's a list, then it is a range of numbers:
                                 if isinstance(poss_list, type([])):
                                     expect_type = type(poss_list[0])
@@ -299,16 +310,39 @@ class URL_Manager():
                                 break
                         assert found_in_list, key + " declared, but not found in file. Test: {0}".format(test_dict["title"])
                 
-                def checkMinMax(key, url_dict, file_dict):
-                    if "min"+key in url_dict and key in file_dict:
+                def checkMinMax(key, test_dict, file_dict):
+                    if "min"+key in test_dict and key in file_dict:
                         for value in file_dict[key]:
-                            number_type = type(url_dict["min"+key])
-                            assert number_type(value) >= url_dict["min"+key], "TESTING"
-                    if "max"+key in url_dict and key in file_dict:
+                            number_type = type(test_dict["min"+key])
+                            assert number_type(value) >= test_dict["min"+key], "TESTING"
+                    if "max"+key in test_dict and key in file_dict:
                         for value in file_dict[key]:
-                            number_type = type(url_dict["max"+key])
-                            assert number_type(value) <= url_dict["max"+key], "TESTING"
+                            number_type = type(test_dict["max"+key])
+                            assert number_type(value) <= test_dict["max"+key], "TESTING"
 
+
+                def checkDate(title, larger=None, smaller=None):
+                    def runAssertTest(larger, smaller):
+                        # Make them both into "year-month-day T hour:min:sec" formats, and
+                        #     remove anything after the sec:
+                        def makeDate(theDate):
+                            theDate = theDate.split(".")[0] # take of any milliseconds. Normally sec.000000
+                            theDate = theDate[:-1] if theDate.endswith("Z") else theDate # take off the 'Z' if it's on the end
+                            theDate = theDate[:-3] if theDate.endswith("UTC") else theDate # take off the 'UTC' if it's on the end
+                            theDate = datetime.strptime(theDate, "%Y-%m-%dT%H:%M:%S")
+                            return theDate
+                        return makeDate(larger) >= makeDate(smaller)
+
+                    # Figure out which is the list of dates:
+                    # (assuming whichever is the list, is loaded from downloads. The other is from yml file)
+                    if isinstance(larger, type([])):
+                        for theDate in larger:
+                            assert runAssertTest(theDate, smaller), "File has too small of a date. File: {0}, smaller than test date: {1}. Test: {2}.".format(theDate, smaller, title)
+                    elif isinstance(smaller, type([])):
+                        for theDate in smaller:
+                            assert runAssertTest(larger, theDate), "File has too large of a date. File: {0}, larger than test date: {1}. Test: {2}.".format(larger, theDate, title)
+                    else: # Else they both are a single date. Not sure if this is needed, but...
+                        runAssertTest(larger, smaller), "Date: {0} is smaller than date {1}. Test: {2}".format(larger, smaller, title)
 
                 checkFileContainsExpected("Platform", test_dict, file_content)
                 checkFileContainsExpected("absoluteOrbit", test_dict, file_content)
@@ -321,6 +355,16 @@ class URL_Manager():
                 checkFileContainsExpected("relativeorbit", test_dict, file_content)
                 checkFileContainsExpected("collectionname", test_dict, file_content)
                 checkFileContainsExpected("beammode", test_dict, file_content)
+                checkFileContainsExpected("processinglevel", test_dict, file_content)
+                checkFileContainsExpected("flightline", test_dict, file_content)
+                checkFileContainsExpected("lookdirection", test_dict, file_content)
+
+                if "processingdate" in file_content and "processingdate" in test_dict:
+                    checkDate(test_dict["title"], larger=file_content["processingdate"], smaller=test_dict["processingdate"])
+                if "starttime" in file_content and "start" in test_dict:
+                    checkDate(test_dict["title"], larger=file_content["starttime"], smaller=test_dict["start"])
+                if "starttime" in file_content and "end" in test_dict:
+                    checkDate(test_dict["title"], larger=test_dict["end"], smaller=file_content["starttime"])
 
                 checkMinMax("baselineperp", test_dict, file_content)
                 checkMinMax("doppler", test_dict, file_content)
@@ -369,6 +413,24 @@ class URL_Manager():
                 elif key.lower() in ["beammode", "beamswath"]:
                     del mutatable_dict[key]
                     mutatable_dict["beammode"] = test_input.parse_string_list(val)
+                elif key.lower() == "processinglevel":
+                    del mutatable_dict[key]
+                    mutatable_dict["processinglevel"] = test_input.parse_string_list(val)
+                elif key.lower() == "flightline":
+                    del mutatable_dict[key]
+                    mutatable_dict["flightline"] = test_input.parse_string_list(val)
+                elif key.lower() == "lookdirection":
+                    del mutatable_dict[key]
+                    mutatable_dict["lookdirection"] = test_input.parse_string_list(val)
+                elif key.lower() == "processingdate":
+                    del mutatable_dict[key]
+                    mutatable_dict["processingdate"] = test_input.parse_date(val.replace("+", " "))
+                elif key.lower() == "start":
+                    del mutatable_dict[key]
+                    mutatable_dict["start"] = test_input.parse_date(val.replace("+", " "))
+                elif key.lower() == "end":
+                    del mutatable_dict[key]
+                    mutatable_dict["end"] = test_input.parse_date(val.replace("+", " "))
                 # MIN/MAX variants
                 # min/max BaselinePerp
                 elif key.lower()[3:] == "baselineperp":
@@ -444,9 +506,28 @@ class URL_Manager():
         for key in ["insarStackSize", "Stack Size"]:
             if key in json_dict:
                 json_dict["insarstacksize"] = json_dict.pop(key)
+        ### min/max FaradayRotation:
         for key in ["faradayRotation", "Faraday Rotation"]:
             if key in json_dict:
                 json_dict["faradayrotation"] = json_dict.pop(key)
+        ### processingLevel:
+        for key in ["Processing Level", "processingLevel"]:
+            if key in json_dict:
+                json_dict["processinglevel"] = json_dict.pop(key)
+        ### flightLine:
+        if "flightLine" in json_dict:
+            json_dict["flightline"] = json_dict.pop("flightLine")
+        ### lookDirection:
+        if "lookDirection" in json_dict:
+            json_dict["lookdirection"] = json_dict.pop("lookDirection")
+        ### processingDate:
+        for key in ["Processing Date", "processingDate"]:
+            if key in json_dict:
+                json_dict["processingdate"] = json_dict.pop(key)
+        ### start & end
+        for key in ["Start Time", "startTime"]:
+            if key in json_dict:
+                json_dict["starttime"] = json_dict.pop(key)
         return json_dict
 
 
@@ -495,6 +576,11 @@ class URL_Manager():
                 # Sentinel-1B
                 elif platform in ["SENTINEL-1B", "SB"]:
                     json_dict["Platform"][i] = "Sentinel-1B"
+                # Sir-C
+                elif platform in ["SIR-C"]:
+                    del json_dict["Platform"][i]
+                    json_dict["Platform"].append("STS-59")
+                    json_dict["Platform"].append("STS-68")
                 # SMAP
                 elif platform in ["SMAP", "SP"]:
                     json_dict["Platform"][i] = "SMAP"
@@ -513,6 +599,17 @@ class URL_Manager():
                 #ASCENDING
                 elif flightdirection in ["A", "ASC", "ASCENDING"]:
                     json_dict["flightdirection"][i] = "ASCENDING"
+        if "lookdirection" in json_dict:
+            for i, lookdirection in enumerate(json_dict["lookdirection"]):
+                if lookdirection == None:
+                    continue
+                lookdirection = lookdirection.upper()
+                #LEFT
+                if lookdirection in ["L", "LEFT"]:
+                    json_dict["lookdirection"][i] = "LEFT"
+                #RIGHT
+                elif lookdirection in ["R", "RIGHT"]:
+                    json_dict["lookdirection"][i] = "RIGHT"
         if "polarization" in json_dict:
             for i, polarization in enumerate(json_dict["polarization"]):
                 if polarization == None:
@@ -527,7 +624,7 @@ class URL_Manager():
             for i, collectionname in enumerate(json_dict["collectionname"]):
                 if collectionname == None:
                     continue
-                # Note: in url_dict, string is separated by comma: 'Big Island', ' HI'
+                # Note: in test_dict, string is separated by comma: 'Big Island', ' HI'
                 # Using the below to match the url string to file string
                 # Big Island, HI
                 if collectionname in ["Big Island", " HI"]:
@@ -535,6 +632,9 @@ class URL_Manager():
                 # Cascade Volcanoes, CA/OR/WA
                 elif collectionname in ["Cascade Volcanoes", " CA/OR/WA"]:
                     json_dict["collectionname"][i] = "Cascade Volcanoes, CA/OR/WA"
+                # Permafrost Sites, AK
+                elif collectionname in ["Permafrost Sites", "AK"]:
+                    json_dict["collectionname"][i] = "Permafrost Sites, AK"
         if "beammode" in json_dict:
             for i, beammode in enumerate(json_dict["beammode"]):
                 if beammode == None:
@@ -576,12 +676,15 @@ class URL_Manager():
             file_content = {}
             for column in rotated_content:
                 file_content[column[0]] = column[1:]
+            file_content["count"] = len(file_content["Platform"])
             return file_content
 
         def jsonToDict(json_data):
             # Combine all matching key-value pairs, to-> key: [list of vals]
             file_content = {}
+            count = 0
             for result in json_data:
+                count += 1
                 for key,val in result.items():
                     # Break apart nested lists if needed, (alows to forloop val):
                     val = [val] if not isinstance(val, type([])) else val
@@ -592,6 +695,7 @@ class URL_Manager():
                         file_content[key] = []
                         for inner_val in val:
                             file_content[key].append(inner_val)
+            file_content["count"] = count
             return file_content
 
         h = requests.head(self.query)
@@ -668,6 +772,262 @@ class URL_Manager():
 
 
 
+
+
+
+
+
+
+
+
+
+################################
+## BULK DOWNLOAD SCRIPT TESTS ##
+################################
+class BULK_DOWNLOAD_SCRIPT_Manager():
+    def __init__(self, test_info):
+        self.root_dir = os.path.dirname(os.path.abspath(__file__))
+        self.output_dir = os.path.join(self.root_dir, "unit_tests", "Resources", "bulk_download_output")
+        # also populates self.bulk_download_code:
+        self.test_info = self.applyDefaultValues(test_info)
+        bulk_download_path = self.getBulkDownloadFromAPI(test_info)
+
+        self.cred_path = os.path.join(self.root_dir, "unit_tests", "creds_earthdata.yml")
+        cookie_jar_path = os.path.join( os.path.expanduser('~'), ".bulk_download_cookiejar.txt")
+
+        if test_info["print"]:
+            print("\n Test: {0}".format(test_info["title"]))
+
+        for version in self.test_info["python_version"]:
+            if test_info["print"]:
+                print()
+
+            # HERE: something like if "setup_account: FullAccess", or "setup_download: blah", do things
+            # in one script, and call it again to test multiple uses...
+
+            # Take out any files from last test, make things consistant:
+            if os.path.isfile(cookie_jar_path):
+                os.remove(cookie_jar_path)
+            for file in os.listdir(self.output_dir):
+                file = os.path.join(self.output_dir, file)
+                os.remove(file)
+
+            cmd = "python{0} {1} {2}".format(str(version), bulk_download_path, self.test_info["args"])
+            if test_info["print"]:
+                print("    cmd: {0}".format(cmd))
+            bulk_process = pexpect.spawn(cmd, encoding='utf-8', timeout=test_info["timeout"], cwd=self.output_dir)
+            self.run_process_tests(bulk_process)
+        os.remove(bulk_download_path)
+
+
+    def applyDefaultValues(self, test_info):
+        def turnValueIntoList(key, test_info, default=[]):
+            # if it doesn't even exist, make it the default:
+            if key not in test_info:
+                test_info[key] = default
+            # if it's just one val, turn into a list of that val:
+            elif not isinstance(test_info[key], type([])):
+                test_info[key] = [ test_info[key] ]
+            return test_info
+
+        # args:
+        if "args" not in test_info:
+            test_info["args"] = ""
+            test_info["files"] = []
+        else:
+            args = test_info["args"].split(" ")
+            test_info["files"] = []
+            for i, arg in enumerate(args):
+                if arg.endswith('.metalink') or arg.endswith('.csv'):
+                    args[i] = os.path.join(self.root_dir, "unit_tests", "Resources", "bulk_download_input", arg)
+                    test_info["files"].extend(self.getProductNamesFromFile(args[i]))
+            test_info["args"] = " ".join(args)
+        # expect_in_output:
+        test_info = turnValueIntoList("expect_in_output", test_info)
+        # expected_files:
+        expected_files = turnValueIntoList("expected_files", test_info)
+        # print:
+        if "print" not in test_info:
+            test_info["print"] = False if "expected_outcome" in test_info else True
+        # products:
+        test_info = turnValueIntoList("products", test_info)
+        # each product is in the form: "http://foo.com/bar.txt", JUST get the bar.txt and extend the list:
+        test_info["files"].extend([product.split("/")[-1] for product in test_info["products"]])
+        # python_version:
+        test_info = turnValueIntoList("python_version", test_info, default=[2, 3])
+        # timeout:
+        if "timeout" not in test_info:
+            test_info["timeout"] = 10
+        elif isinstance(test_info["timeout"], type("")) and test_info["timeout"].lower() == "none": # elif they passed the string "None" instead of Null in yml
+            test_info["timeout"] = None
+        return test_info
+
+    def getProductNamesFromFile(self, path):
+        if not os.path.isfile(path):
+            return []
+        if path.endswith('.metalink'):
+            with open(path, "r") as file:
+                xml_str = file.read()
+            try:
+                xml_root = md.parseString(xml_str, forbid_dtd=True)
+            except Exception as e:  
+                return []
+            products = xml_root.getElementsByTagName("file")
+            products = [product.getAttribute("name") for product in products]
+        elif path.endswith('.csv'):
+            with open(path, "r") as file:
+                csv_str = file.read()
+            csv_obj = csv.reader(StringIO(csv_str), delimiter=',')
+            csv_obj = [a for a in csv_obj]
+            csv_obj = list(map(type([]), zip(*csv_obj)))
+            file_content = {}
+            for column in csv_obj:
+                file_content[column[0]] = column[1:]
+            products = file_content["URL"]
+            # turn http://foo.com/bar.txt to bar.txt
+            products = [product.split("/")[-1] for product in products]
+        return products
+
+
+    def getBulkDownloadFromAPI(self, test_info):
+        url = test_info['api'] + "?filename=Testing"
+        if len(test_info["products"]) > 0:
+            url += "&products=" + ",".join(test_info["products"])
+        try:
+            r = requests.get(url)
+        except (requests.ConnectionError, requests.Timeout, requests.TooManyRedirects) as e:
+            assert False, "Cannot connect to API: {0}. Error: {1}.".format(url, str(e))
+        self.bulk_download_code = r.content.decode("utf-8")   
+        tmp_bulk_download_path = os.path.join(self.root_dir, "TEST_bulk_download.py")
+        with open(tmp_bulk_download_path, "w+") as f:
+            f.write(self.bulk_download_code)
+
+        return tmp_bulk_download_path
+
+
+    def run_process_tests(self, bulk_process):
+        username, password = self.get_test_creds()
+        
+        if self.test_info["print"]:
+            bulk_process.logfile = sys.stdout
+
+        if len(self.test_info["products"]) > 0:
+            for product in self.test_info["products"]:
+                assert product in self.bulk_download_code, "Product {0} was not found inside bulk download script. Test: {1}.".format(product, self.test_info["title"])
+
+        finished_parsing_commands = False
+        file_not_found_hit = False
+        unknown_arg_hit = False
+        while not finished_parsing_commands:
+            # script_output = (int) which element was hit in list:
+            script_output = bulk_process.expect([r"No existing URS cookie found, please enter Earthdata username & password:", \
+                                                 r"Re-using previous cookie jar.", \
+                                                 r"I cannot find the input file you specified", \
+                                                 r"Command line argument .* makes no sense, ignoring\."])
+            # These could get hit if you pass args to the script, before it finds the cookie:
+            if script_output in [0, 1]:
+                cookie_exists = script_output
+                finished_parsing_commands = True
+            elif script_output == 2:
+                assert "file_not_found" in self.test_info["expect_in_output"], "Cannot find specified file. Add 'file_not_found' to expect_in_output to pass this check. Test: {0}.".format(self.test_info["title"])
+                file_not_found_hit = True
+            elif script_output == 3:
+                assert "unknown_arg" in self.test_info["expect_in_output"], "Argument(s) make no sense. Add 'unknown_arg' to expect_in_output to pass this check. Test: {0}.".format(self.test_info["title"])
+                unknown_arg_hit = True
+        # If you state it in expect_in_output, make sure it actually got hit:
+        if "file_not_found" in self.test_info["expect_in_output"]:
+            assert file_not_found_hit, "'file_not_found' declared in 'expect_in_output', but all the files were found... Test: {0}.".format(self.test_info["title"])
+        if "unknown_arg" in self.test_info["expect_in_output"]:
+            assert unknown_arg_hit, "'unknown_arg' declared in 'expect_in_output', but all the files were found... Test: {0}.".format(self.test_info["title"])
+
+
+        # No cookie found:
+        if cookie_exists == 0:
+            bulk_process.expect(r"Username:")
+            bulk_process.sendline(username)
+            bulk_process.expect(r"Password \(will not be displayed\):")
+            bulk_process.sendline(password)
+
+            # creds_success = (int) which element was hit in list:
+            creds_success = bulk_process.expect([r"Username and Password combo was not successful\. Please try again\.", \
+                                                 r"New users: you must first log into Vertex and accept the EULA\. In addition, your Study Area must be set", \
+                                                 r"attempting to download https:\/\/urs\.earthdata\.nasa\.gov\/profile"])
+            if creds_success == 0:
+                if self.test_info["print"]:
+                    print("RESULT: Invalid Username Password combo")
+                if "expected_outcome" in self.test_info:
+                    bad_pass_error_msg = "Bad username/password. EarthData Account: {0}. Test: {1}.".format(self.test_info["account"], self.test_info["title"])
+                    assert self.test_info["expected_outcome"] == "bad_creds", bad_pass_error_msg
+                # No valid cookie, no point on continuing:
+                return
+            elif creds_success == 1:
+                if self.test_info["print"]:
+                    print("RESULT: Eula for {0} not checked.".format(self.test_info['account']))
+                if "expected_outcome" in self.test_info:
+                    # Note: Same header gets returned for both of these. No way to tell them apart atm
+                    error_msg = "Cannot download data: Study area / Eula isn't set in profile. EarthData Account: {0}. Test: {1}.".format(self.test_info["account"], self.test_info["title"])
+                    assert self.test_info["expected_outcome"] in ["bad_eula", "bad_study_area"], error_msg
+                # No way to download data, no point on continuing:
+                bulk_process.expect(pexpect.EOF)
+                return
+            elif creds_success == 2:
+                # You got a cookie, good to go
+                pass
+        # From here on, you have a cookie:
+        # elif cookie_exists == 1:
+        
+        downloadable = bulk_process.expect([r"IMPORTANT: Your user does not have permission to download this type of data!", \
+                                            r"Download Summary"])
+        if downloadable == 0:
+            if self.test_info["print"]:
+                print("RESULT: Bad permissions to download data!")
+            if "expected_outcome" in self.test_info:
+                assert self.test_info["expected_outcome"] == "bad_download_perms", "Account: {0}, lacks the permissions to download this data. Change 'expected_outcome' to 'bad_download_perms' to pass. Test: {1}.".format(self.test_info["account"], self.test_info["title"])
+        elif downloadable == 1:
+            if self.test_info["print"]:
+                print("RESULT: Able to download data!!")
+            if "expected_outcome" in self.test_info:
+                assert self.test_info["expected_outcome"] == "success", "Test was not supposed to pass. Account: {0}. Test: {1}.".format(self.test_info["account"], self.test_info["title"])
+
+            # Script complete, check your downloads:
+
+            # get all files from the output dir into one list:
+            downloaded_files = os.path.join(self.output_dir, "*")
+            downloaded_files = glob.glob(downloaded_files)
+            downloaded_files = [os.path.basename(file) for file in downloaded_files]
+
+            for file in self.test_info["files"]:
+                assert file in downloaded_files, "File not found. File: {0}, Test: {1}".format(file, self.test_info["title"])
+        # for file in self.test_info["expected_files"]:
+        #     assert file in downloaded_files, "Product: {0} Not found in downloaded files dir. Test: {1}.".format(file,self.test_info["title"])
+        bulk_process.expect(pexpect.EOF)
+
+
+    def get_test_creds(self):
+        # Try to open the file, and save the yml:
+        try:
+            yml_file = open(self.cred_path, "r")
+            accounts_dict = yaml.safe_load(yml_file)
+        except (OSError, IOError):
+            assert False, "Error opening yaml {0}. Does it exist?".format(self.cred_path)
+        except (yaml.YAMLError, yaml.MarkedYAMLError) as e:
+            assert False, "Error parsing yaml {0}. Error: {1}.".format(self.cred_path, str(e))
+        
+        # Check if account in yml:
+        account = self.test_info["account"]
+        if account in accounts_dict:
+            try:
+                username = accounts_dict[account]["user"]
+                password = accounts_dict[account]["pass"]
+            except KeyError as e:
+                assert False, "Test {0} is not formatted correctly. No user/pass. Error: {1}.".format(self.test_info["title"], str(e))
+        else:
+            assert False, "Account {0} not found in {1}.".format(account, self.cred_path)
+        # Success! heres your user/pass
+        return username, password
+
+
+
 ################
 ## START MAIN ##
 ################
@@ -685,6 +1045,7 @@ list_of_tests.extend(helpers.loadTestsFromDirectory(tests_root, recurse=True))
 tests_root = os.path.join(project_root, "**", "test_*.yaml")
 list_of_tests.extend(helpers.loadTestsFromDirectory(tests_root, recurse=True))
 
+
 @pytest.mark.parametrize("test_dict", list_of_tests)
 def test_MainManager(test_dict, cli_args):
     test_info = test_dict[0]
@@ -701,3 +1062,5 @@ def test_MainManager(test_dict, cli_args):
     elif test_info['type'] == 'URL':
         test_info['api'] = test_info['api'] + "services/search/param?"
         URL_Manager(test_info)
+    elif test_info['type'] == 'BULK_DOWNLOAD':
+        BULK_DOWNLOAD_SCRIPT_Manager(test_info)

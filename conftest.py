@@ -86,6 +86,8 @@ def loadTestsFromDirectory(dir_path, recurse=False):
                     test["type"] = "WKT"
                 elif "parser" in test and "input" in test:
                     test["type"] = "INPUT"
+                elif "account" in test:
+                    test["type"] = "BULK_DOWNLOAD"
                 else:
                     print("\nUnknownTest: {0}\n".format(test))
                 yaml_dict["tests"][i] = test
