@@ -269,7 +269,7 @@ class URL_Manager():
     def runAssertTests(self, test_dict, status_code, content_type, file_content):
         if "expected code" in test_dict:
             assert test_dict["expected code"] == status_code, "Status codes is different than expected. Test: {0}. URL: {1}.".format(test_dict["title"], self.query)
-        if "maxResults" in test_dict:
+        if "count" in file_content and "maxResults" in test_dict:
             assert test_dict["maxResults"] >= file_content["count"], "API returned too many results. Test: {0}. URL: {1}.".format(test_dict["title"], self.query)
         if "expected file" in test_dict:
             assert test_dict["expected file"] == content_type, "Different file type returned than expected. Test: {0}. URL: {1}.".format(test_dict["title"], self.query)
@@ -714,8 +714,7 @@ class URL_Manager():
         ## CSV
         elif content_type == "csv":
             file_content = csvToDict(file_content)
-            blank_csv = {"Granule Name": [],"Platform": [],"Sensor": [],"Beam Mode": [],"Beam Mode Description": [],"Orbit": [],"Path Number": [],"Frame Number": [],"Acquisition Date": [],"Processing Date": [],"Processing Level": [],"Start Time": [],"End Time": [],"Center Lat": [],"Center Lon": [],"Near Start Lat": [],"Near Start Lon": [],"Far Start Lat": [],"Far Start Lon": [],"Near End Lat": [],"Near End Lon": [],"Far End Lat": [],"Far End Lon": [],"Faraday Rotation": [],"Ascending or Descending?": [],"URL": [],"Size (MB)": [],"Off Nadir Angle": [],"Stack Size": [],"Baseline Perp.": [],"Doppler": [],"GroupID":[]}
-            if file_content == blank_csv:
+            if file_content["count"] == 0:
                 content_type = "blank csv"
         ## DOWNLOAD / PLAIN
         elif content_type == "plain":
