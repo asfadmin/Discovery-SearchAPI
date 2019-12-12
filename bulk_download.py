@@ -254,7 +254,7 @@ class bulk_downloader:
        try:
           response = opener.open(request)
        except HTTPError as e:
-          if e.code == 401:
+          if "WWW-Authenticate" in e.headers and "Please enter your Earthdata Login credentials" in e.headers["WWW-Authenticate"]:
              print (" > Username and Password combo was not successful. Please try again.")
              return False
           else:
