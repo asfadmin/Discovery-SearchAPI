@@ -797,14 +797,9 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
 
         if test_info["print"]:
             print("\n Test: '{0}'".format(test_info["title"]))
+            print()
 
         for version in self.test_info["python_version"]:
-            if test_info["print"]:
-                print()
-
-            # HERE: something like if "setup_account: FullAccess", or "setup_download: blah", do things
-            # in one script, and call it again to test multiple uses...
-
             # Take out any files from last test, make things consistant:
             if os.path.isfile(cookie_jar_path):
                 os.remove(cookie_jar_path)
@@ -812,51 +807,69 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
                 file = os.path.join(self.output_dir, file)
                 os.remove(file)
 
+            # Craft the command for both runs:
             cmd = 'python{0} "{1}" {2}'.format(str(version), bulk_download_path, self.test_info["args"])
             if test_info["print"]:
                 print("    cmd: {0}".format(cmd))
-            bulk_process = pexpect.spawn(cmd, encoding='utf-8', timeout=test_info["timeout"], cwd=self.output_dir)
-            self.run_process_tests(bulk_process)
 
-            if test_info["test_on_second_run"]:
+            try:
+                # Do the optional run first. All the asserts *always* happen in the second run then:
+                if test_info["test_on_second_run"] == True:
+                    bulk_process = pexpect.spawn(cmd, encoding='utf-8', timeout=test_info["timeout"], cwd=self.output_dir)
+                    self.run_process_tests(bulk_process, optional_run=True)
+
                 bulk_process = pexpect.spawn(cmd, encoding='utf-8', timeout=test_info["timeout"], cwd=self.output_dir)
-                self.run_process_tests(bulk_process, second_time=True)
-        
+                self.run_process_tests(bulk_process)            
+            except pexpect.exceptions.TIMEOUT:
+                assert False, "Test ran out of time! Set 'timeout' in test. (Can be Null to disable, or # seconds). Test: '{0}'.".format(test_info["title"])
         os.remove(bulk_download_path)
 
 
 
     def applyDefaultValues(self, test_info):
-        def turnValueIntoList(key, test_info, default=[]):
+        # Lets tester put in single value or list, and it always becomes a list.
+        # if default=None, it won't add the key if it's not already there.
+        def turnValueIntoList(key, test_info, default=None):
             # if it doesn't even exist, make it the default:
             if key not in test_info:
-                test_info[key] = default
+                if default != None:
+                    test_info[key] = default
+                return test_info
             # if it's just one val, turn into a list of that val:
             elif not isinstance(test_info[key], type([])):
                 test_info[key] = [ test_info[key] ]
             return test_info
-
+        # NOTE: \/ Keys in alphabetical order: \/ 
         # args:
+        test_info["files"] = []
         if "args" not in test_info:
             test_info["args"] = ""
-            test_info["files"] = []
         else:
             args = test_info["args"].split(" ")
-            test_info["files"] = []
             for i, arg in enumerate(args):
                 if arg.endswith('.metalink') or arg.endswith('.csv'):
                     args[i] = '"' + os.path.join(self.root_dir, "unit_tests", "Resources", "bulk_download_input", arg) + '"'
+                    # List of files to check they get actually downloaded later:
                     test_info["files"].extend(self.getProductNamesFromFile(args[i]))
             test_info["args"] = " ".join(args)
         # expect_in_output:
         test_info = turnValueIntoList("expect_in_output", test_info)
+        if "expect_in_output" in test_info:
+            for expected in test_info["expect_in_output"]:
+                whitelist = ["bad_url", "cookie_existed", "file_not_found", "file_exists", "file_incomplete", "unknown_arg"]
+                assert expected in whitelist, "Test parsing error: Unknown value for 'expect_in_output'. Test: '{0}'.".format(test_info["title"])
+        # expected_outcome:
+        if "expected_outcome" in test_info:
+            whitelist = ["success", "bad_creds", "bad_eula", "bad_download_perms", "bad_study_area"]
+            assert test_info["expected_outcome"] in whitelist, "Test parsing error: Unknown value for 'expected_outcome'. Test: '{0}'.".format(test_info["title"])
         # print:
         if "print" not in test_info:
             test_info["print"] = False if "expected_outcome" in test_info else True
         # products:
         test_info = turnValueIntoList("products", test_info)
         # each product is in the form: "http://foo.com/bar.txt", JUST get the bar.txt and extend the list:
-        test_info["files"].extend([product.split("/")[-1] for product in test_info["products"]])
+        if "products" in test_info:
+            test_info["files"].extend([product.split("/")[-1] for product in test_info["products"]])
         # python_version:
         test_info = turnValueIntoList("python_version", test_info, default=[2, 3])
         # test_on_second_run:
@@ -898,7 +911,7 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
 
     def getBulkDownloadFromAPI(self, test_info):
         url = test_info['api'] + "?filename=Testing"
-        if len(test_info["products"]) > 0:
+        if "products" in test_info and len(test_info["products"]) > 0:
             url += "&products=" + ",".join(test_info["products"])
         try:
             r = requests.get(url)
@@ -912,51 +925,64 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
         return tmp_bulk_download_path
 
 
-    def run_process_tests(self, bulk_process, second_time=False):
+    def run_process_tests(self, bulk_process, optional_run=False):
         username, password = self.get_test_creds()
         
         if self.test_info["print"]:
+            print("Script Output:")
+            if optional_run:
+                print("   > Optional run:")
+            else:
+                print("   > Normal testing run:")
             bulk_process.logfile = sys.stdout
 
-        if len(self.test_info["products"]) > 0:
+        if not optional_run and "products" in self.test_info:
             for product in self.test_info["products"]:
-                assert product in self.bulk_download_code, "Product {0} was not found inside bulk download script. Test: '{1}'.".format(product, self.test_info["title"])
+                product = urllib.parse.unquote_plus(product)
+                assert product in urllib.parse.unquote_plus(self.bulk_download_code), "Product {0} was not found inside bulk download script. Test: '{1}'.".format(product, self.test_info["title"])
 
-        finished_parsing_commands = False
         file_not_found_hit = False
         unknown_arg_hit = False
-        while not finished_parsing_commands:
+        inject_hit = False
+        
+        # Figure out what the file might return. Add possible injection outputs if needed:
+        possible_file_outputs = [r"No existing URS cookie found, please enter Earthdata username & password:", \
+                                 r"Re-using previous cookie jar.", \
+                                 r"I cannot find the input file you specified", \
+                                 r"Command line argument .* makes no sense, ignoring\."]
+        if "inject_output" in self.test_info:
+            possible_file_outputs.append(self.test_info["inject_output"])
+
+        while True:
             # script_output = (int) which element was hit in list:
-            script_output = bulk_process.expect([r"No existing URS cookie found, please enter Earthdata username & password:", \
-                                                 r"Re-using previous cookie jar.", \
-                                                 r"I cannot find the input file you specified", \
-                                                 r"Command line argument .* makes no sense, ignoring\."])
+            script_output = bulk_process.expect(possible_file_outputs)
             # These could get hit if you pass args to the script, before it finds the cookie:
-            if script_output == 0:
-                cookie_exists = False
-                finished_parsing_commands = True
-            elif script_output == 1:
-                cookie_exists = True
-                finished_parsing_commands = True
-                assert second_time == True, "Found cookie, but this is the first time the script ran... Test: '{0}'.".format(test_info["title"])
-                assert "expect_in_output" in self.test_info and "cookie_exists" in self.test_info["expect_in_output"], "Cookie found. You need to add 'cookie_exists' to 'expect_in_output' to say this is expected. Test: '{0}'.".format(self.test_info["title"])
+            if script_output in [0,1]:
+                cookie_existed = False if script_output == 0 else True
+                break
             # These mean you're not done with the input, do another loop around:
             elif script_output == 2:
-                assert "file_not_found" in self.test_info["expect_in_output"], "Cannot find specified file. Add 'file_not_found' to expect_in_output to pass this check. Test: '{0}'.".format(self.test_info["title"])
+                print("HITTTT!!!!!:")
+                print(bulk_process.after)
+                print()
                 file_not_found_hit = True
             elif script_output == 3:
-                assert "unknown_arg" in self.test_info["expect_in_output"], "Argument(s) make no sense. Add 'unknown_arg' to expect_in_output to pass this check. Test: '{0}'.".format(self.test_info["title"])
                 unknown_arg_hit = True
+            # Can get hit if "inject_output" is used in test:
+            elif script_output == 4:
+                inject_hit = True
 
-        # If you state it in expect_in_output, make sure it actually got hit:
-        if "file_not_found" in self.test_info["expect_in_output"]:
-            assert file_not_found_hit, "'file_not_found' declared in 'expect_in_output', but all the files were found... Test: '{0}'.".format(self.test_info["title"])
-        if "unknown_arg" in self.test_info["expect_in_output"]:
-            assert unknown_arg_hit, "'unknown_arg' declared in 'expect_in_output', but all the files were found... Test: '{0}'.".format(self.test_info["title"])
-
-
+        # If you state it in expect_in_output, make sure it actually got hit. If you *didn't* state it, make sure it didn't happen too:
+        if not optional_run and "expect_in_output" in self.test_info:
+            # Check if you were supposed to hit the warning messages or not:
+            assert ("file_not_found" in self.test_info["expect_in_output"]) == file_not_found_hit, "File(s){0} found. {1} 'file_not_found' to 'expect_in_output' if this is expected. Test: '{2}'.".format(" not" if file_not_found_hit else "", "Add" if file_not_found_hit else "Remove", self.test_info["title"])
+            assert ("unknown_arg" in self.test_info["expect_in_output"]) == unknown_arg_hit, "Unknown arg(s){0} found. {1} 'unknown_arg' to 'expect_in_output' if this is expected. Test: '{2}'.".format(" not" if unknown_arg_hit else "", "Add" if unknown_arg_hit else "Remove", self.test_info["title"])
+            # Check if you wanted to find a cookie or not:
+            assert ("cookie_existed" in self.test_info["expect_in_output"]) == cookie_existed, "Cookie{0} found. {1} 'cookie_existed' to 'expect_in_output' if this is expected. Test: '{2}'.".format("" if cookie_existed else " not", "Remove" if cookie_existed else "Add", self.test_info["title"])
+        if not optional_run and "inject_output" in self.test_info:
+            assert not inject_hit, "Code from 'products' was executed! Test: '{0}'.".format(self.test_info["title"])
         # No cookie found:
-        if cookie_exists == False:
+        if cookie_existed == False:
             bulk_process.expect(r"Username:")
             bulk_process.sendline(username)
             bulk_process.expect(r"Password \(will not be displayed\):")
@@ -972,11 +998,12 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
                 if "expected_outcome" in self.test_info:
                     bad_pass_error_msg = "Bad username/password. EarthData Account: {0}. Test: '{1}'.".format(self.test_info["account"], self.test_info["title"])
                     assert self.test_info["expected_outcome"] == "bad_creds", bad_pass_error_msg
-                # No valid cookie, no point on continuing:
+                # Can't validate user, no point on continuing:
+                # Note: NOT EoF. The script will ask you for your password again
                 return
             elif creds_success == 1:
                 if self.test_info["print"]:
-                    print("RESULT: Eula for {0} not checked.".format(self.test_info['account']))
+                    print("RESULT: Eula for '{0}' not checked.".format(self.test_info['account']))
                 if "expected_outcome" in self.test_info:
                     # Note: Same header gets returned for both of these. No way to tell them apart atm
                     error_msg = "Cannot download data: Study area / Eula isn't set in profile. EarthData Account: {0}. Test: '{1}'.".format(self.test_info["account"], self.test_info["title"])
@@ -988,20 +1015,20 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
                 # You got a cookie, good to go
                 pass
         # From here on, you have a cookie:
-        # elif cookie_exists == 1:
-        end_of_output = False
+        # elif cookie_existed == 1:
         download_existed = False
         download_incomplete = False
-        while not end_of_output:
+        download_bad_url = False
+        while True:
             output = bulk_process.expect([r"Download file .* exists!", \
                                           r"Found .* but it wasn't fully downloaded\. Removing file and downloading again\.", \
                                           r"IMPORTANT: Your user does not have permission to download this type of data!", \
+                                          r"URL Error \(from GET\): .* Name or service not known", \
                                           r"Download Summary"])
             if output == 0:
-                assert "expect_in_output" in self.test_info and "file_exists" in self.test_info["expect_in_output"], "File already exists, but it's not supposed to. Test: '{0}'.".format(self.test_info["title"])
                 download_existed = True
             elif output == 1:
-                assert "expect_in_output" in self.test_info and "file_incomplete" in self.test_info["expect_in_output"], "File is complete. It's not supposed to be. Test: '{0}'.".format(self.test_info["title"])
+                download_incomplete = True
             elif output == 2:
                 if self.test_info["print"]:
                     print("RESULT: Bad permissions to download data!")
@@ -1011,13 +1038,24 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
                 bulk_process.expect(pexpect.EOF)
                 return
             elif output == 3:
+                download_bad_url = True
+            elif output == 4:
                 if self.test_info["print"]:
                     print("RESULT: Able to download data!!")
                 if "expected_outcome" in self.test_info:
-                    assert self.test_info["expected_outcome"] == "success", "Test was not supposed to pass. Account: {0}. Test: '{1}'.".format(self.test_info["account"], self.test_info["title"])
-                end_of_output = True
-            # Script complete, check your downloads:
+                    assert self.test_info["expected_outcome"] == "success", "Test was not supposed to be able to download data, but it can... Account: {0}. Test: '{1}'.".format(self.test_info["account"], self.test_info["title"])
+                break
 
+        # Script complete, check your downloads:
+        if not optional_run and "expect_in_output" in self.test_info:
+            assert ("file_exists" in self.test_info["expect_in_output"]) == download_existed
+            assert ("file_incomplete" in self.test_info["expect_in_output"]) == download_incomplete
+            assert ("bad_url" in self.test_info["expect_in_output"]) == download_bad_url
+
+        # If all the files exist, check the downloads:
+        # all_files_should_exist = ()
+        all_files_should_exist = ("file_not_found" not in self.test_info["expect_in_output"] if "expect_in_output" in self.test_info else True) and ("inject_output" not in self.test_info)
+        if "expect_in_output" in self.test_info and all_files_should_exist:
             # get all files from the output dir into one list:
             downloaded_files = os.path.join(self.output_dir, "*")
             downloaded_files = glob.glob(downloaded_files)
