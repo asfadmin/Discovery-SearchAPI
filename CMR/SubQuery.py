@@ -104,7 +104,7 @@ class CMRSubQuery:
             r = s.post(cfg['cmr_base'] + cfg['cmr_api'], data=self.params)
             q_duration = perf_counter() - q_start
             logging.debug('CMR query time: {0}'.format(q_duration))
-            if(q_duration > 5):
+            if(q_duration > 10):
                 logging.error('Slow CMR response: {0} seconds'.format(q_duration))
                 logging.error('Params sent to CMR:')
                 logging.error(self.params)

@@ -72,7 +72,7 @@ class tester:
         if self.args.save:
             self.save_file = open(self.args.save, 'w')
             self.save_file.write('params, http_status, total_time, download_speed, size_bytes, command\n')
-        for q in self.queries:
+        for i, q in enumerate(self.queries):
             q = q.strip()
             if len(q) <= 0 or q[0] == '#':
                 continue
@@ -94,8 +94,12 @@ class tester:
             else:
                 cache = "-o /dev/null"
             c = "curl --silent --write-out '\"%{{http_code}}\",\"%{{time_total}}\",\"%{{speed_download}}\",\"%{{size_download}}\"' {0} '{1}'".format(cache, q)
-            self.log.info('Executing {0}'.format(p))
-            output = subprocess.check_output(c, shell=True)
+            self.log.info('\n====================\nExecuting {0}/{1}:\n    {2}\n'.format(i+1, len(self.queries), p.replace('&', '\n    ')))
+            try:
+                output = subprocess.check_output(c, shell=True)
+            except Exception as e:
+                self.log.info('~~~~~~~~~~~~~~~~~~~~HELP!~~~~~~~~~~~~~~~~~~~~')
+                continue
             if self.args.save:
                 self.save_file.write('"{0}", {1}, "{2}"\n'.format(p, output, c))
         if self.save_file:
