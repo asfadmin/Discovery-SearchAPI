@@ -310,17 +310,17 @@ class URL_Manager():
                             # If inner for-loop found it, break out of this one too:
                             if found_in_list == True:
                                 break
-                        assert found_in_list, key + " declared, but not found in file. Test: '{0}'".format(test_dict["title"])
+                        assert found_in_list, key + " declared, but not found in file. Test: '{0}'. URL: '{1}'.".format(test_dict["title"], self.query)
                 
                 def checkMinMax(key, test_dict, file_dict):
                     if "min"+key in test_dict and key in file_dict:
                         for value in file_dict[key]:
                             number_type = type(test_dict["min"+key])
-                            assert number_type(value) >= test_dict["min"+key], "TESTING"
+                            assert number_type(value) >= test_dict["min"+key], "Value found smaller than min key. Test: '{0}'. URL: {1}.".format(test_dict["title"], self.query)
                     if "max"+key in test_dict and key in file_dict:
                         for value in file_dict[key]:
                             number_type = type(test_dict["max"+key])
-                            assert number_type(value) <= test_dict["max"+key], "TESTING"
+                            assert number_type(value) <= test_dict["max"+key], "Value found greater than max key. Test: '{0}'. URL: {1}.".format(test_dict["title"], self.query)
 
 
                 def checkDate(title, later_date=None, earlier_date=None):
@@ -466,7 +466,7 @@ class URL_Manager():
                     mutatable_dict[key.lower()[0:3]+"faradayrotation"] = test_input.parse_float(val)
 
         except ValueError as e:
-            assert False, "Test: '{0}'. Incorrect parameter: {1}".format(test_dict["title"], str(e))
+            assert False, "Test: '{0}'. Incorrect parameter: {1}. URL: {2}.".format(test_dict["title"], str(e), self.query)
         test_dict = mutatable_dict
         # Make each possible value line up with what the files returns:
         test_dict = self.renameValsToStandard(test_dict)
