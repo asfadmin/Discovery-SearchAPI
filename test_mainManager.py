@@ -322,42 +322,56 @@ class URL_Manager():
                             number_type = type(test_dict["max"+key])
                             assert number_type(value) <= test_dict["max"+key], "Value found greater than max key. Test: '{0}'. URL: {1}.".format(test_dict["title"], self.query)
 
+                # FOR tz_orig: The timezone the string came from.
+                #       Alaska = "US/Alaska", UTC = "UTC", Blank = whatever timezone you're in now
+                def convertTimezoneUTC(str_time, tz_orig=None):
+                    if tz_orig == None:
+                        tz_orig = get_localzone()
+                    else:
+                        tz_orig = timezone(tz_orig)
+                    # Convert to a datetime object:
+                    str_time = str_time.split(".")[0] # take of any milliseconds. Normally sec.000000
+                    str_time = str_time[:-1] if str_time.endswith("Z") else str_time # take off the 'Z' if it's on the end
+                    str_time = str_time[:-3] if str_time.endswith("UTC") else str_time # take off the 'UTC' if it's on the end
+                    date_obj = datetime.strptime(str_time, "%Y-%m-%dT%H:%M:%S")
+                    # Set the timezone to where the timestamp came from:
+                    date_obj = tz_orig.localize(date_obj)
+                    # Change it to UTC and return it:
+                    return date_obj.astimezone(timezone("UTC"))
 
                 def checkDate(title, later_date=None, earlier_date=None):
-
-                    # FOR tz_orig: The timezone the string came from.
-                    #       Alaska = "US/Alaska", UTC = "UTC", Blank = whatever timezone you're in now
-                    def convertTimezoneUTC(str_time, tz_orig=None):
-                        if tz_orig == None:
-                            tz_orig = get_localzone()
-                        else:
-                            tz_orig = timezone(tz_orig)
-                        # Convert to a datetime object:
-                        str_time = str_time.split(".")[0] # take of any milliseconds. Normally sec.000000
-                        str_time = str_time[:-1] if str_time.endswith("Z") else str_time # take off the 'Z' if it's on the end
-                        str_time = str_time[:-3] if str_time.endswith("UTC") else str_time # take off the 'UTC' if it's on the end
-                        date_obj = datetime.strptime(str_time, "%Y-%m-%dT%H:%M:%S")
-                        # Set the timezone to where the timestamp came from:
-                        date_obj = tz_orig.localize(date_obj)
-                        # Change it to UTC and return it:
-                        return date_obj.astimezone(timezone("UTC"))
-
                     # Figure out which is the list of dates:
                     # (assuming whichever is the list, is loaded from downloads. The other is from yml file)
                     if isinstance(later_date, type([])):
                         earlier_date = convertTimezoneUTC(earlier_date)
                         for theDate in later_date:
-                            theDate = convertTimezoneUTC(theDate, "UTC")
+                            theDate = convertTimezoneUTC(theDate, tz_orig="UTC")
                             assert theDate >= earlier_date, "File has too small of a date. File: {0}, earlier than test date: {1}. Test: '{2}'. URL: {3}.".format(theDate, earlier_date, title, self.query)
                     elif isinstance(earlier_date, type([])):
                         later_date = convertTimezoneUTC(later_date)
                         for theDate in earlier_date:
-                            theDate = convertTimezoneUTC(theDate, "UTC")
+                            theDate = convertTimezoneUTC(theDate, tz_orig="UTC")
                             assert later_date >= theDate, "File has too large of a date. File: {0}, later than test date: {1}. Test: '{2}'. URL: {3}.".format(theDate, later_date, title, self.query)
                     else: # Else they both are a single date. Not sure if this is needed, but...
                         earlier_date = convertTimezoneUTC(earlier_date)
                         later_date = convertTimezoneUTC(later_date)
                         later_date >= earlier_date, "Date: {0} is earlier than date {1}. Test: '{2}'".format(later_date, earlier_date, title)
+
+                def checkSeason(title, file_dates, season_list):
+                    def date_to_nth_day(date):
+                        date = convertTimezoneUTC(date, tz_orig="UTC")
+                        start_of_year = datetime(year=date.year, month=1, day=1)
+                        start_of_year = timezone("UTC").localize(start_of_year)
+                        return (date - start_of_year).days + 1
+
+                    for f_date in file_dates:
+                        f_day = date_to_nth_day(f_date)
+                        # For checking season=5,300:  (gives 5-300)
+                        if season_list[0] <= season_list[1]:
+                            assert season_list[0] <= f_day <= season_list[1], "Found value outside of season range. Test: '{0}'. URL: '{1}'.".format(title, self.query)
+                        # For checking season=300,5:  (gives 300-365, 1-5)
+                        else: # if season_list[0] > season_list[1]:
+                            assert not (season_list[1] < f_day < season_list[0]), "Found value outside of season range. Test: '{0}'. URL: '{1}'.".format(title, self.query)
 
                 checkFileContainsExpected("Platform", test_dict, file_content)
                 checkFileContainsExpected("absoluteOrbit", test_dict, file_content)
@@ -381,10 +395,16 @@ class URL_Manager():
                 if "starttime" in file_content and "end" in test_dict:
                     checkDate(test_dict["title"], later_date=test_dict["end"], earlier_date=file_content["starttime"])
 
+                if "starttime" in file_content and "season" in test_dict:
+                    checkSeason(test_dict["title"], file_content["starttime"], test_dict["season"])
+
                 checkMinMax("baselineperp", test_dict, file_content)
                 checkMinMax("doppler", test_dict, file_content)
                 checkMinMax("insarstacksize", test_dict, file_content)
                 checkMinMax("faradayrotation", test_dict, file_content)
+
+
+
     def parseTestValues(self, test_dict):
         # Turn string values to lists:
         mutatable_dict = deepcopy(test_dict)
@@ -446,6 +466,9 @@ class URL_Manager():
                 elif key.lower() == "end":
                     del mutatable_dict[key]
                     mutatable_dict["end"] = test_input.parse_date(val.replace("+", " "))
+                elif key.lower() == "season":
+                    del mutatable_dict[key]
+                    mutatable_dict["season"] = test_input.parse_int_list(val)
                 # MIN/MAX variants
                 # min/max BaselinePerp
                 elif key.lower()[3:] == "baselineperp":
@@ -1068,7 +1091,8 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
 
         # If all the files exist, check the downloads:
         # all_files_should_exist = ()
-        all_files_should_exist = ("file_not_found" not in self.test_info["expect_in_output"] if "expect_in_output" in self.test_info else True) and ("inject_output" not in self.test_info)
+        
+        all_files_should_exist = False #("file_not_found" not in self.test_info["expect_in_output"] and )if "expect_in_output" in self.test_info else True) and ("inject_output" not in self.test_info)
         if "expect_in_output" in self.test_info and all_files_should_exist:
             # get all files from the output dir into one list:
             downloaded_files = os.path.join(self.output_dir, "*")
