@@ -9,6 +9,7 @@ from copy import deepcopy
 from io import StringIO
 from shutil import copyfile, rmtree
 from datetime import datetime
+from pytz import timezone
 import defusedxml.minidom as md
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -321,28 +322,37 @@ class URL_Manager():
                             assert number_type(value) <= test_dict["max"+key], "TESTING"
 
 
-                def checkDate(title, larger=None, smaller=None):
-                    def runAssertTest(larger, smaller):
-                        # Make them both into "year-month-day T hour:min:sec" formats, and
-                        #     remove anything after the sec:
-                        def makeDate(theDate):
-                            theDate = theDate.split(".")[0] # take of any milliseconds. Normally sec.000000
-                            theDate = theDate[:-1] if theDate.endswith("Z") else theDate # take off the 'Z' if it's on the end
-                            theDate = theDate[:-3] if theDate.endswith("UTC") else theDate # take off the 'UTC' if it's on the end
-                            theDate = datetime.strptime(theDate, "%Y-%m-%dT%H:%M:%S")
-                            return theDate
-                        return makeDate(larger) >= makeDate(smaller)
+                def checkDate(title, later_date=None, earlier_date=None):
+
+                    # FOR tz_orig: The timezone the string came from.
+                    #       Alaska = "US/Alaska", UTC = "UTC"
+                    def convertTimezoneUTC(str_time, tz_orig):
+                        # Convert to a datetime object:
+                        str_time = str_time.split(".")[0] # take of any milliseconds. Normally sec.000000
+                        str_time = str_time[:-1] if str_time.endswith("Z") else str_time # take off the 'Z' if it's on the end
+                        str_time = str_time[:-3] if str_time.endswith("UTC") else str_time # take off the 'UTC' if it's on the end
+                        date_obj = datetime.strptime(str_time, "%Y-%m-%dT%H:%M:%S")
+                        # Set the timezone to where the timestamp came from:
+                        date_obj = timezone(tz_orig).localize(date_obj)
+                        # Change it to UTC and return it:
+                        return date_obj.astimezone(timezone("UTC"))
 
                     # Figure out which is the list of dates:
                     # (assuming whichever is the list, is loaded from downloads. The other is from yml file)
-                    if isinstance(larger, type([])):
-                        for theDate in larger:
-                            assert runAssertTest(theDate, smaller), "File has too small of a date. File: {0}, smaller than test date: {1}. Test: '{2}'.".format(theDate, smaller, title)
-                    elif isinstance(smaller, type([])):
-                        for theDate in smaller:
-                            assert runAssertTest(larger, theDate), "File has too large of a date. File: {0}, larger than test date: {1}. Test: '{2}'.".format(larger, theDate, title)
+                    if isinstance(later_date, type([])):
+                        earlier_date = convertTimezoneUTC(earlier_date, "US/Alaska")
+                        for theDate in later_date:
+                            theDate = convertTimezoneUTC(theDate, "UTC")
+                            assert theDate >= earlier_date, "File has too small of a date. File: {0}, earlier than test date: {1}. Test: '{2}'. URL: {3}.".format(theDate, earlier_date, title, self.query)
+                    elif isinstance(earlier_date, type([])):
+                        later_date = convertTimezoneUTC(later_date, "US/Alaska")
+                        for theDate in earlier_date:
+                            theDate = convertTimezoneUTC(theDate, "UTC")
+                            assert later_date >= theDate, "File has too large of a date. File: {0}, later than test date: {1}. Test: '{2}'. URL: {3}.".format(theDate, later_date, title, self.query)
                     else: # Else they both are a single date. Not sure if this is needed, but...
-                        runAssertTest(larger, smaller), "Date: {0} is smaller than date {1}. Test: '{2}'".format(larger, smaller, title)
+                        earlier_date = convertTimezoneUTC(earlier_date, "US/Alaska")
+                        later_date = convertTimezoneUTC(later_date, "US/Alaska")
+                        later_date >= earlier_date, "Date: {0} is earlier than date {1}. Test: '{2}'".format(later_date, earlier_date, title)
 
                 checkFileContainsExpected("Platform", test_dict, file_content)
                 checkFileContainsExpected("absoluteOrbit", test_dict, file_content)
@@ -360,11 +370,11 @@ class URL_Manager():
                 checkFileContainsExpected("lookdirection", test_dict, file_content)
 
                 if "processingdate" in file_content and "processingdate" in test_dict:
-                    checkDate(test_dict["title"], larger=file_content["processingdate"], smaller=test_dict["processingdate"])
+                    checkDate(test_dict["title"], later_date=file_content["processingdate"], earlier_date=test_dict["processingdate"])
                 if "starttime" in file_content and "start" in test_dict:
-                    checkDate(test_dict["title"], larger=file_content["starttime"], smaller=test_dict["start"])
+                    checkDate(test_dict["title"], later_date=file_content["starttime"], earlier_date=test_dict["start"])
                 if "starttime" in file_content and "end" in test_dict:
-                    checkDate(test_dict["title"], larger=test_dict["end"], smaller=file_content["starttime"])
+                    checkDate(test_dict["title"], later_date=test_dict["end"], earlier_date=file_content["starttime"])
 
                 checkMinMax("baselineperp", test_dict, file_content)
                 checkMinMax("doppler", test_dict, file_content)
@@ -431,6 +441,9 @@ class URL_Manager():
                 elif key.lower() == "end":
                     del mutatable_dict[key]
                     mutatable_dict["end"] = test_input.parse_date(val.replace("+", " "))
+                    print("HIT YML TEST SIDE:")
+                    print(mutatable_dict["end"])
+                    print(type(mutatable_dict["end"]))
                 # MIN/MAX variants
                 # min/max BaselinePerp
                 elif key.lower()[3:] == "baselineperp":
