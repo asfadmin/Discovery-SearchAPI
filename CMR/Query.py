@@ -65,6 +65,15 @@ class CMRQuery:
             if platform_list:
                 q = q + tuple([{input_map()['platform'][0]: input_map()['platform'][1].format('{0}'.format(t))} for t in platform_list])
             final_list.append(q)
+
+        # Restore the original params that got popped off
+        if granule_list:
+            params['granule_list'] = granule_list
+        if product_list:
+            params['product_list'] = product_list
+        if platform_list:
+            params['platform'] = platform_list
+
         return final_list
 
     def get_count(self):
