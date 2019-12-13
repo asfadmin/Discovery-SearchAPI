@@ -10,6 +10,7 @@ from io import StringIO
 from shutil import copyfile, rmtree
 from datetime import datetime
 from pytz import timezone
+from tzlocal import get_localzone
 import defusedxml.minidom as md
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -325,33 +326,37 @@ class URL_Manager():
                 def checkDate(title, later_date=None, earlier_date=None):
 
                     # FOR tz_orig: The timezone the string came from.
-                    #       Alaska = "US/Alaska", UTC = "UTC"
-                    def convertTimezoneUTC(str_time, tz_orig):
+                    #       Alaska = "US/Alaska", UTC = "UTC", Blank = whatever timezone you're in now
+                    def convertTimezoneUTC(str_time, tz_orig=None):
+                        if tz_orig == None:
+                            tz_orig = get_localzone()
+                        else:
+                            tz_orig = timezone(tz_orig)
                         # Convert to a datetime object:
                         str_time = str_time.split(".")[0] # take of any milliseconds. Normally sec.000000
                         str_time = str_time[:-1] if str_time.endswith("Z") else str_time # take off the 'Z' if it's on the end
                         str_time = str_time[:-3] if str_time.endswith("UTC") else str_time # take off the 'UTC' if it's on the end
                         date_obj = datetime.strptime(str_time, "%Y-%m-%dT%H:%M:%S")
                         # Set the timezone to where the timestamp came from:
-                        date_obj = timezone(tz_orig).localize(date_obj)
+                        date_obj = tz_orig.localize(date_obj)
                         # Change it to UTC and return it:
                         return date_obj.astimezone(timezone("UTC"))
 
                     # Figure out which is the list of dates:
                     # (assuming whichever is the list, is loaded from downloads. The other is from yml file)
                     if isinstance(later_date, type([])):
-                        earlier_date = convertTimezoneUTC(earlier_date, "US/Alaska")
+                        earlier_date = convertTimezoneUTC(earlier_date)
                         for theDate in later_date:
                             theDate = convertTimezoneUTC(theDate, "UTC")
                             assert theDate >= earlier_date, "File has too small of a date. File: {0}, earlier than test date: {1}. Test: '{2}'. URL: {3}.".format(theDate, earlier_date, title, self.query)
                     elif isinstance(earlier_date, type([])):
-                        later_date = convertTimezoneUTC(later_date, "US/Alaska")
+                        later_date = convertTimezoneUTC(later_date)
                         for theDate in earlier_date:
                             theDate = convertTimezoneUTC(theDate, "UTC")
                             assert later_date >= theDate, "File has too large of a date. File: {0}, later than test date: {1}. Test: '{2}'. URL: {3}.".format(theDate, later_date, title, self.query)
                     else: # Else they both are a single date. Not sure if this is needed, but...
-                        earlier_date = convertTimezoneUTC(earlier_date, "US/Alaska")
-                        later_date = convertTimezoneUTC(later_date, "US/Alaska")
+                        earlier_date = convertTimezoneUTC(earlier_date)
+                        later_date = convertTimezoneUTC(later_date)
                         later_date >= earlier_date, "Date: {0} is earlier than date {1}. Test: '{2}'".format(later_date, earlier_date, title)
 
                 checkFileContainsExpected("Platform", test_dict, file_content)
@@ -441,9 +446,6 @@ class URL_Manager():
                 elif key.lower() == "end":
                     del mutatable_dict[key]
                     mutatable_dict["end"] = test_input.parse_date(val.replace("+", " "))
-                    print("HIT YML TEST SIDE:")
-                    print(mutatable_dict["end"])
-                    print(type(mutatable_dict["end"]))
                 # MIN/MAX variants
                 # min/max BaselinePerp
                 elif key.lower()[3:] == "baselineperp":
