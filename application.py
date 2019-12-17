@@ -156,6 +156,8 @@ def postflight(exc):
         logging.warning('Request process time:    {0} seconds'.format(total_proc_time))
         logging.warning('Request real time:       {0} seconds'.format(total_real_time))
         logging.warning('Process/real time ratio: {0}'.format(total_proc_time / total_real_time))
+        logging.warning('Request URL:')
+        logging.warning(request.url)
         logging.warning('Request params:')
         logging.warning(request.values)
     except Exception as e:
