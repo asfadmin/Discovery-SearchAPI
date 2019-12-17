@@ -47,7 +47,7 @@ url tests:
 
 #DS-2766 open bug for absoluteOrbit - GRFN scenes search correct range, but file returns different value for absoluteOrbit
 - absoluteOrbit zero range:
-    absoluteOrbit: 17545-17545
+    absoluteOrbit: 19364-19364
     maxresults: 10
     output: csv
 
@@ -55,7 +55,7 @@ url tests:
     expected code: 200
 
 - absoluteOrbit zero range list:
-    absoluteOrbit: 17545-17545,17560
+    absoluteOrbit: 19364-19364,19189
     maxresults: 10
     output: csv
 
@@ -63,8 +63,9 @@ url tests:
     expected code: 200
 
 #WEB2-1956 open bug for asfframe - for R1, frame in file will not match frame in query
+#tests that will fail: asfframe R1 single, asfframe R1 list, asfframe R1 range
 - asfframe R1 single:
-    asfframe: 340
+    asfframe: 307
     platform: R1
     maxresults: 10
     output: csv
@@ -73,7 +74,7 @@ url tests:
     expected code: 200
 
 - asfframe R1 list:
-    asfframe: 340,346,347
+    asfframe: 304,305,306,307
     platform: R1
     maxresults: 10
     output: csv
@@ -82,7 +83,7 @@ url tests:
     expected code: 200
 
 - asfframe R1 range:
-    asfframe: 340-347
+    asfframe: 300-310
     platform: R1
     maxresults: 10
     output: csv
@@ -282,8 +283,8 @@ url tests:
     expected file: csv
     expected code: 200
 
-- collectionName Iceland 100:
-    collectionName: Iceland
+- collectionName ABoVE 100:
+    collectionName: ABoVE
     maxresults: 100
     output: json
 
@@ -300,14 +301,6 @@ url tests:
 
 - collectionName Cascade 100:
     collectionName: Cascade%20Volcanoes,%20CA/OR/WA
-    maxresults: 100
-    output: json
-
-    expected file: json
-    expected code: 200
-
-- collectionName Permafrost Sites Only in Test:
-    collectionName: Permafrost+Sites,+AK
     maxresults: 100
     output: json
 
@@ -408,7 +401,7 @@ url tests:
     expected code: 200
 
 - flightLine:
-    flightLine: 15302
+    flightLine: 16203
     maxresults: 10
     output: json
 
@@ -425,8 +418,9 @@ url tests:
 
 #DS-2772 open bug for frame + platform
 #frame queries with no platform will search centerESAframe & return asfframe in file - file validation will fail
+#failures for frame single & frame range tests
 - frame single:
-    frame: 581
+    frame: 6714
     maxresults: 10
     output: csv
 
@@ -434,7 +428,7 @@ url tests:
     expected code: 200
 
 - frame range:
-    frame: 580-585
+    frame: 6710-6715
     maxresults: 10
     output: csv
 
@@ -442,7 +436,7 @@ url tests:
     expected code: 200
 
 - frame list:
-    frame: 578,579,580
+    frame: 1100,1101,1102
     maxresults: 10
     output: csv
 
@@ -450,7 +444,7 @@ url tests:
     expected code: 200
 
 - frame list range:
-    frame: 688,1530-1532
+    frame: 6714,1100-1105
     maxresults: 10
     output: csv
 
@@ -547,7 +541,7 @@ url tests:
     expected code: 200
 
 - groupid UAVSAR:
-    groupid: UA_EcuVol_17700_15024_006_150319_L090_CX_01
+    groupid: UA_ChiVol_00700_15030_010_150330_L090_CX_01
     output: json
 
     expected file: json
@@ -1008,24 +1002,24 @@ url tests:
     expected file: csv
     expected code: 200
 
-- platform R1 E1:
-    platform: R1,E1
+- platform R1:
+    platform: R1
     maxResults: 10
     output: jSoN
 
     expected file: json
     expected code: 200
 
-- platform R1 E1 2:
-    platform: RADARSAT-1,E1
+- platform R1 2:
+    platform: RADARSAT-1
     maxResults: 10
     output: csv
 
     expected file: csv
     expected code: 200
 
-- platform R1 E1 Level:
-    platform: RADARSAT-1,E1
+- platform R1 Level:
+    platform: RADARSAT-1
     processingLevel: L0,L1
     maxResults: 10
     output: csv
@@ -1980,6 +1974,14 @@ url tests:
     expected file: csv
     expected code: 200
 
+- processingDate yearago:
+    processingDate: 1+year+ago
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
 - processingDate yesterday:
     processingDate: yesterday
     maxResults: 10
@@ -2291,7 +2293,7 @@ url tests:
 
 - start Zdate end count:
     start: 2005-01-01T00:00:00Z
-    end: 2005-01-01T01:00:00Z
+    end: 2006-01-01T01:00:00Z
     output: count
 
     expected file: count
