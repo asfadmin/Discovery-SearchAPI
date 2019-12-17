@@ -16,7 +16,6 @@ from CMR.Health import get_cmr_health
 from Analytics import analytics_pageview
 from werkzeug.exceptions import RequestEntityTooLarge
 import time
-import dumper
 
 
 # EB looks for an 'application' callable by default.
@@ -161,7 +160,6 @@ def postflight(exc):
         logging.warning(request.values)
     except Exception as e:
         logging.error('Exception encountered in postflight handler: {0}'.format(e))
-        pass
 
 # Run a dev server
 if __name__ == '__main__':
