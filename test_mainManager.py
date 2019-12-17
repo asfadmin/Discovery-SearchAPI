@@ -923,7 +923,7 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
                 self.run_process_tests(bulk_process)            
             except pexpect.exceptions.TIMEOUT:
                 assert False, "Test ran out of time! Set 'timeout' in test. (Can be Null to disable, or # seconds). Test: '{0}'.".format(test_info["title"])
-        os.remove(bulk_download_path)
+        # os.remove(bulk_download_path)
 
 
 
@@ -1125,7 +1125,8 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
                                           r"Found .* but it wasn't fully downloaded\. Removing file and downloading again\.", \
                                           r"IMPORTANT: Your user does not have permission to download this type of data!", \
                                           r"URL Error \(from GET\): .* Name or service not known", \
-                                          r"Download Summary"])
+                                          r"Download Summary", \
+                                          r"HTTP Error:.*"])
             if output == 0:
                 download_existed = True
             elif output == 1:
@@ -1146,6 +1147,8 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
                 if "expected_outcome" in self.test_info:
                     assert self.test_info["expected_outcome"] == "success", "Test was not supposed to be able to download data, but it can... Account: {0}. Test: '{1}'.".format(self.test_info["account"], self.test_info["title"])
                 break
+            elif output == 5:
+                assert False, "Data is not available. (Datapool down?). Test: '{0}'. Error: '{1}'. Account: '{2}'.".format(self.test_info["title"], bulk_process.after, self.test_info["account"])
 
         # Script complete, check your downloads:
         if not optional_run and "expect_in_output" in self.test_info:
