@@ -437,9 +437,10 @@ class URL_Manager():
                 checkFileContainsExpected("flightline", test_dict, file_content)
                 checkFileContainsExpected("lookdirection", test_dict, file_content)
 
-                # Processing Date:
-                if "processingdate" in file_content and "processingdate" in test_dict:
-                    checkDate(test_dict["title"], later_date=file_content["processingdate"], earlier_date=test_dict["processingdate"])
+                # Processing Date (can not validate because it uses a field from CMR not in the API):
+                # if "processingdate" in file_content and "processingdate" in test_dict:
+                #     checkDate(test_dict["title"], later_date=file_content["processingdate"], earlier_date=test_dict["processingdate"])
+                # Start & End:
                 if "starttime" in file_content and "start" in test_dict:
                     checkDate(test_dict["title"], later_date=file_content["starttime"], earlier_date=test_dict["start"])
                 if "starttime" in file_content and "end" in test_dict:
@@ -507,9 +508,9 @@ class URL_Manager():
                 elif key.lower() == "lookdirection":
                     del mutatable_dict[key]
                     mutatable_dict["lookdirection"] = test_input.parse_string_list(val)
-                elif key.lower() == "processingdate":
-                    del mutatable_dict[key]
-                    mutatable_dict["processingdate"] = test_input.parse_date(val.replace("+", " "))
+                # elif key.lower() == "processingdate":
+                #     del mutatable_dict[key]
+                #     mutatable_dict["processingdate"] = test_input.parse_date(val.replace("+", " "))
                 elif key.lower() == "start":
                     del mutatable_dict[key]
                     mutatable_dict["start"] = test_input.parse_date(val.replace("+", " "))
@@ -619,9 +620,9 @@ class URL_Manager():
         if "lookDirection" in json_dict:
             json_dict["lookdirection"] = json_dict.pop("lookDirection")
         ### processingDate:
-        for key in ["Processing Date", "processingDate"]:
-            if key in json_dict:
-                json_dict["processingdate"] = json_dict.pop(key)
+        # for key in ["Processing Date", "processingDate"]:
+        #     if key in json_dict:
+        #         json_dict["processingdate"] = json_dict.pop(key)
         ### start & end
         for key in ["Start Time", "startTime"]:
             if key in json_dict:

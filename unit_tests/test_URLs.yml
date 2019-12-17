@@ -2173,6 +2173,7 @@ url tests:
     expected file: csv
     expected code: 200
 
+#open bug for this - DS-2809
 - season 1-175 UAVSAR Start End:
     season: 1,175
     platform: Ua
@@ -2250,6 +2251,15 @@ url tests:
     expected file: csv
     expected code: 200
 
+- season 340-10 wrap:
+    season: 340,10
+    platform: AS
+    maxResults: 100
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
 - start Zdate:
     start: 2005-01-01T00:00:00Z
     maxResults: 10
@@ -2275,8 +2285,8 @@ url tests:
     expected file: csv
     expected code: 200
 
-- start end 1monthago:
-    start: 1+month+ago
+- start end 6monthago:
+    start: 6+month+ago
     end: now
     maxResults: 10
     output: csv
@@ -2299,8 +2309,8 @@ url tests:
     expected file: count
     expected code: 200
 
-- start 3monthagoplus1day count:
-    start: 3+months+and+a+day+ago
+- start 7monthagoplus1day count:
+    start: 7+months+and+a+day+ago
     output: count
 
     expected file: count
