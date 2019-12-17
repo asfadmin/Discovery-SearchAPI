@@ -15,6 +15,7 @@ import json
 from CMR.Health import get_cmr_health
 from Analytics import analytics_pageview
 from werkzeug.exceptions import RequestEntityTooLarge
+import time
 
 
 # EB looks for an 'application' callable by default.
@@ -131,6 +132,8 @@ def handle_oversize_request(error):
 # Pre-flight operations
 @application.before_request
 def preflight():
+    request.asf_start_proc_time = time.process_time()
+    request.asf_start_real_time = time.perf_counter()
     analytics_pageview()
 
 # Cleanup operations
@@ -138,6 +141,25 @@ def preflight():
 def add_header(response):
     response.headers['Access-Control-Allow-Origin'] = '*'
     return response
+
+@application.teardown_request
+def postflight(exc):
+    try:
+        if exc is not None:
+            logging.error('Postflight handler encountered exception: {0}'.format(exc))
+        end_proc_time = time.process_time()
+        total_proc_time = end_proc_time - request.asf_start_proc_time
+        end_real_time = time.perf_counter()
+        total_real_time = end_real_time - request.asf_start_real_time
+        #if total_proc_time / total_real_time > .5 or total_real_time > 10:
+        logging.warning('Total request timing analysis:')
+        logging.warning('Request process time:    {0} seconds'.format(total_proc_time))
+        logging.warning('Request real time:       {0} seconds'.format(total_real_time))
+        logging.warning('Process/real time ratio: {0}'.format(total_proc_time / total_real_time))
+        logging.warning('Request params:')
+        logging.warning(request.values)
+    except Exception as e:
+        logging.error('Exception encountered in postflight handler: {0}'.format(e))
 
 # Run a dev server
 if __name__ == '__main__':
