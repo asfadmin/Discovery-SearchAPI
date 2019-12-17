@@ -324,20 +324,24 @@ class URL_Manager():
 
                 # FOR tz_orig: The timezone the string came from.
                 #       Alaska = "US/Alaska", UTC = "UTC", Blank = whatever timezone you're in now
-                def convertTimezoneUTC(str_time, tz_orig=None):
-                    if tz_orig == None:
-                        tz_orig = get_localzone()
-                    else:
-                        tz_orig = timezone(tz_orig)
-                    # Convert to a datetime object:
-                    str_time = str_time.split(".")[0] # take of any milliseconds. Normally sec.000000
-                    str_time = str_time[:-1] if str_time.endswith("Z") else str_time # take off the 'Z' if it's on the end
-                    str_time = str_time[:-3] if str_time.endswith("UTC") else str_time # take off the 'UTC' if it's on the end
-                    date_obj = datetime.strptime(str_time, "%Y-%m-%dT%H:%M:%S")
+                def convertTimezoneUTC(time, tz_orig=None):
+                    # Assume if tz_orig is overriden, it's a string of what timezone they want. Else, get whatever timezone you're in
+                    tz_orig = get_localzone() if tz_orig == None else timezone(tz_orig)
+
+                    # If it's a string, convert it to datetime and localize it. 
+                    # Else it's already datetime, just localize to the timezone:
+                    if isinstance(time, type("")):
+                        # Strip down a string, so it can be used in the format: "%Y-%m-%dT%H:%M:%S"
+                        time = time.split(".")[0] # take of any milliseconds. Normally sec.000000
+                        time = time[:-1] if time.endswith("Z") else time # take off the 'Z' if it's on the end
+                        time = time[:-3] if time.endswith("UTC") else time # take off the 'UTC' if it's on the end
+                        # Convert to a datetime object:
+                        time = datetime.strptime(time, "%Y-%m-%dT%H:%M:%S")
+
                     # Set the timezone to where the timestamp came from:
-                    date_obj = tz_orig.localize(date_obj)
+                    time = tz_orig.localize(time)
                     # Change it to UTC and return it:
-                    return date_obj.astimezone(timezone("UTC"))
+                    return time.astimezone(timezone("UTC"))
 
                 def checkDate(title, later_date=None, earlier_date=None):
                     # Figure out which is the list of dates:
@@ -357,21 +361,66 @@ class URL_Manager():
                         later_date = convertTimezoneUTC(later_date)
                         later_date >= earlier_date, "Date: {0} is earlier than date {1}. Test: '{2}'".format(later_date, earlier_date, title)
 
-                def checkSeason(title, file_dates, season_list):
+                def checkSeason(title, file_start_dates, file_end_dates, season_list):
                     def date_to_nth_day(date):
-                        date = convertTimezoneUTC(date, tz_orig="UTC")
                         start_of_year = datetime(year=date.year, month=1, day=1)
-                        start_of_year = timezone("UTC").localize(start_of_year)
+                        start_of_year = convertTimezoneUTC(start_of_year, tz_orig="UTC")
                         return (date - start_of_year).days + 1
 
-                    for f_date in file_dates:
-                        f_day = date_to_nth_day(f_date)
-                        # For checking season=5,300:  (gives 5-300)
-                        if season_list[0] <= season_list[1]:
-                            assert season_list[0] <= f_day <= season_list[1], "Found value outside of season range. Test: '{0}'. URL: '{1}'.".format(title, self.query)
-                        # For checking season=300,5:  (gives 300-365, 1-5)
-                        else: # if season_list[0] > season_list[1]:
-                            assert not (season_list[1] < f_day < season_list[0]), "Found value outside of season range. Test: '{0}'. URL: '{1}'.".format(title, self.query)
+                    if len(file_start_dates) == len(file_end_dates):
+                        file_dates = zip(file_start_dates, file_end_dates)
+                    else:
+                        assert False, "Error running test! Not same number of start and end dates. Test: '{0}'. URL: '{1}'.".format(title, self.query)
+                    
+                    # If it's [300,5], turn it into [[300,365],[1,5]]. Else make it [[x,y]]
+                    if season_list[0] > season_list[1]:
+                        season_list = [ [season_list[0],365],[1,season_list[1]] ]
+                    else:
+                        season_list = [season_list]
+
+                    for date in file_dates:
+                        # Each year's range is in a different element. 'season=300,5' on a dataset 2017-2019 will add [300-365,1-365,1-5]:
+                        days_ranges = []
+                        start_season = convertTimezoneUTC(date[0], tz_orig="UTC")
+                        end_season = convertTimezoneUTC(date[1], tz_orig="UTC")
+                        year_diff = abs(start_season.year - end_season.year)
+                        # First check if the product's date takes up an entire year:
+                        if year_diff >= 2 or start_season.month <= end_season.month and year_diff >= 1:
+                            days_ranges = [[1,365]]
+                        else:
+                            # Convert start/end points to ints:
+                            start = date_to_nth_day(start_season)
+                            end = date_to_nth_day(end_season)
+                            # Check if both dates exist in the same calendar year:
+                            if year_diff == 0:
+                                days_ranges.append([start,end])
+                            # append both halfs of the range:
+                            else:
+                                days_ranges.append([start, 365])
+                                days_ranges.append([1, end])
+
+                        # days_ranges is populated. Make sure it lines up with what you asked for:
+                        season_range_hit = False
+                        for season in season_list:
+                            for the_range in days_ranges:
+                                # If either boundry in the file is in what you ask for in the season list, you pass:
+                                if (season[0] <= the_range[0] <= season[1]) or (season[0] <= the_range[1] <= season[1]):
+                                    season_range_hit = True
+                                    break
+
+                        assert season_range_hit, "NOT FOUND IN FILE. days_ranges: {0}. season_list: {1}.".format(days_ranges, season_list)
+                    print(self.query)
+
+
+
+                    # for f_date in file_dates:
+                    #     f_day = date_to_nth_day(f_date)
+                    #     # For checking season=5,300:  (gives 5-300)
+                    #     if season_list[0] <= season_list[1]:
+                    #         assert season_list[0] <= f_day <= season_list[1], "Found value outside of season range. Test: '{0}'. URL: '{1}'.".format(title, self.query)
+                    #     # For checking season=300,5:  (gives 300-365, 1-5)
+                    #     else: # if season_list[0] > season_list[1]:
+                    #         assert not (season_list[1] < f_day < season_list[0]), "Found value outside of season range. Test: '{0}'. URL: '{1}'.".format(title, self.query)
 
                 checkFileContainsExpected("Platform", test_dict, file_content)
                 checkFileContainsExpected("absoluteOrbit", test_dict, file_content)
@@ -388,6 +437,7 @@ class URL_Manager():
                 checkFileContainsExpected("flightline", test_dict, file_content)
                 checkFileContainsExpected("lookdirection", test_dict, file_content)
 
+                # Processing Date:
                 if "processingdate" in file_content and "processingdate" in test_dict:
                     checkDate(test_dict["title"], later_date=file_content["processingdate"], earlier_date=test_dict["processingdate"])
                 if "starttime" in file_content and "start" in test_dict:
@@ -395,8 +445,8 @@ class URL_Manager():
                 if "starttime" in file_content and "end" in test_dict:
                     checkDate(test_dict["title"], later_date=test_dict["end"], earlier_date=file_content["starttime"])
 
-                if "starttime" in file_content and "season" in test_dict:
-                    checkSeason(test_dict["title"], file_content["starttime"], test_dict["season"])
+                if "starttime" in file_content and "endtime" in file_content and "season" in test_dict:
+                    checkSeason(test_dict["title"], file_content["starttime"], file_content["endtime"], test_dict["season"])
 
                 checkMinMax("baselineperp", test_dict, file_content)
                 checkMinMax("doppler", test_dict, file_content)
@@ -490,6 +540,16 @@ class URL_Manager():
 
         except ValueError as e:
             assert False, "Test: '{0}'. Incorrect parameter: {1}. URL: {2}.".format(test_dict["title"], str(e), self.query)
+
+        # If start is larger than end, swap them:
+        if "start" in mutatable_dict and "end" in mutatable_dict:
+            start = datetime.strptime(mutatable_dict["start"], "%Y-%m-%dT%H:%M:%SZ")
+            end = datetime.strptime(mutatable_dict["end"], "%Y-%m-%dT%H:%M:%SZ")
+            if start > end:
+                tmp = mutatable_dict["start"]
+                mutatable_dict["start"] = mutatable_dict["end"]
+                mutatable_dict["end"] = tmp
+
         test_dict = mutatable_dict
         # Make each possible value line up with what the files returns:
         test_dict = self.renameValsToStandard(test_dict)
@@ -566,6 +626,9 @@ class URL_Manager():
         for key in ["Start Time", "startTime"]:
             if key in json_dict:
                 json_dict["starttime"] = json_dict.pop(key)
+        for key in ["End Time", "stopTime"]:
+            if key in json_dict:
+                json_dict["endtime"] = json_dict.pop(key)
         return json_dict
 
 
@@ -683,6 +746,7 @@ class URL_Manager():
                 if beammode[0:2] == "ST":
                     json_dict["beammode"][i] = "STD"
         return json_dict
+
     def getUrl(self, test_dict):
         # DONT add these to url. (Used for tester). Add ALL others to allow testing keywords that don't exist
         reserved_keywords = ["title", "print", "api", "type"]
