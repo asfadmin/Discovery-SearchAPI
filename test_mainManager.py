@@ -408,8 +408,7 @@ class URL_Manager():
                                     season_range_hit = True
                                     break
 
-                        assert season_range_hit, "NOT FOUND IN FILE. days_ranges: {0}. season_list: {1}.".format(days_ranges, season_list)
-                    print(self.query)
+                        assert season_range_hit, "Seasons not found in file. file ranges: {0}. yml range: {1}. Test: {2}. URL: {3}.".format(days_ranges, season_list, title, self.query)
 
 
 
