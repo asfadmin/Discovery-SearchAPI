@@ -990,6 +990,9 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
             test_info["files"].extend([product.split("/")[-1] for product in test_info["products"]])
         # python_version:
         test_info = turnValueIntoList("python_version", test_info, default=[2, 3])
+        # skip_file_check:
+        if "skip_file_check" not in test_info:
+            test_info["skip_file_check"] = False
         # test_on_second_run:
         if "test_on_second_run" not in test_info:
             test_info["test_on_second_run"] = False
@@ -1080,9 +1083,6 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
                 break
             # These mean you're not done with the input, do another loop around:
             elif script_output == 2:
-                print("HITTTT!!!!!:")
-                print(bulk_process.after)
-                print()
                 file_not_found_hit = True
             elif script_output == 3:
                 unknown_arg_hit = True
@@ -1173,11 +1173,8 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
             assert ("file_incomplete" in self.test_info["expect_in_output"]) == download_incomplete
             assert ("bad_url" in self.test_info["expect_in_output"]) == download_bad_url
 
-        # If all the files exist, check the downloads:
-        # all_files_should_exist = ()
-        
-        all_files_should_exist = False #("file_not_found" not in self.test_info["expect_in_output"] and )if "expect_in_output" in self.test_info else True) and ("inject_output" not in self.test_info)
-        if "expect_in_output" in self.test_info and all_files_should_exist:
+        # If the files should exist, check the downloads:        
+        if not optional_run and len(self.test_info["files"]) > 0 and self.test_info["skip_file_check"] == False:
             # get all files from the output dir into one list:
             downloaded_files = os.path.join(self.output_dir, "*")
             downloaded_files = glob.glob(downloaded_files)
