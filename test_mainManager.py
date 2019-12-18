@@ -455,8 +455,8 @@ class URL_Manager():
         try:
             # Dictionary changes sizes, so check one dict, and make  thechanges to other
             for key, val in test_dict.items():
-                # The Input.parse* methods all expect a string:
-                val = str(val)
+                # The Input.parse* methods all expect a string. API automatically decodes it too:
+                val = urllib.parse.unquote_plus(str(val))
                 if key.lower() == "absoluteorbit":
                     del mutatable_dict[key]
                     mutatable_dict["absoluteOrbit"] = test_input.parse_int_or_range_list(val)
@@ -480,14 +480,12 @@ class URL_Manager():
                     mutatable_dict["offnadirangle"] = test_input.parse_float_or_range_list(val)
                 elif key.lower() == "polarization":
                     del mutatable_dict[key]
-                    val = urllib.parse.unquote_plus(val)
                     mutatable_dict["polarization"] = test_input.parse_string_list(val)
                 elif key.lower() == "relativeorbit":
                     del mutatable_dict[key]
                     mutatable_dict["relativeorbit"] = test_input.parse_int_or_range_list(val)
                 elif key.lower() == "collectionname":
                     del mutatable_dict[key]
-                    val = urllib.parse.unquote_plus(val)
                     mutatable_dict["collectionname"] = test_input.parse_string_list(val)
                 elif key.lower() in ["beammode", "beamswath"]:
                     del mutatable_dict[key]
