@@ -770,6 +770,10 @@ class URL_Manager():
         return query, assert_used
 
     def runQuery(self):
+        def countToDict(html):
+            count = int(html.rstrip())
+            return {"count": count}
+
         def csvToDict(file_content):
             file_content = csv.reader(StringIO(file_content), delimiter=',')
             file_content = [a for a in file_content]
@@ -793,7 +797,6 @@ class URL_Manager():
             file_content["count"] = len(files)
             file_content["files"] = files
             return file_content
-
 
         def jsonToDict(json_data):
             # Combine all matching key-value pairs, to-> key: [list of vals]
@@ -824,9 +827,12 @@ class URL_Manager():
 
         ## COUNT / HTML:
         if content_type == "html":
-            content_type = "count"
-            if file_content == '0\n':
+            # They return a number in the html. Convert to a real int:
+            file_content = countToDict(file_content)
+            if file_content["count"] == 0:
                 content_type = "blank count"
+            else:
+                content_type = "count"
         ## CSV
         elif content_type == "csv":
             file_content = csvToDict(file_content)
@@ -834,16 +840,12 @@ class URL_Manager():
                 content_type = "blank csv"
         ## DOWNLOAD / PLAIN
         elif content_type == "plain":
-            content_type = "download"
-            # Check if download script contains this, without granuals in the list:
-            match = re.search(r'self\.files\s*=\s*\[\s*\]', str(file_content))
-            # If you find it, it's the blank script. If not, There's something there to be downloaded:
-            if match:
+            file_content = downloadToDict(file_content)
+            # how many granules are in the script:
+            if file_content["count"] == 0:
                 content_type = "blank download"
             else:
                 content_type = "download"
-            file_content = downloadToDict(file_content)
-
         ## GEOJSON
         elif content_type == "geojson":
             if file_content == '{\n  "features": [],\n  "type": "FeatureCollection"\n}':
