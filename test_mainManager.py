@@ -780,6 +780,20 @@ class URL_Manager():
                 file_content[column[0]] = column[1:]
             file_content["count"] = len(file_content["Platform"])
             return file_content
+        
+        def downloadToDict(bulk_download_file):
+            # Grab everything in the self.files field of the download script:
+            files = re.search(r'self.files\s*=\s*\[.*?\]', bulk_download_file, re.DOTALL)
+            if files == None:
+                assert False, "Problem reading download script! URL: {0}. File: {1}.".format(self.query, bulk_download_file)
+            # Parse out each file-names, and make each one a str in a list:
+            files = re.findall('"(.*?)"', files.group(0))
+            # add the fields and return:
+            file_content = {}
+            file_content["count"] = len(files)
+            file_content["files"] = files
+            return file_content
+
 
         def jsonToDict(json_data):
             # Combine all matching key-value pairs, to-> key: [list of vals]
@@ -828,6 +842,7 @@ class URL_Manager():
                 content_type = "blank download"
             else:
                 content_type = "download"
+            file_content = downloadToDict(file_content)
 
         ## GEOJSON
         elif content_type == "geojson":
