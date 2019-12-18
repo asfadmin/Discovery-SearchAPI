@@ -152,13 +152,8 @@ def postflight(exc):
         end_real_time = time.perf_counter()
         total_real_time = end_real_time - request.asf_start_real_time
         #if total_proc_time / total_real_time > .5 or total_real_time > 10:
-        monologue = """Request timing analysis:
-        Request process time:    {0} seconds
-        Request real time:       {1} seconds
-        Process/real time ratio: {2}
-        Request URL:             {3}
-        Request params:          {4}""".format(total_proc_time, total_real_time, total_proc_time / total_real_time, request.url, request.values)
-        logging.warning(monologue)
+        # process time (s), real time (s), proc/real time ratio, URL, params
+        logging.warning('Request timing analysis: {0}, {1}, {2}, {3}, {4}'.format(total_proc_time, total_real_time, total_proc_time / total_real_time, request.url, request.values))
     except Exception as e:
         logging.error('Exception encountered in postflight handler: {0}'.format(e))
 
