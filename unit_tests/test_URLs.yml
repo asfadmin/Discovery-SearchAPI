@@ -2443,7 +2443,7 @@ url tests:
     frame: 580%2C581%2C582%2C583%2C585
     processingLevel: L0%2CL1.0%2CSLC
     platform: SENTINEL-1A%2CSENTINEL-1B
-    maxResults: 1000
+    maxResults: 10000
     relativeOrbit: 1-1000
 
     expected file: count
@@ -2454,7 +2454,7 @@ url tests:
     asfframe: 580%2C581%2C582%2C583%2C585
     processingLevel: L0%2CL1.0%2CSLC
     platform: SENTINEL-1A%2CSENTINEL-1B
-    maxResults: 1000
+    maxResults: 5000
     relativeOrbit: 100-1000
 
     expected file: count
@@ -2490,6 +2490,7 @@ url tests:
     start: 2017-05-30
     end: 2018-05-31%22
     maxResults: 1000
+    skip_file_check: True
 
     expected file: csv
     expected code: 200
