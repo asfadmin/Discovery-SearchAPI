@@ -76,7 +76,9 @@ def loadTestsFromDirectory(dir_path, recurse=False):
         ##########################
         # ADDING "TYPE" TAG HERE #
         ##########################
+        hit_known_type = False
         if "tests" in yaml_dict and isinstance(yaml_dict["tests"], type([])):
+            hit_known_type = True
             for i, test in enumerate(yaml_dict["tests"]):
                 test = moveTitleIntoTest(test)
                 if test == None:
@@ -92,7 +94,8 @@ def loadTestsFromDirectory(dir_path, recurse=False):
                     print("\nUnknownTest: {0}\n".format(test))
                 yaml_dict["tests"][i] = test
             tests = yaml_dict["tests"]
-        elif "url tests" in yaml_dict and isinstance(yaml_dict["url tests"], type([])):
+        if "url tests" in yaml_dict and isinstance(yaml_dict["url tests"], type([])):
+            hit_known_type = True
             for i, test in enumerate(yaml_dict["url tests"]):
                 test = moveTitleIntoTest(test)
                 if test == None:
@@ -101,7 +104,7 @@ def loadTestsFromDirectory(dir_path, recurse=False):
                 test["type"] = "URL"
                 yaml_dict["url tests"][i] = test
             tests = yaml_dict["url tests"]
-        else:
+        if not hit_known_type:
             print("\n###########")
             print("No tests found in Yaml: {0}. Needs 'tests' key with a list as the value, or JUST a yml list.".format(dir_path))
             print("###########\n")
