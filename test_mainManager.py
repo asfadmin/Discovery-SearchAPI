@@ -929,7 +929,17 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
                 if test_info["test_on_second_run"] == True:
                     bulk_process = pexpect.spawn(cmd, encoding='utf-8', timeout=test_info["timeout"], cwd=self.output_dir)
                     self.run_process_tests(bulk_process, optional_run=True)
+                
+                # Create files here, to represent files not being completed w/ the first script:
+                if "create_files" in test_info:
+                    for create_me in test_info["files"]:
+                        if test_info["print"] == True:
+                            print(" --- Creating file: " + str(create_me))
+                        create_me = os.path.join(self.output_dir, create_me)
+                        f = open(create_me, "w+")
+                        f.close()
 
+                # Run the script for real now, and make sure it does what you're expecting this time:
                 bulk_process = pexpect.spawn(cmd, encoding='utf-8', timeout=test_info["timeout"], cwd=self.output_dir)
                 self.run_process_tests(bulk_process)            
             except pexpect.exceptions.TIMEOUT:
@@ -964,6 +974,8 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
                     # List of files to check they get actually downloaded later:
                     test_info["files"].extend(self.getProductNamesFromFile(args[i]))
             test_info["args"] = " ".join(args)
+        # create_files:
+        test_info = turnValueIntoList("create_files", test_info)
         # expect_in_output:
         test_info = turnValueIntoList("expect_in_output", test_info)
         if "expect_in_output" in test_info:
@@ -976,7 +988,9 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
             assert test_info["expected_outcome"] in whitelist, "Test parsing error: Unknown value for 'expected_outcome'. Test: '{0}'.".format(test_info["title"])
         # print:
         if "print" not in test_info:
-            test_info["print"] = False if "expected_outcome" in test_info else True
+            # If any of this list is in test_info, don't print by default:
+            used_assertion = len([i for i in ["expected_outcome", "expect_in_output", "inject_output"] if i in test_info]) != 0
+            test_info["print"] = not used_assertion
         # products:
         test_info = turnValueIntoList("products", test_info)
         # each product is in the form: "http://foo.com/bar.txt", JUST get the bar.txt and extend the list:
@@ -1132,17 +1146,34 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
         download_incomplete = False
         download_bad_url = False
         while True:
-            output = bulk_process.expect([r"Download file .* exists!", \
-                                          r"Found .* but it wasn't fully downloaded\. Removing file and downloading again\.", \
-                                          r"IMPORTANT: Your user does not have permission to download this type of data!", \
-                                          r"URL Error \(from GET\): .* Name or service not known", \
-                                          r"Download Summary", \
-                                          r"HTTP Error:.*"])
+
+            output = bulk_process.expect([ r"Download Summary", \
+                                           r"Download file .* exists!", \
+                                           r"Found .* but it wasn't fully downloaded\. Removing file and downloading again\.", \
+                                           r"URL Error \(from GET\): .* Name or service not known", \
+                                           r"HTTP Error: (?!401|403)", \
+                                           r"HTTP Error: 401", \
+                                           r"HTTP Error: 403"])
+            # Success! You got data:
             if output == 0:
-                download_existed = True
+                if self.test_info["print"]:
+                    print("RESULT: Able to download data!!")
+                if "expected_outcome" in self.test_info:
+                    assert self.test_info["expected_outcome"] == "success", "Test was not supposed to be able to download data, but it can... Account: {0}. Test: '{1}'.".format(self.test_info["account"], self.test_info["title"])
+                break
+            # One of the downloads already existed:
             elif output == 1:
-                download_incomplete = True
+                download_existed = True
+            # One of the downloads wern't successful the last run:
             elif output == 2:
+                download_incomplete = True
+            # One of the download url's is down / doesn't exist:
+            elif output == 3:
+                download_bad_url = True
+            # Hit this message the last time datapool was down, for the DB upgrade:
+            elif output == 4:
+                assert False, "Data is not available. (Datapool down?). Test: '{0}'. Error: '{1}'. Account: '{2}'.".format(self.test_info["title"], bulk_process.after, self.test_info["account"])
+            elif output == 5:
                 if self.test_info["print"]:
                     print("RESULT: Bad permissions to download data!")
                 if "expected_outcome" in self.test_info:
@@ -1150,16 +1181,14 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
                 # Bad account hit. No files to test. Just return:
                 bulk_process.expect(pexpect.EOF)
                 return
-            elif output == 3:
-                download_bad_url = True
-            elif output == 4:
+            elif output == 6:
                 if self.test_info["print"]:
-                    print("RESULT: Able to download data!!")
-                if "expected_outcome" in self.test_info:
-                    assert self.test_info["expected_outcome"] == "success", "Test was not supposed to be able to download data, but it can... Account: {0}. Test: '{1}'.".format(self.test_info["account"], self.test_info["title"])
-                break
-            elif output == 5:
-                assert False, "Data is not available. (Datapool down?). Test: '{0}'. Error: '{1}'. Account: '{2}'.".format(self.test_info["title"], bulk_process.after, self.test_info["account"])
+                    print("RESULT: HTTP 403. You found out how to hit it!! Not sure if possible yet.")
+                assert False, "API Returned 403. TODO: Find out what causes this and add tests for it..."
+            else:
+                assert False, "TESTING ERROR: output is too high, no idea what to expect."
+
+
 
         # Script complete, check your downloads:
         if not optional_run and "expect_in_output" in self.test_info:
