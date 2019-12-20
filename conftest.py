@@ -76,10 +76,12 @@ def loadTestsFromDirectory(dir_path, recurse=False):
         ##########################
         # ADDING "TYPE" TAG HERE #
         ##########################
+        tests = []
+        # Can't just do 'if elif' chain. I want to support if *both* 'tests' and 'url tests' are in the same file at once:
         hit_known_type = False
         if "tests" in yaml_dict and isinstance(yaml_dict["tests"], type([])):
             hit_known_type = True
-            for i, test in enumerate(yaml_dict["tests"]):
+            for test in yaml_dict["tests"]:
                 test = moveTitleIntoTest(test)
                 if test == None:
                     printTitleError(test, file)
@@ -91,19 +93,19 @@ def loadTestsFromDirectory(dir_path, recurse=False):
                 elif "account" in test:
                     test["type"] = "BULK_DOWNLOAD"
                 else:
-                    print("\nUnknownTest: {0}\n".format(test))
-                yaml_dict["tests"][i] = test
-            tests = yaml_dict["tests"]
+                    print()
+                    print("\nUNKNOWN TEST!! Title: '{0}'. File: '{1}'.\n".format(test["title"], file))
+                    continue
+                tests.append(test)
         if "url tests" in yaml_dict and isinstance(yaml_dict["url tests"], type([])):
             hit_known_type = True
-            for i, test in enumerate(yaml_dict["url tests"]):
+            for test in yaml_dict["url tests"]:
                 test = moveTitleIntoTest(test)
                 if test == None:
                     printTitleError("url tests", file)
                     continue
                 test["type"] = "URL"
-                yaml_dict["url tests"][i] = test
-            tests = yaml_dict["url tests"]
+                tests.append(test)
         if not hit_known_type:
             print("\n###########")
             print("No tests found in Yaml: {0}. Needs 'tests' key with a list as the value, or JUST a yml list.".format(dir_path))
