@@ -907,9 +907,9 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
         self.cred_path = os.path.join(self.root_dir, "unit_tests", "creds_earthdata.yml")
         cookie_jar_path = os.path.join( os.path.expanduser('~'), ".bulk_download_cookiejar.txt")
 
-        if test_info["print"]:
-            print("\n Test: '{0}'".format(test_info["title"]))
-            print()
+        if self.test_info["print"]:
+            print("\n Test: '{0}'".format(self.test_info["title"]))
+            print(" --- Number of expected downloads: {0}.".format(len(self.test_info["files"])))
 
         for version in self.test_info["python_version"]:
             # Take out any files from last test, make things consistant:
@@ -922,7 +922,7 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
             # Craft the command for both runs:
             cmd = 'python{0} "{1}" {2}'.format(str(version), bulk_download_path, self.test_info["args"])
             if test_info["print"]:
-                print("    cmd: {0}".format(cmd))
+                print("\n --- cmd: {0}".format(cmd))
 
             try:
                 # Do the optional run first. All the asserts *always* happen in the second run then:
@@ -970,7 +970,7 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
             args = test_info["args"].split(" ")
             for i, arg in enumerate(args):
                 if arg.endswith('.metalink') or arg.endswith('.csv'):
-                    args[i] = '"' + os.path.join(self.root_dir, "unit_tests", "Resources", "bulk_download_input", arg) + '"'
+                    args[i] = os.path.join(self.root_dir, "unit_tests", "Resources", "bulk_download_input", arg)
                     # List of files to check they get actually downloaded later:
                     test_info["files"].extend(self.getProductNamesFromFile(args[i]))
             test_info["args"] = " ".join(args)
@@ -1035,6 +1035,8 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
             products = file_content["URL"]
             # turn http://foo.com/bar.txt to bar.txt
             products = [product.split("/")[-1] for product in products]
+        else:
+            assert False, "Test Error: Unknown filetype!! Path: '{0}'.".format(path)
         return products
 
 
@@ -1197,7 +1199,7 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
             assert ("bad_url" in self.test_info["expect_in_output"]) == download_bad_url
 
         # If the files should exist, check the downloads:        
-        if not optional_run and len(self.test_info["files"]) > 0 and self.test_info["skip_file_check"] == False:
+        if not optional_run and self.test_info["skip_file_check"] == False:
             # get all files from the output dir into one list:
             downloaded_files = os.path.join(self.output_dir, "*")
             downloaded_files = glob.glob(downloaded_files)
@@ -1205,6 +1207,8 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
 
             for file in self.test_info["files"]:
                 assert file in downloaded_files, "File not found. File: {0}, Test: '{1}'".format(file, self.test_info["title"])
+            assert len(self.test_info["files"]) == len(downloaded_files), "Number of files don't line up with what's expected. Test: '{0}'.".format(self.test_info["title"])
+
         # for file in self.test_info["expected_files"]:
         #     assert file in downloaded_files, "Product: {0} Not found in downloaded files dir. Test: '{1}'.".format(file,self.test_info["title"])
         bulk_process.expect(pexpect.EOF)
