@@ -962,7 +962,7 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
                 test_info[key] = [ test_info[key] ]
             return test_info
         # NOTE: \/ Keys in alphabetical order: \/ 
-        # args:
+        # args / files:
         test_info["files"] = []
         if "args" not in test_info:
             test_info["args"] = ""
@@ -991,7 +991,7 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
             # If any of this list is in test_info, don't print by default:
             used_assertion = len([i for i in ["expected_outcome", "expect_in_output", "inject_output"] if i in test_info]) != 0
             test_info["print"] = not used_assertion
-        # products:
+        # products / files:
         test_info = turnValueIntoList("products", test_info)
         # each product is in the form: "http://foo.com/bar.txt", JUST get the bar.txt and extend the list:
         if "products" in test_info:
@@ -1204,10 +1204,12 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
             downloaded_files = os.path.join(self.output_dir, "*")
             downloaded_files = glob.glob(downloaded_files)
             downloaded_files = [os.path.basename(file) for file in downloaded_files]
-
-            for file in self.test_info["files"]:
+            # Remove duplicate files, because the same file might be in both 'args' and 'products' param:
+            required_files = list(set(self.test_info["files"]))
+            # Check downloaded_files against required_files:
+            for file in required_files:
                 assert file in downloaded_files, "File not found. File: {0}, Test: '{1}'".format(file, self.test_info["title"])
-            assert len(self.test_info["files"]) == len(downloaded_files), "Number of files don't line up with what's expected. Test: '{0}'.".format(self.test_info["title"])
+            assert len(required_files) == len(downloaded_files), "Number of files don't line up with what's expected. Test: '{0}'.".format(self.test_info["title"])
 
         # for file in self.test_info["expected_files"]:
         #     assert file in downloaded_files, "Product: {0} Not found in downloaded files dir. Test: '{1}'.".format(file,self.test_info["title"])

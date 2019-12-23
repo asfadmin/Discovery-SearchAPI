@@ -87,10 +87,6 @@ tests:
     account: FullAccess
     args: "SE_Alaska_1.metalink"
     test_on_second_run: True # <- False by default
-    products:
-      - https://datapool.asf.alaska.edu/METADATA_RAW/SB/S1B_IW_RAW__0SDV_20190824T145948_20190824T150021_017729_0215B7_4E1C.iso.xml
-      - https://datapool.asf.alaska.edu/METADATA_SLC/SB/S1B_IW_SLC__1SDV_20190824T145950_20190824T150018_017729_0215B7_E1B1.iso.xml
-      - https://datapool.asf.alaska.edu/METADATA_GRD_HD/SB/S1B_IW_GRDH_1SDV_20190824T145952_20190824T150017_017729_0215B7_8AC4.iso.xml
     expect_in_output: ["cookie_existed", "file_exists"] # also added file_incomplete. Need "create_files" keyword?
     expected_outcome: success
     timeout: Null
