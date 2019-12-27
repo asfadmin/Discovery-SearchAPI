@@ -232,10 +232,10 @@ class INPUT_Manager():
 
     def runAssertTests(self):
         parser = self.test_dict["parser"]
-        test_input = self.test_dict["input"]
+        test_input_file = self.test_dict["input"]
         try:
             hit_exception = False
-            val = self.parsers[parser](test_input)
+            val = self.parsers[parser](test_input_file)
         except Exception as e:
             hit_exception = True
             val = str(e)
@@ -1248,32 +1248,62 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
 project_root = os.path.realpath(os.path.join(os.path.dirname(__file__)))
 resources_root = os.path.join(project_root, "unit_tests", "Resources")
 
-list_of_tests = []
 
-# Get the tests from all *yml* files:
-tests_root = os.path.join(project_root, "**", "test_*.yml")
-list_of_tests.extend(helpers.loadTestsFromDirectory(tests_root, recurse=True))
+# Get all yml and yaml files:
+all_tests = helpers.loadTestsFromDirectory(project_root, recurse=True)
 
-# Same, but with *yaml* files now:
-tests_root = os.path.join(project_root, "**", "test_*.yaml")
-list_of_tests.extend(helpers.loadTestsFromDirectory(tests_root, recurse=True))
+@pytest.mark.parametrize("tests", all_tests["BULK_DOWNLOAD"])
+def test_bulkDownload_script(tests, cli_args):
+    test_info = tests[0]
+    file_config = tests[1]
+    test_info = helpers.setupTestFromConfig(test_info, file_config, cli_args)
+    helpers.skipTestsIfNecessary(test_info, file_config, cli_args)  
+    BULK_DOWNLOAD_SCRIPT_Manager(test_info)
 
-
-@pytest.mark.parametrize("test_dict", list_of_tests)
-def test_MainManager(test_dict, cli_args):
-    test_info = test_dict[0]
-    file_config = test_dict[1]
-
+@pytest.mark.parametrize("tests", all_tests["INPUT"])
+def test_inputs(tests, cli_args):
+    test_info = tests[0]
+    file_config = tests[1]
     test_info = helpers.setupTestFromConfig(test_info, file_config, cli_args)
     helpers.skipTestsIfNecessary(test_info, file_config, cli_args)
+    INPUT_Manager(test_info)
 
-    if test_info['type'] == 'WKT':
-        test_info['api'] = test_info['api'] + "services/utils/files_to_wkt"
-        WKT_Manager(test_info)
-    elif test_info['type'] == 'INPUT':
-        INPUT_Manager(test_info)
-    elif test_info['type'] == 'URL':
-        test_info['api'] = test_info['api'] + "services/search/param?"
-        URL_Manager(test_info)
-    elif test_info['type'] == 'BULK_DOWNLOAD':
-        BULK_DOWNLOAD_SCRIPT_Manager(test_info)
+@pytest.mark.parametrize("tests", all_tests["URL"])
+def test_urls(tests, cli_args):
+    test_info = tests[0]
+    file_config = tests[1]
+    test_info = helpers.setupTestFromConfig(test_info, file_config, cli_args)
+    helpers.skipTestsIfNecessary(test_info, file_config, cli_args)
+    test_info['api'] = test_info['api'] + "services/search/param?"
+    print()
+    print(test_info)
+    print()
+    URL_Manager(test_info)
+
+@pytest.mark.parametrize("tests", all_tests["WKT"])
+def test_wkts(tests, cli_args):
+    test_info = tests[0]
+    file_config = tests[1]
+    test_info = helpers.setupTestFromConfig(test_info, file_config, cli_args)
+    helpers.skipTestsIfNecessary(test_info, file_config, cli_args)
+    test_info['api'] = test_info['api'] + "services/utils/files_to_wkt"
+    WKT_Manager(test_info)
+
+# @pytest.mark.parametrize("test_dict", list_of_tests)
+# def test_MainManager(test_dict, cli_args):
+#     test_info = test_dict[0]
+#     file_config = test_dict[1]
+
+#     test_info = helpers.setupTestFromConfig(test_info, file_config, cli_args)
+#     helpers.skipTestsIfNecessary(test_info, file_config, cli_args)
+
+#     if test_info['type'] == 'WKT':
+#         test_info['api'] = test_info['api'] + "services/utils/files_to_wkt"
+#         WKT_Manager(test_info)
+#     elif test_info['type'] == 'INPUT':
+#         INPUT_Manager(test_info)
+#     elif test_info['type'] == 'URL':
+#         test_info['api'] = test_info['api'] + "services/search/param?"
+#         URL_Manager(test_info)
+#     elif test_info['type'] == 'BULK_DOWNLOAD':
+#         BULK_DOWNLOAD_SCRIPT_Manager(test_info)

@@ -31,7 +31,7 @@ def cli_args(request):
     all_args['dont run file'] = request.config.getoption('--dont-run-file')
     return all_args
 
-def loadTestsFromDirectory(dir_path, recurse=False):
+def loadTestsFromDirectory(dir_path_root, recurse=False):
     ####################
     # HELPER FUNCTIONS #
     ####################
@@ -45,58 +45,75 @@ def loadTestsFromDirectory(dir_path, recurse=False):
         json_test = next(iter(json_test.values()))
         json_test["title"] = title
         return json_test
-    # Gets called for each yml/yaml file:
+
+    # Gets called for each yml/yaml file. Opens it and returns a dict:
     def openFile(path):
-        if not os.path.exists(file):
+        if not os.path.exists(path):
             print("\n###########")
-            print("File not Found: {0}. Error: {1}".format(dir_path,str(e)))
+            print("File not Found: {0}. Error: {1}".format(path, str(e)))
             print("###########\n")
-        with open(file, "r") as yaml_file:
+        with open(path, "r") as yaml_file:
             try:
                 yaml_dict = yaml.safe_load(yaml_file)
             except yaml.YAMLError as e:
                 print("\n###########")
-                print("Failed to parse yaml: {0}. Error: {1}".format(dir_path,str(e)))
+                print("Failed to parse yaml: {0}. Error: {1}".format(path, str(e)))
                 print("###########\n")
                 return None
         return yaml_dict
+
     # printTitleError: prints if moveTitleIntoTest cannot find the title:
     def printTitleError(test, file):
         print("\n###########")
         print("Yaml test '{0}' not formatted correctly: {1}.".format(str(test), file))
         print("###########\n")
-    ##############
-    # OPEN FILES #
-    ##############
-    list_of_tests = []
-    for file in glob.glob(dir_path, recursive=recurse):
+
+
+    ############################
+    # SETUP TESTS / OPEN FILES #
+    ############################
+    tests = {}
+    tests["BULK_DOWNLOAD"] = []
+    tests["INPUT"] = []
+    tests["URL"] = []
+    tests["WKT"] = []
+    tests_pattern = os.path.join(dir_path_root, "**", "test_*.y*ml")
+
+    for file in glob.glob(tests_pattern, recursive=recurse):
         yaml_dict = openFile(file)
         if yaml_dict == None:
             continue
-        ##########################
-        # ADDING "TYPE" TAG HERE #
-        ##########################
-        tests = []
+
+        # Store the configs from each file:
+        file_config = {}
+        file_config['api'] = yaml_dict["api"] if "api" in yaml_dict else None
+        file_config['yml name'] = os.path.basename(file)
+        file_config['print'] = yaml_dict["print"] if "print" in yaml_dict else None
+
         # Can't just do 'if elif' chain. I want to support if *both* 'tests' and 'url tests' are in the same file at once:
         hit_known_type = False
         if "tests" in yaml_dict and isinstance(yaml_dict["tests"], type([])):
             hit_known_type = True
+
             for test in yaml_dict["tests"]:
                 test = moveTitleIntoTest(test)
                 if test == None:
                     printTitleError(test, file)
                     continue
+
+                test_with_config = (test, file_config)
                 if "test wkt" in test:
-                    test["type"] = "WKT"
+                    tests["WKT"].append(test_with_config)
                 elif "parser" in test and "input" in test:
-                    test["type"] = "INPUT"
+                    tests["INPUT"].append(test_with_config)
                 elif "account" in test:
-                    test["type"] = "BULK_DOWNLOAD"
+                    tests["BULK_DOWNLOAD"].append(test_with_config)
                 else:
                     print()
                     print("\nUNKNOWN TEST!! Title: '{0}'. File: '{1}'.\n".format(test["title"], file))
                     continue
-                tests.append(test)
+                
+
         if "url tests" in yaml_dict and isinstance(yaml_dict["url tests"], type([])):
             hit_known_type = True
             for test in yaml_dict["url tests"]:
@@ -104,23 +121,21 @@ def loadTestsFromDirectory(dir_path, recurse=False):
                 if test == None:
                     printTitleError("url tests", file)
                     continue
-                test["type"] = "URL"
-                tests.append(test)
+                tests["URL"].append((test, file_config))
+
         if not hit_known_type:
             print("\n###########")
-            print("No tests found in Yaml: {0}. Needs 'tests' key with a list as the value, or JUST a yml list.".format(dir_path))
+            print("No tests found in Yaml: {0}. File needs 'tests' or 'url tests' key, with a list as the value.".format(dir_path_root))
             print("###########\n")
         #############################
         # READING FILE CONFIGS HERE #
         #############################
-        # Store the configs for each file:
-        file_config = {}
-        file_config['yml name'] = os.path.basename(file)
-        file_config['api'] = yaml_dict["api"] if "api" in yaml_dict else None
-        file_config['print'] = yaml_dict["print"] if "print" in yaml_dict else None
-        tests = zip(tests, itertools.repeat(file_config))
-        list_of_tests.extend(tests)
-    return list_of_tests
+        # Key=Type of test, Val=List of tests. Add info from the file itself to 
+        #      each individual test:
+        # for _,val in tests.items():
+        #     for i in range(len(val)):
+        #         val[i-1] = (val, file_config)
+    return tests
 
 def setupTestFromConfig(test_info, file_config, cli_args):
     def getAPI(str_api, default="DEV"):
@@ -141,7 +156,8 @@ def setupTestFromConfig(test_info, file_config, cli_args):
     # Figure out which api to use:
     api_url = cli_args['api'] if cli_args['api'] != None else file_config['api']
     test_info['api'] = getAPI(api_url)
-
+    if file_config["print"] != None:
+        test_info["print"] = file_config["print"]
     return test_info
 
 def skipTestsIfNecessary(test_info, file_config, cli_args):
