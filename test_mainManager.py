@@ -1252,6 +1252,8 @@ resources_root = os.path.join(project_root, "unit_tests", "Resources")
 # Get all yml and yaml files:
 all_tests = helpers.loadTestsFromDirectory(project_root, recurse=True)
 
+
+@pytest.mark.serial
 @pytest.mark.parametrize("tests", all_tests["BULK_DOWNLOAD"])
 def test_bulkDownload_script(tests, cli_args):
     test_info = tests[0]
@@ -1260,6 +1262,7 @@ def test_bulkDownload_script(tests, cli_args):
     helpers.skipTestsIfNecessary(test_info, file_config, cli_args)  
     BULK_DOWNLOAD_SCRIPT_Manager(test_info)
 
+@pytest.mark.parallel
 @pytest.mark.parametrize("tests", all_tests["INPUT"])
 def test_inputs(tests, cli_args):
     test_info = tests[0]
@@ -1268,6 +1271,7 @@ def test_inputs(tests, cli_args):
     helpers.skipTestsIfNecessary(test_info, file_config, cli_args)
     INPUT_Manager(test_info)
 
+@pytest.mark.parallel
 @pytest.mark.parametrize("tests", all_tests["URL"])
 def test_urls(tests, cli_args):
     test_info = tests[0]
@@ -1280,6 +1284,7 @@ def test_urls(tests, cli_args):
     print()
     URL_Manager(test_info)
 
+@pytest.mark.parallel
 @pytest.mark.parametrize("tests", all_tests["WKT"])
 def test_wkts(tests, cli_args):
     test_info = tests[0]
