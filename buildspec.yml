@@ -1,5 +1,10 @@
 version: 0.2
 
+eb_codebuild_settings:
+  CodeBuildServiceRole: ${CodeBuildServiceRole}
+  ComputeType: BUILD_GENERAL1_SMALL
+  Image: aws/codebuild/standard:2.0
+
 phases:
   install:
     runtime-versions:
@@ -8,4 +13,5 @@ phases:
     commands:
       - pip install -r ./requirements.txt
       # - python ./application.py <- this might block...
-      - python -m pytest -s test_mainManager.py 
+      # - python -m pytest -s test_mainManager.py 
+      - echo "End of pre_build"
