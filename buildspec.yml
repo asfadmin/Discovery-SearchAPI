@@ -8,4 +8,4 @@ phases:
     commands:
       - pip install -r ./requirements.txt
       # - python ./application.py <- this might block...
-      - pytest -s test_mainManager.py 
+      - python -m pytest -s test_mainManager.py 
