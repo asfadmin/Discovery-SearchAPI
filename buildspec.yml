@@ -11,7 +11,10 @@ phases:
       python: 3.7
   pre_build:
     commands:
+      # Install the dependancies:
       - pip install -r ./requirements.txt
-      # - python ./application.py <- this might block...
-      - python -m pytest -s test_mainManager.py --api ${TmpUrl}
-      - echo "End of tests"
+      # Run the tests that support threading all at once:
+      - python -m pytest -s -m parallel -n auto test_mainManager.py --api ${TmpUrl}
+      # Run the single threaded tests w/out the -n:
+      - python -m pytest -s -m serial test_mainManager.py --api ${TmpUrl}
+      - echo "End of building this..."
