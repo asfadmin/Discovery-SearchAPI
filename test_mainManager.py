@@ -1252,14 +1252,13 @@ resources_root = os.path.join(project_root, "unit_tests", "Resources")
 # Get all yml and yaml files:
 all_tests = helpers.loadTestsFromDirectory(project_root, recurse=True)
 
-
 @pytest.mark.serial
 @pytest.mark.parametrize("tests", all_tests["BULK_DOWNLOAD"])
 def test_bulkDownload_script(tests, cli_args):
     test_info = tests[0]
     file_config = tests[1]
     test_info = helpers.setupTestFromConfig(test_info, file_config, cli_args)
-    helpers.skipTestsIfNecessary(test_info, file_config, cli_args)  
+    helpers.skipTestsIfNecessary(test_info, file_config["yml name"], cli_args) 
     BULK_DOWNLOAD_SCRIPT_Manager(test_info)
 
 @pytest.mark.parallel
@@ -1268,7 +1267,7 @@ def test_inputs(tests, cli_args):
     test_info = tests[0]
     file_config = tests[1]
     test_info = helpers.setupTestFromConfig(test_info, file_config, cli_args)
-    helpers.skipTestsIfNecessary(test_info, file_config, cli_args)
+    helpers.skipTestsIfNecessary(test_info, file_config["yml name"], cli_args)
     INPUT_Manager(test_info)
 
 @pytest.mark.parallel
@@ -1277,7 +1276,7 @@ def test_urls(tests, cli_args):
     test_info = tests[0]
     file_config = tests[1]
     test_info = helpers.setupTestFromConfig(test_info, file_config, cli_args)
-    helpers.skipTestsIfNecessary(test_info, file_config, cli_args)
+    helpers.skipTestsIfNecessary(test_info, file_config["yml name"], cli_args)
     test_info['api'] = test_info['api'] + "services/search/param?"
     print()
     print(test_info)
@@ -1290,7 +1289,7 @@ def test_wkts(tests, cli_args):
     test_info = tests[0]
     file_config = tests[1]
     test_info = helpers.setupTestFromConfig(test_info, file_config, cli_args)
-    helpers.skipTestsIfNecessary(test_info, file_config, cli_args)
+    helpers.skipTestsIfNecessary(test_info, file_config["yml name"], cli_args)
     test_info['api'] = test_info['api'] + "services/utils/files_to_wkt"
     WKT_Manager(test_info)
 
