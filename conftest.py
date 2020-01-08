@@ -11,13 +11,13 @@ import itertools
 def pytest_addoption(parser):
     parser.addoption("--api", action="store", default=None,
         help = "Override which api ALL .yml tests use with this. (DEV/PROD or SOME-URL).")
-    parser.addoption("--only-run", action="store", default=None,
+    parser.addoption("--only-run", action="append", default=None,
         help = "Only run tests that contains this param in their name.")
-    parser.addoption("--dont-run", action="store", default=None,
+    parser.addoption("--dont-run", action="append", default=None,
         help = "Dont run tests that contains this param in their name.")
-    parser.addoption("--only-run-file", action="store", default=None,
+    parser.addoption("--only-run-file", action="append", default=None,
         help = "Only run files that contain this in their name.")
-    parser.addoption("--dont-run-file", action="store", default=None,
+    parser.addoption("--dont-run-file", action="append", default=None,
         help = "Dont run files that contain this in their name.")
 
 @pytest.fixture
@@ -30,9 +30,9 @@ def cli_args(request):
     all_args['dont run file'] = request.config.getoption('--dont-run-file')
     return all_args
 
-def pytest_load_initial_conftests(args):
-    print("\n\nHITT\n\n")
-    print(args)
+# def pytest_load_initial_conftests(args):
+#     print("\n\nHITT\n\n")
+#     print(args)
 
 #################################
 ## BEGIN YML LOADING FUNCTIONS ##
@@ -171,20 +171,44 @@ def setupTestFromConfig(test_info, file_config, cli_args):
         test_info["print"] = file_config["print"]
     return test_info
 
-def skipTestsIfNecessary(test_info, file_config, cli_args):
+def skipTestsIfNecessary(test_info, file_name, cli_args):
     only_run_cli = cli_args['only run']
     dont_run_cli = cli_args['dont run']
     only_run_file_cli = cli_args['only run file']
     dont_run_file_cli = cli_args['dont run file']
 
-    # If they passed '--only-run val', and val not in test title:
-    if only_run_cli != None and only_run_cli.lower() not in test_info["title"].lower():
-        pytest.skip("Title of test did not contain --only-run param (case insensitive)")
-    # Same, but reversed for '--dont-run':
-    if dont_run_cli != None and dont_run_cli.lower() in test_info["title"].lower():
-        pytest.skip("Title of test contained --dont-run param (case insensitive)")
-    # Same, but now for the file variants:
-    if only_run_file_cli != None and only_run_file_cli.lower() not in file_config["yml name"].lower():
-        pytest.skip("File test was in did not match --only-run-file param (case insensitive)")
-    if dont_run_file_cli != None and dont_run_file_cli.lower() in file_config["yml name"].lower():
-        pytest.skip("File test was in matched --dont-run-file param (case insensitive)")
+    ## If they passed '--only-run val', and val not in test title:
+    if only_run_cli != None:
+        # Might be in one element of the list, but not the other:
+        title_in_cli_list = False
+        for only_run_each in only_run_cli:
+            if only_run_each.lower() in test_info["title"].lower():
+                title_in_cli_list = True
+                break
+        if not title_in_cli_list:
+            pytest.skip("Title of test did not contain --only-run param (case insensitive)")
+
+    ## Same, but reversed for '--dont-run':
+    if dont_run_cli != None:
+        # Black list, skip as soon as you hit it:
+        for dont_run_each in dont_run_cli:
+            if dont_run_each.lower() in test_info["title"].lower():
+                pytest.skip("Title of test contained --dont-run param (case insensitive)")
+
+    ## Same, but now for the <file> variants:
+    if only_run_file_cli != None:
+        # Might be in one element of the list, but not the other:
+        file_in_cli_list = False
+        for only_run_each in only_run_file_cli:
+            if only_run_each.lower() in file_name.lower():
+                file_in_cli_list = True
+                break
+        if not file_in_cli_list:
+            pytest.skip("File test was in did not match --only-run-file param (case insensitive)")
+
+
+    if dont_run_file_cli != None:
+        # Black list, skip as soon as you hit it:
+        for dont_run_each in dont_run_file_cli:
+            if dont_run_each.lower() in file_name.lower():
+                pytest.skip("File test was in matched --dont-run-file param (case insensitive)")
