@@ -1,3 +1,4 @@
+# print: False
 tests:
 - full access account:
     account: FullAccess
@@ -9,7 +10,8 @@ tests:
 - bad user pass account:
     account: DoesntExist
     expected_outcome: bad_creds
-
+    # print: True
+    
 - no study area account:
     account: NoStudyArea
     expected_outcome: bad_study_area
@@ -33,7 +35,7 @@ tests:
     account: OnlyEulaASF
     args: "input_file.csv"
     expected_outcome: success
-    timeout: Null
+    # timeout: Null
 
 - able to download csv file:
     account: FullAccess
@@ -90,14 +92,6 @@ tests:
     expect_in_output: ["cookie_existed", "file_exists"] # also added file_incomplete. Need "create_files" keyword?
     expected_outcome: success
     timeout: Null
-
-- Known bug - Inject urls:
-    account: FullAccess
-    inject_output: HACKED
-    products: http://IHopeThisURLDoesntExist.com/rando1.png%22%20]%0A%20%20%20%20%20%20%20%20print(%22HACKED%22)%0A%20%20%20%20%20%20%20%20[%20%221
-    expected_outcome: success
-    skip_file_check: True
-    # print: True
 
 - Unknown argument does not stop download:
     account: FullAccess
