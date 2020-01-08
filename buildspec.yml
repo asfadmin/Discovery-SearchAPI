@@ -13,6 +13,5 @@ phases:
     commands:
       # - pip install -r ./requirements.txt
       # - python ./application.py <- this might block...
-      # - python -m pytest -s test_mainManager.py 
-      - echo "End of pre_build"
-      - eb init
+      - python -m pytest -s test_mainManager.py --api ${TmpUrl}
+      - echo "End of tests"
