@@ -8,7 +8,6 @@ import itertools
 #####################
 ## BEGIN CLI STUFF ##
 #####################
-
 def pytest_addoption(parser):
     parser.addoption("--api", action="store", default=None,
         help = "Override which api ALL .yml tests use with this. (DEV/PROD or SOME-URL).")
@@ -31,6 +30,13 @@ def cli_args(request):
     all_args['dont run file'] = request.config.getoption('--dont-run-file')
     return all_args
 
+def pytest_load_initial_conftests(args):
+    print("\n\nHITT\n\n")
+    print(args)
+
+#################################
+## BEGIN YML LOADING FUNCTIONS ##
+#################################
 def loadTestsFromDirectory(dir_path_root, recurse=False):
     ####################
     # HELPER FUNCTIONS #
@@ -137,6 +143,9 @@ def loadTestsFromDirectory(dir_path_root, recurse=False):
         #         val[i-1] = (val, file_config)
     return tests
 
+#############################
+## BEGIN YML TO TEST STUFF ##
+#############################
 def setupTestFromConfig(test_info, file_config, cli_args):
     def getAPI(str_api, default="DEV"):
         # Stop 'http://str_api/params' from becoming 'http://str_api//params'
@@ -152,6 +161,8 @@ def setupTestFromConfig(test_info, file_config, cli_args):
             return "http://127.0.0.1:5000/"
         # Else assume it IS a url:
         else:
+            if str_api[-1:] != '/':
+                str_api += '/'
             return str_api
     # Figure out which api to use:
     api_url = cli_args['api'] if cli_args['api'] != None else file_config['api']
