@@ -16,3 +16,15 @@ tests:
     input: Good luck parsing this!
     expected error: Invalid int range
     # print: True
+
+- relative date parse with plus:
+    parser: parse_date
+    input: a+day+ago
+    expected error: "Invalid date: a+day+ago"
+
+##   can't really test this, because I end up using the same parser for input *and* output,
+##   so nothing is really being tested here? Can't verify its sanity, but verifies it doesn't crash...
+# - relative date parse with spaces:
+#     parser: parse_date
+#     input: a day ago
+#     expected: a day ago
