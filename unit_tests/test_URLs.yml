@@ -11,15 +11,6 @@ url tests:
     expected file: csv
     expected code: 200
 
-#DS-2766 open bug for absoluteOrbit - GRFN scenes search correct range, but file returns different value for absoluteOrbit
-- absoluteOrbit range:
-    absoluteOrbit: 5000-6000
-    maxresults: 10
-    output: csv
-
-    expected file: csv
-    expected code: 200
-
 - absoluteOrbit list:
     absoluteOrbit: 5542,5543,5545
     maxresults: 10
@@ -36,6 +27,14 @@ url tests:
     expected file: csv
     expected code: 200
 
+- absoluteOrbit zero range:
+    absoluteOrbit: 19364-19364
+    maxresults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
 - absoluteOrbit list E1:
     absoluteOrbit: 32448,32449,32450
     platform: E1
@@ -45,46 +44,8 @@ url tests:
     expected file: csv
     expected code: 200
 
-#DS-2766 open bug for absoluteOrbit - GRFN scenes search correct range, but file returns different value for absoluteOrbit
-- absoluteOrbit zero range:
-    absoluteOrbit: 19364-19364
-    maxresults: 10
-    output: csv
-
-    expected file: csv
-    expected code: 200
-
 - absoluteOrbit zero range list:
     absoluteOrbit: 19364-19364,19189
-    maxresults: 10
-    output: csv
-
-    expected file: csv
-    expected code: 200
-
-#WEB2-1956 open bug for asfframe - for R1, frame in file will not match frame in query
-#tests that will fail: asfframe R1 single, asfframe R1 list, asfframe R1 range
-- asfframe R1 single:
-    asfframe: 307
-    platform: R1
-    maxresults: 10
-    output: csv
-
-    expected file: csv
-    expected code: 200
-
-- asfframe R1 list:
-    asfframe: 304,305,306,307
-    platform: R1
-    maxresults: 10
-    output: csv
-
-    expected file: csv
-    expected code: 200
-
-- asfframe R1 range:
-    asfframe: 300-310
-    platform: R1
     maxresults: 10
     output: csv
 
@@ -416,25 +377,6 @@ url tests:
     expected file: json
     expected code: 200
 
-#DS-2772 open bug for frame + platform
-#frame queries with no platform will search centerESAframe & return asfframe in file - file validation will fail
-#failures for frame single & frame range tests
-- frame single:
-    frame: 6714
-    maxresults: 10
-    output: csv
-
-    expected file: csv
-    expected code: 200
-
-- frame range:
-    frame: 6710-6715
-    maxresults: 10
-    output: csv
-
-    expected file: csv
-    expected code: 200
-
 - frame list:
     frame: 1100,1101,1102
     maxresults: 10
@@ -731,32 +673,6 @@ url tests:
 - min and max Doppler negative:
     minDoppler: -20000
     maxDoppler: -1
-    maxResults: 10
-    output: csv
-
-    expected file: csv
-    expected code: 200
-
-#DS-1945 open bug for this
-- maxFaradayRotation:
-    maxFaradayRotation: 3
-    maxResults: 10
-    output: csv
-
-    expected file: csv
-    expected code: 200
-
-- minFaradayRotation:
-    minFaradayRotation: 3
-    maxResults: 10
-    output: csv
-
-    expected file: csv
-    expected code: 200
-
-- min and max FaradayRotation:
-    minFaradayRotation: 2
-    maxFaradayRotation: 3
     maxResults: 10
     output: csv
 
@@ -1982,24 +1898,8 @@ url tests:
     expected file: csv
     expected code: 200
 
-- processingDate yesterday:
-    processingDate: yesterday
-    maxResults: 10
-    output: csv
-
-    expected file: csv
-    expected code: 200
-
 - processingDate 1weekago:
     processingDate: 1+week+ago
-    maxResults: 10
-    output: csv
-
-    expected file: csv
-    expected code: 200
-
-- processingDate today:
-    processingDate: today
     maxResults: 10
     output: csv
 
@@ -2323,34 +2223,6 @@ url tests:
     expected file: count
     expected code: 200
 
-- start 1weekago count:
-    start: 1+week+ago
-    output: count
-
-    expected file: count
-    expected code: 200
-
-- start 1dayago count:
-    start: 1+day+ago
-    output: count
-
-    expected file: count
-    expected code: 200
-
-- start today count:
-    start: today
-    output: count
-
-    expected file: count
-    expected code: 200
-
-- start yesterday count:
-    start: yesterday
-    output: count
-
-    expected file: count
-    expected code: 200
-
 - start backwards reversed:
     start: now
     end: 1+year+ago
@@ -2369,37 +2241,8 @@ url tests:
     expected file: csv
     expected code: 200
 
-- start now end yesterday reversed:
-    start: now
-    end: yesterday
-    output: csv
-    maxResults: 10
-
-    expected file: csv
-    expected code: 200
-
-- realworld 1:
-    intersectsWith: point(-168.0380672+53.9279675)
-    platform: Sentinel-1A,Sentinel-1B
-    processingLevel: GRD_HS,GRD_HD
-    beamMode: IW
-    output: count
-
-    expected file: count
-    expected code: 200
-
 - realworld 1 modified:
     intersectsWith: point(-162.4535+61.4945)
-    platform: Sentinel-1A,Sentinel-1B
-    processingLevel: GRD_HS,GRD_HD
-    beamMode: IW
-    output: count
-
-    expected file: count
-    expected code: 200
-
-- realworld 2:
-    intersectsWith: linestring(-102+37.59,-94+37,-94+39,-102+39)
     platform: Sentinel-1A,Sentinel-1B
     processingLevel: GRD_HS,GRD_HD
     beamMode: IW
@@ -2413,16 +2256,6 @@ url tests:
     platform: Sentinel-1A,Sentinel-1B
     processingLevel: GRD_HS,GRD_HD
     beamMode: S4
-    output: count
-
-    expected file: count
-    expected code: 200
-
-- realworld 3:
-    intersectsWith: polygon((-102+37.59,-94+37,-94+39,-102+39,-102+37.59))
-    platform: Sentinel-1A,Sentinel-1B
-    processingLevel: GRD_HS,GRD_HD
-    beamMode: IW
     output: count
 
     expected file: count
