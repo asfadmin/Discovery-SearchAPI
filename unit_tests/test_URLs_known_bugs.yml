@@ -1,7 +1,7 @@
 
 api: Test
 
-#This file contains test cases with known bugs. Bug is listed above each group. These will fail if run, and will block the AWS pipeline
+## This file contains test cases with known bugs. Bug is listed above each group. These will fail if run, and will block the AWS pipeline
 
 url tests:
 #No Bug Entered - Still researching "today" failures, due to CMR issue
@@ -103,3 +103,13 @@ url tests:
 
     expected file: csv
     expected code: 200
+
+
+tests:
+- Known bug - Inject urls:
+    account: FullAccess
+    inject_output: HACKED
+    products: http://IHopeThisURLDoesntExist.com/rando1.png%22%20]%0A%20%20%20%20%20%20%20%20print(%22HACKED%22)%0A%20%20%20%20%20%20%20%20[%20%221
+    expected_outcome: success
+    skip_file_check: True
+    # print: True
