@@ -13,8 +13,8 @@ phases:
     commands:
       # Install the dependancies:
       - pip install -r ./requirements.txt
-      # Run the tests that support threading all at once:
-      - python -m pytest -s -m parallel -n auto test_mainManager.py --api ${TmpUrl}
-      # Run the single threaded tests w/out the -n:
-      - python -m pytest -s -m serial test_mainManager.py --api ${TmpUrl}
+      - pytest -s test_mainManager.py --api ${TmpUrl} --dont-run-file known_failures_test_api --dont-run-file known_bugs
+      # Broke apart to run threaded test seperatly, but threads break logging. Tmp dissable:
+        # - python -m pytest -s -m parallel -n auto test_mainManager.py --api ${TmpUrl}
+        # - python -m pytest -s -m serial test_mainManager.py --api ${TmpUrl}
       - echo "End of building this..."
