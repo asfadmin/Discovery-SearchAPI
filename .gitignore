@@ -13,6 +13,7 @@ __pycache__/
 # dev/test files
 test/cache/*
 test/results.csv
+unit_tests/Resources/bulk_download_output/*
 
 # api jsonlite local cache
 jsonlite_cache/*
