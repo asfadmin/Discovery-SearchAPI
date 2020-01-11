@@ -1,0 +1,14 @@
+api: Test
+
+tests:
+- today1:
+    date: today   
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+- today2:
+    date:    
+    expected file: error json
+    expected code: 200
+    expected error: could not parse date
