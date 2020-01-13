@@ -83,6 +83,7 @@ def loadTestsFromDirectory(dir_path_root, recurse=False):
     tests["INPUT"] = []
     tests["URL"] = []
     tests["WKT"] = []
+    tests["DATE_PARSE"] = []
     tests_pattern = os.path.join(dir_path_root, "**", "test_*.y*ml")
 
     for file in glob.glob(tests_pattern, recursive=recurse):
@@ -114,6 +115,8 @@ def loadTestsFromDirectory(dir_path_root, recurse=False):
                     tests["INPUT"].append(test_with_config)
                 elif "account" in test:
                     tests["BULK_DOWNLOAD"].append(test_with_config)
+                elif "date" in test:
+                    tests["DATE_PARSE"].append(test_with_config)
                 else:
                     print()
                     print("\nUNKNOWN TEST!! Title: '{0}'. File: '{1}'.\n".format(test["title"], file))

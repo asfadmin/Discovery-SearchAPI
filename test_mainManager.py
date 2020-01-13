@@ -884,12 +884,72 @@ class URL_Manager():
 
 
 
+#######################
+## DATE PARSE TESTS ##
+#######################
+class DATE_PARSE_Manager():
+    def __init__(self, test_dict):
+        #Get the url string and if assert was used:
+        self.query, assert_used = self.getUrl(test_dict)
+        status_code, content_type, file_content = self.runQuery()
+
+        if assert_used:
+            self.runAssertTests(status_code, test_dict, file_content)
 
 
+    def getUrl(self, test_dict):
+        #DONT add these to url. (Used for tester.)
+        reserved_keywords = ["title", "print", "api", "type"]
+        asserts_keywords = ["expected file", "expected error", "expected code"]
 
+        assert_used = 0 != len([k for k,_ in test_dict.items() if k in asserts_keywords])
+        keywords = []
+        for key,val in test_dict.items():
+            # If it's reserved, move on:
+            if key in reserved_keywords or key in asserts_keywords:
+                continue
+            # If blank, add key with no value
+            if val == None:
+                keywords.append(str(key)+"=")
+            # Otherwise, add key and value pair to url
+            else:
+                keywords.append(str(key)+"="+str(val))
+        query = test_dict['api'] + "&".join(keywords)
+        return query, assert_used
 
+    def runQuery(self):
+        
+        h = requests.head(self.query)
+        # text/csv; charset=utf-8
+        content_type = h.headers.get('content-type').split("/")[1]
+        # Take out the "csv; charset=utf-8", without crahsing on things without charset
+        file_content = requests.get(self.query).content.decode("utf-8")
 
+        if content_type == "json":
+            file_content = json.loads(file_content)
+            if "error" in file_content:
+                content_type = "error json"
+            elif "parsed" in file_content:
+                content_type = jsonlite
+                file_content
 
+        return h.status_code, content_type, file_content
+
+    def runAssertTests(self,status_code, test_dict, file_content):
+        assert status_code == 200, "API returned code {0}".format(status_code)
+        if "expected error" in test_dict:
+            if "error" in file_content:
+                assert test_dict["expected error"].lower() in str(file_content).lower(), "API returned a different error than expected. Test: '{0}'.".format(test_dict["title"])
+            else:
+                assert False, "API parsed value when validation error expected. Test: '{0}'.".format(test_dict["title"])
+        if "expected date" in test_dict:
+            if "date" in file_content:
+                try:
+                    time = datetime.strptime(file_content["date"]["parsed"], "%Y-%m-%dT%H:%M:%SZ")
+                except ValueError as e:
+                    assert False, "API did not return the a date. Error Message: {1} Test: '{0}'.".format(test_dict["title"], str(e))
+            else: 
+                assert False, "API returned an unexpected parsing error. Test: '{0}'.".format(test_dict["title"])
 
 
 
@@ -1292,6 +1352,19 @@ def test_wkts(tests, cli_args):
     helpers.skipTestsIfNecessary(test_info, file_config["yml name"], cli_args)
     test_info['api'] = test_info['api'] + "services/utils/files_to_wkt"
     WKT_Manager(test_info)
+
+@pytest.mark.parallel
+@pytest.mark.parametrize("tests", all_tests["DATE_PARSE"])
+def test_dates(tests, cli_args):
+    test_info = tests[0]
+    file_config = tests[1]
+    test_info = helpers.setupTestFromConfig(test_info, file_config, cli_args)
+    helpers.skipTestsIfNecessary(test_info, file_config["yml name"], cli_args)
+    test_info['api'] = test_info['api'] + "services/utils/date?"
+    print(test_info)
+    DATE_PARSE_Manager(test_info)
+
+
 
 # @pytest.mark.parametrize("test_dict", list_of_tests)
 # def test_MainManager(test_dict, cli_args):
