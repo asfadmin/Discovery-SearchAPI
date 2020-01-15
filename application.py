@@ -67,7 +67,7 @@ def view_script():
     return '<html><pre>' + create_script() + '</pre></html>'
 
 # Send the generated script as an attachment so it downloads directly
-@application.route('/', methods = ['GET', 'POST'])
+@application.route('/devel/', methods = ['GET', 'POST'])
 def get_script():
     filename = get_filename()
     results = create_script()
@@ -82,34 +82,34 @@ def get_script():
 ########## Search API endpoints ##########
 
 # Validate and/or repair a WKT to ensure it meets CMR's requirements
-@application.route('/services/utils/wkt', methods = ['GET', 'POST'])
+@application.route('/devel/services/utils/wkt', methods = ['GET', 'POST'])
 def validate_wkt():
     return WKTValidator(request).get_response()
 
 # Validate a date to ensure it meets our requirements
-@application.route('/services/utils/date', methods = ['GET', 'POST'])
+@application.route('/devel/services/utils/date', methods = ['GET', 'POST'])
 def validate_date():
     return DateValidator(request).get_response()
 
 # Convert a set of shapefiles or a geojson file to WKT
-@application.route('/services/utils/files_to_wkt', methods = ['POST'])
+@application.route('/devel/services/utils/files_to_wkt', methods = ['POST'])
 def filesToWKT():
     return FilesToWKT(request).get_response()
 
 # Collect a list of missions from CMR for a given platform
-@application.route('/services/utils/mission_list', methods = ['GET', 'POST'])
+@application.route('/devel/services/utils/mission_list', methods = ['GET', 'POST'])
 def missionList():
     return MissionList(request).get_response()
 
 # Fetch and convert the results from CMR
-@application.route('/services/search/param', methods = ['GET', 'POST'])
+@application.route('/devel/services/search/param', methods = ['GET', 'POST'])
 def proxy_search():
     return APIProxyQuery(request).get_response()
 
 ########## General endpoints ##########
 
 # Health check endpoint
-@application.route('/health')
+@application.route('/devel/health')
 def health_check():
     cmr_health = get_cmr_health()
     api_health = {'ASFSearchAPI': {'ok?': True}, 'CMRSearchAPI': cmr_health}
@@ -118,7 +118,7 @@ def health_check():
     return response
 
 # Send the API swagger docs
-@application.route('/reference')
+@application.route('/devel/reference')
 def reference():
     return application.send_static_file('./SearchAPIRef.yaml')
 
@@ -140,6 +140,7 @@ def preflight():
 @application.after_request
 def add_header(response):
     response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['experimental-enviro'] = 'yup'
     return response
 
 @application.teardown_request
