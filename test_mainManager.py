@@ -232,10 +232,10 @@ class INPUT_Manager():
 
     def runAssertTests(self):
         parser = self.test_dict["parser"]
-        test_input = self.test_dict["input"]
+        test_input_file = self.test_dict["input"]
         try:
             hit_exception = False
-            val = self.parsers[parser](test_input)
+            val = self.parsers[parser](test_input_file)
         except Exception as e:
             hit_exception = True
             val = str(e)
@@ -884,12 +884,72 @@ class URL_Manager():
 
 
 
+#######################
+## DATE PARSE TESTS ##
+#######################
+class DATE_PARSE_Manager():
+    def __init__(self, test_dict):
+        #Get the url string and if assert was used:
+        self.query, assert_used = self.getUrl(test_dict)
+        status_code, content_type, file_content = self.runQuery()
+
+        if assert_used:
+            self.runAssertTests(status_code, test_dict, file_content)
 
 
+    def getUrl(self, test_dict):
+        #DONT add these to url. (Used for tester.)
+        reserved_keywords = ["title", "print", "api", "type"]
+        asserts_keywords = ["expected file", "expected error", "expected code"]
 
+        assert_used = 0 != len([k for k,_ in test_dict.items() if k in asserts_keywords])
+        keywords = []
+        for key,val in test_dict.items():
+            # If it's reserved, move on:
+            if key in reserved_keywords or key in asserts_keywords:
+                continue
+            # If blank, add key with no value
+            if val == None:
+                keywords.append(str(key)+"=")
+            # Otherwise, add key and value pair to url
+            else:
+                keywords.append(str(key)+"="+str(val))
+        query = test_dict['api'] + "&".join(keywords)
+        return query, assert_used
 
+    def runQuery(self):
+        
+        h = requests.head(self.query)
+        # text/csv; charset=utf-8
+        content_type = h.headers.get('content-type').split("/")[1]
+        # Take out the "csv; charset=utf-8", without crahsing on things without charset
+        file_content = requests.get(self.query).content.decode("utf-8")
 
+        if content_type == "json":
+            file_content = json.loads(file_content)
+            if "error" in file_content:
+                content_type = "error json"
+            elif "parsed" in file_content:
+                content_type = jsonlite
+                file_content
 
+        return h.status_code, content_type, file_content
+
+    def runAssertTests(self,status_code, test_dict, file_content):
+        assert status_code == 200, "API returned code {0}".format(status_code)
+        if "expected error" in test_dict:
+            if "error" in file_content:
+                assert test_dict["expected error"].lower() in str(file_content).lower(), "API returned a different error than expected. Test: '{0}'.".format(test_dict["title"])
+            else:
+                assert False, "API parsed value when validation error expected. Test: '{0}'.".format(test_dict["title"])
+        if "expected date" in test_dict:
+            if "date" in file_content:
+                try:
+                    time = datetime.strptime(file_content["date"]["parsed"], "%Y-%m-%dT%H:%M:%SZ")
+                except ValueError as e:
+                    assert False, "API did not return the a date. Error Message: {1} Test: '{0}'.".format(test_dict["title"], str(e))
+            else: 
+                assert False, "API returned an unexpected parsing error. Test: '{0}'.".format(test_dict["title"])
 
 
 
@@ -907,9 +967,9 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
         self.cred_path = os.path.join(self.root_dir, "unit_tests", "creds_earthdata.yml")
         cookie_jar_path = os.path.join( os.path.expanduser('~'), ".bulk_download_cookiejar.txt")
 
-        if test_info["print"]:
-            print("\n Test: '{0}'".format(test_info["title"]))
-            print()
+        if self.test_info["print"]:
+            print("\n Test: '{0}'".format(self.test_info["title"]))
+            print(" --- Number of expected downloads: {0}.".format(len(self.test_info["files"])))
 
         for version in self.test_info["python_version"]:
             # Take out any files from last test, make things consistant:
@@ -922,14 +982,24 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
             # Craft the command for both runs:
             cmd = 'python{0} "{1}" {2}'.format(str(version), bulk_download_path, self.test_info["args"])
             if test_info["print"]:
-                print("    cmd: {0}".format(cmd))
+                print("\n --- cmd: {0}".format(cmd))
 
             try:
                 # Do the optional run first. All the asserts *always* happen in the second run then:
                 if test_info["test_on_second_run"] == True:
                     bulk_process = pexpect.spawn(cmd, encoding='utf-8', timeout=test_info["timeout"], cwd=self.output_dir)
                     self.run_process_tests(bulk_process, optional_run=True)
+                
+                # Create files here, to represent files not being completed w/ the first script:
+                if "create_files" in test_info:
+                    for create_me in test_info["files"]:
+                        if test_info["print"] == True:
+                            print(" --- Creating file: " + str(create_me))
+                        create_me = os.path.join(self.output_dir, create_me)
+                        f = open(create_me, "w+")
+                        f.close()
 
+                # Run the script for real now, and make sure it does what you're expecting this time:
                 bulk_process = pexpect.spawn(cmd, encoding='utf-8', timeout=test_info["timeout"], cwd=self.output_dir)
                 self.run_process_tests(bulk_process)            
             except pexpect.exceptions.TIMEOUT:
@@ -952,7 +1022,7 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
                 test_info[key] = [ test_info[key] ]
             return test_info
         # NOTE: \/ Keys in alphabetical order: \/ 
-        # args:
+        # args / files:
         test_info["files"] = []
         if "args" not in test_info:
             test_info["args"] = ""
@@ -960,10 +1030,12 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
             args = test_info["args"].split(" ")
             for i, arg in enumerate(args):
                 if arg.endswith('.metalink') or arg.endswith('.csv'):
-                    args[i] = '"' + os.path.join(self.root_dir, "unit_tests", "Resources", "bulk_download_input", arg) + '"'
+                    args[i] = os.path.join(self.root_dir, "unit_tests", "Resources", "bulk_download_input", arg)
                     # List of files to check they get actually downloaded later:
                     test_info["files"].extend(self.getProductNamesFromFile(args[i]))
             test_info["args"] = " ".join(args)
+        # create_files:
+        test_info = turnValueIntoList("create_files", test_info)
         # expect_in_output:
         test_info = turnValueIntoList("expect_in_output", test_info)
         if "expect_in_output" in test_info:
@@ -976,8 +1048,10 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
             assert test_info["expected_outcome"] in whitelist, "Test parsing error: Unknown value for 'expected_outcome'. Test: '{0}'.".format(test_info["title"])
         # print:
         if "print" not in test_info:
-            test_info["print"] = False if "expected_outcome" in test_info else True
-        # products:
+            # If any of this list is in test_info, don't print by default:
+            used_assertion = len([i for i in ["expected_outcome", "expect_in_output", "inject_output"] if i in test_info]) != 0
+            test_info["print"] = not used_assertion
+        # products / files:
         test_info = turnValueIntoList("products", test_info)
         # each product is in the form: "http://foo.com/bar.txt", JUST get the bar.txt and extend the list:
         if "products" in test_info:
@@ -1021,6 +1095,8 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
             products = file_content["URL"]
             # turn http://foo.com/bar.txt to bar.txt
             products = [product.split("/")[-1] for product in products]
+        else:
+            assert False, "Test Error: Unknown filetype!! Path: '{0}'.".format(path)
         return products
 
 
@@ -1132,17 +1208,34 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
         download_incomplete = False
         download_bad_url = False
         while True:
-            output = bulk_process.expect([r"Download file .* exists!", \
-                                          r"Found .* but it wasn't fully downloaded\. Removing file and downloading again\.", \
-                                          r"IMPORTANT: Your user does not have permission to download this type of data!", \
-                                          r"URL Error \(from GET\): .* Name or service not known", \
-                                          r"Download Summary", \
-                                          r"HTTP Error:.*"])
+
+            output = bulk_process.expect([ r"Download Summary", \
+                                           r"Download file .* exists!", \
+                                           r"Found .* but it wasn't fully downloaded\. Removing file and downloading again\.", \
+                                           r"URL Error \(from GET\): .* Name or service not known", \
+                                           r"HTTP Error: (?!401|403)", \
+                                           r"HTTP Error: 401", \
+                                           r"HTTP Error: 403"])
+            # Success! You got data:
             if output == 0:
-                download_existed = True
+                if self.test_info["print"]:
+                    print("RESULT: Able to download data!!")
+                if "expected_outcome" in self.test_info:
+                    assert self.test_info["expected_outcome"] == "success", "Test was not supposed to be able to download data, but it can... Account: {0}. Test: '{1}'.".format(self.test_info["account"], self.test_info["title"])
+                break
+            # One of the downloads already existed:
             elif output == 1:
-                download_incomplete = True
+                download_existed = True
+            # One of the downloads wern't successful the last run:
             elif output == 2:
+                download_incomplete = True
+            # One of the download url's is down / doesn't exist:
+            elif output == 3:
+                download_bad_url = True
+            # Hit this message the last time datapool was down, for the DB upgrade:
+            elif output == 4:
+                assert False, "Data is not available. (Datapool down?). Test: '{0}'. Error: '{1}'. Account: '{2}'.".format(self.test_info["title"], bulk_process.after, self.test_info["account"])
+            elif output == 5:
                 if self.test_info["print"]:
                     print("RESULT: Bad permissions to download data!")
                 if "expected_outcome" in self.test_info:
@@ -1150,16 +1243,14 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
                 # Bad account hit. No files to test. Just return:
                 bulk_process.expect(pexpect.EOF)
                 return
-            elif output == 3:
-                download_bad_url = True
-            elif output == 4:
+            elif output == 6:
                 if self.test_info["print"]:
-                    print("RESULT: Able to download data!!")
-                if "expected_outcome" in self.test_info:
-                    assert self.test_info["expected_outcome"] == "success", "Test was not supposed to be able to download data, but it can... Account: {0}. Test: '{1}'.".format(self.test_info["account"], self.test_info["title"])
-                break
-            elif output == 5:
-                assert False, "Data is not available. (Datapool down?). Test: '{0}'. Error: '{1}'. Account: '{2}'.".format(self.test_info["title"], bulk_process.after, self.test_info["account"])
+                    print("RESULT: HTTP 403. You found out how to hit it!! Not sure if possible yet.")
+                assert False, "API Returned 403. TODO: Find out what causes this and add tests for it..."
+            else:
+                assert False, "TESTING ERROR: output is too high, no idea what to expect."
+
+
 
         # Script complete, check your downloads:
         if not optional_run and "expect_in_output" in self.test_info:
@@ -1168,14 +1259,18 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
             assert ("bad_url" in self.test_info["expect_in_output"]) == download_bad_url
 
         # If the files should exist, check the downloads:        
-        if not optional_run and len(self.test_info["files"]) > 0 and self.test_info["skip_file_check"] == False:
+        if not optional_run and self.test_info["skip_file_check"] == False:
             # get all files from the output dir into one list:
             downloaded_files = os.path.join(self.output_dir, "*")
             downloaded_files = glob.glob(downloaded_files)
             downloaded_files = [os.path.basename(file) for file in downloaded_files]
-
-            for file in self.test_info["files"]:
+            # Remove duplicate files, because the same file might be in both 'args' and 'products' param:
+            required_files = list(set(self.test_info["files"]))
+            # Check downloaded_files against required_files:
+            for file in required_files:
                 assert file in downloaded_files, "File not found. File: {0}, Test: '{1}'".format(file, self.test_info["title"])
+            assert len(required_files) == len(downloaded_files), "Number of files don't line up with what's expected. Test: '{0}'.".format(self.test_info["title"])
+
         # for file in self.test_info["expected_files"]:
         #     assert file in downloaded_files, "Product: {0} Not found in downloaded files dir. Test: '{1}'.".format(file,self.test_info["title"])
         bulk_process.expect(pexpect.EOF)
@@ -1213,32 +1308,79 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
 project_root = os.path.realpath(os.path.join(os.path.dirname(__file__)))
 resources_root = os.path.join(project_root, "unit_tests", "Resources")
 
-list_of_tests = []
 
-# Get the tests from all *yml* files:
-tests_root = os.path.join(project_root, "**", "test_*.yml")
-list_of_tests.extend(helpers.loadTestsFromDirectory(tests_root, recurse=True))
+# Get all yml and yaml files:
+all_tests = helpers.loadTestsFromDirectory(project_root, recurse=True)
 
-# Same, but with *yaml* files now:
-tests_root = os.path.join(project_root, "**", "test_*.yaml")
-list_of_tests.extend(helpers.loadTestsFromDirectory(tests_root, recurse=True))
-
-
-@pytest.mark.parametrize("test_dict", list_of_tests)
-def test_MainManager(test_dict, cli_args):
-    test_info = test_dict[0]
-    file_config = test_dict[1]
-
+@pytest.mark.serial
+@pytest.mark.parametrize("tests", all_tests["BULK_DOWNLOAD"])
+def test_bulkDownload_script(tests, cli_args):
+    test_info = tests[0]
+    file_config = tests[1]
     test_info = helpers.setupTestFromConfig(test_info, file_config, cli_args)
-    helpers.skipTestsIfNecessary(test_info, file_config, cli_args)
+    helpers.skipTestsIfNecessary(test_info, file_config["yml name"], cli_args) 
+    BULK_DOWNLOAD_SCRIPT_Manager(test_info)
 
-    if test_info['type'] == 'WKT':
-        test_info['api'] = test_info['api'] + "services/utils/files_to_wkt"
-        WKT_Manager(test_info)
-    elif test_info['type'] == 'INPUT':
-        INPUT_Manager(test_info)
-    elif test_info['type'] == 'URL':
-        test_info['api'] = test_info['api'] + "services/search/param?"
-        URL_Manager(test_info)
-    elif test_info['type'] == 'BULK_DOWNLOAD':
-        BULK_DOWNLOAD_SCRIPT_Manager(test_info)
+@pytest.mark.parallel
+@pytest.mark.parametrize("tests", all_tests["INPUT"])
+def test_inputs(tests, cli_args):
+    test_info = tests[0]
+    file_config = tests[1]
+    test_info = helpers.setupTestFromConfig(test_info, file_config, cli_args)
+    helpers.skipTestsIfNecessary(test_info, file_config["yml name"], cli_args)
+    INPUT_Manager(test_info)
+
+@pytest.mark.parallel
+@pytest.mark.parametrize("tests", all_tests["URL"])
+def test_urls(tests, cli_args):
+    test_info = tests[0]
+    file_config = tests[1]
+    test_info = helpers.setupTestFromConfig(test_info, file_config, cli_args)
+    helpers.skipTestsIfNecessary(test_info, file_config["yml name"], cli_args)
+    test_info['api'] = test_info['api'] + "services/search/param?"
+    print()
+    print(test_info)
+    print()
+    URL_Manager(test_info)
+
+@pytest.mark.parallel
+@pytest.mark.parametrize("tests", all_tests["WKT"])
+def test_wkts(tests, cli_args):
+    test_info = tests[0]
+    file_config = tests[1]
+    test_info = helpers.setupTestFromConfig(test_info, file_config, cli_args)
+    helpers.skipTestsIfNecessary(test_info, file_config["yml name"], cli_args)
+    test_info['api'] = test_info['api'] + "services/utils/files_to_wkt"
+    WKT_Manager(test_info)
+
+@pytest.mark.parallel
+@pytest.mark.parametrize("tests", all_tests["DATE_PARSE"])
+def test_dates(tests, cli_args):
+    test_info = tests[0]
+    file_config = tests[1]
+    test_info = helpers.setupTestFromConfig(test_info, file_config, cli_args)
+    helpers.skipTestsIfNecessary(test_info, file_config["yml name"], cli_args)
+    test_info['api'] = test_info['api'] + "services/utils/date?"
+    print(test_info)
+    DATE_PARSE_Manager(test_info)
+
+
+
+# @pytest.mark.parametrize("test_dict", list_of_tests)
+# def test_MainManager(test_dict, cli_args):
+#     test_info = test_dict[0]
+#     file_config = test_dict[1]
+
+#     test_info = helpers.setupTestFromConfig(test_info, file_config, cli_args)
+#     helpers.skipTestsIfNecessary(test_info, file_config, cli_args)
+
+#     if test_info['type'] == 'WKT':
+#         test_info['api'] = test_info['api'] + "services/utils/files_to_wkt"
+#         WKT_Manager(test_info)
+#     elif test_info['type'] == 'INPUT':
+#         INPUT_Manager(test_info)
+#     elif test_info['type'] == 'URL':
+#         test_info['api'] = test_info['api'] + "services/search/param?"
+#         URL_Manager(test_info)
+#     elif test_info['type'] == 'BULK_DOWNLOAD':
+#         BULK_DOWNLOAD_SCRIPT_Manager(test_info)
