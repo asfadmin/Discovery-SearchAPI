@@ -399,21 +399,21 @@ tests:
     expected code: 200
     expected date: parsed
 
-# parses incorrectly - ensure it does not crash API or fail - doesn't subtract the 5 hours
+# parses incorrectly: ensure it does not crash API or fail: doesn't subtract the 5 hours
 - 21 July 2013 10:15 pm -0500:
     date: 21+July+2013+10:15+pm+-0500
     expected file: json
     expected code: 200
     expected date: parsed
 
-# parses incorrectly - ensure it does not crash API or fail - yesterday correct, but subtracts 0200 hours from now
+# parses incorrectly: ensure it does not crash API or fail: yesterday correct, but subtracts 0200 hours from now
 - yesterday 20:00 -0200:
     date: yesterday+20:00+-0200
     expected file: json
     expected code: 200
     expected date: parsed
 
-# parses incorrectly - ensure it does not crash API or fail - yesterday correct, but subtracts 0200 hours from now
+# parses incorrectly: ensure it does not crash API or fail: yesterday correct, but subtracts 0200 hours from now
 - yesterday 8pm -0200:
     date: yesterday+8pm+-0200
     expected file: json
@@ -468,30 +468,54 @@ tests:
     expected code: 200
     expected date: parsed
 
-# parses incorrectly - ensure it does not crash API or fail - subtracts X from “today”, not year listed
+# parses incorrectly: ensure it does not crash API or fail: subtracts X from “today”, not year listed
 - 123rd day of 1990:
     date: 123rd+day+of+1990
     expected file: json
     expected code: 200
     expected date: parsed
 
-# parses incorrectly - ensure it does not crash API or fail - subtracts X from “today”, not year listed
+# parses incorrectly: ensure it does not crash API or fail: subtracts X from “today”, not year listed
 - 2nd day of 2002:
     date: 2nd+day+of+2002
     expected file: json
     expected code: 200
     expected date: parsed
 
-# parses incorrectly - ensure it does not crash API or fail - subtracts X from "current date" but lists correct month
+# parses incorrectly: ensure it does not crash API or fail: subtracts X from "current date" but lists correct month
 - 1st day of 2 months ago:
     date: 1st+day+of+2+months+ago
     expected file: json
     expected code: 200
     expected date: parsed
 
-# parses incorrectly - ensure it does not crash API or fail - subtracts X from "current date" but lists correct month
+# parses incorrectly: ensure it does not crash API or fail: subtracts X from "current date" but lists correct month
 - 5th day of 5 months ago:
     date: 5th+day+of+5+months+ago
     expected file: json
     expected code: 200
     expected date: parsed
+
+- Special Characters 1:
+    date: $@
+    expected file: error json
+    expected code: 200
+    expected error: could not parse date
+
+- Special Characters 2:
+    date: _+
+    expected file: error json
+    expected code: 200
+    expected error: could not parse date
+
+- Special Characters 3:
+    date: $!)
+    expected file: error json
+    expected code: 200
+    expected error: could not parse date
+
+- Special Characters 4:
+    date: ~~~
+    expected file: error json
+    expected code: 200
+    expected error: could not parse date
