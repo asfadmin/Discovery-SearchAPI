@@ -55,8 +55,10 @@ class APIProxyQuery:
                 if(self.output == 'count'):
                     return(make_response(str(q.get_count()) + '\n'))
                 (translator, mimetype, suffix) = output_translators().get(self.output, output_translators()['metalink'])
-                filename = 'asf-datapool-results-{0}.{1}'.format(datetime.now().strftime('%Y-%m-%d_%H-%M-%S'), suffix)
+
+                filename = make_filename(suffix)
                 d = api_headers.base(mimetype)
+
                 d.add('Content-Disposition', 'attachment', filename=filename)
                 return Response(stream_with_context(translator(q.get_results)), headers=d)
             except CMRError as e:
@@ -68,3 +70,10 @@ class APIProxyQuery:
             d = api_headers.base(mimetype='application/json')
             resp_dict = { 'error': {'type': 'VALIDATION_ERROR', 'report': 'Validation Error: {0}'.format(validated)}}
             return Response(json.dumps(resp_dict, sort_keys=True, indent=4), 400, headers=d)
+
+
+def make_filename(suffix):
+    return 'asf-datapool-results-{0}.{1}'.format(
+        datetime.now().strftime('%Y-%m-%d_%H-%M-%S'),
+        suffix
+    )

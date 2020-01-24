@@ -1,0 +1,18 @@
+version: 0.2
+
+env:
+  variables:
+    ENV: "search-api"
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.7
+    commands:
+      - python -m venv ${ENV}
+      - . ./${ENV}/bin/activate
+      - pip install -r requirements.txt
+
+  build:
+    commands:
+      - zappa update ${MATURITY}
