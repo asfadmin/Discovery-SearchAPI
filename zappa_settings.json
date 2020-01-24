@@ -7,9 +7,7 @@
         "s3_bucket": "zappa-search-api-i6gt1q4v4",
         "memory_size": 1524,
         "slim_handler": true,
-        "environment_variables": {"MATURITY": "dev"},
-        "certificate_arn": "arn:aws:acm:us-east-1:059104817440:certificate/7b946df3-2298-45a4-b7c3-9b27491e9c8a",
-        "domain": "api-dev.asf.alaska.edu"
+        "environment_variables": {"MATURITY": "dev"}
     },
     "test": {
         "app_function": "application.application",
@@ -19,8 +17,6 @@
         "s3_bucket": "zappa-search-api-i6gt1q4v3",
         "memory_size": 1524,
         "slim_handler": true,
-        "environment_variables": {"MATURITY": "test"},
-        "certificate_arn": "arn:aws:acm:us-east-1:059104817440:certificate/7b946df3-2298-45a4-b7c3-9b27491e9c8a",
-        "domain": "api-test.asf.alaska.edu"
+        "environment_variables": {"MATURITY": "test"}
     }
 }
