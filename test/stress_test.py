@@ -8,10 +8,11 @@ import random
 import time
 
 class bulk_query:
-    def __init__(self, file, save, parallel):
+    def __init__(self, file, save, parallel, quiet):
         self.file = file
         self.save = save
         self.parallel = parallel
+        self.quiet = quiet
         self.queries = None
 
     def read_queries(self):
@@ -22,7 +23,7 @@ class bulk_query:
                     q = q.strip()
                     if len(q) <= 0 or q[0] == '#':
                         continue
-                    p = re.compile('\&?output\=\w+', re.IGNORECASE)
+                    p = re.compile(r'\&?output\=\w+', re.IGNORECASE)
                     q = p.sub('', q)
                     q = q + '&output=jsonlite'
                     self.queries.append(q)
@@ -40,11 +41,12 @@ class bulk_query:
         end = time.perf_counter()
         result = ''
         if r.status_code != 200:
-            result = '"{0}","ERROR: HTTP status {1}""'.format(q, r.status_code)
+            result = '"{0}","{1}","ERROR: HTTP status {2}"'.format(q, end - start, r.status_code)
         else:
             result = '"{0}","{1}"'.format(q, end - start)
         output_lock.acquire()
-        print(result)
+        if not self.quiet:
+            print(result)
         with open(self.save, 'a') as save_file:
             save_file.write('{0}\n'.format(result))
         output_lock.release()
@@ -55,7 +57,6 @@ class bulk_query:
 
         with open(self.save, 'w') as save_file:
             save_file.write('"API Query","Duration (s)"\n')
-        s = requests.Session()
         self.done(*pool.map(self.run_query, self.queries))
 
     def done(self, *whateva):
@@ -67,8 +68,10 @@ if __name__ == '__main__':
     parser.add_argument('-f', '--file', action='store', required=True, help='File to read query URLs from')
     parser.add_argument('-s', '--save', action='store', required=True, help='File to save results to')
     parser.add_argument('-p', '--parallel', action='store', type=int, required=True, help='Number of queries to run in parallel')
+    parser.add_argument('-q', '--quiet', action='store_true', required=False, help='Suppress screen output (does not affect file output)')
+
     args = parser.parse_args()
-    querier = bulk_query(file=args.file, save=args.save, parallel=args.parallel)
+    querier = bulk_query(file=args.file, save=args.save, parallel=args.parallel, quiet=args.quiet)
     querier.read_queries()
     querier.run_queries()
     querier.done()
