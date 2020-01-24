@@ -269,7 +269,7 @@ url tests:
     expected code: 200
 
 - end csv:
-    end: 2010-01-01T00:00:00Z
+    end: "2010-01-01T00:00:00Z"
     maxResults: 10
     output: csv
 
@@ -277,7 +277,7 @@ url tests:
     expected code: 200
 
 - end count:
-    end: 2005-01-01T00:00:00Z
+    end: "2005-01-01T00:00:00Z"
     output: count
 
     expected file: count
@@ -291,7 +291,7 @@ url tests:
     expected code: 200
 
 - end future count:
-    end: 2025-01-01T00:00:00Z
+    end: "2025-01-01T00:00:00Z"
     output: count
 
     expected file: count
@@ -630,7 +630,7 @@ url tests:
     output: csv
 
     expected file: csv
-    expected code: 200 
+    expected code: 200
 
 - min and max BaselinePerp:
     minBaselinePerp: 100
@@ -640,7 +640,7 @@ url tests:
     output: csv
 
     expected file: csv
-    expected code: 200 
+    expected code: 200
 
 - maxDoppler:
     maxDoppler: 2000
@@ -853,7 +853,7 @@ url tests:
     output: jsonlite
 
     expected file: jsonlite
-    expected code: 200 
+    expected code: 200
 
 - output kml:
     platform: SB
@@ -873,8 +873,8 @@ url tests:
 
 - platform SA:
     platform: SA
-    start: 2015-01-01T00:00:00Z
-    end: 2016-01-02T00:00:00Z
+    start: "2015-01-01T00:00:00Z"
+    end: "2016-01-02T00:00:00Z"
     output: csv
     maxResults: 2000
 
@@ -993,8 +993,8 @@ url tests:
 
 - platform count S1:
     platform: S1
-    start: 2016-01-01T00:00:00Z
-    end: 2018-01-02T00:00:00Z
+    start: "2016-01-01T00:00:00Z"
+    end: "2018-01-02T00:00:00Z"
     output: count
 
     expected file: count
@@ -1002,8 +1002,8 @@ url tests:
 
 - platform count SENTINEL-1-1:
     platform: SENTINEL-1
-    start: 2016-01-01T00:00:00Z
-    end: 2018-01-02T00:00:00Z
+    start: "2016-01-01T00:00:00Z"
+    end: "2018-01-02T00:00:00Z"
     output: count
 
     expected file: count
@@ -1011,8 +1011,8 @@ url tests:
 
 - platform count Sentinel-1:
     platform: Sentinel-1
-    start: 2016-01-01T00:00:00Z
-    end: 2018-01-02T00:00:00Z
+    start: "2016-01-01T00:00:00Z"
+    end: "2018-01-02T00:00:00Z"
     output: count
 
     expected file: count
@@ -1020,8 +1020,8 @@ url tests:
 
 - platform count s1:
     platform: s1
-    start: 2016-01-01T00:00:00Z
-    end: 2018-01-02T00:00:00Z
+    start: "2016-01-01T00:00:00Z"
+    end: "2018-01-02T00:00:00Z"
     output: count
 
     expected file: count
@@ -1029,8 +1029,8 @@ url tests:
 
 - platform count Sentinel-1A:
     platform: Sentinel-1A
-    start: 2016-01-01T00:00:00Z
-    end: 2018-01-02T00:00:00Z
+    start: "2016-01-01T00:00:00Z"
+    end: "2018-01-02T00:00:00Z"
     output: count
 
     expected file: count
@@ -1038,8 +1038,8 @@ url tests:
 
 - platform count sa:
     platform: sa
-    start: 1978-01-01T00:00:00Z
-    end: 2019-01-02T00:00:00Z
+    start: "1978-01-01T00:00:00Z"
+    end: "2019-01-02T00:00:00Z"
     output: count
 
     expected file: count
@@ -1047,8 +1047,8 @@ url tests:
 
 - platform count SA:
     platform: SA
-    start: 1978-01-01T00:00:00Z
-    end: 2019-01-02T00:00:00Z
+    start: "1978-01-01T00:00:00Z"
+    end: "2019-01-02T00:00:00Z"
     output: count
 
     expected file: count
@@ -1056,8 +1056,8 @@ url tests:
 
 - platform count sentinel-1a:
     platform: sentinel-1a
-    start: 1978-01-01T00:00:00Z
-    end: 2019-01-02T00:00:00Z
+    start: "1978-01-01T00:00:00Z"
+    end: "2019-01-02T00:00:00Z"
     output: count
 
     expected file: count
@@ -1065,8 +1065,8 @@ url tests:
 
 - platform count SENTINEL-1A:
     platform: SENTINEL-1A
-    start: 1978-01-01T00:00:00Z
-    end: 2019-01-02T00:00:00Z
+    start: "1978-01-01T00:00:00Z"
+    end: "2019-01-02T00:00:00Z"
     output: count
 
     expected file: count
@@ -1074,8 +1074,8 @@ url tests:
 
 - platform count sb:
     platform: sb
-    start: 1978-01-01T00:00:00Z
-    end: 2019-01-02T00:00:00Z
+    start: "1978-01-01T00:00:00Z"
+    end: "2019-01-02T00:00:00Z"
     output: count
 
     expected file: count
@@ -1083,8 +1083,8 @@ url tests:
 
 - platform count SB:
     platform: SB
-    start: 1978-01-01T00:00:00Z
-    end: 2019-01-02T00:00:00Z
+    start: "1978-01-01T00:00:00Z"
+    end: "2019-01-02T00:00:00Z"
     output: count
 
     expected file: count
@@ -1092,8 +1092,8 @@ url tests:
 
 - platform count Sentinel-1B:
     platform: Sentinel-1B
-    start: 1978-01-01T00:00:00Z
-    end: 2019-01-02T00:00:00Z
+    start: "1978-01-01T00:00:00Z"
+    end: "2019-01-02T00:00:00Z"
     output: count
 
     expected file: count
@@ -1101,8 +1101,8 @@ url tests:
 
 - platform count SENTINEL-1B:
     platform: SENTINEL-1B
-    start: 1978-01-01T00:00:00Z
-    end: 2019-01-02T00:00:00Z
+    start: "1978-01-01T00:00:00Z"
+    end: "2019-01-02T00:00:00Z"
     output: count
 
     expected file: count
@@ -1166,8 +1166,8 @@ url tests:
 
 - platform count SMAP:
     platform: SMAP
-    start: 2015-01-01T00:00:00Z
-    end: 2019-01-02T00:00:00Z
+    start: "2015-01-01T00:00:00Z"
+    end: "2019-01-02T00:00:00Z"
     output: count
 
     expected file: count
@@ -1175,8 +1175,8 @@ url tests:
 
 - platform count Smap:
     platform: Smap
-    start: 2015-01-01T00:00:00Z
-    end: 2019-01-02T00:00:00Z
+    start: "2015-01-01T00:00:00Z"
+    end: "2019-01-02T00:00:00Z"
     output: count
 
     expected file: count
@@ -1184,8 +1184,8 @@ url tests:
 
 - platform count smap:
     platform: smap
-    start: 2015-01-01T00:00:00Z
-    end: 2019-01-02T00:00:00Z
+    start: "2015-01-01T00:00:00Z"
+    end: "2019-01-02T00:00:00Z"
     output: count
 
     expected file: count
@@ -1193,8 +1193,8 @@ url tests:
 
 - platform count SMAP SP:
     platform: SP
-    start: 2015-01-01T00:00:00Z
-    end: 2019-01-02T00:00:00Z
+    start: "2015-01-01T00:00:00Z"
+    end: "2019-01-02T00:00:00Z"
     output: count
 
     expected file: count
@@ -1202,8 +1202,8 @@ url tests:
 
 - platform count SMAP Sp:
     platform: Sp
-    start: 2015-01-01T00:00:00Z
-    end: 2019-01-02T00:00:00Z
+    start: "2015-01-01T00:00:00Z"
+    end: "2019-01-02T00:00:00Z"
     output: count
 
     expected file: count
@@ -1211,8 +1211,8 @@ url tests:
 
 - platform count SMAP sp:
     platform: sp
-    start: 2015-01-01T00:00:00Z
-    end: 2019-01-02T00:00:00Z
+    start: "2015-01-01T00:00:00Z"
+    end: "2019-01-02T00:00:00Z"
     output: count
 
     expected file: count
@@ -1220,7 +1220,7 @@ url tests:
 
 - platform count UAVSAR:
     platform: UAVSAR
-    start: 2008-04-28T00:00:00Z
+    start: "2008-04-28T00:00:00Z"
     output: count
 
     expected file: count
@@ -1228,7 +1228,7 @@ url tests:
 
 - platform count UAvSAR:
     platform: UAvSAR
-    start: 2008-04-28T00:00:00Z
+    start: "2008-04-28T00:00:00Z"
     output: count
 
     expected file: count
@@ -1236,7 +1236,7 @@ url tests:
 
 - platform count UA:
     platform: UA
-    start: 2008-04-28T00:00:00Z
+    start: "2008-04-28T00:00:00Z"
     output: count
 
     expected file: count
@@ -1244,7 +1244,7 @@ url tests:
 
 - platform count ua:
     platform: ua
-    start: 2008-04-28T00:00:00Z
+    start: "2008-04-28T00:00:00Z"
     output: count
 
     expected file: count
@@ -1252,7 +1252,7 @@ url tests:
 
 - platform count Ua:
     platform: Ua
-    start: 2008-04-28T00:00:00Z
+    start: "2008-04-28T00:00:00Z"
     output: count
 
     expected file: count
@@ -1260,7 +1260,7 @@ url tests:
 
 - platform count UAVSAR G-III:
     platform: G-III
-    start: 2008-04-28T00:00:00Z
+    start: "2008-04-28T00:00:00Z"
     output: count
 
     expected file: count
@@ -1268,7 +1268,7 @@ url tests:
 
 - platform count UAVSAR g-iii:
     platform: g-iii
-    start: 2008-04-28T00:00:00Z
+    start: "2008-04-28T00:00:00Z"
     output: count
 
     expected file: count
@@ -1276,8 +1276,8 @@ url tests:
 
 - platform count ALOS:
     platform: ALOS
-    start: 2006-01-01T00:00:00Z
-    end: 2012-01-01T00:00:00Z
+    start: "2006-01-01T00:00:00Z"
+    end: "2012-01-01T00:00:00Z"
     output: count
 
     expected file: count
@@ -1285,8 +1285,8 @@ url tests:
 
 - platform count Alos:
     platform: Alos
-    start: 2006-01-01T00:00:00Z
-    end: 2012-01-01T00:00:00Z
+    start: "2006-01-01T00:00:00Z"
+    end: "2012-01-01T00:00:00Z"
     output: count
 
     expected file: count
@@ -1294,8 +1294,8 @@ url tests:
 
 - platform count alos:
     platform: alos
-    start: 2006-01-01T00:00:00Z
-    end: 2012-01-01T00:00:00Z
+    start: "2006-01-01T00:00:00Z"
+    end: "2012-01-01T00:00:00Z"
     output: count
 
     expected file: count
@@ -1303,8 +1303,8 @@ url tests:
 
 - platform count ALOS A3:
     platform: A3
-    start: 2006-01-01T00:00:00Z
-    end: 2012-01-01T00:00:00Z
+    start: "2006-01-01T00:00:00Z"
+    end: "2012-01-01T00:00:00Z"
     output: count
 
     expected file: count
@@ -1312,8 +1312,8 @@ url tests:
 
 - platform count ALOS a3:
     platform: a3
-    start: 2006-01-01T00:00:00Z
-    end: 2012-01-01T00:00:00Z
+    start: "2006-01-01T00:00:00Z"
+    end: "2012-01-01T00:00:00Z"
     output: count
 
     expected file: count
@@ -1321,8 +1321,8 @@ url tests:
 
 - platform count radarsat-1:
     platform: radarsat-1
-    start: 1990-01-01T00:00:00Z
-    end: 2019-01-01T00:00:00Z
+    start: "1990-01-01T00:00:00Z"
+    end: "2019-01-01T00:00:00Z"
     output: count
 
     expected file: count
@@ -1330,8 +1330,8 @@ url tests:
 
 - platform count r1:
     platform: r1
-    start: 1990-01-01T00:00:00Z
-    end: 2019-01-01T00:00:00Z
+    start: "1990-01-01T00:00:00Z"
+    end: "2019-01-01T00:00:00Z"
     output: count
 
     expected file: count
@@ -1339,8 +1339,8 @@ url tests:
 
 - platform count R1:
     platform: R1
-    start: 1990-01-01T00:00:00Z
-    end: 2019-01-01T00:00:00Z
+    start: "1990-01-01T00:00:00Z"
+    end: "2019-01-01T00:00:00Z"
     output: count
 
     expected file: count
@@ -1348,8 +1348,8 @@ url tests:
 
 - platform count ERS:
     platform: ERS
-    start: 1990-01-01T00:00:00Z
-    end: 2012-01-01T00:00:00Z
+    start: "1990-01-01T00:00:00Z"
+    end: "2012-01-01T00:00:00Z"
     output: count
 
     expected file: count
@@ -1357,8 +1357,8 @@ url tests:
 
 - platform count erS:
     platform: erS
-    start: 1990-01-01T00:00:00Z
-    end: 2012-01-01T00:00:00Z
+    start: "1990-01-01T00:00:00Z"
+    end: "2012-01-01T00:00:00Z"
     output: count
 
     expected file: count
@@ -1366,8 +1366,8 @@ url tests:
 
 - platform count E1:
     platform: E1
-    start: 1990-01-01T00:00:00Z
-    end: 2012-01-01T00:00:00Z
+    start: "1990-01-01T00:00:00Z"
+    end: "2012-01-01T00:00:00Z"
     output: count
 
     expected file: count
@@ -1375,8 +1375,8 @@ url tests:
 
 - platform count ERS-1:
     platform: ERS-1
-    start: 1990-01-01T00:00:00Z
-    end: 2012-01-01T00:00:00Z
+    start: "1990-01-01T00:00:00Z"
+    end: "2012-01-01T00:00:00Z"
     output: count
 
     expected file: count
@@ -1384,8 +1384,8 @@ url tests:
 
 - platform count Ers-1:
     platform: Ers-1
-    start: 1990-01-01T00:00:00Z
-    end: 2012-01-01T00:00:00Z
+    start: "1990-01-01T00:00:00Z"
+    end: "2012-01-01T00:00:00Z"
     output: count
 
     expected file: count
@@ -1393,8 +1393,8 @@ url tests:
 
 - platform count E2:
     platform: E2
-    start: 1990-01-01T00:00:00Z
-    end: 2012-01-01T00:00:00Z
+    start: "1990-01-01T00:00:00Z"
+    end: "2012-01-01T00:00:00Z"
     output: count
 
     expected file: count
@@ -1402,8 +1402,8 @@ url tests:
 
 - platform count ERS-2:
     platform: ERS-2
-    start: 1990-01-01T00:00:00Z
-    end: 2012-01-01T00:00:00Z
+    start: "1990-01-01T00:00:00Z"
+    end: "2012-01-01T00:00:00Z"
     output: count
 
     expected file: count
@@ -1411,8 +1411,8 @@ url tests:
 
 - platform count e2:
     platform: e2
-    start: 1990-01-01T00:00:00Z
-    end: 2012-01-01T00:00:00Z
+    start: "1990-01-01T00:00:00Z"
+    end: "2012-01-01T00:00:00Z"
     output: count
 
     expected file: count
@@ -1420,8 +1420,8 @@ url tests:
 
 - platform count ers-2:
     platform: ers-2
-    start: 1990-01-01T00:00:00Z
-    end: 2012-01-01T00:00:00Z
+    start: "1990-01-01T00:00:00Z"
+    end: "2012-01-01T00:00:00Z"
     output: count
 
     expected file: count
@@ -1429,8 +1429,8 @@ url tests:
 
 - platform count JERS-1:
     platform: JERS-1
-    start: 1990-01-01T00:00:00Z
-    end: 2000-01-01T00:00:00Z
+    start: "1990-01-01T00:00:00Z"
+    end: "2000-01-01T00:00:00Z"
     output: count
 
     expected file: count
@@ -1438,8 +1438,8 @@ url tests:
 
 - platform count Jers-1:
     platform: Jers-1
-    start: 1990-01-01T00:00:00Z
-    end: 2000-01-01T00:00:00Z
+    start: "1990-01-01T00:00:00Z"
+    end: "2000-01-01T00:00:00Z"
     output: count
 
     expected file: count
@@ -1447,8 +1447,8 @@ url tests:
 
 - platform count J1:
     platform: J1
-    start: 1990-01-01T00:00:00Z
-    end: 2000-01-01T00:00:00Z
+    start: "1990-01-01T00:00:00Z"
+    end: "2000-01-01T00:00:00Z"
     output: count
 
     expected file: count
@@ -1456,8 +1456,8 @@ url tests:
 
 - platform count j1:
     platform: j1
-    start: 1990-01-01T00:00:00Z
-    end: 2000-01-01T00:00:00Z
+    start: "1990-01-01T00:00:00Z"
+    end: "2000-01-01T00:00:00Z"
     output: count
 
     expected file: count
@@ -1465,8 +1465,8 @@ url tests:
 
 - platform count AIRSAR:
     platform: AIRSAR
-    start: 1990-01-01T00:00:00Z
-    end: 2019-01-01T00:00:00Z
+    start: "1990-01-01T00:00:00Z"
+    end: "2019-01-01T00:00:00Z"
     output: count
 
     expected file: count
@@ -1474,8 +1474,8 @@ url tests:
 
 - platform count Airsar:
     platform: Airsar
-    start: 1990-01-01T00:00:00Z
-    end: 2019-01-01T00:00:00Z
+    start: "1990-01-01T00:00:00Z"
+    end: "2019-01-01T00:00:00Z"
     output: count
 
     expected file: count
@@ -1483,8 +1483,8 @@ url tests:
 
 - platform count AirSar:
     platform: AirSar
-    start: 1990-01-01T00:00:00Z
-    end: 2019-01-01T00:00:00Z
+    start: "1990-01-01T00:00:00Z"
+    end: "2019-01-01T00:00:00Z"
     output: count
 
     expected file: count
@@ -1492,8 +1492,8 @@ url tests:
 
 - platform count AIRSAR as:
     platform: as
-    start: 1990-01-01T00:00:00Z
-    end: 2019-01-01T00:00:00Z
+    start: "1990-01-01T00:00:00Z"
+    end: "2019-01-01T00:00:00Z"
     output: count
 
     expected file: count
@@ -1501,8 +1501,8 @@ url tests:
 
 - platform count AIRSAR AS:
     platform: AS
-    start: 1990-01-01T00:00:00Z
-    end: 2019-01-01T00:00:00Z
+    start: "1990-01-01T00:00:00Z"
+    end: "2019-01-01T00:00:00Z"
     output: count
 
     expected file: count
@@ -1510,8 +1510,8 @@ url tests:
 
 - platform count AIRSAR DC-8:
     platform: DC-8
-    start: 1990-01-01T00:00:00Z
-    end: 2019-01-01T00:00:00Z
+    start: "1990-01-01T00:00:00Z"
+    end: "2019-01-01T00:00:00Z"
     output: count
 
     expected file: count
@@ -1519,8 +1519,8 @@ url tests:
 
 - platform count AIRSAR dc-8:
     platform: dc-8
-    start: 1990-01-01T00:00:00Z
-    end: 2019-01-01T00:00:00Z
+    start: "1990-01-01T00:00:00Z"
+    end: "2019-01-01T00:00:00Z"
     output: count
 
     expected file: count
@@ -1826,7 +1826,7 @@ url tests:
     output: csv
 
     expected file: csv
-    expected code: 200    
+    expected code: 200
 
 - processingLevel Jers-1:
     processingLevel: L0,L1,BROWSE,THUMBNAIL
@@ -1883,7 +1883,7 @@ url tests:
     expected code: 200
 
 - processingDate Z:
-    processingDate: 2018-01-01T00:00:00Z
+    processingDate: "2018-01-01T00:00:00Z"
     maxResults: 10
     output: csv
 
@@ -1939,7 +1939,7 @@ url tests:
     expected code: 200
 
 - product_list multi:
-    product_list: 
+    product_list:
         - S1B_S6_GRDH_1SDV_20190911T214309_20190911T214338_017995_021E10_5CCB-GRD_HD
         - ALPSRP279070820-RTC_HI_RES
         - J1_36272_STD_F249-L1
@@ -2054,8 +2054,8 @@ url tests:
 - season 32-90 S1 Start End:
     season: 32,90
     platform: SA,SB
-    start: 2017-01-01T00:00:00Z
-    end: 2019-01-01T01:00:00Z
+    start: "2017-01-01T00:00:00Z"
+    end: "2019-01-01T01:00:00Z"
     maxResults: 1000
     output: csv
 
@@ -2065,8 +2065,8 @@ url tests:
 - season 1-100 S1 Start End:
     season: 1,100
     platform: sa,sb
-    start: 2015-01-01T00:00:00Z
-    end: 2018-01-01T01:00:00Z
+    start: "2015-01-01T00:00:00Z"
+    end: "2018-01-01T01:00:00Z"
     maxResults: 1000
     output: csv
 
@@ -2077,8 +2077,8 @@ url tests:
 - season 1-175 UAVSAR Start End:
     season: 1,175
     platform: Ua
-    start: 2005-01-01T00:00:00Z
-    end: 2019-01-01T01:00:00Z
+    start: "2005-01-01T00:00:00Z"
+    end: "2019-01-01T01:00:00Z"
     maxResults: 1000
     output: csv
 
@@ -2161,7 +2161,7 @@ url tests:
     expected code: 200
 
 - start Zdate:
-    start: 2005-01-01T00:00:00Z
+    start: "2005-01-01T00:00:00Z"
     maxResults: 10
     output: csv
 
@@ -2195,15 +2195,15 @@ url tests:
     expected code: 200
 
 - start Zdate count:
-    start: 2005-01-01T00:00:00Z
+    start: "2005-01-01T00:00:00Z"
     output: count
 
     expected file: count
     expected code: 200
 
 - start Zdate end count:
-    start: 2005-01-01T00:00:00Z
-    end: 2006-01-01T01:00:00Z
+    start: "2005-01-01T00:00:00Z"
+    end: "2006-01-01T01:00:00Z"
     output: count
 
     expected file: count
