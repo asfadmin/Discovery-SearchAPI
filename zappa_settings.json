@@ -1,0 +1,37 @@
+{
+    "devel": {
+        "app_function": "application.application",
+        "aws_region": "us-east-1",
+        "project_name": "discovery-search-api",
+        "runtime": "python3.7",
+        "s3_bucket": "zappa-search-api-i6gt1q4v4",
+        "memory_size": 1524,
+        "slim_handler": true,
+        "environment_variables": {"MATURITY": "dev"},
+        "timeout_seconds": 60,
+        "domain": "api-dev.asf.alaska.edu"
+    },
+    "test": {
+        "app_function": "application.application",
+        "aws_region": "us-east-1",
+        "project_name": "discovery-search-api",
+        "runtime": "python3.7",
+        "s3_bucket": "zappa-search-api-i6gt1q4v3",
+        "memory_size": 1524,
+        "slim_handler": true,
+        "environment_variables": {"MATURITY": "test"},
+        "timeout_seconds": 60,
+        "domain": "api-test.asf.alaska.edu"
+    },
+    "prod": {
+        "app_function": "application.application",
+        "aws_region": "us-east-1",
+        "project_name": "discovery-search-api",
+        "runtime": "python3.7",
+        "s3_bucket": "zappa-search-api-i6gt1q4v2",
+        "memory_size": 1524,
+        "slim_handler": true,
+        "environment_variables": {"MATURITY": "prod"},
+        "timeout_seconds": 60
+    }
+}
