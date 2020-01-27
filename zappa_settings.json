@@ -8,7 +8,8 @@
         "memory_size": 1524,
         "slim_handler": true,
         "environment_variables": {"MATURITY": "dev"},
-        "timeout_seconds": 60
+        "timeout_seconds": 60,
+        "domain": "api-dev.asf.alaska.edu"
     },
     "test": {
         "app_function": "application.application",
@@ -19,7 +20,8 @@
         "memory_size": 1524,
         "slim_handler": true,
         "environment_variables": {"MATURITY": "test"},
-        "timeout_seconds": 60
+        "timeout_seconds": 60,
+        "domain": "api-test.asf.alaska.edu"
     },
     "prod": {
         "app_function": "application.application",

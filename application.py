@@ -132,8 +132,8 @@ def handle_oversize_request(error):
 # Pre-flight operations
 @application.before_request
 def preflight():
-    request.asf_start_proc_time = time.process_time()
-    request.asf_start_real_time = time.perf_counter()
+    #request.asf_start_proc_time = time.process_time()
+    #request.asf_start_real_time = time.perf_counter()
     analytics_pageview()
 
 # Cleanup operations
@@ -142,6 +142,7 @@ def add_header(response):
     response.headers['Access-Control-Allow-Origin'] = '*'
     return response
 
+'''
 @application.teardown_request
 def postflight(exc):
     try:
@@ -156,6 +157,7 @@ def postflight(exc):
         logging.warning('Request timing analysis: {0}, {1}, {2}, {3}, {4}'.format(total_proc_time, total_real_time, total_proc_time / total_real_time, request.url, request.values))
     except Exception as e:
         logging.error('Exception encountered in postflight handler: {0}'.format(e))
+'''
 
 # Run a dev server
 if __name__ == '__main__':
