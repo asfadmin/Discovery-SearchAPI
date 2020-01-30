@@ -6,7 +6,7 @@ def get_config():
         logging.warning('os.environ[\'MATURITY\'] not set! Defaulting to prod config.]')
     return {
         'dev': {
-            'bulk_download_api': 'https://bulk-download-test.asf.alaska.edu',
+            'bulk_download_api': 'https://bulk-download.asf.alaska.edu',
             'analytics_id': 'UA-118881300-4',
             'cmr_base': 'https://cmr.uat.earthdata.nasa.gov',
             'cmr_health': '/search/health',
@@ -17,7 +17,7 @@ def get_config():
             }
         },
         'test': {
-            'bulk_download_api': 'https://bulk-download-test.asf.alaska.edu',
+            'bulk_download_api': 'https://bulk-download.asf.alaska.edu',
             'analytics_id': 'UA-118881300-3',
             'cmr_base': 'https://cmr.uat.earthdata.nasa.gov',
             'cmr_health': '/search/health',
