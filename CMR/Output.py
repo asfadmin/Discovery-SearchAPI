@@ -64,7 +64,7 @@ def cmr_to_jsonlite(rgen):
 
     streamer = JSONLiteStreamArray(rgen)
 
-    for p in json.JSONEncoder(indent=2, sort_keys=True).iterencode({'results': streamer}):
+    for p in json.JSONEncoder(sort_keys=True).iterencode({'results': streamer}):
         yield p
 
 def cmr_to_geojson(rgen):
