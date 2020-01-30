@@ -246,8 +246,8 @@ url tests:
 
 - platform count RADARSAT-1 blank:
     platform: RADARSAT-1
-    start: 2017-01-01T00:00:00Z
-    end: 2018-01-01T00:00:00Z
+    start: "2017-01-01T00:00:00Z"
+    end: "2018-01-01T00:00:00Z"
     output: count
 
     expected file: blank count
@@ -255,8 +255,8 @@ url tests:
 
 - platform count Radarsat-1 blank:
     platform: Radarsat-1
-    start: 2016-01-01T00:00:00Z
-    end: 2018-01-01T00:00:00Z
+    start: "2016-01-01T00:00:00Z"
+    end: "2018-01-01T00:00:00Z"
     output: count
 
     expected file: blank count
@@ -285,8 +285,8 @@ url tests:
 
 - platform wrong name blank:
     platform: S2
-    start: 2016-01-01T00:00:00Z
-    end: 2016-01-02T00:00:00Z
+    start: "2016-01-01T00:00:00Z"
+    end: "2016-01-02T00:00:00Z"
     output: csv
 
     expected file: blank csv
@@ -304,8 +304,8 @@ url tests:
 
 - platform TEST blank:
     platform: TEST
-    start: 2011-01-01T00:00:00Z
-    end: 2016-01-02T00:00:00Z
+    start: "2011-01-01T00:00:00Z"
+    end: "2016-01-02T00:00:00Z"
     output: csv
 
     expected file: blank csv

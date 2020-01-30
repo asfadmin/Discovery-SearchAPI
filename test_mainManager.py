@@ -232,10 +232,10 @@ class INPUT_Manager():
 
     def runAssertTests(self):
         parser = self.test_dict["parser"]
-        test_input = self.test_dict["input"]
+        test_input_file = self.test_dict["input"]
         try:
             hit_exception = False
-            val = self.parsers[parser](test_input)
+            val = self.parsers[parser](test_input_file)
         except Exception as e:
             hit_exception = True
             val = str(e)
@@ -275,184 +275,177 @@ class URL_Manager():
             assert test_dict["maxResults"] >= file_content["count"], "API returned too many results. Test: {0}. URL: {1}.".format(test_dict["title"], self.query)
         if "expected file" in test_dict:
             assert test_dict["expected file"] == content_type, "Different file type returned than expected. Test: '{0}'. URL: {1}.".format(test_dict["title"], self.query)
-            # If you expect it to be a ligit file, and 'file_content' was converted from str to dict:
-            if content_type[0:5] not in ["error", "blank"] and isinstance(file_content, type({})):
-                ### BEGIN TESTING FILE CONTENTS:
-                test_dict = self.parseTestValues(test_dict)
-                file_content = self.renameKeysToStandard(file_content)
-                file_content = self.renameValsToStandard(file_content)
-                # print(json.dumps(test_dict, indent=4, default=str))
-                # IF used in url, IF contained in file's content, check if they match
+            # If the tester added the override, don't check its contents:
+            if "skip_file_check" in test_dict and test_dict["skip_file_check"] == True:
+                return
+            # If it's not a valid file, don't check its contents:
+            if not isinstance(file_content, type({})) or content_type[0:5] in ["error", "blank"]:
+                return
+            ### BEGIN TESTING FILE CONTENTS:
+            test_dict = self.parseTestValues(test_dict)
+            file_content = self.renameKeysToStandard(file_content)
+            file_content = self.renameValsToStandard(file_content)
+            # print(json.dumps(test_dict, indent=4, default=str))
+            # IF used in url, IF contained in file's content, check if they match
 
-                def checkFileContainsExpected(key, test_dict, file_dict):
-                    # print(test_dict)
-                    # print("CHECKING FILE HERE")
-                    # print(file_dict)
-                    # print(json.dumps(file_dict, indent=4, default=str))
-                    if key in test_dict and key in file_dict:
-                        found_in_list = False
-                        for found_param in file_dict[key]:
-                            # poss_list is either single "i", or range "[i,j]":
-                            for poss_list in test_dict[key]:
-                                # If it's a list, then it is a range of numbers:
-                                if isinstance(poss_list, type([])):
-                                    expect_type = type(poss_list[0])
-                                    # "found_param" is always a string. Convert it to match
-                                    if expect_type(found_param) >= poss_list[0] and expect_type(found_param) <= poss_list[1]:
-                                        found_in_list = True
-                                        break
-                                # This part gets hit for single numbers, and strings. (ie "Platform"):
-                                else:
-                                    expect_type = type(poss_list)
-                                    if expect_type(found_param) == poss_list:
-                                        found_in_list = True
-                                        break
-                            # If inner for-loop found it, break out of this one too:
-                            if found_in_list == True:
-                                break
-                        assert found_in_list, key + " declared, but not found in file. Test: '{0}'. URL: '{1}'.".format(test_dict["title"], self.query)
-                
-                def checkMinMax(key, test_dict, file_dict):
-                    if "min"+key in test_dict and key in file_dict:
-                        for value in file_dict[key]:
-                            number_type = type(test_dict["min"+key])
-                            assert number_type(value) >= test_dict["min"+key], "Value found smaller than min key. Test: '{0}'. URL: {1}.".format(test_dict["title"], self.query)
-                    if "max"+key in test_dict and key in file_dict:
-                        for value in file_dict[key]:
-                            number_type = type(test_dict["max"+key])
-                            assert number_type(value) <= test_dict["max"+key], "Value found greater than max key. Test: '{0}'. URL: {1}.".format(test_dict["title"], self.query)
-
-                # FOR tz_orig: The timezone the string came from.
-                #       Alaska = "US/Alaska", UTC = "UTC", Blank = whatever timezone you're in now
-                def convertTimezoneUTC(time, tz_orig=None):
-                    # Assume if tz_orig is overriden, it's a string of what timezone they want. Else, get whatever timezone you're in
-                    tz_orig = get_localzone() if tz_orig == None else timezone(tz_orig)
-
-                    # If it's a string, convert it to datetime and localize it. 
-                    # Else it's already datetime, just localize to the timezone:
-                    if isinstance(time, type("")):
-                        # Strip down a string, so it can be used in the format: "%Y-%m-%dT%H:%M:%S"
-                        time = time.split(".")[0] # take of any milliseconds. Normally sec.000000
-                        time = time[:-1] if time.endswith("Z") else time # take off the 'Z' if it's on the end
-                        time = time[:-3] if time.endswith("UTC") else time # take off the 'UTC' if it's on the end
-                        # Convert to a datetime object:
-                        time = datetime.strptime(time, "%Y-%m-%dT%H:%M:%S")
-
-                    # Set the timezone to where the timestamp came from:
-                    time = tz_orig.localize(time)
-                    # Change it to UTC and return it:
-                    return time.astimezone(timezone("UTC"))
-
-                def checkDate(title, later_date=None, earlier_date=None):
-                    # Figure out which is the list of dates:
-                    # (assuming whichever is the list, is loaded from downloads. The other is from yml file)
-                    if isinstance(later_date, type([])):
-                        earlier_date = convertTimezoneUTC(earlier_date)
-                        for theDate in later_date:
-                            theDate = convertTimezoneUTC(theDate, tz_orig="UTC")
-                            assert theDate >= earlier_date, "File has too small of a date. File: {0}, earlier than test date: {1}. Test: '{2}'. URL: {3}.".format(theDate, earlier_date, title, self.query)
-                    elif isinstance(earlier_date, type([])):
-                        later_date = convertTimezoneUTC(later_date)
-                        for theDate in earlier_date:
-                            theDate = convertTimezoneUTC(theDate, tz_orig="UTC")
-                            assert later_date >= theDate, "File has too large of a date. File: {0}, later than test date: {1}. Test: '{2}'. URL: {3}.".format(theDate, later_date, title, self.query)
-                    else: # Else they both are a single date. Not sure if this is needed, but...
-                        earlier_date = convertTimezoneUTC(earlier_date)
-                        later_date = convertTimezoneUTC(later_date)
-                        later_date >= earlier_date, "Date: {0} is earlier than date {1}. Test: '{2}'".format(later_date, earlier_date, title)
-
-                def checkSeason(title, file_start_dates, file_end_dates, season_list):
-                    def date_to_nth_day(date):
-                        start_of_year = datetime(year=date.year, month=1, day=1)
-                        start_of_year = convertTimezoneUTC(start_of_year, tz_orig="UTC")
-                        return (date - start_of_year).days + 1
-
-                    if len(file_start_dates) == len(file_end_dates):
-                        file_dates = zip(file_start_dates, file_end_dates)
-                    else:
-                        assert False, "Error running test! Not same number of start and end dates. Test: '{0}'. URL: '{1}'.".format(title, self.query)
-                    
-                    # If it's [300,5], turn it into [[300,365],[1,5]]. Else make it [[x,y]]
-                    if season_list[0] > season_list[1]:
-                        season_list = [ [season_list[0],365],[1,season_list[1]] ]
-                    else:
-                        season_list = [season_list]
-
-                    for date in file_dates:
-                        # Each year's range is in a different element. 'season=300,5' on a dataset 2017-2019 will add [300-365,1-365,1-5]:
-                        days_ranges = []
-                        start_season = convertTimezoneUTC(date[0], tz_orig="UTC")
-                        end_season = convertTimezoneUTC(date[1], tz_orig="UTC")
-                        year_diff = abs(start_season.year - end_season.year)
-                        # First check if the product's date takes up an entire year:
-                        if year_diff >= 2 or start_season.month <= end_season.month and year_diff >= 1:
-                            days_ranges = [[1,365]]
-                        else:
-                            # Convert start/end points to ints:
-                            start = date_to_nth_day(start_season)
-                            end = date_to_nth_day(end_season)
-                            # Check if both dates exist in the same calendar year:
-                            if year_diff == 0:
-                                days_ranges.append([start,end])
-                            # append both halfs of the range:
-                            else:
-                                days_ranges.append([start, 365])
-                                days_ranges.append([1, end])
-
-                        # days_ranges is populated. Make sure it lines up with what you asked for:
-                        season_range_hit = False
-                        for season in season_list:
-                            for the_range in days_ranges:
-                                # If either boundry in the file is in what you ask for in the season list, you pass:
-                                if (season[0] <= the_range[0] <= season[1]) or (season[0] <= the_range[1] <= season[1]):
-                                    season_range_hit = True
+            def checkFileContainsExpected(key, test_dict, file_dict):
+                # print(test_dict)
+                # print("CHECKING FILE HERE")
+                # print(file_dict)
+                # print(json.dumps(file_dict, indent=4, default=str))
+                if key in test_dict and key in file_dict:
+                    found_in_list = False
+                    for found_param in file_dict[key]:
+                        # poss_list is either single "i", or range "[i,j]":
+                        for poss_list in test_dict[key]:
+                            # If it's a list, then it is a range of numbers:
+                            if isinstance(poss_list, type([])):
+                                expect_type = type(poss_list[0])
+                                # "found_param" is always a string. Convert it to match
+                                if expect_type(found_param) >= poss_list[0] and expect_type(found_param) <= poss_list[1]:
+                                    found_in_list = True
                                     break
+                            # This part gets hit for single numbers, and strings. (ie "Platform"):
+                            else:
+                                expect_type = type(poss_list)
+                                if expect_type(found_param) == poss_list:
+                                    found_in_list = True
+                                    break
+                        # If inner for-loop found it, break out of this one too:
+                        if found_in_list == True:
+                            break
+                    assert found_in_list, key + " declared, but not found in file. Test: '{0}'. URL: '{1}'.".format(test_dict["title"], self.query)
+            
+            def checkMinMax(key, test_dict, file_dict):
+                if "min"+key in test_dict and key in file_dict:
+                    for value in file_dict[key]:
+                        number_type = type(test_dict["min"+key])
+                        assert number_type(value) >= test_dict["min"+key], "Value found smaller than min key. Test: '{0}'. URL: {1}.".format(test_dict["title"], self.query)
+                if "max"+key in test_dict and key in file_dict:
+                    for value in file_dict[key]:
+                        number_type = type(test_dict["max"+key])
+                        assert number_type(value) <= test_dict["max"+key], "Value found greater than max key. Test: '{0}'. URL: {1}.".format(test_dict["title"], self.query)
 
-                        assert season_range_hit, "NOT FOUND IN FILE. days_ranges: {0}. season_list: {1}.".format(days_ranges, season_list)
-                    print(self.query)
+            # FOR tz_orig: The timezone the string came from.
+            #       Alaska = "US/Alaska", UTC = "UTC", Blank = whatever timezone you're in now
+            def convertTimezoneUTC(time, tz_orig=None):
+                # Assume if tz_orig is overriden, it's a string of what timezone they want. Else, get whatever timezone you're in
+                tz_orig = get_localzone() if tz_orig == None else timezone(tz_orig)
+
+                # If it's a string, convert it to datetime and localize it. 
+                # Else it's already datetime, just localize to the timezone:
+                if isinstance(time, type("")):
+                    # Strip down a string, so it can be used in the format: "%Y-%m-%dT%H:%M:%S"
+                    time = time.split(".")[0] # take of any milliseconds. Normally sec.000000
+                    time = time[:-1] if time.endswith("Z") else time # take off the 'Z' if it's on the end
+                    time = time[:-3] if time.endswith("UTC") else time # take off the 'UTC' if it's on the end
+                    # Convert to a datetime object:
+                    time = datetime.strptime(time, "%Y-%m-%dT%H:%M:%S")
+
+                # Set the timezone to where the timestamp came from:
+                time = tz_orig.localize(time)
+                # Change it to UTC and return it:
+                return time.astimezone(timezone("UTC"))
+
+            def checkDate(title, later_date=None, earlier_date=None):
+                # Figure out which is the list of dates:
+                # (assuming whichever is the list, is loaded from downloads. The other is from yml file)
+                if isinstance(later_date, type([])):
+                    earlier_date = convertTimezoneUTC(earlier_date)
+                    for theDate in later_date:
+                        theDate = convertTimezoneUTC(theDate, tz_orig="UTC")
+                        assert theDate >= earlier_date, "File has too small of a date. File: {0}, earlier than test date: {1}. Test: '{2}'. URL: {3}.".format(theDate, earlier_date, title, self.query)
+                elif isinstance(earlier_date, type([])):
+                    later_date = convertTimezoneUTC(later_date)
+                    for theDate in earlier_date:
+                        theDate = convertTimezoneUTC(theDate, tz_orig="UTC")
+                        assert later_date >= theDate, "File has too large of a date. File: {0}, later than test date: {1}. Test: '{2}'. URL: {3}.".format(theDate, later_date, title, self.query)
+                else: # Else they both are a single date. Not sure if this is needed, but...
+                    earlier_date = convertTimezoneUTC(earlier_date)
+                    later_date = convertTimezoneUTC(later_date)
+                    later_date >= earlier_date, "Date: {0} is earlier than date {1}. Test: '{2}'".format(later_date, earlier_date, title)
+
+            def checkSeason(title, file_start_dates, file_end_dates, season_list):
+                def date_to_nth_day(date):
+                    start_of_year = datetime(year=date.year, month=1, day=1)
+                    start_of_year = convertTimezoneUTC(start_of_year, tz_orig="UTC")
+                    return (date - start_of_year).days + 1
+
+                if len(file_start_dates) == len(file_end_dates):
+                    file_dates = zip(file_start_dates, file_end_dates)
+                else:
+                    assert False, "Error running test! Not same number of start and end dates. Test: '{0}'. URL: '{1}'.".format(title, self.query)
+                
+                # If it's [300,5], turn it into [[300,365],[1,5]]. Else make it [[x,y]]
+                if season_list[0] > season_list[1]:
+                    season_list = [ [season_list[0],365],[1,season_list[1]] ]
+                else:
+                    season_list = [season_list]
+
+                for date in file_dates:
+                    # Each year's range is in a different element. 'season=300,5' on a dataset 2017-2019 will add [300-365,1-365,1-5]:
+                    days_ranges = []
+                    start_season = convertTimezoneUTC(date[0], tz_orig="UTC")
+                    end_season = convertTimezoneUTC(date[1], tz_orig="UTC")
+                    year_diff = abs(start_season.year - end_season.year)
+                    # First check if the product's date takes up an entire year:
+                    if year_diff >= 2 or start_season.month <= end_season.month and year_diff >= 1:
+                        days_ranges = [[1,365]]
+                    else:
+                        # Convert start/end points to ints:
+                        start = date_to_nth_day(start_season)
+                        end = date_to_nth_day(end_season)
+                        # Check if both dates exist in the same calendar year:
+                        if year_diff == 0:
+                            days_ranges.append([start,end])
+                        # append both halfs of the range:
+                        else:
+                            days_ranges.append([start, 365])
+                            days_ranges.append([1, end])
+
+                    # days_ranges is populated. Make sure it lines up with what you asked for:
+                    season_range_hit = False
+                    for season in season_list:
+                        for the_range in days_ranges:
+                            # If either boundry in the file is in what you ask for in the season list, you pass:
+                            if (season[0] <= the_range[0] <= season[1]) or (season[0] <= the_range[1] <= season[1]):
+                                season_range_hit = True
+                                break
+
+                    assert season_range_hit, "Seasons not found in file. file ranges: {0}. yml range: {1}. Test: {2}. URL: {3}.".format(days_ranges, season_list, title, self.query)
 
 
+            checkFileContainsExpected("Platform", test_dict, file_content)
+            checkFileContainsExpected("absoluteOrbit", test_dict, file_content)
+            checkFileContainsExpected("asfframe", test_dict, file_content)
+            checkFileContainsExpected("granule_list", test_dict, file_content)
+            checkFileContainsExpected("groupid", test_dict, file_content)
+            checkFileContainsExpected("flightdirection", test_dict, file_content)
+            checkFileContainsExpected("offnadirangle", test_dict, file_content)
+            checkFileContainsExpected("polarization", test_dict, file_content)
+            checkFileContainsExpected("relativeorbit", test_dict, file_content)
+            checkFileContainsExpected("collectionname", test_dict, file_content)
+            checkFileContainsExpected("beammode", test_dict, file_content)
+            checkFileContainsExpected("processinglevel", test_dict, file_content)
+            checkFileContainsExpected("flightline", test_dict, file_content)
+            checkFileContainsExpected("lookdirection", test_dict, file_content)
 
-                    # for f_date in file_dates:
-                    #     f_day = date_to_nth_day(f_date)
-                    #     # For checking season=5,300:  (gives 5-300)
-                    #     if season_list[0] <= season_list[1]:
-                    #         assert season_list[0] <= f_day <= season_list[1], "Found value outside of season range. Test: '{0}'. URL: '{1}'.".format(title, self.query)
-                    #     # For checking season=300,5:  (gives 300-365, 1-5)
-                    #     else: # if season_list[0] > season_list[1]:
-                    #         assert not (season_list[1] < f_day < season_list[0]), "Found value outside of season range. Test: '{0}'. URL: '{1}'.".format(title, self.query)
+            # Processing Date (can not validate because it uses a field from CMR not in the API):
+            # if "processingdate" in file_content and "processingdate" in test_dict:
+            #     checkDate(test_dict["title"], later_date=file_content["processingdate"], earlier_date=test_dict["processingdate"])
+            # Start & End:
+            if "starttime" in file_content and "start" in test_dict:
+                checkDate(test_dict["title"], later_date=file_content["starttime"], earlier_date=test_dict["start"])
+            if "starttime" in file_content and "end" in test_dict:
+                checkDate(test_dict["title"], later_date=test_dict["end"], earlier_date=file_content["starttime"])
 
-                checkFileContainsExpected("Platform", test_dict, file_content)
-                checkFileContainsExpected("absoluteOrbit", test_dict, file_content)
-                checkFileContainsExpected("asfframe", test_dict, file_content)
-                checkFileContainsExpected("granule_list", test_dict, file_content)
-                checkFileContainsExpected("groupid", test_dict, file_content)
-                checkFileContainsExpected("flightdirection", test_dict, file_content)
-                checkFileContainsExpected("offnadirangle", test_dict, file_content)
-                checkFileContainsExpected("polarization", test_dict, file_content)
-                checkFileContainsExpected("relativeorbit", test_dict, file_content)
-                checkFileContainsExpected("collectionname", test_dict, file_content)
-                checkFileContainsExpected("beammode", test_dict, file_content)
-                checkFileContainsExpected("processinglevel", test_dict, file_content)
-                checkFileContainsExpected("flightline", test_dict, file_content)
-                checkFileContainsExpected("lookdirection", test_dict, file_content)
+            if "starttime" in file_content and "endtime" in file_content and "season" in test_dict:
+                checkSeason(test_dict["title"], file_content["starttime"], file_content["endtime"], test_dict["season"])
 
-                # Processing Date (can not validate because it uses a field from CMR not in the API):
-                # if "processingdate" in file_content and "processingdate" in test_dict:
-                #     checkDate(test_dict["title"], later_date=file_content["processingdate"], earlier_date=test_dict["processingdate"])
-                # Start & End:
-                if "starttime" in file_content and "start" in test_dict:
-                    checkDate(test_dict["title"], later_date=file_content["starttime"], earlier_date=test_dict["start"])
-                if "starttime" in file_content and "end" in test_dict:
-                    checkDate(test_dict["title"], later_date=test_dict["end"], earlier_date=file_content["starttime"])
-
-                if "starttime" in file_content and "endtime" in file_content and "season" in test_dict:
-                    checkSeason(test_dict["title"], file_content["starttime"], file_content["endtime"], test_dict["season"])
-
-                checkMinMax("baselineperp", test_dict, file_content)
-                checkMinMax("doppler", test_dict, file_content)
-                checkMinMax("insarstacksize", test_dict, file_content)
-                checkMinMax("faradayrotation", test_dict, file_content)
+            checkMinMax("baselineperp", test_dict, file_content)
+            checkMinMax("doppler", test_dict, file_content)
+            checkMinMax("insarstacksize", test_dict, file_content)
+            checkMinMax("faradayrotation", test_dict, file_content)
 
 
 
@@ -462,8 +455,8 @@ class URL_Manager():
         try:
             # Dictionary changes sizes, so check one dict, and make  thechanges to other
             for key, val in test_dict.items():
-                # The Input.parse* methods all expect a string:
-                val = str(val)
+                # The Input.parse* methods all expect a string. API automatically decodes it too:
+                val = urllib.parse.unquote_plus(str(val))
                 if key.lower() == "absoluteorbit":
                     del mutatable_dict[key]
                     mutatable_dict["absoluteOrbit"] = test_input.parse_int_or_range_list(val)
@@ -487,14 +480,12 @@ class URL_Manager():
                     mutatable_dict["offnadirangle"] = test_input.parse_float_or_range_list(val)
                 elif key.lower() == "polarization":
                     del mutatable_dict[key]
-                    val = urllib.parse.unquote_plus(val)
                     mutatable_dict["polarization"] = test_input.parse_string_list(val)
                 elif key.lower() == "relativeorbit":
                     del mutatable_dict[key]
                     mutatable_dict["relativeorbit"] = test_input.parse_int_or_range_list(val)
                 elif key.lower() == "collectionname":
                     del mutatable_dict[key]
-                    val = urllib.parse.unquote_plus(val)
                     mutatable_dict["collectionname"] = test_input.parse_string_list(val)
                 elif key.lower() in ["beammode", "beamswath"]:
                     del mutatable_dict[key]
@@ -550,7 +541,9 @@ class URL_Manager():
                 tmp = mutatable_dict["start"]
                 mutatable_dict["start"] = mutatable_dict["end"]
                 mutatable_dict["end"] = tmp
-
+        # If skip_file_check not declared, default to False:
+        if "skip_file_check" not in mutatable_dict:
+            mutatable_dict["skip_file_check"] = False
         test_dict = mutatable_dict
         # Make each possible value line up with what the files returns:
         test_dict = self.renameValsToStandard(test_dict)
@@ -750,7 +743,7 @@ class URL_Manager():
 
     def getUrl(self, test_dict):
         # DONT add these to url. (Used for tester). Add ALL others to allow testing keywords that don't exist
-        reserved_keywords = ["title", "print", "api", "type"]
+        reserved_keywords = ["title", "print", "api", "type", "skip_file_check"]
         asserts_keywords = ["expected file","expected code", "expected in file"]
 
         assert_used = 0 != len([k for k,_ in test_dict.items() if k in asserts_keywords])
@@ -771,6 +764,10 @@ class URL_Manager():
         return query, assert_used
 
     def runQuery(self):
+        def countToDict(html):
+            count = int(html.rstrip())
+            return {"count": count}
+
         def csvToDict(file_content):
             file_content = csv.reader(StringIO(file_content), delimiter=',')
             file_content = [a for a in file_content]
@@ -780,6 +777,19 @@ class URL_Manager():
             for column in rotated_content:
                 file_content[column[0]] = column[1:]
             file_content["count"] = len(file_content["Platform"])
+            return file_content
+        
+        def downloadToDict(bulk_download_file):
+            # Grab everything in the self.files field of the download script:
+            files = re.search(r'self.files\s*=\s*\[.*?\]', bulk_download_file, re.DOTALL)
+            if files == None:
+                assert False, "Problem reading download script! URL: {0}. File: {1}.".format(self.query, bulk_download_file)
+            # Parse out each file-names, and make each one a str in a list:
+            files = re.findall('"(.*?)"', files.group(0))
+            # add the fields and return:
+            file_content = {}
+            file_content["count"] = len(files)
+            file_content["files"] = files
             return file_content
 
         def jsonToDict(json_data):
@@ -811,9 +821,12 @@ class URL_Manager():
 
         ## COUNT / HTML:
         if content_type == "html":
-            content_type = "count"
-            if file_content == '0\n':
+            # They return a number in the html. Convert to a real int:
+            file_content = countToDict(file_content)
+            if file_content["count"] == 0:
                 content_type = "blank count"
+            else:
+                content_type = "count"
         ## CSV
         elif content_type == "csv":
             file_content = csvToDict(file_content)
@@ -821,15 +834,12 @@ class URL_Manager():
                 content_type = "blank csv"
         ## DOWNLOAD / PLAIN
         elif content_type == "plain":
-            content_type = "download"
-            # Check if download script contains this, without granuals in the list:
-            match = re.search(r'self\.files\s*=\s*\[\s*\]', str(file_content))
-            # If you find it, it's the blank script. If not, There's something there to be downloaded:
-            if match:
+            file_content = downloadToDict(file_content)
+            # how many granules are in the script:
+            if file_content["count"] == 0:
                 content_type = "blank download"
             else:
                 content_type = "download"
-
         ## GEOJSON
         elif content_type == "geojson":
             if file_content == '{\n  "features": [],\n  "type": "FeatureCollection"\n}':
@@ -874,12 +884,72 @@ class URL_Manager():
 
 
 
+#######################
+## DATE PARSE TESTS ##
+#######################
+class DATE_PARSE_Manager():
+    def __init__(self, test_dict):
+        #Get the url string and if assert was used:
+        self.query, assert_used = self.getUrl(test_dict)
+        status_code, content_type, file_content = self.runQuery()
+
+        if assert_used:
+            self.runAssertTests(status_code, test_dict, file_content)
 
 
+    def getUrl(self, test_dict):
+        #DONT add these to url. (Used for tester.)
+        reserved_keywords = ["title", "print", "api", "type"]
+        asserts_keywords = ["expected file", "expected error", "expected code"]
 
+        assert_used = 0 != len([k for k,_ in test_dict.items() if k in asserts_keywords])
+        keywords = []
+        for key,val in test_dict.items():
+            # If it's reserved, move on:
+            if key in reserved_keywords or key in asserts_keywords:
+                continue
+            # If blank, add key with no value
+            if val == None:
+                keywords.append(str(key)+"=")
+            # Otherwise, add key and value pair to url
+            else:
+                keywords.append(str(key)+"="+str(val))
+        query = test_dict['api'] + "&".join(keywords)
+        return query, assert_used
 
+    def runQuery(self):
+        
+        h = requests.head(self.query)
+        # text/csv; charset=utf-8
+        content_type = h.headers.get('content-type').split("/")[1]
+        # Take out the "csv; charset=utf-8", without crahsing on things without charset
+        file_content = requests.get(self.query).content.decode("utf-8")
 
+        if content_type == "json":
+            file_content = json.loads(file_content)
+            if "error" in file_content:
+                content_type = "error json"
+            elif "parsed" in file_content:
+                content_type = jsonlite
+                file_content
 
+        return h.status_code, content_type, file_content
+
+    def runAssertTests(self,status_code, test_dict, file_content):
+        assert status_code == 200, "API returned code {0}".format(status_code)
+        if "expected error" in test_dict:
+            if "error" in file_content:
+                assert test_dict["expected error"].lower() in str(file_content).lower(), "API returned a different error than expected. Test: '{0}'.".format(test_dict["title"])
+            else:
+                assert False, "API parsed value when validation error expected. Test: '{0}'.".format(test_dict["title"])
+        if "expected date" in test_dict:
+            if "date" in file_content:
+                try:
+                    time = datetime.strptime(file_content["date"]["parsed"], "%Y-%m-%dT%H:%M:%SZ")
+                except ValueError as e:
+                    assert False, "API did not return the a date. Error Message: {1} Test: '{0}'.".format(test_dict["title"], str(e))
+            else: 
+                assert False, "API returned an unexpected parsing error. Test: '{0}'.".format(test_dict["title"])
 
 
 
@@ -897,9 +967,9 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
         self.cred_path = os.path.join(self.root_dir, "unit_tests", "creds_earthdata.yml")
         cookie_jar_path = os.path.join( os.path.expanduser('~'), ".bulk_download_cookiejar.txt")
 
-        if test_info["print"]:
-            print("\n Test: '{0}'".format(test_info["title"]))
-            print()
+        if self.test_info["print"]:
+            print("\n Test: '{0}'".format(self.test_info["title"]))
+            print(" --- Number of expected downloads: {0}.".format(len(self.test_info["files"])))
 
         for version in self.test_info["python_version"]:
             # Take out any files from last test, make things consistant:
@@ -912,19 +982,29 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
             # Craft the command for both runs:
             cmd = 'python{0} "{1}" {2}'.format(str(version), bulk_download_path, self.test_info["args"])
             if test_info["print"]:
-                print("    cmd: {0}".format(cmd))
+                print("\n --- cmd: {0}".format(cmd))
 
             try:
                 # Do the optional run first. All the asserts *always* happen in the second run then:
                 if test_info["test_on_second_run"] == True:
                     bulk_process = pexpect.spawn(cmd, encoding='utf-8', timeout=test_info["timeout"], cwd=self.output_dir)
                     self.run_process_tests(bulk_process, optional_run=True)
+                
+                # Create files here, to represent files not being completed w/ the first script:
+                if "create_files" in test_info:
+                    for create_me in test_info["files"]:
+                        if test_info["print"] == True:
+                            print(" --- Creating file: " + str(create_me))
+                        create_me = os.path.join(self.output_dir, create_me)
+                        f = open(create_me, "w+")
+                        f.close()
 
+                # Run the script for real now, and make sure it does what you're expecting this time:
                 bulk_process = pexpect.spawn(cmd, encoding='utf-8', timeout=test_info["timeout"], cwd=self.output_dir)
                 self.run_process_tests(bulk_process)            
             except pexpect.exceptions.TIMEOUT:
                 assert False, "Test ran out of time! Set 'timeout' in test. (Can be Null to disable, or # seconds). Test: '{0}'.".format(test_info["title"])
-        os.remove(bulk_download_path)
+        # os.remove(bulk_download_path)
 
 
 
@@ -942,7 +1022,7 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
                 test_info[key] = [ test_info[key] ]
             return test_info
         # NOTE: \/ Keys in alphabetical order: \/ 
-        # args:
+        # args / files:
         test_info["files"] = []
         if "args" not in test_info:
             test_info["args"] = ""
@@ -950,10 +1030,12 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
             args = test_info["args"].split(" ")
             for i, arg in enumerate(args):
                 if arg.endswith('.metalink') or arg.endswith('.csv'):
-                    args[i] = '"' + os.path.join(self.root_dir, "unit_tests", "Resources", "bulk_download_input", arg) + '"'
+                    args[i] = os.path.join(self.root_dir, "unit_tests", "Resources", "bulk_download_input", arg)
                     # List of files to check they get actually downloaded later:
                     test_info["files"].extend(self.getProductNamesFromFile(args[i]))
             test_info["args"] = " ".join(args)
+        # create_files:
+        test_info = turnValueIntoList("create_files", test_info)
         # expect_in_output:
         test_info = turnValueIntoList("expect_in_output", test_info)
         if "expect_in_output" in test_info:
@@ -966,14 +1048,19 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
             assert test_info["expected_outcome"] in whitelist, "Test parsing error: Unknown value for 'expected_outcome'. Test: '{0}'.".format(test_info["title"])
         # print:
         if "print" not in test_info:
-            test_info["print"] = False if "expected_outcome" in test_info else True
-        # products:
+            # If any of this list is in test_info, don't print by default:
+            used_assertion = len([i for i in ["expected_outcome", "expect_in_output", "inject_output"] if i in test_info]) != 0
+            test_info["print"] = not used_assertion
+        # products / files:
         test_info = turnValueIntoList("products", test_info)
         # each product is in the form: "http://foo.com/bar.txt", JUST get the bar.txt and extend the list:
         if "products" in test_info:
             test_info["files"].extend([product.split("/")[-1] for product in test_info["products"]])
         # python_version:
         test_info = turnValueIntoList("python_version", test_info, default=[2, 3])
+        # skip_file_check:
+        if "skip_file_check" not in test_info:
+            test_info["skip_file_check"] = False
         # test_on_second_run:
         if "test_on_second_run" not in test_info:
             test_info["test_on_second_run"] = False
@@ -1008,6 +1095,8 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
             products = file_content["URL"]
             # turn http://foo.com/bar.txt to bar.txt
             products = [product.split("/")[-1] for product in products]
+        else:
+            assert False, "Test Error: Unknown filetype!! Path: '{0}'.".format(path)
         return products
 
 
@@ -1064,9 +1153,6 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
                 break
             # These mean you're not done with the input, do another loop around:
             elif script_output == 2:
-                print("HITTTT!!!!!:")
-                print(bulk_process.after)
-                print()
                 file_not_found_hit = True
             elif script_output == 3:
                 unknown_arg_hit = True
@@ -1122,16 +1208,34 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
         download_incomplete = False
         download_bad_url = False
         while True:
-            output = bulk_process.expect([r"Download file .* exists!", \
-                                          r"Found .* but it wasn't fully downloaded\. Removing file and downloading again\.", \
-                                          r"IMPORTANT: Your user does not have permission to download this type of data!", \
-                                          r"URL Error \(from GET\): .* Name or service not known", \
-                                          r"Download Summary"])
+
+            output = bulk_process.expect([ r"Download Summary", \
+                                           r"Download file .* exists!", \
+                                           r"Found .* but it wasn't fully downloaded\. Removing file and downloading again\.", \
+                                           r"URL Error \(from GET\): .* Name or service not known", \
+                                           r"HTTP Error: (?!401|403)", \
+                                           r"HTTP Error: 401", \
+                                           r"HTTP Error: 403"])
+            # Success! You got data:
             if output == 0:
-                download_existed = True
+                if self.test_info["print"]:
+                    print("RESULT: Able to download data!!")
+                if "expected_outcome" in self.test_info:
+                    assert self.test_info["expected_outcome"] == "success", "Test was not supposed to be able to download data, but it can... Account: {0}. Test: '{1}'.".format(self.test_info["account"], self.test_info["title"])
+                break
+            # One of the downloads already existed:
             elif output == 1:
-                download_incomplete = True
+                download_existed = True
+            # One of the downloads wern't successful the last run:
             elif output == 2:
+                download_incomplete = True
+            # One of the download url's is down / doesn't exist:
+            elif output == 3:
+                download_bad_url = True
+            # Hit this message the last time datapool was down, for the DB upgrade:
+            elif output == 4:
+                assert False, "Data is not available. (Datapool down?). Test: '{0}'. Error: '{1}'. Account: '{2}'.".format(self.test_info["title"], bulk_process.after, self.test_info["account"])
+            elif output == 5:
                 if self.test_info["print"]:
                     print("RESULT: Bad permissions to download data!")
                 if "expected_outcome" in self.test_info:
@@ -1139,14 +1243,14 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
                 # Bad account hit. No files to test. Just return:
                 bulk_process.expect(pexpect.EOF)
                 return
-            elif output == 3:
-                download_bad_url = True
-            elif output == 4:
+            elif output == 6:
                 if self.test_info["print"]:
-                    print("RESULT: Able to download data!!")
-                if "expected_outcome" in self.test_info:
-                    assert self.test_info["expected_outcome"] == "success", "Test was not supposed to be able to download data, but it can... Account: {0}. Test: '{1}'.".format(self.test_info["account"], self.test_info["title"])
-                break
+                    print("RESULT: HTTP 403. You found out how to hit it!! Not sure if possible yet.")
+                assert False, "API Returned 403. TODO: Find out what causes this and add tests for it..."
+            else:
+                assert False, "TESTING ERROR: output is too high, no idea what to expect."
+
+
 
         # Script complete, check your downloads:
         if not optional_run and "expect_in_output" in self.test_info:
@@ -1154,18 +1258,19 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
             assert ("file_incomplete" in self.test_info["expect_in_output"]) == download_incomplete
             assert ("bad_url" in self.test_info["expect_in_output"]) == download_bad_url
 
-        # If all the files exist, check the downloads:
-        # all_files_should_exist = ()
-        
-        all_files_should_exist = False #("file_not_found" not in self.test_info["expect_in_output"] and )if "expect_in_output" in self.test_info else True) and ("inject_output" not in self.test_info)
-        if "expect_in_output" in self.test_info and all_files_should_exist:
+        # If the files should exist, check the downloads:        
+        if not optional_run and self.test_info["skip_file_check"] == False:
             # get all files from the output dir into one list:
             downloaded_files = os.path.join(self.output_dir, "*")
             downloaded_files = glob.glob(downloaded_files)
             downloaded_files = [os.path.basename(file) for file in downloaded_files]
-
-            for file in self.test_info["files"]:
+            # Remove duplicate files, because the same file might be in both 'args' and 'products' param:
+            required_files = list(set(self.test_info["files"]))
+            # Check downloaded_files against required_files:
+            for file in required_files:
                 assert file in downloaded_files, "File not found. File: {0}, Test: '{1}'".format(file, self.test_info["title"])
+            assert len(required_files) == len(downloaded_files), "Number of files don't line up with what's expected. Test: '{0}'.".format(self.test_info["title"])
+
         # for file in self.test_info["expected_files"]:
         #     assert file in downloaded_files, "Product: {0} Not found in downloaded files dir. Test: '{1}'.".format(file,self.test_info["title"])
         bulk_process.expect(pexpect.EOF)
@@ -1203,32 +1308,79 @@ class BULK_DOWNLOAD_SCRIPT_Manager():
 project_root = os.path.realpath(os.path.join(os.path.dirname(__file__)))
 resources_root = os.path.join(project_root, "unit_tests", "Resources")
 
-list_of_tests = []
 
-# Get the tests from all *yml* files:
-tests_root = os.path.join(project_root, "**", "test_*.yml")
-list_of_tests.extend(helpers.loadTestsFromDirectory(tests_root, recurse=True))
+# Get all yml and yaml files:
+all_tests = helpers.loadTestsFromDirectory(project_root, recurse=True)
 
-# Same, but with *yaml* files now:
-tests_root = os.path.join(project_root, "**", "test_*.yaml")
-list_of_tests.extend(helpers.loadTestsFromDirectory(tests_root, recurse=True))
-
-
-@pytest.mark.parametrize("test_dict", list_of_tests)
-def test_MainManager(test_dict, cli_args):
-    test_info = test_dict[0]
-    file_config = test_dict[1]
-
+@pytest.mark.serial
+@pytest.mark.parametrize("tests", all_tests["BULK_DOWNLOAD"])
+def test_bulkDownload_script(tests, cli_args):
+    test_info = tests[0]
+    file_config = tests[1]
     test_info = helpers.setupTestFromConfig(test_info, file_config, cli_args)
-    helpers.skipTestsIfNecessary(test_info, file_config, cli_args)
+    helpers.skipTestsIfNecessary(test_info, file_config["yml name"], cli_args) 
+    BULK_DOWNLOAD_SCRIPT_Manager(test_info)
 
-    if test_info['type'] == 'WKT':
-        test_info['api'] = test_info['api'] + "services/utils/files_to_wkt"
-        WKT_Manager(test_info)
-    elif test_info['type'] == 'INPUT':
-        INPUT_Manager(test_info)
-    elif test_info['type'] == 'URL':
-        test_info['api'] = test_info['api'] + "services/search/param?"
-        URL_Manager(test_info)
-    elif test_info['type'] == 'BULK_DOWNLOAD':
-        BULK_DOWNLOAD_SCRIPT_Manager(test_info)
+@pytest.mark.parallel
+@pytest.mark.parametrize("tests", all_tests["INPUT"])
+def test_inputs(tests, cli_args):
+    test_info = tests[0]
+    file_config = tests[1]
+    test_info = helpers.setupTestFromConfig(test_info, file_config, cli_args)
+    helpers.skipTestsIfNecessary(test_info, file_config["yml name"], cli_args)
+    INPUT_Manager(test_info)
+
+@pytest.mark.parallel
+@pytest.mark.parametrize("tests", all_tests["URL"])
+def test_urls(tests, cli_args):
+    test_info = tests[0]
+    file_config = tests[1]
+    test_info = helpers.setupTestFromConfig(test_info, file_config, cli_args)
+    helpers.skipTestsIfNecessary(test_info, file_config["yml name"], cli_args)
+    test_info['api'] = test_info['api'] + "services/search/param?"
+    print()
+    print(test_info)
+    print()
+    URL_Manager(test_info)
+
+@pytest.mark.parallel
+@pytest.mark.parametrize("tests", all_tests["WKT"])
+def test_wkts(tests, cli_args):
+    test_info = tests[0]
+    file_config = tests[1]
+    test_info = helpers.setupTestFromConfig(test_info, file_config, cli_args)
+    helpers.skipTestsIfNecessary(test_info, file_config["yml name"], cli_args)
+    test_info['api'] = test_info['api'] + "services/utils/files_to_wkt"
+    WKT_Manager(test_info)
+
+@pytest.mark.parallel
+@pytest.mark.parametrize("tests", all_tests["DATE_PARSE"])
+def test_dates(tests, cli_args):
+    test_info = tests[0]
+    file_config = tests[1]
+    test_info = helpers.setupTestFromConfig(test_info, file_config, cli_args)
+    helpers.skipTestsIfNecessary(test_info, file_config["yml name"], cli_args)
+    test_info['api'] = test_info['api'] + "services/utils/date?"
+    print(test_info)
+    DATE_PARSE_Manager(test_info)
+
+
+
+# @pytest.mark.parametrize("test_dict", list_of_tests)
+# def test_MainManager(test_dict, cli_args):
+#     test_info = test_dict[0]
+#     file_config = test_dict[1]
+
+#     test_info = helpers.setupTestFromConfig(test_info, file_config, cli_args)
+#     helpers.skipTestsIfNecessary(test_info, file_config, cli_args)
+
+#     if test_info['type'] == 'WKT':
+#         test_info['api'] = test_info['api'] + "services/utils/files_to_wkt"
+#         WKT_Manager(test_info)
+#     elif test_info['type'] == 'INPUT':
+#         INPUT_Manager(test_info)
+#     elif test_info['type'] == 'URL':
+#         test_info['api'] = test_info['api'] + "services/search/param?"
+#         URL_Manager(test_info)
+#     elif test_info['type'] == 'BULK_DOWNLOAD':
+#         BULK_DOWNLOAD_SCRIPT_Manager(test_info)

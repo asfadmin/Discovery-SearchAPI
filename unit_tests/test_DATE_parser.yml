@@ -1,0 +1,521 @@
+api: Test
+
+tests:
+- blank date:
+    date:
+    expected file: error json
+    expected code: 200
+    expected error: could not parse date
+
+- today:
+    date: today
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+- last day:
+    date: last+day
+    expected file: error json
+    expected code: 200
+    expected error: could not parse date
+
+- last 10 days:
+    date: last+10+days
+    expected file: error json
+    expected code: 200
+    expected error: could not parse date
+
+- last week:
+    date: last+week
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+- last month:
+    date: last+month
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+- last year:
+    date: last+year
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+- next day:
+    date: next+day
+    expected file: error json
+    expected code: 200
+    expected error: could not parse date
+
+- next 10 days:
+    date: next+10+days
+    expected file: error json
+    expected code: 200
+    expected error: could not parse date
+
+- next hour:
+    date: next+hour
+    expected file: error json
+    expected code: 200
+    expected error: could not parse date
+
+- next week:
+    date: next+week
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+- next month:
+    date: next+month
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+- next year:
+    date: next+year
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+- yesterday morning:
+    date: yesterday+morning
+    expected file: error json
+    expected code: 200
+    expected error: could not parse date
+
+- yesterday evening:
+    date: yesterday+evening
+    expected file: error json
+    expected code: 200
+    expected error: could not parse date
+
+- 7daysago no spaces:
+    date: 7daysago
+    expected file: error json
+    expected code: 200
+    expected error: could not parse date
+
+- ayearago no spaces:
+    date: ayearago
+    expected file: error json
+    expected code: 200
+    expected error: could not parse date
+
+- beginning of last week:
+    date: beginning+of+last+week
+    expected file: error json
+    expected code: 200
+    expected error: could not parse date
+
+- beginning of the year:
+    date: beginning+of+the+year
+    expected file: error json
+    expected code: 200
+    expected error: could not parse date
+
+- le 01-02-2020:
+    date: le+01-02-2020
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+- 01-02-2020:
+    date: 01-02-2020
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+- now in Italian:
+    date: adesso
+    expected file: error json
+    expected code: 200
+    expected error: could not parse date
+
+- tomorrow in Italian:
+    date: domani
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+- yesterday in French:
+    date: hier
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+- a month ago in German:
+    date: vor+einem+monat
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+- now in German:
+    date: jetzt
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+- a year ago in Spanish:
+    date: Hace+un+ano
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+- yesterday in Spanish:
+    date: ayer
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+- now in Chinese:
+    date: 现在
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+- tomorrow in Chinese:
+    date: 明天
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+- 1 month ago in Chinese:
+    date: 1个月前
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+- 10 min ago:
+    date: 10+min+ago
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+- 3 months 1 week and 1 day ago:
+    date: 3+months,+1+week+and+1+day+ago
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+- in 2 days:
+    date: in+2+days
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+- tomorrow:
+    date: tomorrow
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+- March:
+    date: March
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+- March 2016:
+    date: March+2016
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+- last February:
+    date: last+February
+    expected file: error json
+    expected code: 200
+    expected error: could not parse date
+
+- February:
+    date: February
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+- Feb:
+    date: Feb
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+- Nov:
+    date: Nov
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+- 3 day ago:
+    date: 3+day+ago
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+- 3 days ago:
+    date: 3+days+ago
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+- 3 week ago:
+    date: 3+week+ago
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+- 3 weeks ago:
+    date: 3+weeks+ago
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+- 3 month ago:
+    date: 3+month+ago
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+- 3 months ago:
+    date: 3+months+ago
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+- 3 year ago:
+    date: 3+year+ago
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+- 3 years ago:
+    date: 3+years+ago
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+- 1pm yesterday:
+    date: 1pm+yesterday
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+- 1am yesterday:
+    date: 1am+yesterday
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+- 10am yesterday:
+    date: 10am+yesterday
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+- 10 am yesterday:
+    date: 10+am+yesterday
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+- 10:00 yesterday:
+    date: 10:00+yesterday
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+- 20:00 yesterday:
+    date: 20:00+yesterday
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+# parses incorrectly - ensure it does not crash API or fail - yesterday, current time
+- 13 yesterday:
+    date: 13+yesterday
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+# parses incorrectly - ensure it does not crash API or fail - yesterday, current time
+- 1300 yesterday:
+    date: 1300+yesterday
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+- one oclock yesterday:
+    date: one+oclock+yesterday
+    expected file: error json
+    expected code: 200
+    expected error: could not parse date
+
+- 1oclock yesterday:
+    date: 1oclock+yesterday
+    expected file: error json
+    expected code: 200
+    expected error: could not parse date
+
+- midnight yesterday:
+    date: midnight+yesterday
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+- noon yesterday:
+    date: noon+yesterday
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+- 1 hour ago:
+    date: 1+hour+ago
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+- 3 hours ago:
+    date: 3+hours+ago
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+- August 14, 2015 EST:
+    date: August+14,+2015+EST
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+- July 4, 2013 PST:
+    date: July+4,+2013+PST
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+- yesterday -0200:
+    date: yesterday+-0200
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+# parses incorrectly: ensure it does not crash API or fail: doesn't subtract the 5 hours
+- 21 July 2013 10:15 pm -0500:
+    date: 21+July+2013+10:15+pm+-0500
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+# parses incorrectly: ensure it does not crash API or fail: yesterday correct, but subtracts 0200 hours from now
+- yesterday 20:00 -0200:
+    date: yesterday+20:00+-0200
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+# parses incorrectly: ensure it does not crash API or fail: yesterday correct, but subtracts 0200 hours from now
+- yesterday 8pm -0200:
+    date: yesterday+8pm+-0200
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+- Thur:
+    date: Thur
+    expected file: error json
+    expected code: 200
+    expected error: could not parse date
+
+- Thurs:
+    date: Thurs
+    expected file: error json
+    expected code: 200
+    expected error: could not parse date
+
+- last Sunday:
+    date: last+Sunday
+    expected file: error json
+    expected code: 200
+    expected error: could not parse date
+
+- Tuesday:
+    date: Tuesday
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+- Thursday:
+    date: Thursday
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+- Sat:
+    date: Sat
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+- Fri:
+    date: Fri
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+- Sunday:
+    date: Sunday
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+# parses incorrectly: ensure it does not crash API or fail: subtracts X from “today”, not year listed
+- 123rd day of 1990:
+    date: 123rd+day+of+1990
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+# parses incorrectly: ensure it does not crash API or fail: subtracts X from “today”, not year listed
+- 2nd day of 2002:
+    date: 2nd+day+of+2002
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+# parses incorrectly: ensure it does not crash API or fail: subtracts X from "current date" but lists correct month
+- 1st day of 2 months ago:
+    date: 1st+day+of+2+months+ago
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+# parses incorrectly: ensure it does not crash API or fail: subtracts X from "current date" but lists correct month
+- 5th day of 5 months ago:
+    date: 5th+day+of+5+months+ago
+    expected file: json
+    expected code: 200
+    expected date: parsed
+
+- Special Characters 1:
+    date: $@
+    expected file: error json
+    expected code: 200
+    expected error: could not parse date
+
+- Special Characters 2:
+    date: _+
+    expected file: error json
+    expected code: 200
+    expected error: could not parse date
+
+- Special Characters 3:
+    date: $!)
+    expected file: error json
+    expected code: 200
+    expected error: could not parse date
+
+- Special Characters 4:
+    date: ~~~
+    expected file: error json
+    expected code: 200
+    expected error: could not parse date
