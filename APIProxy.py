@@ -39,37 +39,51 @@ class APIProxyQuery:
         events.append({'ec': 'Param List', 'ea': ', '.join(sorted([p.lower() for p in self.request.values]))})
         analytics_events(events=events)
         validated = self.can_use_cmr()
-        if validated == True:
-            try:
-                logging.debug('Handling query from {0}'.format(self.request.access_route[-1]))
-                maxResults = self.max_results
 
-                # This is absolutely the darndest thing. Something about streaming json AND having maxresults
-                # set leads to truncating the last result. If maxresults is not set, no truncation happens.
-                # This only affects json-based formats, all others work fine with or without maxresults.
-                # This is an admittedly kludgey workaround but I just can't seem to pinpoint the issue yet.
-                if maxResults is not None and self.output.lower() in ['json', 'jsonlite', 'geojson']:
-                    maxResults += 1
-
-                q = CMRQuery(params=dict(self.cmr_params), output=self.output, max_results=maxResults, analytics=True)
-                if(self.output == 'count'):
-                    return(make_response(str(q.get_count()) + '\n'))
-                (translator, mimetype, suffix) = output_translators().get(self.output, output_translators()['metalink'])
-
-                filename = make_filename(suffix)
-                d = api_headers.base(mimetype)
-
-                d.add('Content-Disposition', 'attachment', filename=filename)
-                return Response(stream_with_context(translator(q.get_results)), headers=d)
-            except CMRError as e:
-                return make_response('A CMR error has occured: {0}'.format(e))
-        else:
+        if validated is not True:
             logging.debug('Malformed query, returning HTTP 400')
             logging.debug(self.request.values)
 
             d = api_headers.base(mimetype='application/json')
             resp_dict = { 'error': {'type': 'VALIDATION_ERROR', 'report': 'Validation Error: {0}'.format(validated)}}
             return Response(json.dumps(resp_dict, sort_keys=True, indent=4), 400, headers=d)
+
+        try:
+            logging.debug('Handling query from {0}'.format(self.request.access_route[-1]))
+            maxResults = self.max_results
+
+            # This is absolutely the darndest thing. Something about streaming json AND having maxresults
+            # set leads to truncating the last result. If maxresults is not set, no truncation happens.
+            # This only affects json-based formats, all others work fine with or without maxresults.
+            # This is an admittedly kludgey workaround but I just can't seem to pinpoint the issue yet.
+            if maxResults is not None and self.output.lower() in ['json', 'jsonlite', 'geojson']:
+                maxResults += 1
+
+            q = CMRQuery(
+                params=dict(self.cmr_params),
+                output=self.output,
+                max_results=maxResults,
+                analytics=True
+            )
+
+            if self.output == 'count':
+                return make_response(f'{q.get_count()}\n')
+
+            translators = output_translators()
+
+            (translator, mimetype, suffix) = translators \
+                .get(self.output, translators['metalink'])
+
+            filename = make_filename(suffix)
+            d = api_headers.base(mimetype)
+            d.add('Content-Disposition', 'attachment', filename=filename)
+
+            stream = stream_with_context(translator(q.get_results))
+
+            return Response(stream, headers=d)
+
+        except CMRError as e:
+            return make_response('A CMR error has occured: {0}'.format(e))
 
 
 def make_filename(suffix):
