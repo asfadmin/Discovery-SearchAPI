@@ -14,24 +14,27 @@ import numpy as np
 class simplifyWKT():
     def __init__(self, wkt_str):
         self.shapes = []
-        self.error = None
+        self.errors = None
         self.repairs = []
         # I use this in a couple areas. It matches things like: .5, 6e-6, -9. etc.
         self.regex_digit = r"(-?(((\d+\.\d+|\d+)(e-?\d+)?)|(\d+\.|\.\d+)))"
 
-        # wkt.loads doesn't like 3D/4D tags, BUT it loads the coords just fine:
-        wkt_str = wkt_str.upper()
-        wkt_str = wkt_str.replace(" Z", " ")
-        wkt_str = wkt_str.replace(" M", " ")
-        wkt_str = wkt_str.replace(" ZM", " ")
-
         try:
+            # wkt.loads doesn't like 3D/4D tags, BUT it loads the coords just fine:
+            wkt_str = wkt_str.upper()
+            wkt_str = wkt_str.replace(" Z", " ")
+            wkt_str = wkt_str.replace(" M", " ")
+            wkt_str = wkt_str.replace(" ZM", " ")
+
             wkt_json = wkt.loads(wkt_str)
+        except AttributeError as e:
+            self.errors = { 'errors': [{'type': 'ATTRIBUTE', 'report': 'Could not parse WKT: {0}.'.format(str(e))}] }
+            return           
         except (ValueError, InvalidGeoJSONException) as e:
-            self.error = { 'error': {'type': 'VALUE', 'report': 'Could not parse WKT: {0}.'.format(str(e))} }
+            self.errors = { 'errors': [{'type': 'VALUE', 'report': 'Could not parse WKT: {0}.'.format(str(e))}] }
             return
         except TypeError as e:
-            self.error =  { 'error': {'type': 'TYPE', 'report': str(e)} }
+            self.errors =  { 'errors': [{'type': 'TYPE', 'report': str(e)}] }
             return
 
         # Turn the json into a list of individual shapes:
@@ -42,7 +45,7 @@ class simplifyWKT():
 
         # See if a merge is required or not:
         if len(self.shapes) == 0:
-            self.error = { 'error': {'type': 'VALUE', 'report': 'Could not parse WKT: No valid shapes found.'} }
+            self.errors = { 'errors': [{'type': 'VALUE', 'report': 'Could not parse WKT: No valid shapes found.'}] }
             return
         elif len(self.shapes) == 1:
             single_wkt = self.shapes[0]
@@ -68,7 +71,7 @@ class simplifyWKT():
  
         self.wkt_unwrapped, self.wkt_wrapped = self.__repairMergedWKT(single_wkt)
         # If the repairMergedWkt hit an error:
-        if self.error != None:
+        if self.errors != None:
             return        
 
         if single_wkt.geom_type.upper() == "POLYGON":
@@ -78,8 +81,8 @@ class simplifyWKT():
 
 
     def get_simplified_json(self):
-        if self.error != None:
-            return self.error
+        if self.errors != None:
+            return self.errors
         else:
             return { 
                 'wkt': {
@@ -452,7 +455,7 @@ class simplifyWKT():
             # If it couldn't simplify enough:
             # Would add closest_dist check here, but it's unclear *exactly* what that distance is. Just hope CMR accept's it at this point:
             if current_num_points > 300:
-                self.error = { 'error': {'type': 'SIMPLIFY', 'report': 'Could not simplify {0} past 300 points. (Got from {1}, to {2})'.format(wkt_shapely.geom_type, org_num_points, current_num_points)} }
+                self.errors = { 'errors': [{'type': 'SIMPLIFY', 'report': 'Could not simplify {0} past 300 points. (Got from {1}, to {2})'.format(wkt_shapely.geom_type, org_num_points, current_num_points)}] }
                 return
             if attempts > 0:
                 self.repairs.append({
@@ -465,14 +468,14 @@ class simplifyWKT():
         ## REPAIR MERGED WKT START:
         # Quick sanity check. No clue if it's actually possible to hit this:
         if single_wkt.geom_type.upper() not in ["POLYGON", "LINESTRING", "POINT"]:
-            self.error = {'error': {'type': 'VALUE', 'report': 'Could not simplify WKT down to single shape.'} }
+            self.errors = {'errors': [{'type': 'VALUE', 'report': 'Could not simplify WKT down to single shape.'}] }
             return
         # You can't edit coords in shapely. You have to create a new shape w/ the new coords:
         wkt_json = wkt.loads(shapely.wkt.dumps(single_wkt))
         wkt_json = getClampedCoords(wkt_json)
         wkt_json = simplifyPoints(wkt_json)
         # Clamp, simplify, *then* wrap, to help simplify be more accuate w/ points outside of poles
-        if self.error != None:
+        if self.errors != None:
             return
         wkt_unwrapped = wkt.dumps(wkt_json)
         wkt_wrapped = wkt.dumps(getWrappedCoords(wkt_json))
@@ -510,18 +513,18 @@ class simplifyWKT():
                         })
                     logging.debug(self.repairs[-1])
                 else:
-                    self.error = { 'error': {'type': 'UNKNOWN', 'report': 'Tried to repair winding order but still getting CMR error: {0}'.format(text)} }
+                    self.errors = { 'errors': [{'type': 'UNKNOWN', 'report': 'Tried to repair winding order but still getting CMR error: {0}'.format(text)}] }
                     return
             elif 'The polygon boundary intersected itself' in text:
-                self.error = { 'error': {'type': 'SELF_INTERSECT', 'report': 'Self-intersecting polygon'}}
+                self.errors = { 'errors': [{'type': 'SELF_INTERSECT', 'report': 'Self-intersecting polygon'}]}
                 return
             elif 'The shape contained duplicate points' in text:
                 # Get the list of points from the error, and list them to the user:
                 match_brackets = r'\[(.*?)\]'
                 bad_points = re.findall(match_brackets, text)
-                self.error = { 'error': {'type': 'DUPLICATE_POINTS', 'report': 'Duplicated or too-close points: [{0}]'.format("], [".join(bad_points))}}
+                self.errors = { 'errors': [{'type': 'DUPLICATE_POINTS', 'report': 'Duplicated or too-close points: [{0}]'.format("], [".join(bad_points))}]}
             else:
-                self.error = { 'error': {'type': 'UNKNOWN', 'report': 'Unknown CMR error: {0}'.format(text)}}     
+                self.errors = { 'errors': [{'type': 'UNKNOWN', 'report': 'Unknown CMR error: {0}'.format(text)}]}     
                 return     
 
         self.wkt_wrapped = wkt.dumps(wkt_obj_wrapped)
