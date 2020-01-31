@@ -22,8 +22,8 @@ class APIProxyQuery:
 
     def get_response(self):
         self.post_analytics()
-        validated = self.can_use_cmr()
 
+        validated = self.can_use_cmr()
         if validated is not True:
             return self.validation_error(validated)
 
