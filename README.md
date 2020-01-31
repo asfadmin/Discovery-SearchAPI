@@ -47,7 +47,7 @@ To get started with a local instance for development:
 ```
 
 # Testing
-To deploy to test, merge changes to the test branch.
+Testing is done using the [Discovery-PytestAutomation](https://github.com/asfadmin/Discovery-PytestAutomation) submodule
 
 # Production
 To deploy to prod, merge changes to the prod branch.
