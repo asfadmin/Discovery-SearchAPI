@@ -39,4 +39,15 @@ url tests:
 
     expected file: csv
     expected code: 200
+- end count:
+    end: "2005-01-01T00:00:00Z"
+    output: count
 
+    expected file: count
+    expected code: 200
+- invalid query:
+    output: csv
+    maxresults: 10
+
+    expected file: error json
+    expected code: 400
