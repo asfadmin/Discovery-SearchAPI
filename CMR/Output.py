@@ -230,33 +230,33 @@ class JSONLiteStreamArray(JSONStreamArray):
 
         return {
             # Mandatory:
-            'dataset': p['platform'],
-            'downloadUrl': p['downloadUrl'],
-            'fileName': p['fileName'],
-            'granuleName': p['granuleName'],
-            'groupID': p['groupID'],
-            'productID': p['product_file_id'],
-            'productType': p['processingLevel'],
-            'productTypeDisplay': p['processingTypeDisplay'],
-            'startTime': p['startTime'],
-            'wkt': p['stringFootprint'],
-            'wkt_unwrapped': unwrap_wkt(p['stringFootprint']),
+            'd': p['platform'],
+            'du': p['downloadUrl'].replace(p['granuleName'], '{gn}'),
+            'fn': p['fileName'].replace(p['granuleName'], '{gn}'),
+            'gn': p['granuleName'],
+            'gid': p['groupID'].replace(p['granuleName'], '{gn}'),
+            'pid': p['product_file_id'].replace(p['granuleName'], '{gn}'),
+            'pt': p['processingLevel'],
+            'ptd': p['processingTypeDisplay'],
+            'st': p['startTime'],
+            'w': p['stringFootprint'],
+            'wu': unwrap_wkt(p['stringFootprint']),
             # Optional:
-            'beamMode': p['beamMode'],
-            'browse': p['browse'],
-            'flightDirection': p['flightDirection'],
-            'flightLine': p['flightLine'],
-            'frame': p['frameNumber'],
-            'missionName': p['missionName'],
-            'orbit': p['absoluteOrbit'],
-            'path': p['relativeOrbit'],
-            'polarization': p['polarization'],
-            'sizeMB': p['sizeMB'],
-            'stackSize': p['insarStackSize'], # Used for datasets with precalculated stacks
-            'thumb': p['thumbnailUrl'],
+            'bm': p['beamMode'],
+            'b': [a.replace(p['granuleName'], '{gn}') for a in p['browse']] if p['browse'] is not None else p['browse'],
+            'fd': p['flightDirection'],
+            'fl': p['flightLine'],
+            'f': p['frameNumber'],
+            'mn': p['missionName'],
+            'o': p['absoluteOrbit'],
+            'p': p['relativeOrbit'],
+            'po': p['polarization'],
+            's': p['sizeMB'],
+            'ss': p['insarStackSize'], # Used for datasets with precalculated stacks
+            't': p['thumbnailUrl'].replace(p['granuleName'], '{gn}') if p['thumbnailUrl'] is not None else p['thumbnailUrl'],
             # Dataset-specific:
-            'faradayRotation': p['faradayRotation'], # ALOS
-            'offNadirAngle': p['offNadirAngle'] # ALOS
+            'fr': p['faradayRotation'], # ALOS
+            'on': p['offNadirAngle'] # ALOS
         }
 
 class GeoJSONStreamArray(JSONStreamArray):
