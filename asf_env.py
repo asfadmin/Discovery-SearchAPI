@@ -38,17 +38,6 @@ def get_config():
                 'Client-Id': 'vertex_asf'
             }
         },
-        'beta': {
-            'bulk_download_api': 'https://bulk-download.asf.alaska.edu',
-            'analytics_id': 'UA-118881300-5',
-            'cmr_base': 'https://cmr.earthdata.nasa.gov',
-            'cmr_health': '/search/health',
-            'cmr_api': '/search/granules.echo10',
-            'cmr_collections': '/search/collections',
-            'cmr_headers': {
-                'Client-Id': 'vertex_asf'
-            }
-        },
         'prod-private': {
             'bulk_download_api': 'https://bulk-download.asf.alaska.edu',
             'analytics_id': 'UA-118881300-5',
