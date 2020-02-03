@@ -17,54 +17,103 @@ class FilesToWKT:
 
     def __init__(self, request):
         self.request = request  # store the incoming request
+        self.errors = []
+        # Find out if the user passed us files:
+        if 'files' in self.request.files and len(list(self.request.files.getlist('files'))) > 0:
+            self.files = self.request.files.getlist("files")
+        else:
+            self.files = None
 
     def get_response(self):
         d = api_headers.base(mimetype='application/json')
-
         resp_dict = self.make_response()
-
+        ###### For backwards compatibility ######################
+        if "parsed wkt" in resp_dict:                           #
+            repaired_json = repairWKT(resp_dict["parsed wkt"])  #
+            for key, val in repaired_json.items():              #
+                resp_dict[key] = val                            #
+        #########################################################
         return Response(json.dumps(resp_dict, sort_keys=True, indent=4), 200, headers=d)
 
     def make_response(self):
-        args = self.request.args.to_dict()
-        should_repair = False if "repair" in args and args['repair'].lower() == 'false' else True
+        if self.files == None:
+            self.errors.append({'type': 'POST', 'report': 'No files provided in files= parameter'})
+            return {'errors': self.errors }
 
-        if 'files' not in self.request.files or len(list(self.request.files.getlist('files'))) < 1:
-            return {'error': 'No files provided in files= parameter'}
+        # Helper for organizing files into a dict, combining shps/shx, etc.
+        def add_file_to_dict(file_dict, full_name, file_stream):
+            ext = full_name.split(".")[-1:][0].lower()              # Everything after the last dot.
+            file_name = ".".join(full_name.split(".")[:-1])         # Everything before the last dot.
 
-        if len(list(self.request.files.getlist('files'))) > 1:
-            return repairWKT(parse_shapefile_set(self.request.files.getlist('files')))
+            # SHP'S:
+            if ext in ["shp", "shx", "dbf"]:
+                # Save shps as {"filename": {"shp": data, "shx": data, "dbf": data}, "file_2.kml": kml_data}
+                if file_name not in file_dict:
+                    file_dict[file_name] = {}
+                file_dict[file_name][ext] = BytesIO(file_stream)
+            # BASIC FILES:
+            elif ext in ["kml", "geojson"]:
+                file_dict[full_name] = BytesIO(file_stream)
+            # Else they pass a zip again:
+            elif ext in ["zip"]:
+                self.errors.append({"type": "FILE_UNZIP", "report": "Cannot unzip double-compressed files. File: '{0}'.".format(full_name)})
+            else:
+                self.errors.append({"type": "FILE_UNKNOWN", "report": "Ignoring file with unknown extension. File: '{0}'.".format(full_name)})
 
-        files = self.request.files.to_dict()
-        f = list(files.values())[0]
-        filename = f.filename
-        ext = os.path.splitext(filename)[1].lower()
-        # GEOJSON
-        if ext == '.geojson':
-            parsed_geo = parse_geojson(f)
-            if "error" in parsed_geo or not should_repair:
-                return parsed_geo
-            return repairWKT(parsed_geo)
-        # KML
-        elif ext == '.kml':
-            parsed_kml = parse_kml(f)
-            if "error" in parsed_kml or not should_repair:
-                return parsed_kml
-            return repairWKT(parsed_kml)
-        # SHP
-        elif ext == '.shp':
-            parsed_shp = parse_shp(f)
-            if "error" in parsed_shp or not should_repair:
-                return parsed_shp
-            return repairWKT(parsed_shp)
+        # Have to group all shp types together:
+        file_dict = {}
+        for file in self.files: 
+            full_name = file.filename                   # Everything.
+            ext = full_name.split(".")[-1:][0].lower()  # Everything after the last dot.
 
-        elif ext == '.zip':
-            parsed_zip = parse_shapefile_zip(f)
-            if "error" in parsed_zip or not should_repair:
-                return parsed_zip
-            return repairWKT(parsed_zip)
+            if ext == "zip":
+                # Add each file 
+                with BytesIO(file.read()) as zip_f:
+                    zip_obj = zipfile.ZipFile(zip_f)
+                    parts = zip_obj.namelist()
+                    for part_path in parts:
+                        # If it's a dir, skip it. ('parts' still contains the files in that dir)
+                        if part_path.endswith("/"):
+                            continue
+                        part_name = os.path.basename(part_path)
+                        add_file_to_dict(file_dict, part_name, zip_obj.read(part_path))
+            else:
+                # Try to add whatever it is:
+                add_file_to_dict(file_dict, full_name, file.read())
+
+        # With everything organized in dict, start parsing them:
+        wkt_list = []
+        for key, val in file_dict.items():
+            ext = key.split(".")[-1:][0].lower()
+            # If it's a shp set. (Check first, because 'file.kml.shp' will be loaded, and
+            #       the key will become 'file.kml'. The val is always a dict for shps tho):
+            if isinstance(val, type({})):
+                wkt = parse_shapefile(val)
+            # Check for each type now:
+            elif ext == "geojson":
+                wkt = parse_geojson(val)
+            elif ext == "kml":
+                wkt = parse_kml(val)
+            else:
+                # This *should* never get hit, but someone might add a new file-type in 'add_file_to_dict' w/out declaring it here.
+                self.errors.append({"type": "STREAM_UNKNOWN", "report": "Ignoring file with unknown tag. File: '{0}'".format(key)})
+                continue
+            # If the parse function returned a json error:
+            if isinstance(wkt, type({})) and "error" in wkt:
+                # Give the error a better error discription:
+                wkt["error"]["report"] += " (Cannot load file: '{0}')".format(key)
+                self.errors.append(wkt["error"])
+                continue
+            else:
+                wkt_list.append(wkt)
+
+        if len(wkt_list) == 0:
+            return { 'errors': self.errors }
+        elif len(wkt_list) == 1:
+            full_wkt = wkt_list[0]
         else:
-            return {'error': 'Unrecognized file type'}
+            full_wkt = "GEOMETRYCOLLECTION({0})".format(",".join(wkt_list))
+        return {"parsed wkt": full_wkt, "errors": self.errors}
     
 
 # Takes any json, and returns a list of all {"type": x, "coordinates": y} objects 
@@ -120,8 +169,8 @@ def parse_geojson(f):
 
 
 def parse_kml(f):
-    kml_str = f.read()
     try:
+        kml_str = f.read()
         kml_root = md.parseString(kml_str, forbid_dtd=True)
         wkt_json = kml2json(kml_root)
     # All these BUT the type/value errors are for the md.parseString:
@@ -129,41 +178,6 @@ def parse_kml(f):
     except Exception as e:  
         return {'error': {'type': 'VALUE', 'report': 'Could not parse kml: {0}'.format(str(e))}} 
     return json_to_wkt(wkt_json)
-
-
-def parse_shp(f):
-    fileset = {'shp': BytesIO(f.read())}
-    return parse_shapefile(fileset)
-
-
-def parse_shapefile_zip(f):
-    with BytesIO(f.read()) as file:
-        fileset = {}
-        zip_obj = zipfile.ZipFile(file)
-        parts = zip_obj.namelist()
-        for p in parts:
-            ext = os.path.splitext(p)[1].lower()
-            if ext == '.shp':
-                fileset['shp'] = BytesIO(zip_obj.read(p))
-            elif ext == '.dbf':
-                fileset['dbf'] = BytesIO(zip_obj.read(p))
-            elif ext == '.shx':
-                fileset['shx'] = BytesIO(zip_obj.read(p))
-
-    return parse_shapefile(fileset)
-
-def parse_shapefile_set(files):
-    fileset = {}
-    for p in files:
-        ext = os.path.splitext(p.filename)[1].lower()
-        if ext == '.shp':
-            fileset['shp'] = BytesIO(p.read())
-        elif ext == '.dbf':
-            fileset['dbf'] = BytesIO(p.read())
-        elif ext == '.shx':
-            fileset['shx'] = BytesIO(p.read())
-
-    return parse_shapefile(fileset)
 
 def parse_shapefile(fileset):
     try:
