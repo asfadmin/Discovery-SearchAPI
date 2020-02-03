@@ -28,7 +28,7 @@
         "aws_region": "us-east-1",
         "project_name": "discovery-search-api",
         "runtime": "python3.7",
-        "s3_bucket": "zappa-search-api-i6gt1q4v2",
+        "s3_bucket": "zappa-search-api-prod-i6gt1q4v2",
         "memory_size": 1524,
         "slim_handler": true,
         "environment_variables": {"MATURITY": "prod"},
