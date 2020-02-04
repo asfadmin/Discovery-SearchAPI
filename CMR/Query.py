@@ -105,13 +105,13 @@ def get_query_list(params):
     sub_queries = cartesian_product(subquery_params)
     list_params = format_list_params(list_params)
 
-    final_queries = [
+    final_sub_queries = [
         query + list_params for query in sub_queries
     ]
 
-    logging.debug(f'{len(final_queries)} subqueries built')
+    logging.debug(f'{len(final_sub_queries)} subqueries built')
 
-    return final_queries
+    return final_sub_queries
 
 
 def cartesian_product(params):
@@ -137,7 +137,7 @@ def format_query_params(params):
 
 
 def translate_param(param_name, param_val):
-    plist = []
+    param_list = []
 
     cmr_input_map = input_map()
 
@@ -149,13 +149,13 @@ def translate_param(param_name, param_val):
         param_val = [param_val]
 
     for l in param_val:
-        format_param_val = l
+        format_val = l
 
         if isinstance(l, list):
-            format_param_val = ','.join([f'{t}' for t in l])
+            format_val = ','.join([f'{t}' for t in l])
 
-        plist.append({
-            cmr_param: cmr_format_str.format(format_param_val)
+        param_list.append({
+            cmr_param: cmr_format_str.format(format_val)
         })
 
-    return plist
+    return param_list
