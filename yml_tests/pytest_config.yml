@@ -1,0 +1,29 @@
+
+
+
+### A WIP idea, might impliment if other tests require custom cli arguments:
+### (Might move '--api' to this at that point too)
+# add_cli_options:
+# - Change API:
+#     usage: --api # CLI usage
+#     help: "Override which api ALL .yml tests use with this. (LOCAL/DEV/TEST/PROD, or url)."
+#     action: store # store/store_true, etc. Same as argparse
+#     default: Null
+#     key: api # What to look up in conftest.cli_args dict it returns
+#     verify_method: verify_api # If you want to verify what the user passes into this meets spicific requirements
+
+
+api_urls:
+  local: http://127.0.0.1:5000/
+  # dev: TODO - Find out if everything has dev url
+  test: https://api-test.asf.alaska.edu/
+  prod: https://api.daac.asf.alaska.edu/
+  default: prod
+
+
+test_types:
+- Get Data from API:
+    required_keys: Null
+    method: test_URL_Manager
+    variables:
+      endpoint: services/search/param?
