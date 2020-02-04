@@ -117,12 +117,12 @@ def get_query_list(params):
 
 
 def cartesian_product(params):
-    params_in_itertools_format = itertools_product_fromat(params)
+    params_in_itertools_format = format_subquery_params(params)
 
     return list(product(*params_in_itertools_format))
 
 
-def itertools_product_fromat(params):
+def format_subquery_params(params):
     listed_params = []
 
     for param_name, param_val in params.items():
@@ -130,6 +130,19 @@ def itertools_product_fromat(params):
         listed_params.append(plist)
 
     return listed_params
+
+
+def format_list_params(list_params):
+    cmr_param_format = []
+
+    for list_name, list_param in list_params:
+        if not list_param:
+            continue
+
+        param_list = translate_param(list_name, list_param)
+        cmr_param_format += param_list
+
+    return tuple(cmr_param_format)
 
 
 def translate_param(param_name, param_val):
@@ -156,15 +169,3 @@ def translate_param(param_name, param_val):
 
     return plist
 
-
-def format_list_params(list_params):
-    cmr_param_format = tuple()
-
-    for list_name, list_param in list_params:
-        if not list_param:
-            continue
-
-        param_list = translate_param(list_name, list_param)
-        cmr_param_format += tuple(param_list)
-
-    return cmr_param_format
