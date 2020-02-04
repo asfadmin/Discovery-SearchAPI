@@ -1,15 +1,17 @@
-import requests
-from math import ceil
 import logging
+from math import ceil
 import re
-from CMR.Translate import parse_cmr_response
-from CMR.Exceptions import CMRError
-from Analytics import analytics_events
-from asf_env import get_config
 from time import time, sleep, perf_counter
 
-class CMRSubQuery:
+import requests
 
+from asf_env import get_config
+from Analytics import analytics_events
+from CMR.Translate import parse_cmr_response
+from CMR.Exceptions import CMRError
+
+
+class CMRSubQuery:
     def __init__(self, params, extra_params, analytics=True):
         self.params = params
         self.extra_params = extra_params
@@ -26,105 +28,182 @@ class CMRSubQuery:
 
         self.params.extend(self.extra_params.items())
 
-        # Platform-specific hacks
-        # We do them at the subquery level in case the main query crosses platforms
-        # that don't suffer these issue.
-        use_asf_frame = False
-        for p in self.params:
-            if p[0] == 'platform[]' and p[1] in ['SENTINEL-1A', 'SENTINEL-1B', 'ALOS']:
-                use_asf_frame = True
-        if use_asf_frame:
-            # Sentinel/ALOS: always use asf frame instead of esa frame
-            for n, p in enumerate(self.params):
-                if isinstance(p[1], str):
-                    m = re.search(r'CENTER_ESA_FRAME', p[1])
-                    if m is not None:
-                        logging.debug('Sentinel/ALOS subquery, using ASF frame instead of ESA frame')
-                        self.params[n] = (p[0], p[1].replace(',CENTER_ESA_FRAME,', ',FRAME_NUMBER,'))
+        if self.should_use_asf_frame():
+            self.use_asf_frame()
 
-        logging.debug('New CMRSubQuery object with params: {0}'.format(self.params))
+        logging.debug(f'New CMRSubQuery object with params: {self.params}')
+
+    def should_use_asf_frame(self):
+        asf_frame_platforms = ['SENTINEL-1A', 'SENTINEL-1B', 'ALOS']
+
+        for p in self.params:
+            if p[0] == 'platform[]' and p[1] in asf_frame_platforms:
+                return True
+
+        return False
+
+    def use_asf_frame(self):
+        """
+        Sentinel/ALOS: always use asf frame instead of esa frame
+
+        Platform-specific hack
+        We do them at the subquery level in case the main query crosses platforms
+        that don't suffer these issue.
+        """
+
+        for n, p in enumerate(self.params):
+            if not isinstance(p[1], str):
+                continue
+
+            m = re.search(r'CENTER_ESA_FRAME', p[1])
+            if m is None:
+                continue
+
+            logging.debug(
+                'Sentinel/ALOS subquery, using ASF frame instead of ESA frame'
+            )
+
+            self.params[n] = (
+                p[0],
+                p[1].replace(',CENTER_ESA_FRAME,', ',FRAME_NUMBER,')
+            )
 
     def get_count(self):
-        s = requests.Session()
-        s.headers.update({'Client-Id': 'vertex_asf'})
 
-        cfg = get_config()
-
-        # over-ride scroll and page size for count queries to minimize data transfer, since we can't do a HEAD request like this anymore
-        params = [x for x in self.params if x[0] not in ['scroll', 'page_size']]
+        # over-ride scroll and page size for count queries to minimize data
+        # transfer, since we can't do a HEAD request like this anymore
+        params = [
+            param for param in self.params
+            if param[0] not in ['scroll', 'page_size']
+        ]
         params.append(('page_size', 0))
 
-        r = s.post(cfg['cmr_base'] + cfg['cmr_api'], data=params)
-        if 'CMR-hits' not in r.headers:
-            raise CMRError(r.text)
-        self.hits = int(r.headers['CMR-hits'])
+        session = self.asf_session()
+        url = self.cmr_api_url()
+
+        request = session.post(url, data=params)
+
+        if 'CMR-hits' not in request.headers:
+            raise CMRError(request.text)
+
+        self.hits = int(request.headers['CMR-hits'])
+
         logging.debug('CMR reported {0} hits'.format(self.hits))
-        return int(r.headers['CMR-hits'])
+
+        return int(request.headers['CMR-hits'])
 
     def get_results(self):
-        #self.get_count()
-        s = requests.Session()
-        s.headers.update({'Client-Id': 'vertex_asf'})
-
         logging.debug('Processing page 1')
-        r = self.get_page(s)
-        if r is None:
-            return
-        self.hits = int(r.headers['CMR-hits'])
-        self.sid = r.headers['CMR-Scroll-Id']
-        logging.debug('CMR reported {0} hits for session {1}'.format(self.hits, self.sid))
 
+        session = self.asf_session()
+        response = self.get_page(session)
+
+        if response is None:
+            return
+
+        self.hits = int(response.headers['CMR-hits'])
+        self.sid = response.headers['CMR-Scroll-Id']
+
+        logging.debug(f'CMR reported {self.hits} hits for session {self.sid}')
         logging.debug('Parsing page 1')
-        for p in parse_cmr_response(r):
+
+        for p in parse_cmr_response(response):
             yield p
 
-        pages = list(range(2, int(ceil(float(self.hits) / float(self.extra_params['page_size']))) + 1))
-        logging.debug('Planning to fetch additional {0} pages'.format(len(pages)))
-        s.headers.update({'CMR-Scroll-Id': self.sid})
+        hits = float(self.hits)
+        page_size = float(self.extra_params['page_size'])
+        num_pages = int(ceil(hits / page_size)) + 1
+
+        logging.debug(f'Planning to fetch additional {num_pages} pages')
+        session.headers.update({'CMR-Scroll-Id': self.sid})
 
         # fetch multiple pages of results if needed, yield a product at a time
-        for page_num in pages:
+        for page_num in range(2, num_pages):
             logging.debug('Processing page {0}'.format(page_num))
-            page = self.get_page(s)
-            logging.debug('Parsing page {0}'.format(page_num))
-            for p in parse_cmr_response(page):
-                yield p
-            logging.debug('Parsing page {0} complete'.format(page_num))
-            logging.debug('Processing page {0} complete'.format(page_num))
 
-        logging.debug('Done fetching results: got {0}/{1}'.format(len(self.results), self.hits))
+            page = self.get_page(session)
+
+            logging.debug('Parsing page {0}'.format(page_num))
+
+            for parsed_page in parse_cmr_response(page):
+                yield parsed_page
+
+            logging.debug(f'Parsing page {page_num} complete')
+            logging.debug(f'Processing page {page_num} complete')
+
+        logging.debug('Done fetching results: got {0}/{1}'.format(
+            len(self.results), self.hits
+        ))
+
         return
 
-    def get_page(self, s):
+    def get_page(self, session):
         logging.debug('Page fetch starting')
-        cfg = get_config()
         max_retry = 3
-        for attempt in range(max_retry): # Sometimes CMR is on the fritz, retry for a bit
+
+        # Sometimes CMR is on the fritz, retry for a bit
+        for attempt in range(max_retry):
             q_start = perf_counter()
-            r = s.post(cfg['cmr_base'] + cfg['cmr_api'], data=self.params)
-            q_duration = perf_counter() - q_start
-            logging.debug('CMR query time: {0}'.format(q_duration))
-            if(q_duration > 10):
-                logging.error('Slow CMR response: {0} seconds'.format(q_duration))
-                logging.error('Params sent to CMR:')
-                logging.error(self.params)
-                logging.error('Headers sent to CMR:')
-                logging.error(s.headers)
-                logging.error('Response code: {0}'.format(r.status_code))
+
+            api_url = self.cmr_api_url()
+            response = session.post(api_url, data=self.params)
+
+            query_duration = perf_counter() - q_start
+            logging.debug(f'CMR query time: {query_duration}')
+
+            if query_duration > 10:
+                self.log_slow_cmr_response(session, response, query_duration)
+
             if self.analytics:
-                analytics_events(events=[{'ec': 'CMR API Status', 'ea': r.status_code}])
-            if r.status_code != 200:
-                logging.error('Bad news bears! CMR said {0} on session {1}'.format(r.status_code, self.sid))
-                logging.error('Attempt {0} of {1}'.format(attempt + 1, max_retry))
-                logging.error('Params sent to CMR:')
-                logging.error(self.params)
-                logging.error('Headers sent to CMR:')
-                logging.error(s.headers)
-                logging.error('Error body: {0}'.format(r.text))
-                sleep(0.5) # Yikes, but maybe give CMR a chance to sort itself out
-            else:
-                logging.debug('Page fetch complete')
-                return r
-        # CMR isn't cooperating, just move on?
+                analytics_events(events=[
+                    {'ec': 'CMR API Status', 'ea': response.status_code}
+                ])
+
+            if response.status_code != 200:
+                self.log_bad_cmr_response(
+                    attempt, max_retry, response, session
+                )
+
+                # CMR a chance to sort itself out
+                sleep(0.5)
+                continue
+
+            logging.debug('Page fetch complete')
+            return response
+
         logging.error('Max number of retries reached, moving on')
         return
+
+    def asf_session(self):
+        session = requests.Session()
+        session.headers.update({'Client-Id': 'vertex_asf'})
+
+        return session
+
+    def cmr_api_url(self):
+        cfg = get_config()
+
+        base, path = cfg['cmr_base'], cfg['cmr_api']
+        url = f'{base}{path}'
+
+        return url
+
+    def log_slow_cmr_response(self, session, response, response_time):
+        logging.error(f'Slow CMR response: {response_time} seconds')
+        logging.error('Params sent to CMR:')
+        logging.error(self.params)
+        logging.error('Headers sent to CMR:')
+        logging.error(session.headers)
+        logging.error(f'Response code: {response.status_code}')
+
+    def log_bad_cmr_response(self, attempt, max_retry, response, session):
+        logging.error(
+            f'Bad news bears! CMR said {response.status_code} '
+            f'on session {self.sid}'
+        )
+        logging.error('Attempt {0} of {1}'.format(attempt + 1, max_retry))
+        logging.error('Params sent to CMR:')
+        logging.error(self.params)
+        logging.error('Headers sent to CMR:')
+        logging.error(session.headers)
+        logging.error('Error body: {0}'.format(response.text))
