@@ -1,11 +1,12 @@
-from itertools import product
+import itertools
 import logging
 import time
+
 from CMR.Translate import input_map
 from CMR.SubQuery import CMRSubQuery
 
-class CMRQuery:
 
+class CMRQuery:
     def __init__(self, params=None, max_results=None, output='metalink', analytics=True):
         self.extra_params = {
             'provider': 'ASF',  # always limit the results to ASF as the provider
@@ -30,14 +31,13 @@ class CMRQuery:
         current_time = time.time()
         self.cutoff_time = current_time + time_in_seconds
 
-        query_list = get_query_list(self.params)
         self.sub_queries = [
             CMRSubQuery(
                 params=list(query),
                 extra_params=self.extra_params,
                 analytics=self.analytics
             )
-            for query in query_list
+            for query in subquery_list_from(self.params)
         ]
 
         logging.debug('New CMRQuery object ready to go')
@@ -85,7 +85,7 @@ class CMRQuery:
         )
 
 
-def get_query_list(params):
+def subquery_list_from(params):
     """
     Use the cartesian product of all the list parameters to
     determine subqueries
@@ -103,10 +103,10 @@ def get_query_list(params):
             subquery_params[k] = v
 
     sub_queries = cartesian_product(subquery_params)
-    list_params = format_list_params(list_params)
+    formatted_list_params = format_list_params(list_params)
 
     final_sub_queries = [
-        query + list_params for query in sub_queries
+        query + formatted_list_params for query in sub_queries
     ]
 
     logging.debug(f'{len(final_sub_queries)} subqueries built')
@@ -117,7 +117,7 @@ def get_query_list(params):
 def cartesian_product(params):
     formatted_params = format_query_params(params)
 
-    return list(product(*formatted_params))
+    return list(itertools.product(*formatted_params))
 
 
 def format_list_params(list_params):

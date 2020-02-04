@@ -1,10 +1,10 @@
-import json
 from datetime import datetime
+import logging
+import json
 
 from flask import Response, make_response, stream_with_context
 
 import api_headers
-import logging
 from CMR.Query import CMRQuery
 from CMR.Translate import translate_params, input_fixer
 from CMR.Output import output_translators
