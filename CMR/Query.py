@@ -93,21 +93,20 @@ def get_query_list(params):
     logging.debug('Building subqueries using params:')
     logging.debug(params)
 
-    non_subquery_params = ['granule_list', 'product_list', 'platform']
-    params_to_subquery = {
-        k: v for k, v in params.items() if k not in non_subquery_params
-    }
+    subquery_params, list_params = {}, {}
 
-    subqueries = cartesian_product(params_to_subquery)
+    list_param_names = ['granule_list', 'product_list', 'platform']
+    for k, v in params.items():
+        if k in list_param_names:
+            list_params[k] = v
+        else:
+            subquery_params[k] = v
 
-    list_params = format_list_params([
-        ['granule_list', params.get('granule_list', None)],
-        ['product_list', params.get('product_list', None)],
-        ['platform', params.get('platform', None)]
-    ])
+    sub_queries = cartesian_product(subquery_params)
+    list_params = format_list_params(list_params)
 
     final_queries = [
-        query + list_params for query in subqueries
+        query + list_params for query in sub_queries
     ]
 
     logging.debug(f'{len(final_queries)} subqueries built')
@@ -116,12 +115,18 @@ def get_query_list(params):
 
 
 def cartesian_product(params):
-    params_in_itertools_format = format_subquery_params(params)
+    formatted_params = format_query_params(params)
 
-    return list(product(*params_in_itertools_format))
+    return list(product(*formatted_params))
 
 
-def format_subquery_params(params):
+def format_list_params(list_params):
+    formatted_params = sum(format_query_params(list_params), [])
+
+    return tuple(formatted_params)
+
+
+def format_query_params(params):
     listed_params = []
 
     for param_name, param_val in params.items():
@@ -129,19 +134,6 @@ def format_subquery_params(params):
         listed_params.append(plist)
 
     return listed_params
-
-
-def format_list_params(list_params):
-    cmr_param_format = []
-
-    for list_name, list_param in list_params:
-        if not list_param:
-            continue
-
-        param_list = translate_param(list_name, list_param)
-        cmr_param_format += param_list
-
-    return tuple(cmr_param_format)
 
 
 def translate_param(param_name, param_val):
@@ -167,4 +159,3 @@ def translate_param(param_name, param_val):
         })
 
     return plist
-
