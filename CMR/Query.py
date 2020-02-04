@@ -99,7 +99,7 @@ def get_query_list(params):
         k: v for k, v in params.items() if k not in non_subquery_params
     }
 
-    sub_queries = cartesian_product(params_to_subquery)
+    subqueries = cartesian_product(params_to_subquery)
 
     list_params = format_list_params([
         ['granule_list', params.get('granule_list', None)],
@@ -108,7 +108,7 @@ def get_query_list(params):
     ])
 
     final_queries = [
-        query + list_params for query in sub_queries
+        query + list_params for query in subqueries
     ]
 
     logging.debug(f'{len(final_queries)} subqueries built')
@@ -158,22 +158,13 @@ def translate_param(param_name, param_val):
 
 
 def format_list_params(list_params):
-    cmr_input_map = input_map()
     cmr_param_format = tuple()
 
     for list_name, list_param in list_params:
         if not list_param:
             continue
 
-        param_input_map = cmr_input_map[list_name]
-        cmr_name = param_input_map[0]
-        cmr_format_str = param_input_map[1]
-
-        param_list = [
-            {cmr_name: cmr_format_str.format(f'{list_param_val}')}
-            for list_param_val in list_param
-        ]
-
+        param_list = translate_param(list_name, list_param)
         cmr_param_format += tuple(param_list)
 
     return cmr_param_format
