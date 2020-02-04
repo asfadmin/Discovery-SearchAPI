@@ -73,3 +73,12 @@ url tests:
 
     expected file: csv
     expected code: 200
+- realworld 1 modified:
+    intersectsWith: point(-162.4535+61.4945)
+    platform: Sentinel-1A,Sentinel-1B
+    processingLevel: GRD_HS,GRD_HD
+    beamMode: IW
+    output: count
+
+    expected file: count
+    expected code: 200

@@ -8,28 +8,27 @@ class CMRQuery:
 
     def __init__(self, params=None, max_results=None, output='metalink', analytics=True):
         self.extra_params = {
-            'provider': 'ASF', # always limit the results to ASF as the provider
-            'page_size': 2000, # page size to request from CMR
+            'provider': 'ASF',  # always limit the results to ASF as the provider
+            'page_size': 2000,  # page size to request from CMR
             'scroll': 'true',  # used for fetching multiple page_size
             'options[temporal][and]': 'true', # Makes handling date ranges easier
             'sort_key[]': '-end_date', # Sort CMR results, but this is partially defeated by the subquery system
             'options[platform][ignore_case]': 'true'
-         }
+        }
 
-        self.params = params
         self.max_results = max_results
+        self.params = params
         self.output = output
         self.analytics = analytics
+
+        if self.is_small_max_results():
+            self.extra_params['page_size'] = self.max_results
 
         self.result_counter = 0
 
         time_in_seconds = 14.5 * 60
         current_time = time.time()
-
         self.cutoff_time = current_time + time_in_seconds
-
-        if self.is_small_max_results():
-            self.extra_params['page_size'] = self.max_results
 
         query_list = get_query_list(self.params)
         self.sub_queries = [
