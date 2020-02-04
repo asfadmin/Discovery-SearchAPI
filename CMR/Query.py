@@ -7,13 +7,14 @@ from CMR.SubQuery import CMRSubQuery
 class CMRQuery:
 
     def __init__(self, params=None, max_results=None, output='metalink', analytics=True):
-        self.extra_params = {'provider': 'ASF', # always limit the results to ASF as the provider
-                             'page_size': 2000, # page size to request from CMR
-                             'scroll': 'true',  # used for fetching multiple page_size
-                             'options[temporal][and]': 'true', # Makes handling date ranges easier
-                             'sort_key[]': '-end_date', # Sort CMR results, but this is partially defeated by the subquery system
-                             'options[platform][ignore_case]': 'true'
-                             }
+        self.extra_params = {
+            'provider': 'ASF', # always limit the results to ASF as the provider
+            'page_size': 2000, # page size to request from CMR
+            'scroll': 'true',  # used for fetching multiple page_size
+            'options[temporal][and]': 'true', # Makes handling date ranges easier
+            'sort_key[]': '-end_date', # Sort CMR results, but this is partially defeated by the subquery system
+            'options[platform][ignore_case]': 'true'
+         }
 
         self.params = params
         self.max_results = max_results
@@ -21,81 +22,150 @@ class CMRQuery:
         self.analytics = analytics
 
         self.result_counter = 0
-        self.cutoff_time = time.time() + 870 #14.5 minutes max
 
-        if self.max_results is not None and self.max_results < self.extra_params['page_size']: # minimize data transfer on small max_results
+        time_in_seconds = 14.5 * 60
+        current_time = time.time()
+
+        self.cutoff_time = current_time + time_in_seconds
+
+        if self.is_small_max_results():
             self.extra_params['page_size'] = self.max_results
 
-        logging.debug('Building subqueries using params:')
-        logging.debug(self.params)
-        self.query_list = self.get_query_list(self.params)
-        self.sub_queries = [CMRSubQuery(params=list(q), extra_params=self.extra_params, analytics=self.analytics) for q in self.query_list]
-        logging.debug('{0} subqueries built'.format(len(self.sub_queries)))
+        query_list = get_query_list(self.params)
+        self.sub_queries = [
+            CMRSubQuery(
+                params=list(query),
+                extra_params=self.extra_params,
+                analytics=self.analytics
+            )
+            for query in query_list
+        ]
 
         logging.debug('New CMRQuery object ready to go')
 
-    # Use the cartesian product of all the list parameters to determine subqueries
-    def get_query_list(self, params):
-        # A couple params shouldn't get subqueried out:
-        granule_list = params.pop('granule_list', None)
-        product_list = params.pop('product_list', None)
-        platform_list = params.pop('platform', None)
-
-        # First we have to get the params into a form itertools.product() understands
-        listed_params = []
-        for k in params:
-            plist = []
-            if isinstance(params[k], list):
-                for l in params[k]:
-                    if isinstance(l, list):
-                        plist.append({input_map()[k][0]: input_map()[k][1].format(','.join(['{0}'.format(t) for t in l]))})
-                    else:
-                        plist.append({input_map()[k][0]: input_map()[k][1].format(l)})
-                listed_params.append(plist)
-            else:
-                listed_params.append([{input_map()[k][0]: input_map()[k][1].format(params[k])}])
-        # Get the actual cartesian product
-        query_list = list(product(*listed_params))
-        final_list = []
-        for q in query_list:
-            if granule_list:
-                q = q + tuple([{input_map()['granule_list'][0]: input_map()['granule_list'][1].format('{0}'.format(t))} for t in granule_list])
-            if product_list:
-                q = q + tuple([{input_map()['product_list'][0]: input_map()['product_list'][1].format('{0}'.format(t))} for t in product_list])
-            if platform_list:
-                q = q + tuple([{input_map()['platform'][0]: input_map()['platform'][1].format('{0}'.format(t))} for t in platform_list])
-            final_list.append(q)
-
-        # Restore the original params that got popped off
-        if granule_list:
-            params['granule_list'] = granule_list
-        if product_list:
-            params['product_list'] = product_list
-        if platform_list:
-            params['platform'] = platform_list
-
-        return final_list
+    def is_small_max_results(self):
+        return (
+            self.max_results is not None and
+            self.max_results < self.extra_params['page_size']
+        )
 
     def get_count(self):
-        total_hits = 0
-        for sq in self.sub_queries:
-            total_hits += sq.get_count()
-        return total_hits
+        return sum([sq.get_count() for sq in self.sub_queries])
 
     def get_results(self):
-        for n, subq in enumerate(self.sub_queries):
-            logging.debug('Running subquery {0}'.format(n+1))
-            # taking a page at a time from each subquery, yield one result at a time until we max out
-            for r in subq.get_results():
-                if time.time() > self.cutoff_time:
+        for query_num, subquery in enumerate(self.sub_queries):
+            logging.debug('Running subquery {0}'.format(query_num+1))
+
+            # taking a page at a time from each subquery,
+            # yield one result at a time until we max out
+            for result in subquery.get_results():
+                if self.is_out_of_time():
                     logging.warning('Query ran too long, terminating')
                     logging.warning(self.params)
                     return
-                if r is not None:
-                    if self.max_results is None or self.result_counter < self.max_results:
-                        self.result_counter += 1
-                        yield r
-                    else:
-                        logging.debug('Max results reached, terminating')
-                        return
+
+                if self.max_results_reached():
+                    logging.debug('Max results reached, terminating')
+                    return
+
+                if result is None:
+                    continue
+
+                self.result_counter += 1
+                yield result
+
             logging.debug('End of available results reached')
+
+    def is_out_of_time(self):
+        return time.time() > self.cutoff_time
+
+    def max_results_reached(self):
+        return (
+            self.max_results is not None and
+            self.result_counter >= self.max_results
+        )
+
+
+def get_query_list(params):
+    """
+    Use the cartesian product of all the list parameters to
+    determine subqueries
+    """
+    logging.debug('Building subqueries using params:')
+    logging.debug(params)
+
+    non_subquery_params = ['granule_list', 'product_list', 'platform']
+    params_to_subquery = {
+        k: v for k, v in params.items() if k not in non_subquery_params
+    }
+
+    sub_queries = cartesian_product(params_to_subquery)
+
+    list_params = format_list_params([
+        ['granule_list', params.get('granule_list', None)],
+        ['product_list', params.get('product_list', None)],
+        ['platform', params.get('platform', None)]
+    ])
+
+    final_queries = [
+        query + list_params for query in sub_queries
+    ]
+
+    logging.debug(f'{len(final_queries)} subqueries built')
+
+    return final_queries
+
+
+def cartesian_product(params):
+    params_in_itertools_format = itertools_product_fromat(params)
+
+    return list(product(*params_in_itertools_format))
+
+
+def itertools_product_fromat(params):
+    listed_params = []
+    cmr_input_map = input_map()
+
+    for param_name, request_param in params.items():
+        plist = []
+
+        cmr_param = cmr_input_map[param_name][0]
+        cmr_format_str = cmr_input_map[param_name][1]
+
+        if not isinstance(request_param, list):
+            request_param = [request_param]
+
+        for l in request_param:
+            format_param_val = l
+
+            if isinstance(l, list):
+                format_param_val = (
+                    ','.join([f'{t}' for t in l])
+                )
+
+            plist.append({
+                cmr_param: cmr_format_str.format(format_param_val)
+            })
+
+        listed_params.append(plist)
+
+    return listed_params
+
+
+def format_list_params(list_params):
+    cmr_input_map = input_map()
+    cmr_param_format = tuple()
+
+    for list_name, list_param in list_params:
+        if not list_param:
+            continue
+
+        list_input_map = cmr_input_map[list_name]
+        cmr_name, cmr_format_str = list_input_map[0], list_input_map[1]
+
+        cmr_param_format += tuple([
+            {cmr_name: cmr_format_str.format(f'{list_param_val}')}
+            for list_param_val in list_param
+        ])
+
+    return cmr_param_format
