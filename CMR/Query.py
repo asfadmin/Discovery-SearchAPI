@@ -124,32 +124,37 @@ def cartesian_product(params):
 
 def itertools_product_fromat(params):
     listed_params = []
-    cmr_input_map = input_map()
 
-    for param_name, request_param in params.items():
-        plist = []
-
-        cmr_param = cmr_input_map[param_name][0]
-        cmr_format_str = cmr_input_map[param_name][1]
-
-        if not isinstance(request_param, list):
-            request_param = [request_param]
-
-        for l in request_param:
-            format_param_val = l
-
-            if isinstance(l, list):
-                format_param_val = (
-                    ','.join([f'{t}' for t in l])
-                )
-
-            plist.append({
-                cmr_param: cmr_format_str.format(format_param_val)
-            })
-
+    for param_name, param_val in params.items():
+        plist = translate_param(param_name, param_val)
         listed_params.append(plist)
 
     return listed_params
+
+
+def translate_param(param_name, param_val):
+    plist = []
+
+    cmr_input_map = input_map()
+
+    param_input_map = cmr_input_map[param_name]
+    cmr_param = param_input_map[0]
+    cmr_format_str = param_input_map[1]
+
+    if not isinstance(param_val, list):
+        param_val = [param_val]
+
+    for l in param_val:
+        format_param_val = l
+
+        if isinstance(l, list):
+            format_param_val = ','.join([f'{t}' for t in l])
+
+        plist.append({
+            cmr_param: cmr_format_str.format(format_param_val)
+        })
+
+    return plist
 
 
 def format_list_params(list_params):
@@ -160,12 +165,15 @@ def format_list_params(list_params):
         if not list_param:
             continue
 
-        list_input_map = cmr_input_map[list_name]
-        cmr_name, cmr_format_str = list_input_map[0], list_input_map[1]
+        param_input_map = cmr_input_map[list_name]
+        cmr_name = param_input_map[0]
+        cmr_format_str = param_input_map[1]
 
-        cmr_param_format += tuple([
+        param_list = [
             {cmr_name: cmr_format_str.format(f'{list_param_val}')}
             for list_param_val in list_param
-        ])
+        ]
+
+        cmr_param_format += tuple(param_list)
 
     return cmr_param_format
