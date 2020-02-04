@@ -51,3 +51,34 @@ tests:
 
     expected file: error json
     expected code: 400
+- granule_list single csv:
+    granule_list: S1B_S6_GRDH_1SDV_20190911T214309_20190911T214338_017995_021E10_5CCB
+    output: csv
+
+    expected file: csv
+    expected code: 200
+- product_list S1:
+    product_list: S1B_IW_GRDH_1SDV_20190410T153301_20190410T153328_015746_01D8D2_0E9B-GRD_HD,S1B_S6_GRDH_1SDV_20190911T214309_20190911T214338_017995_021E10_5CCB-GRD_HD,S1B_IW_SLC__1SDV_20180517T005744_20180517T005757_010954_0140DF_9891-SLC,S1B_WV_OCN__2SSV_20180513T055028_20180513T062610_010898_013F0C_059A-METADATA_OCN
+    output: json
+
+    expected file: json
+    expected code: 200
+- season 32-90 S1 July 2018-now:
+    season: 32,90
+    platform: SA,SB
+    start: 2018-July-15
+    end: now
+    maxResults: 100
+    output: csv
+
+    expected file: csv
+    expected code: 200
+- realworld 1 modified:
+    intersectsWith: point(-162.4535+61.4945)
+    platform: Sentinel-1A,Sentinel-1B
+    processingLevel: GRD_HS,GRD_HD
+    beamMode: IW
+    output: count
+
+    expected file: count
+    expected code: 200
