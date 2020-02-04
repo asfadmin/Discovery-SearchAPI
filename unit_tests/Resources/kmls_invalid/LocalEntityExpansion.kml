@@ -1,4 +1,0 @@
-<!DOCTYPE external [
-<!ENTITY ee SYSTEM "file:///PATH/TO/simple.xml">
-]>
-<root>&ee;</root>
