@@ -113,7 +113,12 @@ class FilesToWKT:
             full_wkt = wkt_list[0]
         else:
             full_wkt = "GEOMETRYCOLLECTION({0})".format(",".join(wkt_list))
-        return {"parsed wkt": full_wkt, "errors": self.errors}
+
+        returned_dict = {"parsed wkt": full_wkt}
+        # Only return the 'errors' key IF there are errors...
+        if self.errors != []:
+            returned_dict['errors'] = self.errors
+        return returned_dict
     
 
 # Takes any json, and returns a list of all {"type": x, "coordinates": y} objects 
