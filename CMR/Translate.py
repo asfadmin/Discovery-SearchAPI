@@ -1,15 +1,18 @@
-#import defusedxml.ElementTree as ET
-#import xml.etree.cElementTree as ET
-from lxml import etree as ET
 import dateparser
 from datetime import datetime
-import requests
 import logging
+
+from lxml import etree as ET
+import requests
+
 from asf_env import get_config
-from CMR.Input import parse_int, parse_float, parse_string, parse_wkt, parse_date
-from CMR.Input import parse_string_list, parse_int_list, parse_int_or_range_list, parse_float_or_range_list
-from CMR.Input import parse_coord_string, parse_bbox_string, parse_point_string
+from CMR.Input import (
+    parse_int, parse_float, parse_string, parse_wkt, parse_date,
+    parse_string_list, parse_int_list, parse_int_or_range_list, parse_float_or_range_list,
+    parse_coord_string, parse_bbox_string, parse_point_string
+)
 from CMR.Output import output_translators
+
 
 def fix_polygon(v):
     # Trim whitespace and split it up
@@ -22,7 +25,19 @@ def fix_polygon(v):
     # Do a quick CMR query to see if the shape is wound correctly
     logging.debug('Checking winding order')
     cfg = get_config()
-    r = requests.post(cfg['cmr_base'] + cfg['cmr_api'], headers=cfg['cmr_headers'], data={'polygon': ','.join(v), 'provider': 'ASF', 'page_size': 1, 'concept-id': 'C1266376001-ASF', 'attribute[]': 'string,ASF_PLATFORM,FAKEPLATFORM'})
+
+    r = requests.post(
+        cfg['cmr_base'] + cfg['cmr_api'],
+        headers=cfg['cmr_headers'],
+        data={
+            'polygon': ','.join(v),
+            'provider': 'ASF',
+            'page_size': 1,
+            'concept-id': 'C1266376001-ASF',
+            'attribute[]': 'string,ASF_PLATFORM,FAKEPLATFORM'
+        }
+    )
+
     if r.status_code == 200:
         logging.debug('Winding order looks good')
     else:
@@ -32,45 +47,80 @@ def fix_polygon(v):
             it = iter(v)
             rev = reversed(list(zip(it, it)))
             rv = [i for sub in rev for i in sub]
-            r = requests.post(cfg['cmr_base'] + cfg['cmr_api'], headers=cfg['cmr_headers'], data={'polygon': ','.join(rv), 'provider': 'ASF', 'page_size': 1, 'concept-id': 'C1266376001-ASF', 'attribute[]': 'string,ASF_PLATFORM,FAKEPLATFORM'})
+
+            r = requests.post(
+                    cfg['cmr_base'] + cfg['cmr_api'],
+                    headers=cfg['cmr_headers'],
+                    data={
+                        'polygon': ','.join(rv),
+                        'provider': 'ASF',
+                        'page_size': 1,
+                        'concept-id': 'C1266376001-ASF',
+                        'attribute[]': 'string,ASF_PLATFORM,FAKEPLATFORM'
+                    }
+                )
+
             if r.status_code == 200:
                 logging.debug('Polygon repaired')
                 v = rv
             else:
-                logging.warning('Polygon repair needed but reversing the points did not help, query will fail')
-                raise ValueError('Invalid coordinates, could not repair: {0}'.format(v))
+                logging.warning(
+                    'Polygon repair needed but reversing the '
+                    'points did not help, query will fail'
+                )
+                raise ValueError(f'Invalid coordinates, could not repair: {v}')
         else:
-            raise ValueError('Invalid coordinates, could not repair: {0}'.format(v))
+            raise ValueError(
+                'Invalid coordinates, could not repair: {0}'.format(v)
+            )
+
     return ','.join(v)
 
-# A few inputs need to be specially handled to make the flexible input the legacy
-# API allowed match what's at CMR, since we can't use wildcards on additional attributes
+
 def input_fixer(params):
+    """
+    A few inputs need to be specially handled to make the flexible input the
+    legacy API allowed match what's at CMR, since we can't use wildcards on
+    additional attributes
+    """
+
     fixed_params = {}
     for k in params:
         v = params[k]
         k = k.lower()
-        if k == 'lookdirection': # Vaguely wildcard-like behavior
+        if k == 'lookdirection':  # Vaguely wildcard-like behavior
             if v[0].upper() not in ['L', 'R']:
                 raise ValueError('Invalid look direction: {0}'.format(v))
             fixed_params[k] = v[0].upper()
-        elif k == 'flightdirection': # Vaguely wildcard-like behavior
+        elif k == 'flightdirection':  # Vaguely wildcard-like behavior
             if v[0].upper() not in ['A', 'D']:
                 raise ValueError('Invalid flight direction: {0}'.format(v))
-            fixed_params[k] = {'A': 'ASCENDING', 'D': 'DESCENDING'}[v[0].upper()]
-        elif k == 'season': # clamp range or abort
+            fixed_params[k] = {
+                'A': 'ASCENDING',
+                'D': 'DESCENDING'
+            }[v[0].upper()]
+        elif k == 'season':  # clamp range or abort
             if len(v) != 2:
-                raise ValueError('Invalid season, must provide two values: {0}'.format(v))
+                raise ValueError(
+                    f'Invalid season, must provide two values: {v}'
+                )
             if not (1 <= v[0] <= 366) or not (1 <= v[1] < 366):
-                raise ValueError('Invalid season value, must be between 1 and 366: {0}'.format(v))
+                raise ValueError(
+                    f'Invalid season value, must be between 1 and 366: {v}'
+                )
             fixed_params[k] = v
-        elif k == 'platform': # Legacy API allowed a few synonyms. If they're using one, translate it. Also handle airsar/seasat/uavsar platform conversion
+        elif k == 'platform':
+            # Legacy API allowed a few synonyms. If they're using one,
+            # translate it. Also handle airsar/seasat/uavsar platform
+            # conversion
+
             plat_aliases = {
                 'S1': ['SENTINEL-1A', 'SENTINEL-1B'],
                 'SENTINEL-1': ['SENTINEL-1A', 'SENTINEL-1B'],
                 'SENTINEL': ['SENTINEL-1A', 'SENTINEL-1B'],
                 'ERS': ['ERS-1', 'ERS-2'],
-                'SIR-C': ['STS-59', 'STS-68'],}
+                'SIR-C': ['STS-59', 'STS-68']
+            }
 
             plat_names = {
                 'R1': 'RADARSAT-1',
@@ -108,9 +158,9 @@ def input_fixer(params):
                 'STANDARD': 'STD'
             }
             fixed_params[k] = [beammap[a.upper()] if a.upper() in beammap else a for a in v]
-        elif k == 'polygon': # Do what we can to fix polygons up
+        elif k == 'polygon':  # Do what we can to fix polygons up
             fixed_params[k] = fix_polygon(v)
-        elif k == 'intersectswith': # Need to take the parsed value here and send it to one of polygon=, line=, point=
+        elif k == 'intersectswith':  # Need to take the parsed value here and send it to one of polygon=, line=, point=
             (t, p) = v.split(':')
             if t == 'polygon':
                 p = fix_polygon(p)
@@ -131,9 +181,11 @@ def input_fixer(params):
         # Check/fix the order of start/end
         if start > end:
             start, end = end, start
+
         # Final temporal string that will actually be used
         fixed_params['temporal'] = '{0},{1}'.format(start.strftime('%Y-%m-%dT%H:%M:%SZ'), end.strftime('%Y-%m-%dT%H:%M:%SZ'))
-        #add the seasonal search if requested now that the regular dates are sorted out
+
+        # add the seasonal search if requested now that the regular dates are sorted out
         if 'season' in fixed_params:
             fixed_params['temporal'] += ',{0}'.format(','.join(str(x) for x in fixed_params['season']))
 
@@ -144,8 +196,11 @@ def input_fixer(params):
 
     return fixed_params
 
-# Supported input parameters and their associated CMR parameters
+
 def input_map():
+    """
+    Supported input parameters and their associated CMR parameters
+    """
     return {
 #       API parameter           CMR parameter               CMR format strings                  Parser
         'output':               [None,                      '{0}',                              parse_string],
@@ -188,81 +243,132 @@ def input_map():
         'groupid':              ['attribute[]',             'string,GROUP_ID,{0}',              parse_string_list]
     }
 
-# translate supported params into CMR params
+
 def translate_params(p):
+    """
+    Translate supported params into CMR params
+    """
     params = {}
 
     for k in p:
         if k.lower() not in input_map():
-            raise ValueError('Unsupported parameter: {0}'.format(k))
+            raise ValueError(f'Unsupported parameter: {k}')
         try:
             params[k.lower()] = input_map()[k.lower()][2](p[k])
         except ValueError as e:
-            raise ValueError('{0}: {1}'.format(k, e))
+            raise ValueError(f'{k}: {e}')
 
     # be nice to make this not a special case
     output = 'metalink'
+
     if 'output' in params and params['output'].lower() in output_translators():
         output = params['output'].lower()
+
     if 'output' in params:
         del params['output']
     max_results = None
+
     if 'maxresults' in params:
         max_results = params['maxresults']
         if max_results < 1:
-            raise ValueError('Invalid maxResults, must be > 0: {0}'.format(max_results))
+            raise ValueError(
+                'Invalid maxResults, must be > 0: {0}'.format(max_results)
+            )
         del params['maxresults']
     return params, output, max_results
 
-# convenience method for handling echo10 additional attributes
+
 def attr(name):
-    return "./AdditionalAttributes/AdditionalAttribute[Name='" + name + "']/Values/Value"
+    """
+    Convenience method for handling echo10 additional attributes
+    """
+    return (
+        "./AdditionalAttributes/AdditionalAttribute"
+        f"[Name='{name}']/Values/Value"
+    )
+
 
 def get_val(granule, path, default=None):
     r = granule.xpath(path)
+
     if r is not None and len(r) > 0:
         return r[0].text
-    return default
+    else:
+        return default
 
-# for kml generation
+
 def wkt_from_gpolygon(gpoly):
+    """
+    for kml generation
+    """
     shapes = []
     for g in gpoly:
         shapes.append([])
         for point in g.iter('Point'):
-            shapes[-1].append({'lon': point.findtext('PointLongitude'), 'lat': point.findtext('PointLatitude')})
-        if shapes[-1][0]['lat'] != shapes[-1][-1]['lat'] or shapes[-1][0]['lon'] != shapes[-1][-1]['lon']:
-            shapes[-1].append(shapes[-1][0]) # Close the shape if needed
+            shapes[-1].append({
+                'lon': point.findtext('PointLongitude'),
+                'lat': point.findtext('PointLatitude')
+            })
+
+        if shape_not_closed(shapes):
+            # Close the shape if needed
+            shapes[-1].append(shapes[-1][0])
+
     longest = shapes[0]
     for shape in shapes:
         if len(shape) > len(longest):
             longest = shape
-    wkt_shape = 'POLYGON(({0}))'.format(','.join(['{0} {1}'.format(x['lon'], x['lat']) for x in longest]))
-    #logging.debug('Translated to WKT: {0}'.format(wkt))
+
+    wkt_shape = 'POLYGON(({0}))'.format(
+        ','.join(['{0} {1}'.format(x['lon'], x['lat']) for x in longest])
+    )
+
     return longest, wkt_shape
+
+
+def shape_not_closed(shapes):
+    return (
+        shapes[-1][0]['lat'] != shapes[-1][-1]['lat'] or
+        shapes[-1][0]['lon'] != shapes[-1][-1]['lon']
+    )
+
 
 def get_browse_urls(browseElems):
     browseList = []
+
     for b in browseElems:
         browseList.extend(b.findall('ProviderBrowseUrl'))
+
     browseUrls = [''.join(b.itertext()).strip() for b in browseList]
     browseUrls.sort()
+
     return browseUrls
 
-# Convert echo10 xml to results list used by output translators
+
 def parse_cmr_response(r):
+    """
+    Convert echo10 xml to results list used by output translators
+    """
     logging.debug('parsing CMR results')
+
     try:
         root = ET.fromstring(r.text.encode('latin-1'))
     except ET.ParseError as e:
-        logging.error('CMR parsing error: {0} when parsing: {1}'.format(e, r.text))
+        logging.error(f'CMR parsing error: {e} when parsing: {r.text}')
         return
-    logging.debug('Found {0} results in this page'.format(len(root.xpath('/results/result/Granule'))))
+
+    num_results = len(root.xpath('/results/result/Granule'))
+    logging.debug(f'Found {num_results} results in this page')
+
     for granule in root.xpath('/results/result/Granule'):
         yield parse_granule(granule)
 
+
 def parse_granule(granule):
-    (shape, wkt_shape) = wkt_from_gpolygon(granule.xpath('./Spatial/HorizontalSpatialDomain/Geometry/GPolygon'))
+    (shape, wkt_shape) = wkt_from_gpolygon(
+        granule.xpath('./Spatial/HorizontalSpatialDomain/Geometry/GPolygon')
+    )
+
     result = {
         'granuleName': get_val(granule, "./DataGranule/ProducerGranuleId"),
         'sizeMB': get_val(granule, "./DataGranule/SizeMBDataGranule"),
@@ -336,7 +442,9 @@ def parse_granule(granule):
         'sceneDateString': 'NA', # always None in API
         'groupID': get_val(granule, attr('GROUP_ID'), default='NA'),
     }
+
     for k in result:
         if result[k] == 'NULL':
             result[k] = None
+
     return result
