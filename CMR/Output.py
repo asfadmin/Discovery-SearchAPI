@@ -18,6 +18,7 @@ def output_translators():
         'kml':          [cmr_to_kml, 'application/vnd.google-earth.kml+xml; charset=utf-8', 'kmz'],
         'json':         [cmr_to_json, 'application/json; charset=utf-8', 'json'],
         'jsonlite':     [cmr_to_jsonlite, 'application/json; charset=utf-8', 'json'],
+        'jsonlite2':    [cmr_to_jsonlite2, 'application/json; charset=utf-8', 'json'],
         'geojson':      [cmr_to_geojson, 'application/geojson; charset=utf-8', 'geojson'],
         'count':        [count, 'text/plain; charset=utf-8', 'txt'],
         'download':     [cmr_to_download, 'text/plain; charset=utf-8', 'py']
@@ -65,6 +66,14 @@ def cmr_to_jsonlite(rgen):
     streamer = JSONLiteStreamArray(rgen)
 
     for p in json.JSONEncoder(sort_keys=True).iterencode({'results': streamer}):
+        yield p
+
+def cmr_to_jsonlite2(rgen):
+    logging.debug('translating: jsonlite')
+
+    streamer = JSONLiteTinyStreamArray(rgen)
+
+    for p in json.JSONEncoder(sort_keys=True, separators=(',', ':')).iterencode({'results': streamer}):
         yield p
 
 def cmr_to_geojson(rgen):
@@ -257,6 +266,83 @@ class JSONLiteStreamArray(JSONStreamArray):
             # Dataset-specific:
             'faradayRotation': p['faradayRotation'], # ALOS
             'offNadirAngle': p['offNadirAngle'] # ALOS
+        }
+
+
+class JSONLiteTinyStreamArray(JSONStreamArray):
+
+    @staticmethod
+    def getItem(p):
+        for i in p.keys():
+            if p[i] == 'NA' or p[i] == '':
+                p[i] = None
+        try:
+            if float(p['offNadirAngle']) < 0:
+                p['offNadirAngle'] = None
+        except TypeError:
+            pass
+
+        try:
+            if float(p['relativeOrbit']) < 0:
+                p['relativeOrbit'] = None
+        except TypeError:
+            pass
+
+        try:
+            if p['groupID'] is None:
+                p['groupID'] = p['granuleName']
+        except TypeError:
+            pass
+
+        try:
+            p['sizeMB'] = float(p['sizeMB'])
+        except TypeError:
+            pass
+
+        try:
+            p['relativeOrbit'] = int(p['relativeOrbit'])
+        except TypeError:
+            pass
+
+        try:
+            p['frameNumber'] = int(p['frameNumber'])
+        except TypeError:
+            pass
+
+        try:
+            p['absoluteOrbit'] = int(p['absoluteOrbit'])
+        except TypeError:
+            pass
+
+        return {
+            # Mandatory:
+            'd': p['platform'],
+            'du': p['downloadUrl'].replace(p['granuleName'], '{gn}'),
+            'fn': p['fileName'].replace(p['granuleName'], '{gn}'),
+            'gn': p['granuleName'],
+            'gid': p['groupID'].replace(p['granuleName'], '{gn}'),
+            'pid': p['product_file_id'].replace(p['granuleName'], '{gn}'),
+            'pt': p['processingLevel'],
+            'ptd': p['processingTypeDisplay'],
+            'st': p['startTime'],
+            'w': p['stringFootprint'],
+            'wu': unwrap_wkt(p['stringFootprint']),
+            # Optional:
+            'bm': p['beamMode'],
+            'b': [a.replace(p['granuleName'], '{gn}') for a in p['browse']] if p['browse'] is not None else p['browse'],
+            'fd': p['flightDirection'],
+            'fl': p['flightLine'],
+            'f': p['frameNumber'],
+            'mn': p['missionName'],
+            'o': p['absoluteOrbit'],
+            'p': p['relativeOrbit'],
+            'po': p['polarization'],
+            's': p['sizeMB'],
+            'ss': p['insarStackSize'], # Used for datasets with precalculated stacks
+            't': p['thumbnailUrl'].replace(p['granuleName'], '{gn}') if p['thumbnailUrl'] is not None else p['thumbnailUrl'],
+            # Dataset-specific:
+            'fr': p['faradayRotation'], # ALOS
+            'on': p['offNadirAngle'] # ALOS
         }
 
 class GeoJSONStreamArray(JSONStreamArray):
