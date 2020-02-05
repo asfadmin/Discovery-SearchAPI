@@ -1,7 +1,7 @@
 import logging
 from math import ceil
 import re
-from time import time, sleep, perf_counter
+from time import sleep, perf_counter
 
 import requests
 
@@ -20,18 +20,21 @@ class CMRSubQuery:
         self.hits = 0
         self.results = []
 
-        fixed = []
-        for p in self.params:
-            fixed.extend(p.items())
-
-        self.params = fixed
-
-        self.params.extend(self.extra_params.items())
+        self.params = self.combine_params(self.params, self.extra_params)
 
         if self.should_use_asf_frame():
             self.use_asf_frame()
 
         logging.debug(f'New CMRSubQuery object with params: {self.params}')
+
+    def combine_params(self, params, extra_params):
+        fixed = []
+        for p in params:
+            fixed.extend(p.items())
+
+        fixed.extend(self.extra_params.items())
+
+        return fixed
 
     def should_use_asf_frame(self):
         asf_frame_platforms = ['SENTINEL-1A', 'SENTINEL-1B', 'ALOS']
@@ -47,8 +50,8 @@ class CMRSubQuery:
         Sentinel/ALOS: always use asf frame instead of esa frame
 
         Platform-specific hack
-        We do them at the subquery level in case the main query crosses platforms
-        that don't suffer these issue.
+        We do them at the subquery level in case the main query crosses
+        platforms that don't suffer these issue.
         """
 
         for n, p in enumerate(self.params):
@@ -69,7 +72,6 @@ class CMRSubQuery:
             )
 
     def get_count(self):
-
         # over-ride scroll and page size for count queries to minimize data
         # transfer, since we can't do a HEAD request like this anymore
         params = [
