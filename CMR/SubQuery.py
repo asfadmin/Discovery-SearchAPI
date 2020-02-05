@@ -39,11 +39,10 @@ class CMRSubQuery:
     def should_use_asf_frame(self):
         asf_frame_platforms = ['SENTINEL-1A', 'SENTINEL-1B', 'ALOS']
 
-        for p in self.params:
-            if p[0] == 'platform[]' and p[1] in asf_frame_platforms:
-                return True
-
-        return False
+        return any([
+            p[0] == 'platform[]' and p[1] in asf_frame_platforms
+            for p in self.params
+        ])
 
     def use_asf_frame(self):
         """
