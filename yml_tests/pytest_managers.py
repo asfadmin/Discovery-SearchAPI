@@ -133,7 +133,10 @@ class test_URL_Manager():
         ## COUNT / HTML:
         if content_type == "html":
             # They return a number in the html. Convert to a real int:
-            file_content = countToDict(file_content)
+            try:
+                file_content = countToDict(file_content)
+            except ValueError as e:
+                assert False, "API returned html that was not a count. Test: {0}.\nHTML Page: \n{1}\n".format(test_info["title"], file_content)
             if file_content["count"] == 0:
                 content_type = "blank count"
             else:
