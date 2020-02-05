@@ -18,7 +18,7 @@ def output_translators():
         'kml':          [cmr_to_kml, 'application/vnd.google-earth.kml+xml; charset=utf-8', 'kmz'],
         'json':         [cmr_to_json, 'application/json; charset=utf-8', 'json'],
         'jsonlite':     [cmr_to_jsonlite, 'application/json; charset=utf-8', 'json'],
-        'jsonlitetiny': [cmr_to_jsonlitetiny, 'application/json; charset=utf-8', 'json'],
+        'jsonlite2':    [cmr_to_jsonlite2, 'application/json; charset=utf-8', 'json'],
         'geojson':      [cmr_to_geojson, 'application/geojson; charset=utf-8', 'geojson'],
         'count':        [count, 'text/plain; charset=utf-8', 'txt'],
         'download':     [cmr_to_download, 'text/plain; charset=utf-8', 'py']
@@ -68,7 +68,7 @@ def cmr_to_jsonlite(rgen):
     for p in json.JSONEncoder(sort_keys=True).iterencode({'results': streamer}):
         yield p
 
-def cmr_to_jsonlitetiny(rgen):
+def cmr_to_jsonlite2(rgen):
     logging.debug('translating: jsonlite')
 
     streamer = JSONLiteTinyStreamArray(rgen)

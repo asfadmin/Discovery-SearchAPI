@@ -128,7 +128,7 @@ def is_max_results_with_json_output(maxResults, output):
 
     return (
         maxResults is not None and
-        output.lower() in ['json', 'jsonlite', 'geojson', 'jsonlitetiny']
+        output.lower() in ['json', 'jsonlite', 'geojson', 'jsonlite2']
     )
 
 
