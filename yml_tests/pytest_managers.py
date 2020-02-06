@@ -123,11 +123,12 @@ class test_URL_Manager():
             return file_content
 
         h = requests.head(self.query)
+        content_header = h.headers.get('content-type')
         # text/csv; charset=utf-8
         try:
-            content_type = h.headers.get('content-type').split('/')[1]
+            content_type = content_header.split('/')[1]
         except AttributeError:
-            assert False, "Header is not formatted as expected. Test: {0}. Header: {1}.".format(title, h.headers.get('content-type'))
+            assert False, "Header is not formatted as expected. Test: {0}. Header: {1}. URL: {2}.".format(title, content_header, self.query)
         # Take out the "csv; charset=utf-8", without crahsing on things without charset
         content_type = content_type.split(';')[0] if ';' in content_type else content_type
         file_content = requests.get(self.query).content.decode("utf-8")
