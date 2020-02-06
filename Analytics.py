@@ -1,12 +1,15 @@
-import requests
 import logging
-from flask import request
-from asf_env import get_config
+import multiprocessing
 import time
+
+import requests
+from flask import request
+
+from asf_env import get_config
 
 
 def analytics_events(events=None):
-    if events is None:
+    if events is None or len(events) == 0:
         return
 
     cfg = get_config()
@@ -16,39 +19,63 @@ def analytics_events(events=None):
         logging.debug('Skipping analytics: analytics_id not set')
         return
 
-    logging.debug(f'Posting analytics events to {analytics_id}')
-    url = "http://www.google-analytics.com/collect"
+    logging.debug(f'Posting {len(events)} analytics events to {analytics_id}')
 
     params = {
         "v":    "1",
         "tid":  analytics_id,
         "cid":  f'{request.access_route[-1]}'
-        }
+    }
 
+    events_with_params = [
+        combine_event_and_params(params, event) for event in events
+    ]
+
+    start = time.time()
     try:
-        session = requests.Session()
+        if len(events) == 1:
+            post_analytics_event(events_with_params[0])
+        else:
+            num_processes = min([8, len(events)])
+            p = multiprocessing.pool.ThreadPool(processes=num_processes)
 
-        start = time.time()
-        for event in events:
-            p = dict(params)
-            p['t'] = 'event'
-            p['ec'] = event['ec']
-            p['ea'] = event['ea']
-            logging.debug(f'POSTING EVENT {p}')
-            session.post(url, data=p)
-
-        end = time.time()
-        print(f'ANALYTICS TOOK {end - start}')
+            p.map_async(post_analytics_event, events_with_params)
 
     except requests.RequestException as e:
         logging.debug('Problem logging analytics: {0}'.format(e))
+
+    end = time.time()
+    print(f'ANALYTICS TOOK {end - start}')
+
+
+def combine_event_and_params(params, event):
+    p = dict(params)
+    p['t'] = 'event'
+    p['ec'] = event['ec']
+    p['ea'] = event['ea']
+
+    return p
+
+
+def post_analytics_event(event):
+    logging.debug(f'POSTING EVENT {event}')
+
+    session = requests.Session()
+    url = get_analytics_url()
+    session.post(url, data=event)
+
+
+def get_analytics_url():
+    return "http://www.google-analytics.com/collect"
+
 
 def analytics_pageview():
     if get_config()['analytics_id'] is None:
         logging.debug('Skipping analytics: analytics_id not set')
         return
+
     logging.debug('Posting analytics pageview to {0}'.format(get_config()['analytics_id']))
-    url = "http://www.google-analytics.com/collect"
+    url = get_analytics_url()
     params = {
         "v":    "1",
         "tid":  get_config()['analytics_id'],
