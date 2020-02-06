@@ -22,10 +22,6 @@ def parse_cmr_response(r):
 
 
 def parse_granule(granule):
-    (shape, wkt_shape) = wkt_from_gpolygon(
-        granule.xpath('./Spatial/HorizontalSpatialDomain/Geometry/GPolygon')
-    )
-
     def get_val(path, default='NA'):
         r = granule.xpath(path)
 
@@ -36,6 +32,10 @@ def parse_granule(granule):
 
     def get_attr(path, default='NA'):
         return get_val(attr(path), default=default)
+
+    shape, wkt_shape = wkt_from_gpolygon(
+        granule.xpath('./Spatial/HorizontalSpatialDomain/Geometry/GPolygon')
+    )
 
     asf_platforms = ['Sentinel-1A', 'Sentinel-1B', 'ALOS']
     frame_number = get_attr('FRAME_NUMBER') \
