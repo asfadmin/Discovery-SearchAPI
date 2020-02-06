@@ -14,6 +14,7 @@ class CMRQuery:
             'scroll': 'true',  # used for fetching multiple page_size
             'options[temporal][and]': 'true', # Makes handling date ranges easier
             'sort_key[]': '-end_date', # Sort CMR results, but this is partially defeated by the subquery system
+            'sort_key[]': 'granule_ur', # Secondary sort key, the order these keys are specified in matters! This is to make multiple granules with the same date sort consistently
             'options[platform][ignore_case]': 'true'
         }
 
