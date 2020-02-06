@@ -29,10 +29,8 @@ class CMRSubQuery:
 
     def combine_params(self, params, extra_params):
         fixed = []
-        for p in params:
+        for p in params + extra_params:
             fixed.extend(p.items())
-
-        fixed.extend(self.extra_params.items())
 
         return fixed
 
