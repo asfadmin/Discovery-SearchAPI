@@ -45,7 +45,7 @@ def analytics_events(events=None):
         logging.debug('Problem logging analytics: {0}'.format(e))
 
     end = time.time()
-    print(f'ANALYTICS TOOK {end - start}')
+    logging.debug(f'ANALYTICS TOOK {end - start}')
 
 
 def combine_event_and_params(params, event):
