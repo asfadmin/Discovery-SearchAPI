@@ -8,23 +8,22 @@ from CMR.SubQuery import CMRSubQuery
 
 class CMRQuery:
     def __init__(self, params=None, max_results=None, output='metalink', analytics=True):
-        self.extra_params = {
-            'provider': 'ASF',  # always limit the results to ASF as the provider
-            'page_size': 2000,  # page size to request from CMR
-            'scroll': 'true',  # used for fetching multiple page_size
-            'options[temporal][and]': 'true', # Makes handling date ranges easier
-            'sort_key[]': '-end_date', # Sort CMR results, but this is partially defeated by the subquery system
-            'sort_key[]': 'granule_ur', # Secondary sort key, the order these keys are specified in matters! This is to make multiple granules with the same date sort consistently
-            'options[platform][ignore_case]': 'true'
-        }
 
         self.max_results = max_results
+        self.page_size = 2000
         self.params = params
         self.output = output
         self.analytics = analytics
 
-        if self.is_small_max_results():
-            self.extra_params['page_size'] = self.max_results
+        self.extra_params = [
+            {'provider': 'ASF'},  # always limit the results to ASF as the provider
+            {'page_size': self.max_results if self.is_small_max_results() else self.page_size},  # page size to request from CMR
+            {'scroll': 'true'},  # used for fetching multiple page_size
+            {'options[temporal][and]': 'true'}, # Makes handling date ranges easier
+            {'sort_key[]': '-end_date'}, # Sort CMR results, but this is partially defeated by the subquery system
+            {'sort_key[]': 'granule_ur'}, # Secondary sort key, the order these keys are specified in matters! This is to make multiple granules with the same date sort consistently
+            {'options[platform][ignore_case]': 'true'}
+        ]
 
         self.result_counter = 0
 
@@ -46,7 +45,7 @@ class CMRQuery:
     def is_small_max_results(self):
         return (
             self.max_results is not None and
-            self.max_results < self.extra_params['page_size']
+            self.max_results < self.page_size
         )
 
     def get_count(self):
