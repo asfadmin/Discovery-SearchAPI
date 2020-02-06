@@ -37,7 +37,7 @@ class test_URL_Manager():
         if "print" not in test_info:
             test_info["print"] = False if assert_used else True
 
-        status_code, content_type, file_content = self.runQuery()
+        status_code, content_type, file_content = self.runQuery(test_info["title"])
 
         if test_info["print"]:
             print()
@@ -74,7 +74,7 @@ class test_URL_Manager():
                 keywords.append(str(key)+"="+str(val))
         return keywords, assert_used
 
-    def runQuery(self):
+    def runQuery(self, title):
         def countToDict(html):
             count = int(html.rstrip())
             return {"count": count}
@@ -136,7 +136,7 @@ class test_URL_Manager():
             try:
                 file_content = countToDict(file_content)
             except ValueError as e:
-                assert False, "API returned html that was not a count. Test: {0}.\nHTML Page: \n{1}\n".format(test_info["title"], file_content)
+                assert False, "API returned html that was not a count. Test: {0}. URL: {1}.\nHTML Page: \n{2}\n".format(title, self.query, file_content)
             if file_content["count"] == 0:
                 content_type = "blank count"
             else:
