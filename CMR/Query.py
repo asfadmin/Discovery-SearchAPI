@@ -7,7 +7,7 @@ from CMR.SubQuery import CMRSubQuery
 
 
 class CMRQuery:
-    def __init__(self, params=None, max_results=None, output='metalink', analytics=True):
+    def __init__(self, params=None, max_results=None, output='metalink', analytics=True, is_streaming=True):
         self.extra_params = {
             'provider': 'ASF',  # always limit the results to ASF as the provider
             'page_size': 2000,  # page size to request from CMR
@@ -35,7 +35,8 @@ class CMRQuery:
             CMRSubQuery(
                 params=list(query),
                 extra_params=self.extra_params,
-                analytics=self.analytics
+                analytics=self.analytics,
+                is_streaming=is_streaming
             )
             for query in subquery_list_from(self.params)
         ]
@@ -47,6 +48,11 @@ class CMRQuery:
             self.max_results is not None and
             self.max_results < self.extra_params['page_size']
         )
+
+    def get_analytics_events(self):
+        return sum([
+            subquery.get_analytics_events() for subquery in self.sub_queries
+        ], [])
 
     def get_count(self):
         return sum([sq.get_count() for sq in self.sub_queries])
