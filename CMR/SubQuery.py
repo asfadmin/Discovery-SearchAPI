@@ -29,12 +29,15 @@ class CMRSubQuery:
 
         logging.debug(f'New CMRSubQuery object with params: {self.params}')
 
+    def get_page_size(self):
+        for param in self.params:
+            if 'page_size' in param:
+                return param[1]
+
     def combine_params(self, params, extra_params):
         fixed = []
-        for p in params:
+        for p in params + extra_params:
             fixed.extend(p.items())
-
-        fixed.extend(self.extra_params.items())
 
         return fixed
 
@@ -117,7 +120,7 @@ class CMRSubQuery:
             yield p
 
         hits = float(self.hits)
-        page_size = float(self.extra_params['page_size'])
+        page_size = float(self.get_page_size())
         num_pages = int(ceil(hits / page_size)) + 1
 
         logging.debug(f'Planning to fetch additional {num_pages} pages')

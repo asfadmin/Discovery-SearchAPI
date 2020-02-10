@@ -37,7 +37,7 @@ class test_URL_Manager():
         if "print" not in test_info:
             test_info["print"] = False if assert_used else True
 
-        status_code, content_type, file_content = self.runQuery()
+        status_code, content_type, file_content = self.runQuery(test_info["title"])
 
         if test_info["print"]:
             print()
@@ -74,7 +74,7 @@ class test_URL_Manager():
                 keywords.append(str(key)+"="+str(val))
         return keywords, assert_used
 
-    def runQuery(self):
+    def runQuery(self, title):
         def countToDict(html):
             count = int(html.rstrip())
             return {"count": count}
@@ -123,17 +123,25 @@ class test_URL_Manager():
             return file_content
 
         h = requests.head(self.query)
+        content_header = h.headers.get('content-type')
+        file_content = requests.get(self.query).content.decode("utf-8")
         # text/csv; charset=utf-8
-        content_type = h.headers.get('content-type').split('/')[1]
+        try:
+            content_type = content_header.split('/')[1]
+        except AttributeError:
+            assert False, "Header is not formatted as expected. Test: {0}. Header: {1}. URL: {2}.\nFile Content: \n{3}\n".format(title, content_header, self.query, file_content)
         # Take out the "csv; charset=utf-8", without crahsing on things without charset
         content_type = content_type.split(';')[0] if ';' in content_type else content_type
-        file_content = requests.get(self.query).content.decode("utf-8")
+
         # print(file_content)
 
         ## COUNT / HTML:
         if content_type == "html":
             # They return a number in the html. Convert to a real int:
-            file_content = countToDict(file_content)
+            try:
+                file_content = countToDict(file_content)
+            except ValueError as e:
+                assert False, "API returned html that was not a count. Test: {0}. URL: {1}.\nHTML Page: \n{2}\n".format(title, self.query, file_content)
             if file_content["count"] == 0:
                 content_type = "blank count"
             else:
