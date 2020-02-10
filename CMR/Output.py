@@ -24,9 +24,11 @@ def output_translators():
         'download':     [cmr_to_download, 'text/plain; charset=utf-8', 'py']
     }
 
+
 def count(r):
     logging.debug('translating: count')
     return str(r)
+
 
 def cmr_to_metalink(rgen):
     logging.debug('translating: metalink')
@@ -34,11 +36,13 @@ def cmr_to_metalink(rgen):
     for l in template.stream(results=rgen()):
         yield l
 
+
 def cmr_to_csv(rgen):
     logging.debug('translating: csv')
     template = templateEnv.get_template('template.csv')
     for l in template.stream(results=rgen()):
         yield l
+
 
 def cmr_to_kml(rgen):
     logging.debug('translating: kml')
@@ -46,11 +50,14 @@ def cmr_to_kml(rgen):
     for l in template.stream(results=rgen()):
         yield l
 
+
 def cmr_to_download(rgen):
     logging.debug('translating: bulk download script')
     plist = [p['downloadUrl'] for p in rgen()]
     bd_res = requests.post(get_config()['bulk_download_api'], data={'products': ','.join(plist)})
-    yield (bd_res.text)
+
+    yield bd_res.text
+
 
 def cmr_to_json(rgen):
     logging.debug('translating: json')
@@ -60,6 +67,7 @@ def cmr_to_json(rgen):
     for p in json.JSONEncoder(indent=2, sort_keys=True).iterencode([streamer]):
         yield p
 
+
 def cmr_to_jsonlite(rgen):
     logging.debug('translating: jsonlite')
 
@@ -67,6 +75,7 @@ def cmr_to_jsonlite(rgen):
 
     for p in json.JSONEncoder(sort_keys=True).iterencode({'results': streamer}):
         yield p
+
 
 def cmr_to_jsonlite2(rgen):
     logging.debug('translating: jsonlite')
@@ -76,6 +85,7 @@ def cmr_to_jsonlite2(rgen):
     for p in json.JSONEncoder(sort_keys=True, separators=(',', ':')).iterencode({'results': streamer}):
         yield p
 
+
 def cmr_to_geojson(rgen):
     logging.debug('translating: geojson')
 
@@ -83,6 +93,7 @@ def cmr_to_geojson(rgen):
 
     for p in json.JSONEncoder(indent=2, sort_keys=True).iterencode({'type': 'FeatureCollection','features':streamer}):
         yield p
+
 
 # Some trickery is required to make JSONEncoder().iterencode take any ol' generator,
 # this approach works without slurping the list into memory

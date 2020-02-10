@@ -14,14 +14,14 @@ from Analytics import analytics_events
 
 class APIProxyQuery:
 
-    def __init__(self, request):
+    def __init__(self, request, should_stream=True):
         self.request = request
         self.cmr_params = {}
         self.output = 'metalink'
         self.max_results = None
+        self.should_stream = should_stream
 
     def get_response(self):
-        self.post_analytics()
 
         validated = self.can_use_cmr()
         if validated is not True:
@@ -32,12 +32,13 @@ class APIProxyQuery:
         except CMRError as e:
             return self.cmr_error(e)
 
-    def post_analytics(self):
+    def post_analytics(self, query_events):
         events = [{'ec': 'Param', 'ea': v} for v in self.request.values]
         events.append({
             'ec': 'Param List',
             'ea': ', '.join(sorted([p.lower() for p in self.request.values]))
         })
+        events += query_events
 
         analytics_events(events=events)
 
@@ -76,15 +77,16 @@ class APIProxyQuery:
         if is_max_results_with_json_output(maxResults, self.output):
             maxResults += 1
 
-        q = CMRQuery(
+        query = CMRQuery(
             params=dict(self.cmr_params),
             output=self.output,
             max_results=maxResults,
-            analytics=True
+            analytics=True,
+            is_streaming=self.should_stream
         )
 
         if self.output == 'count':
-            return make_response(f'{q.get_count()}\n')
+            return make_response(f'{query.get_count()}\n')
 
         translators = output_translators()
 
@@ -95,9 +97,18 @@ class APIProxyQuery:
         d = api_headers.base(mimetype)
         d.add('Content-Disposition', 'attachment', filename=filename)
 
-        stream = stream_with_context(translator(q.get_results))
+        if self.should_stream:
+            self.post_analytics([])
+            resp = stream_with_context(translator(query.get_results))
+        else:
+            resp = ''
+            for result in translator(query.get_results):
+                resp += result
 
-        return Response(stream, headers=d)
+            analytics_events = query.get_analytics_events()
+            self.post_analytics(analytics_events)
+
+        return Response(resp, headers=d)
 
     def validation_error(self, error):
         logging.debug('Malformed query, returning HTTP 400')
