@@ -17,7 +17,16 @@ from CMR.Health import get_cmr_health
 from Analytics import analytics_pageview
 from werkzeug.exceptions import RequestEntityTooLarge
 import time
+import importlib
 
+# GLOBALS:
+project_root = os.path.dirname(os.path.abspath(__file__))
+bulk_download_repo = "Discovery-BulkDownload"
+utils_api_repo = "Discovery-UtilsAPI"
+
+# Submodule imports:
+sys.path.append(os.path.join(project_root, bulk_download_repo))
+bulkdownload = importlib.import_module("APIBulkDownload")
 
 # EB looks for an 'application' callable by default.
 application = Flask(__name__)
@@ -26,21 +35,7 @@ application.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024 # limit to 10 MB, pr
 
 ########## Bulk Download API endpoints and support ##########
 
-# Read a blank download script, populate it with product URLs if needed
-def create_script():
-    with open('bulk_download.py', 'r') as script_file:
-        script = script_file.read()
-
-    # need to move these to external config
-    script = script.replace('REPLACE_URS_URL', 'https://urs.earthdata.nasa.gov/oauth/authorize')
-    script = script.replace('REPLACE_CLIENT_ID', 'BO_n7nTIlMljdvU6kRRB3g')
-    script = script.replace('REPLACE_REDIR_URL', 'https://auth.asf.alaska.edu/login')
-    script = script.replace('REPLACE_HELP_URL', 'http://bulk-download.asf.alaska.edu/help')
-
-    filename = get_filename()
-    script = script.replace('REPLACE_FILENAME', filename)
-
-    products = None
+def get_products():
     try:
         products = request.values.getlist('products')
         all_products = []
@@ -49,13 +44,11 @@ def create_script():
         products = list(filter(lambda p: p is not None, map(lambda p: ('"' + str(p) + '"') if p else None, all_products)))
     except:
         products = []
-    script = script.replace('\'REPLACE_PRODUCT_LIST\'', ",\n                       ".join(products))
-    return script
+    return products
 
-# Returns either the default filename or the param-specified one
 def get_filename():
-    if 'filename' in request.values:
-        return request.values['filename']
+    if "filename" in request.values:
+        return request.values["filename"]
     return 'download-all-{0}.py'.format(datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
 
 # Send the help docs
@@ -66,14 +59,17 @@ def view_help():
 # Send the generated script as content formatted for display in the browser
 @application.route('/view')
 def view_script():
-    return '<html><pre>' + create_script() + '</pre></html>'
+    filename = get_filename()
+    products = get_products()
+    return '<html><pre>' + bulkdownload.create_script(filename, products) + '</pre></html>'
 
 # Send the generated script as an attachment so it downloads directly
 @application.route('/', methods = ['GET', 'POST'])
 def get_script():
     filename = get_filename()
-    results = create_script()
-    generator = (cell for row in results
+    products = get_products()
+    script = bulkdownload.create_script(filename, products)
+    generator = (cell for row in script
                     for cell in row)
     return Response(generator,
                        mimetype = 'text/plain',
