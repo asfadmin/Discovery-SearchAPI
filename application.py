@@ -26,7 +26,12 @@ utils_api_repo = "Discovery-UtilsAPI"
 
 # Submodule imports:
 sys.path.append(os.path.join(project_root, bulk_download_repo))
-bulkdownload = importlib.import_module("APIBulkDownload")
+BulkDownloadAPI = importlib.import_module("APIBulkDownload")
+sys.path.remove(os.path.join(project_root, bulk_download_repo))
+
+# sys.path.append(os.path.join(project_root, utils_api_repo))
+# UtilsAPI = importlib.import_module("APIBulkDownload")
+# sys.path.remove(os.path.join(project_root, utils_api_repo))
 
 # EB looks for an 'application' callable by default.
 application = Flask(__name__)
@@ -49,7 +54,7 @@ def get_products():
 def get_filename():
     if "filename" in request.values:
         return request.values["filename"]
-    return 'download-all-{0}.py'.format(datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
+    return BulkDownloadAPI.get_default_filename()
 
 # Send the help docs
 @application.route('/help')
@@ -61,14 +66,14 @@ def view_help():
 def view_script():
     filename = get_filename()
     products = get_products()
-    return '<html><pre>' + bulkdownload.create_script(filename, products) + '</pre></html>'
+    return '<html><pre>' + BulkDownloadAPI.create_script(filename, products) + '</pre></html>'
 
 # Send the generated script as an attachment so it downloads directly
 @application.route('/', methods = ['GET', 'POST'])
 def get_script():
     filename = get_filename()
     products = get_products()
-    script = bulkdownload.create_script(filename, products)
+    script = BulkDownloadAPI.create_script(filename, products)
     generator = (cell for row in script
                     for cell in row)
     return Response(generator,
