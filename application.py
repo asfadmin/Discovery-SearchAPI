@@ -108,7 +108,6 @@ def missionList():
 def proxy_search():
     return APIProxyQuery(request, should_stream=True).get_response()
 
-
 @application.route('/services/load/param', methods = ['GET', 'POST'])
 def proxy_search_without_stream():
     return APIProxyQuery(request, should_stream=False).get_response()
