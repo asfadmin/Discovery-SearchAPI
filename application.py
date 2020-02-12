@@ -3,10 +3,6 @@ from flask import request
 from flask import Response
 from flask_compress import Compress
 from APIProxy import APIProxyQuery
-from WKTValidator import WKTValidator
-from DateValidator import DateValidator
-from FilesToWKT import FilesToWKT
-from MissionList import MissionList
 from datetime import datetime
 from urllib import parse
 import sys
@@ -29,9 +25,12 @@ sys.path.append(os.path.join(project_root, bulk_download_repo))
 BulkDownloadAPI = importlib.import_module("APIBulkDownload")
 sys.path.remove(os.path.join(project_root, bulk_download_repo))
 
-# sys.path.append(os.path.join(project_root, utils_api_repo))
-# UtilsAPI = importlib.import_module("APIBulkDownload")
-# sys.path.remove(os.path.join(project_root, utils_api_repo))
+sys.path.append(os.path.join(project_root, utils_api_repo))
+FilesToWKT = importlib.import_module("FilesToWKT")
+WKTValidator = importlib.import_module("WKTValidator")
+DateValidator = importlib.import_module("DateValidator")
+MissionList = importlib.import_module("MissionList")
+sys.path.remove(os.path.join(project_root, utils_api_repo))
 
 # EB looks for an 'application' callable by default.
 application = Flask(__name__)
@@ -87,22 +86,22 @@ def get_script():
 # Validate and/or repair a WKT to ensure it meets CMR's requirements
 @application.route('/services/utils/wkt', methods = ['GET', 'POST'])
 def validate_wkt():
-    return WKTValidator(request).get_response()
+    return WKTValidator.WKTValidator(request).get_response()
 
 # Validate a date to ensure it meets our requirements
 @application.route('/services/utils/date', methods = ['GET', 'POST'])
 def validate_date():
-    return DateValidator(request).get_response()
+    return DateValidator.DateValidator(request).get_response()
 
 # Convert a set of shapefiles or a geojson file to WKT
 @application.route('/services/utils/files_to_wkt', methods = ['POST'])
 def filesToWKT():
-    return FilesToWKT(request).get_response()
+    return FilesToWKT.FilesToWKT(request).get_response()
 
 # Collect a list of missions from CMR for a given platform
 @application.route('/services/utils/mission_list', methods = ['GET', 'POST'])
 def missionList():
-    return MissionList(request).get_response()
+    return MissionList.MissionList(request).get_response()
 
 # Fetch and convert the results from CMR
 @application.route('/services/search/param', methods = ['GET', 'POST'])
