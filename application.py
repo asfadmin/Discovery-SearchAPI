@@ -3,10 +3,6 @@ from flask import request
 from flask import Response
 from flask_compress import Compress
 from APIProxy import APIProxyQuery
-from WKTValidator import WKTValidator
-from DateValidator import DateValidator
-from FilesToWKT import FilesToWKT
-from MissionList import MissionList
 from datetime import datetime
 from urllib import parse
 import sys
@@ -17,7 +13,24 @@ from CMR.Health import get_cmr_health
 from Analytics import analytics_pageview
 from werkzeug.exceptions import RequestEntityTooLarge
 import time
+import importlib
 
+# GLOBALS:
+project_root = os.path.dirname(os.path.abspath(__file__))
+bulk_download_repo = "Discovery-BulkDownload"
+utils_api_repo = "Discovery-UtilsAPI"
+
+# Submodule imports:
+sys.path.append(os.path.join(project_root, bulk_download_repo))
+BulkDownloadAPI = importlib.import_module("APIBulkDownload")
+sys.path.remove(os.path.join(project_root, bulk_download_repo))
+
+sys.path.append(os.path.join(project_root, utils_api_repo))
+FilesToWKT = importlib.import_module("FilesToWKT")
+WKTValidator = importlib.import_module("WKTValidator")
+DateValidator = importlib.import_module("DateValidator")
+MissionList = importlib.import_module("MissionList")
+sys.path.remove(os.path.join(project_root, utils_api_repo))
 
 # EB looks for an 'application' callable by default.
 application = Flask(__name__)
@@ -26,21 +39,7 @@ application.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024 # limit to 10 MB, pr
 
 ########## Bulk Download API endpoints and support ##########
 
-# Read a blank download script, populate it with product URLs if needed
-def create_script():
-    with open('bulk_download.py', 'r') as script_file:
-        script = script_file.read()
-
-    # need to move these to external config
-    script = script.replace('REPLACE_URS_URL', 'https://urs.earthdata.nasa.gov/oauth/authorize')
-    script = script.replace('REPLACE_CLIENT_ID', 'BO_n7nTIlMljdvU6kRRB3g')
-    script = script.replace('REPLACE_REDIR_URL', 'https://auth.asf.alaska.edu/login')
-    script = script.replace('REPLACE_HELP_URL', 'http://bulk-download.asf.alaska.edu/help')
-
-    filename = get_filename()
-    script = script.replace('REPLACE_FILENAME', filename)
-
-    products = None
+def get_products():
     try:
         products = request.values.getlist('products')
         all_products = []
@@ -49,14 +48,12 @@ def create_script():
         products = list(filter(lambda p: p is not None, map(lambda p: ('"' + str(p) + '"') if p else None, all_products)))
     except:
         products = []
-    script = script.replace('\'REPLACE_PRODUCT_LIST\'', ",\n                       ".join(products))
-    return script
+    return products
 
-# Returns either the default filename or the param-specified one
 def get_filename():
-    if 'filename' in request.values:
-        return request.values['filename']
-    return 'download-all-{0}.py'.format(datetime.now().strftime('%Y-%m-%d_%H-%M-%S'))
+    if "filename" in request.values:
+        return request.values["filename"]
+    return BulkDownloadAPI.get_default_filename()
 
 # Send the help docs
 @application.route('/help')
@@ -66,14 +63,17 @@ def view_help():
 # Send the generated script as content formatted for display in the browser
 @application.route('/view')
 def view_script():
-    return '<html><pre>' + create_script() + '</pre></html>'
+    filename = get_filename()
+    products = get_products()
+    return '<html><pre>' + BulkDownloadAPI.create_script(filename, products) + '</pre></html>'
 
 # Send the generated script as an attachment so it downloads directly
 @application.route('/', methods = ['GET', 'POST'])
 def get_script():
     filename = get_filename()
-    results = create_script()
-    generator = (cell for row in results
+    products = get_products()
+    script = BulkDownloadAPI.create_script(filename, products)
+    generator = (cell for row in script
                     for cell in row)
     return Response(generator,
                        mimetype = 'text/plain',
@@ -86,22 +86,22 @@ def get_script():
 # Validate and/or repair a WKT to ensure it meets CMR's requirements
 @application.route('/services/utils/wkt', methods = ['GET', 'POST'])
 def validate_wkt():
-    return WKTValidator(request).get_response()
+    return WKTValidator.WKTValidator(request).get_response()
 
 # Validate a date to ensure it meets our requirements
 @application.route('/services/utils/date', methods = ['GET', 'POST'])
 def validate_date():
-    return DateValidator(request).get_response()
+    return DateValidator.DateValidator(request).get_response()
 
 # Convert a set of shapefiles or a geojson file to WKT
 @application.route('/services/utils/files_to_wkt', methods = ['POST'])
 def filesToWKT():
-    return FilesToWKT(request).get_response()
+    return FilesToWKT.FilesToWKT(request).get_response()
 
 # Collect a list of missions from CMR for a given platform
 @application.route('/services/utils/mission_list', methods = ['GET', 'POST'])
 def missionList():
-    return MissionList(request).get_response()
+    return MissionList.MissionList(request).get_response()
 
 # Fetch and convert the results from CMR
 @application.route('/services/search/param', methods = ['GET', 'POST'])
