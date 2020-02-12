@@ -6,21 +6,17 @@ from time import sleep, perf_counter
 import requests
 
 from asf_env import get_config
-from Analytics import analytics_events
 from CMR.Translate import parse_cmr_response
 from CMR.Exceptions import CMRError
 
 
 class CMRSubQuery:
-    def __init__(self, params, extra_params, analytics=True, is_streaming=True):
+    def __init__(self, params, extra_params):
         self.params = params
         self.extra_params = extra_params
-        self.analytics = analytics
         self.sid = None
         self.hits = 0
         self.results = []
-        self.is_streaming = is_streaming
-        self.analytics_events = []
 
         self.params = self.combine_params(self.params, self.extra_params)
 
@@ -74,9 +70,6 @@ class CMRSubQuery:
                 p[0],
                 p[1].replace(',CENTER_ESA_FRAME,', ',FRAME_NUMBER,')
             )
-
-    def get_analytics_events(self):
-        return self.analytics_events
 
     def get_count(self):
         # over-ride scroll and page size for count queries to minimize data
@@ -163,11 +156,6 @@ class CMRSubQuery:
             if query_duration > 10:
                 self.log_slow_cmr_response(session, response, query_duration)
 
-            if self.analytics:
-                self.add_analytics_event(
-                    {'ec': 'CMR API Status', 'ea': response.status_code}
-                )
-
             if response.status_code != 200:
                 self.log_bad_cmr_response(
                     attempt, max_retry, response, session
@@ -182,14 +170,6 @@ class CMRSubQuery:
 
         logging.error('Max number of retries reached, moving on')
         return
-
-    def add_analytics_event(self, event):
-        if self.is_streaming:
-            analytics_events(events=[
-                event
-            ])
-        else:
-            self.analytics_events.append(event)
 
     def asf_session(self):
         session = requests.Session()

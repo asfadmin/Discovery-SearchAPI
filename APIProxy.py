@@ -32,13 +32,12 @@ class APIProxyQuery:
         except CMRError as e:
             return self.cmr_error(e)
 
-    def post_analytics(self, query_events):
+    def post_analytics(self):
         events = [{'ec': 'Param', 'ea': v} for v in self.request.values]
         events.append({
             'ec': 'Param List',
             'ea': ', '.join(sorted([p.lower() for p in self.request.values]))
         })
-        events += query_events
 
         analytics_events(events=events)
 
@@ -81,8 +80,6 @@ class APIProxyQuery:
             params=dict(self.cmr_params),
             output=self.output,
             max_results=maxResults,
-            analytics=True,
-            is_streaming=self.should_stream
         )
 
         if self.output == 'count':
@@ -98,15 +95,9 @@ class APIProxyQuery:
         d.add('Content-Disposition', 'attachment', filename=filename)
 
         if self.should_stream:
-            self.post_analytics([])
             resp = stream_with_context(translator(query.get_results))
         else:
-            resp = ''
-            for result in translator(query.get_results):
-                resp += result
-
-            analytics_events = query.get_analytics_events()
-            self.post_analytics(analytics_events)
+            resp = ''.join(translator(query.get_results))
 
         return Response(resp, headers=d)
 
