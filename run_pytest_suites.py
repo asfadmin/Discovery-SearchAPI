@@ -1,4 +1,5 @@
-import sys, os
+import sys
+import os
 import argparse
 import subprocess
 
@@ -8,21 +9,22 @@ pytest_repo = "Discovery-PytestAutomation"
 
 # Assumes you're in correct directory.
 #		num_threads - pass None if not threadsafe
-#		quit_of_first_fail - Bool
+#		quit_on_first_fail - Bool
 #		unknown_args - list, everything THIS argparse doesn't know about
 def run_suite(num_threads, quit_on_first_fail, unknown_args):
-	cmd = ["pytest", "-s"]
+	cmd = "pytest -s"
 	if num_threads != None:
-		cmd.extend(['-n', str(num_threads)])
+		cmd += " -n " + str(num_threads)
 	if quit_on_first_fail:
-		cmd.extend(["-x"])
-	cmd.extend(["."])
-	cmd.extend(unknown_args)
-	print("cmd:")
-	print(" ".join(cmd))
-	
-	output = subprocess.run(cmd, shell=True)
-	print(output.returncode)
+		cmd += " -x"
+	cmd += " . " + " ".join(unknown_args)
+	cmd = ["bash", "-c", cmd]
+	output = subprocess.run(cmd)
+
+	# If a test failed, and you don't want to continue:
+	if output.status_code != 0 and quit_on_first_fail:
+		exit(1)
+
 if __name__ == "__main__":
 	# Save your original dir, and switch to project root:
 	original_dir = os.getcwd()
@@ -49,8 +51,17 @@ if __name__ == "__main__":
 	if args.n == None:
 		raise argparse.ArgumentTypeError("Must pass a value to '-n'.")
 
-	# Run UtilsAPI suite:
-	os.chdir(os.path.join(project_root,utils_api_repo,pytest_repo))
+	print("\n ---- SearchAPI ----\n")
+	os.chdir(os.path.join(project_root, pytest_repo))
 	run_suite(args.n, args.x, unknown_args)
-	# Switch back to whatever dir you were in:
+
+	print("\n ---- Utils API ----\n")
+	os.chdir(os.path.join(project_root, utils_api_repo, pytest_repo))
+	run_suite(args.n, args.x, unknown_args)
+
+	print("\n ---- BulkDownload API ----\n")
+	os.chdir(os.path.join(project_root, bulk_download_repo, pytest_repo))
+	run_suite(0, args.x, unknown_args) # NOT thread safe, because of account cookie.
+
+	# Switch back to whatever dir you were in before running this script:
 	os.chdir(original_dir)
