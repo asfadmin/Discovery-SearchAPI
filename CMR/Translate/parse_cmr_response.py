@@ -24,9 +24,9 @@ def parse_cmr_response(r):
 def parse_granule(granule):
     # Build a dict out of the list of attributes
     # Caution: this will stomp on attributes that are listed multiple times
-    def list_to_dict(list, key, path):
+    def list_to_dict(props, key, path):
         attributes = {}
-        for attr in list:
+        for attr in props:
             attributes[attr[key]] = get_val(attr, path)
         return attributes
 
