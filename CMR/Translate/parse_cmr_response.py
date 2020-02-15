@@ -102,7 +102,7 @@ def parse_granule(granule):
         'percentUnwrapped':         None,  # not in CMR
         'platform':                 attributes.get('ASF_PLATFORM',get_val(granule, "Platforms/[0]/ShortName")),
         'polarization':             attributes.get('POLARIZATION'),
-        'processingDate':           get_val(granule, "ProcessingDates/[0]"),
+        'processingDate':           processing_dates[0],
         'processingDescription':    attributes.get('PROCESSING_DESCRIPTION'),
         'processingLevel':          attributes.get('PROCESSING_TYPE'),
         'processingType':           attributes.get('PROCESSING_LEVEL'),
