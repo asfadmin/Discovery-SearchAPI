@@ -23,6 +23,7 @@ def parse_cmr_response(r):
 
 def parse_granule(granule):
     # Build a dict out of the list of attributes
+    # Caution: this will stomp on attributes that are listed multiple times
     def list_to_dict(list, key, path):
         attributes = {}
         for attr in list:
@@ -38,12 +39,17 @@ def parse_granule(granule):
         key=lambda x: \
             dateparser.parse(x['Date']) if x['Type'] in ['Insert', 'Update'] \
             else None)
+
     data_granule_identifiers = list_to_dict(get_val(granule, 'DataGranule/Identifiers'), key='IdentifierType', path='Identifier')
+
     product_urls = [url['URL'] for url in get_val(granule, 'RelatedUrls') if url['Type'] == 'GET DATA']
+
     browse_urls = [url['URL'] for url in get_val(granule, 'RelatedUrls') if url['Type'] == 'GET RELATED VISUALIZATION']
+
     shape, wkt_shape = wkt_from_gpolygon(
         get_val(granule, 'SpatialExtent/HorizontalSpatialDomain/Geometry/GPolygons')
     )
+
     frame_number = attributes.get('FRAME_NUMBER') \
         if attributes.get('ASF_PLATFORM') in ['Sentinel-1A', 'Sentinel-1B', 'ALOS'] \
         else attributes.get('CENTER_ESA_FRAME')
@@ -129,7 +135,7 @@ def parse_granule(granule):
 
 def get_val(dictionary, keys, default=None):
     """
-    For picking out directly-locatable properties using an xmlpath-like approach with defaults along the way
+    For picking out directly-locatable properties using an xmlpath-like approach with recursive defaults along the way
     """
     return reduce(lambda d, key: d.get(key, default) if isinstance(d, dict) else d[int(key.strip('[]'))] if isinstance(d, list) else default, keys.split("/"), dictionary)
 
@@ -168,16 +174,3 @@ def shape_not_closed(shapes):
         shapes[-1][0]['lat'] != shapes[-1][-1]['lat'] or
         shapes[-1][0]['lon'] != shapes[-1][-1]['lon']
     )
-
-
-def get_browse_urls(granule, browse_path):
-    browse_elems = granule.xpath(browse_path)
-    browseList = []
-
-    for b in browse_elems:
-        browseList.extend(b.findall('ProviderBrowseUrl'))
-
-    browseUrls = [''.join(b.itertext()).strip() for b in browseList]
-    browseUrls.sort()
-
-    return browseUrls
