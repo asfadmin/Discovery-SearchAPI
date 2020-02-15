@@ -10,7 +10,7 @@ def get_config():
             'analytics_id': 'UA-118881300-4',
             'cmr_base': 'https://cmr.uat.earthdata.nasa.gov',
             'cmr_health': '/search/health',
-            'cmr_api': '/search/granules.echo10',
+            'cmr_api': '/search/granules.umm_json_v1_4',
             'cmr_collections': '/search/collections',
             'cmr_headers': {
                 'Client-Id': 'vertex_asf'
@@ -21,7 +21,7 @@ def get_config():
             'analytics_id': 'UA-118881300-3',
             'cmr_base': 'https://cmr.uat.earthdata.nasa.gov',
             'cmr_health': '/search/health',
-            'cmr_api': '/search/granules.echo10',
+            'cmr_api': '/search/granules.umm_json_v1_4',
             'cmr_collections': '/search/collections',
             'cmr_headers': {
                 'Client-Id': 'vertex_asf'
@@ -32,7 +32,7 @@ def get_config():
             'analytics_id': 'UA-118881300-2',
             'cmr_base': 'https://cmr.earthdata.nasa.gov',
             'cmr_health': '/search/health',
-            'cmr_api': '/search/granules.echo10',
+            'cmr_api': '/search/granules.umm_json_v1_4',
             'cmr_collections': '/search/collections',
             'cmr_headers': {
                 'Client-Id': 'vertex_asf'
@@ -43,7 +43,7 @@ def get_config():
             'analytics_id': 'UA-118881300-5',
             'cmr_base': 'https://cmr.earthdata.nasa.gov',
             'cmr_health': '/search/health',
-            'cmr_api': '/search/granules.echo10',
+            'cmr_api': '/search/granules.umm_json_v1_4',
             'cmr_collections': '/search/collections',
             'cmr_headers': {
                 'Client-Id': 'vertex_asf'
