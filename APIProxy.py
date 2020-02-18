@@ -14,14 +14,14 @@ from Analytics import analytics_events
 
 class APIProxyQuery:
 
-    def __init__(self, request):
+    def __init__(self, request, should_stream=True):
         self.request = request
         self.cmr_params = {}
         self.output = 'metalink'
         self.max_results = None
+        self.should_stream = should_stream
 
     def get_response(self):
-        self.post_analytics()
 
         validated = self.can_use_cmr()
         if validated is not True:
@@ -76,15 +76,14 @@ class APIProxyQuery:
         if is_max_results_with_json_output(maxResults, self.output):
             maxResults += 1
 
-        q = CMRQuery(
+        query = CMRQuery(
             params=dict(self.cmr_params),
             output=self.output,
             max_results=maxResults,
-            analytics=True
         )
 
         if self.output == 'count':
-            return make_response(f'{q.get_count()}\n')
+            return make_response(f'{query.get_count()}\n')
 
         translators = output_translators()
 
@@ -95,9 +94,12 @@ class APIProxyQuery:
         d = api_headers.base(mimetype)
         d.add('Content-Disposition', 'attachment', filename=filename)
 
-        stream = stream_with_context(translator(q.get_results))
+        if self.should_stream:
+            resp = stream_with_context(translator(query.get_results))
+        else:
+            resp = ''.join(translator(query.get_results))
 
-        return Response(stream, headers=d)
+        return Response(resp, headers=d)
 
     def validation_error(self, error):
         logging.debug('Malformed query, returning HTTP 400')

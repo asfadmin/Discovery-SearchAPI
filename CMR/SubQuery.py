@@ -6,16 +6,14 @@ from time import sleep, perf_counter
 import requests
 
 from asf_env import get_config
-from Analytics import analytics_events
 from CMR.Translate import parse_cmr_response
 from CMR.Exceptions import CMRError
 
 
 class CMRSubQuery:
-    def __init__(self, params, extra_params, analytics=True):
+    def __init__(self, params, extra_params):
         self.params = params
         self.extra_params = extra_params
-        self.analytics = analytics
         self.sid = None
         self.hits = 0
         self.results = []
@@ -157,11 +155,6 @@ class CMRSubQuery:
 
             if query_duration > 10:
                 self.log_slow_cmr_response(session, response, query_duration)
-
-            if self.analytics:
-                analytics_events(events=[
-                    {'ec': 'CMR API Status', 'ea': response.status_code}
-                ])
 
             if response.status_code != 200:
                 self.log_bad_cmr_response(

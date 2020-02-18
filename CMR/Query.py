@@ -7,13 +7,11 @@ from CMR.SubQuery import CMRSubQuery
 
 
 class CMRQuery:
-    def __init__(self, params=None, max_results=None, output='metalink', analytics=True):
-
+    def __init__(self, params=None, max_results=None, output='metalink'):
         self.max_results = max_results
         self.page_size = 2000
         self.params = params
         self.output = output
-        self.analytics = analytics
 
         self.extra_params = [
             {'provider': 'ASF'},  # always limit the results to ASF as the provider
@@ -35,7 +33,6 @@ class CMRQuery:
             CMRSubQuery(
                 params=list(query),
                 extra_params=self.extra_params,
-                analytics=self.analytics
             )
             for query in subquery_list_from(self.params)
         ]
