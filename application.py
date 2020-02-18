@@ -3,7 +3,6 @@ from flask import request
 from flask import Response
 from flask_compress import Compress
 from APIProxy import APIProxyQuery
-from datetime import datetime
 from urllib import parse
 import sys
 import logging
