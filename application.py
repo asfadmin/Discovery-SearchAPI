@@ -37,8 +37,21 @@ Compress(application)
 application.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024 # limit to 10 MB, primarily affects file uploads
 
 ########## Bulk Download API endpoints and support ##########
+config = {
+    'urs_url': 'https://urs.earthdata.nasa.gov/oauth/authorize',
+    'client_id': 'BO_n7nTIlMljdvU6kRRB3g',
+    'redir_url': 'https://auth.asf.alaska.edu/login',
+    'help_url': 'http://bulk-download.asf.alaska.edu/help'
+}
 
-def get_products():
+# Returns either the default filename or the param-specified one
+def get_filename():
+    if 'filename' in request.values:
+        return request.values['filename']
+    return BulkDownloadAPI.get_default_filename()
+
+def get_product_list():
+    products = None
     try:
         products = request.values.getlist('products')
         all_products = []
@@ -49,11 +62,6 @@ def get_products():
         products = []
     return products
 
-def get_filename():
-    if "filename" in request.values:
-        return request.values["filename"]
-    return BulkDownloadAPI.get_default_filename()
-
 # Send the help docs
 @application.route('/help')
 def view_help():
@@ -62,22 +70,18 @@ def view_help():
 # Send the generated script as content formatted for display in the browser
 @application.route('/view')
 def view_script():
-    filename = get_filename()
-    products = get_products()
-    return '<html><pre>' + BulkDownloadAPI.create_script(filename, products) + '</pre></html>'
+    return '<html><pre>' + BulkDownloadAPI.create_script(config=config, filename=get_filename(), products=get_product_list()) + '</pre></html>'
 
 # Send the generated script as an attachment so it downloads directly
 @application.route('/', methods = ['GET', 'POST'])
 def get_script():
     filename = get_filename()
-    products = get_products()
-    script = BulkDownloadAPI.create_script(filename, products)
-    generator = (cell for row in script
+    results = BulkDownloadAPI.create_script(config=config, filename=filename, products=get_product_list())
+    generator = (cell for row in results
                     for cell in row)
     return Response(generator,
                        mimetype = 'text/plain',
-                       headers = {'Access-Control-Allow-Origin': '*',
-                                  'Content-Disposition':
+                       headers = {'Content-Disposition':
                                   'attachment;filename=' + filename})
 
 ########## Search API endpoints ##########
