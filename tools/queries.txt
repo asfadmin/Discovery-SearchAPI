@@ -1,0 +1,528 @@
+# queries designed just for testing
+
+# absoluteOrbit + MaxResults 10 + CSV output
+https://api-test.asf.alaska.edu/services/search/param?absoluteorbit=5000&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?absoluteorbit=5000-6000&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?absoluteorbit=5000,5001,5002&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?absoluteorbit=5000,5100-5200&maxresults=100&output=csv
+https://api-test.asf.alaska.edu/services/search/param?absoluteorbit=5000,5001,5002&platform=R1&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?absoluteorbit=27601-27601&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?absoluteorbit=27120-27120,27076&maxresults=10&output=csv
+
+# asfframe + platform + MaxResults 10 + CSV output
+https://api-test.asf.alaska.edu/services/search/param?asfframe=345&platform=R1&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?asfframe=345,346,347&platform=R1&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?asfframe=345-347&platform=R1&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?asfframe=340,345-347&platform=R1&maxresults=10&output=csv
+https://api.daac.asf.alaska.edu/services/search/param?asfframe=340-340&platform=R1&maxresults=10&output=csv
+https://api.daac.asf.alaska.edu/services/search/param?asfframe=340-340,345&platform=R1&maxresults=10&output=csv
+
+# beamMode + MaxResults 100 + CSV output
+https://api-test.asf.alaska.edu/services/search/param?beamMode=FBD,FBS,Standard&maxresults=100&output=csv
+https://api-test.asf.alaska.edu/services/search/param?beamMode=Standard&maxresults=10&output=csv
+
+# bbox + MaxResults + CSV output
+https://api-test.asf.alaska.edu/services/search/param?bbox=-150.2,65.0,-150.1,65.5&maxresults=10&output=csv
+
+# collectionName + CSV output
+https://api-test.asf.alaska.edu/services/search/param?platform=UAVSAR&collectionName=ABoVE&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?platform=AIRSAR&collectionName=Almo&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?platform=AIRSAR&collectionName=Almo+GA&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?platform=AIRSAR&collectionName=Almo,GA&output=CSV
+
+# flightDirection + MaxResults 10 + CSV output
+https://api-test.asf.alaska.edu/services/search/param?flightDirection=A&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?flightDirection=ASC&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?flightDirection=ASCENDING&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?flightDirection=D&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?flightDirection=DESC&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?flightDirection=DESCENDING&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?flightDirection=asCEndInG&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?flightDirection=dEsCeN&maxresults=10&output=csv
+
+# flightLine + MaxResults 10 + CSV output
+https://api-test.asf.alaska.edu/services/search/param?flightLine=15302&maxresults=10&output=csv
+
+# frame + platform + MaxResults + CSV output
+https://api-test.asf.alaska.edu/services/search/param?frame=2277&platform=R1&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?frame=1530-1532&platform=R1&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?frame=1531,1530,1532&platform=R1&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?frame=688,1530-1532&platform=R1&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?frame=190-190&platform=ALOS&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?frame=180-180,185&platform=ALOS&maxresults=10&output=csv
+
+# granule + CSV,Metalink,KML,JSON,JSONLITE,COUNT,MAP, DOWNLOAD output
+https://api-test.asf.alaska.edu/services/search/param?granule_list=S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80&output=csv
+https://api-test.asf.alaska.edu/services/search/param?granule_list=S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80&output=metalink
+https://api-test.asf.alaska.edu/services/search/param?granule_list=S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80&output=kml
+https://api-test.asf.alaska.edu/services/search/param?granule_list=S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80&output=json
+https://api-test.asf.alaska.edu/services/search/param?granule_list=S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80&output=jsonlite
+https://api-test.asf.alaska.edu/services/search/param?granule_list=S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80&output=count
+https://api-test.asf.alaska.edu/services/search/param?granule_list=S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80&output=map
+https://api-test.asf.alaska.edu/services/search/param?granule_list=S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80&output=download
+
+# groupid + JSON output
+https://api-test.asf.alaska.edu/services/search/param?groupid=12345&output=json
+https://api-test.asf.alaska.edu/services/search/param?groupid=sdfkhgsdfkhgsdf&output=json
+https://api-test.asf.alaska.edu/services/search/param?groupid=S1A_IWDV_0382_0387_019686_014&output=json
+https://api-test.asf.alaska.edu/services/search/param?groupid=S1-GUNW-D-R-087-tops-20190816_20190804-161614-19149N_17138N-PP-fee7-v2_0_2&output=json
+https://api-test.asf.alaska.edu/services/search/param?groupid=SP_15077_D_005&output=json
+https://api-test.asf.alaska.edu/services/search/param?groupid=UA_EcuVol_17700_15024_006_150319_L090_CX_01&output=json
+https://api-test.asf.alaska.edu/services/search/param?groupid=ALPSRP278477070&output=json
+https://api-test.asf.alaska.edu/services/search/param?groupid=ts1902&output=json
+https://api-test.asf.alaska.edu/services/search/param?groupid=R1_63781_FN1_F277&output=json
+https://api-test.asf.alaska.edu/services/search/param?groupid=E1_08794_STD_F267&output=json
+https://api-test.asf.alaska.edu/services/search/param?groupid=J1_01508_STD_F315&output=json
+https://api-test.asf.alaska.edu/services/search/param?groupid=SS_01499_STD_F1200&output=json
+
+# intersectsWithPoint + MaxResults + CSV output
+https://api-test.asf.alaska.edu/services/search/param?intersectsWith=point%28-119.543+37.925%29&maxResults=1000&output=CSV
+
+# intersectsWithPolygon + MaxResults + CSV output
+https://api-test.asf.alaska.edu/services/search/param?intersectsWith=polygon%28%28-119.543 37.925+ -118.443 37.7421+ -118.682 36.8525+ -119.77 37.0352+ -119.543 37.925%29%29&maxResults=1000&output=CSV
+
+# intersectsWithLinestring + MaxResults + CSV output
+https://api-test.asf.alaska.edu/services/search/param?intersectsWith=linestring(-119.543 37.925, -118.443 37.7421)&maxResults=1000&output=CSV
+
+# lookDirection + MaxResults 100 + CSV output
+https://api-test.asf.alaska.edu/services/search/param?lookDirection=LEFT&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?lookDirection=RIGHT&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?lookDirection=L&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?lookDirection=R&maxresults=10&output=csv
+
+# maxbaselineperp + platform + MaxResults + CSV output
+https://api-test.asf.alaska.edu/services/search/param?maxbaselineperp=150&platform=R1&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?minbaselineperp=150&platform=R1&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?minbaselineperp=100&maxbaselineperp=150&platform=R1&maxresults=10&output=csv
+
+# maxdoppler + platform + MaxResults + CSV output
+https://api-test.asf.alaska.edu/services/search/param?maxdoppler=2000&platform=R1&maxresults=10&output=csv
+
+# maxResults Keyword
+https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=1&output=csv
+https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=1&output=json
+https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=1&output=jsonlite
+https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=1&output=geojson
+https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=2&output=csv
+https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=2&output=json
+https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=2&output=jsonlite
+https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=2&output=geojson
+
+# mindoppler + platform + MaxResults + CSV output
+https://api-test.asf.alaska.edu/services/search/param?mindoppler=-20000&platform=R1&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?mindoppler=-2000&maxdoppler=2000&platform=R1&maxresults=10&output=csv
+
+# minmaxFaradayRotation + MaxResults + CSV output
+https://api-test.asf.alaska.edu/services/search/param?minfaradayrotation=3&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?maxfaradayrotation=3&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?minfaradayrotation=2&maxfaradayrotation=3&maxresults=10&output=csv
+
+# minmaxFaradayRotation boundary + CSV output
+https://api-test.asf.alaska.edu/services/search/param?platform=Sentinel&minFaradayRotation=0.5&maxFaradayRotation=3.5&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?minFaradayRotation=0.5&maxFaradayRotation=3.5&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?platform=Sentinel&minFaradayRotation=0.5&maxFaradayRotation=5.5&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?platform=Sentinel&minFaradayRotation=2&maxFaradayRotation=5.5&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?minFaradayRotation=2&maxFaradayRotation=3.5&output=CSV
+
+# minmaxInsarStackSize + MaxResults + CSV output
+https://api-test.asf.alaska.edu/services/search/param?mininsarstacksize=50&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?maxinsarstacksize=50&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?mininsarstacksize=80&maxinsarstacksize=100&maxresults=10&output=csv
+
+# offnadirangle + MaxResults + CSV output
+https://api-test.asf.alaska.edu/services/search/param?offnadirangle=21.5&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?offnadirangle=21.5,23.1,27.1&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?offnadirangle=20-30&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?offnadirangle=21.5-21.5&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?offnadirangle=34.3-34.3,20-25&maxresults=10&output=csv
+
+# platform RADARSAT + Max Results 10 + CSV, JSON output
+https://api-test.asf.alaska.edu/services/search/param?platform=R1,E1&maxResults=10&output=jSoN
+https://api-test.asf.alaska.edu/services/search/param?platform=RADARSAT-1,E1&maxResults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?platform=RADARSAT-1,E1&processingLEVEL=L0,L1&maxResults=10&output=csv
+
+# platform + Polygon + MaxResults 100 + CSV output
+https://api-test.asf.alaska.edu/services/search/param?platform=J1&polygon=-148.52,64.63,-150.41,64.64,-149.58,63.86,-148.52,64.63&maxResults=100&output=csv
+
+# platform + ProcessingLevel + Polygon + MaxResults 100 + CSV output
+https://api-test.asf.alaska.edu/services/search/param?platform=A3&processinglevel=L1.0&polygon=-148.52,64.63,-150.41,64.64,-149.58,63.86,-148.52,64.63&maxResults=100&output=csv
+
+# platform aliases + count output
+https://api-test.asf.alaska.edu/services/search/param?platform=S1&start=2016-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&start=2016-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=Sentinel-1&start=2016-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=s1&start=2016-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=ERS&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=erS&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=R1&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=r1&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=RADARSAT-1&start=2016-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=Radarsat-1&start=2016-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=E1&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=ERS-1&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=Ers-1&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=E2&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=ERS-2&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=e2&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=ers-2&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=J1&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=JERS-1&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=Jers-1&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=j1&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=A3&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=ALOS&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=a3&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=alos&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=Alos&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=AS&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=DC-8&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=AIRSAR&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=Airsar&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=as&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=AiRSAR&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=dc-8&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=SS&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=SEASAT%201&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=SEASAT&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=SEASAT%201&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=ss&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=Seasat&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=SeaSAT%201&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=SA&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=Sentinel-1A&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=sa&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=sentinel-1a&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1A&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=Sb&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=SB&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=Sentinel-1B&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1B&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=SP&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=Sp&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=sp&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=SMAP&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=Smap&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=smap&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=UA&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=ua&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=Ua&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=UAVSAR&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=UAvSAR&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=G-III&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=g-iii&start=1978-01-01T00:00:00Z&end=2018-01-02T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=STS-59&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=STS-68&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=STS-59,STS-68&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=sts-59&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=StS-68&output=count
+https://api-test.asf.alaska.edu/services/search/param?platform=Sts-59,StS-68&output=count
+
+# point + MaxResults + CSV output
+https://api-test.asf.alaska.edu/services/search/param?point=-150.2,65.0&maxresults=10&output=csv
+
+# polarization + platform + MaxResults + CSV output
+https://api-test.asf.alaska.edu/services/search/param?polarization=HH&platform=SA&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?polarization=VV&platform=SA&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?polarization=HH%2bHV&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?polarization=Dual+VV&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?polarization=QUADRATURE&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?polarization=hH&platform=SA&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?polarization=Vv&platform=SA&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?polarization=Hh%2bhV&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?polarization=Dual+vv&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?polarization=quadrature&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?polarization=vv%2bVH&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?polarization=Dual+hv&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?polarization=dual+VH&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?polarization=dual+vh&maxresults=10&output=csv
+
+# polygon + MaxResults 100 + CSV output
+https://api-test.asf.alaska.edu/services/search/param?polygon=-148.52,64.63,-150.41,64.64,-149.58,63.86,-148.52,64.63&maxResults=100&output=csv
+
+# polygon + platform + processingLevel + start + CSV output
+https://api-test.asf.alaska.edu/services/search/param?polygon=12.13,41.74,13.4,41.74,13.4,42.75,12.13,42.75,12.13,41.74&platform=Sentinel-1A,Sentinel-1B&processingLevel=SLC&start=2018-05-01T00:00:00UTC&output=csv
+
+# processingLevel + Max Results 10 + CSV output
+https://api-test.asf.alaska.edu/services/search/param?processingLevel=L1.1&maxResults=10&output=cSV
+https://api-test.asf.alaska.edu/services/search/param?processingLevel=L1.1,L1.0&maxResults=10&output=cSV
+https://api-test.asf.alaska.edu/services/search/param?processingLevel=LSTOKES&&output=COUNT
+https://api-test.asf.alaska.edu/services/search/param?processingLevel=LSTOKES,3FP,ATI&output=COUNT
+https://api-test.asf.alaska.edu/services/search/param?processingLevel=METADATA_GRD&output=COUNT
+https://api-test.asf.alaska.edu/services/search/param?processingLevel=GRD_HS&output=COUNT
+
+# processingDate + MaxResults + CSV output
+https://api-test.asf.alaska.edu/services/search/param?processingDate=2018-01-01T00:00:00Z&maxresults=10&output=csv
+#https://api-test.asf.alaska.edu/services/search/param?processingDate=2018-01-01T00:00:00UTC&maxResults=1200&output=CSV
+#https://api-test.asf.alaska.edu/services/search/param?processingDate=2018-01-01T00:00:00UTC&output=CSV
+#https://api-test.asf.alaska.edu/services/search/param?processingDate=2018-07-15T00:00:00UTC&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?processingDate=todayC&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?start=today&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?start=1+week+ago&end=now&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?start=1+week+ago&end=nowtest&output=CSV
+
+# product_list + MaxResults + CSV output
+#https://api-test.asf.alaska.edu/services/search/param?product_list=S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80-GRD_HD,S1A_IW_GRDH_1SDV_20141003T040550_20141003T040619_002660_002F64_EC04-GRD_HD,S1A_IW_GRDH_1SDV_20141003T040644_20141003T040709_002660_002F64_9E20-GRD_HD,S1A_IW_GRDH_1SDV_20141003T040709_20141003T040734_002660_002F64_4C78-GRD_HD,S1A_IW_GRDH_1SDV_20141003T040734_20141003T040754_002660_002F64_288E-GRD_HD,S1A_IW_GRDH_1SDV_20141003T053708_20141003T053737_002661_002F66_A2F4-GRD_HD,S1A_IW_GRDH_1SDV_20141003T053737_20141003T053802_002661_002F66_6132-GRD_HD,S1A_IW_GRDH_1SDV_20141003T053802_20141003T053827_002661_002F66_18D8-GRD_HD,S1A_IW_GRDH_1SDV_20141003T053827_20141003T053852_002661_002F66_5DF0-GRD_HD,S1A_IW_GRDH_1SDV_20141003T053852_20141003T053917_002661_002F66_C3AA-GRD_HD,S1A_IW_GRDH_1SDV_20141003T053917_20141003T053942_002661_002F66_014F-GRD_HD,S1A_IW_GRDH_1SDV_20141003T053942_20141003T054007_002661_002F66_7F10-GRD_HD,S1A_IW_GRDH_1SDV_20141003T054007_20141003T054032_002661_002F66_825E-GRD_HD&output=jsonlite
+#https://api-test.asf.alaska.edu/services/search/param?product_list=S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80-GRD_HD&product_list=ALPSRP016350310-L1.5,ALPSRP016350320-L1.5,ALPSRP016350330-L1.5,ALPSRP016350340-L1.5,ALPSRP016350350-L1.5,ALPSRP016350360-L1.5,ALPSRP016350370-L1.5,ALPSRP016350380-L1.5&output=jsonlite
+#https://api-test.asf.alaska.edu/services/search/param?product_list=S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80-GRD_HD&product_list=ALPSRP016350310-L1.5&product_list=E2_23229_STD_F285-L0&product_list=R1_14387_ST5_F281-L0&product_list=E1_24859_STD_F703-L0&output=jsonlite
+#https://api-test.asf.alaska.edu/services/search/param?product_list=S1A_IW_GRDH_1SDV_20171213T155548_20171213T155613_019686_021746_FC80-GRD_HD&product_list=E2_18061_STD_F277-L1,E2_18061_STD_F315-L1,E2_18061_STD_F259-L1,E2_18061_STD_F295-L1&output=jsonlite
+
+# relativeOrbit + MaxResults + CSV output
+https://api-test.asf.alaska.edu/services/search/param?relativeorbit=20&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?relativeorbit=20-22&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?relativeorbit=20,21,22&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?relativeorbit=20,23-24&maxresults=100&output=csv
+https://api-test.asf.alaska.edu/services/search/param?relativeorbit=20,23,25&platform=R1&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?platform=UAVSAR&relativeOrbit=05905&output=COUNT
+https://api-test.asf.alaska.edu/services/search/param?platform=UAVSAR&relativeOrbit=05905-05906&output=COUNT
+https://api-test.asf.alaska.edu/services/search/param?platform=UAVSAR&relativeOrbit=5905&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?platform=UAVSAR&relativeOrbit=05905&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?relativeorbit=16-16&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?relativeorbit=16-16,17&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?relativeorbit=17,16-16&maxresults=10&output=csv
+
+# season + CSV output
+https://api-test.asf.alaska.edu/services/search/param?season=32,90&platform=SA,SB&maxresults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?season=1,100&platform=SA,SB&maxresults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?season=1,175&platform=UA&maxresults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?season=32,90&platform=SA,SB&start=2017-01-01T00:00:00Z&end=2019-01-01T01:00:00Z&maxresults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?season=1,100&platform=SA,SB&start=2015-01-01T00:00:00Z&end=2018-01-01T01:00:00Z&maxresults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?season=1,175&platform=UA&start=2005-01-01T00:00:00Z&end=2019-01-01T01:00:00Z&maxresults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?season=32,90&platform=SA,SB&start=2+year+ago&end=now&maxresults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?season=1,100&platform=SA,SB&start=2+year+ago&end=now&maxresults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?season=1,175&platform=UA&start=2018-July-15&end=now&maxresults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?season=32,90&platform=SA,SB&start=2018-July-15&end=now&maxresults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?season=1,100&platform=SA,SB&start=1+year+ago&end=now&maxresults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?season=1,175&platform=UA&start=3+year+ago&end=now&maxresults=1000&output=CSV
+
+# start, end + CSV,COUNT output
+https://api-test.asf.alaska.edu/services/search/param?end=2005-01-01T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?start=2005-01-01T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?start=2005-01-01T00:00:00Z&end=2005-01-01T01:00:00Z&output=csv
+https://api-test.asf.alaska.edu/services/search/param?platform=SA&start=2016-01-01T00:00:00Z&end=2016-01-02T00:00:00Z&output=csv
+https://api-test.asf.alaska.edu/services/search/param?platform=SB&start=1+week+ago&end=now&maxresults=2000&output=csv
+https://api-test.asf.alaska.edu/services/search/param?start=2018-July-15&end=now&maxResults=1200&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?start=yesterday&end=now&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?start=2018-July-18&end=2018-July-17&output=CSV
+
+
+### Negative Tests ###
+
+# Invalid queries
+https://api-test.asf.alaska.edu/services/search/param?output=csv&maxresults=10
+https://api-test.asf.alaska.edu/services/search/param
+
+# absoluteOrbit Invalid + CSV output
+https://api-test.asf.alaska.edu/services/search/param?absoluteorbit=TEST&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?absoluteorbit=@&maxresults=10&output=csv
+
+# asfframe Invalid + CSV output
+https://api-test.asf.alaska.edu/services/search/param?asfframe=TEST&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?asfframe=$&maxresults=10&output=csv
+
+# bbox invalid + CSV output
+https://api-test.asf.alaska.edu/services/search/param?bbox=TEST&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?bbox=$&output=CSV
+
+# bbox incomplete + CSV,JSON,JSONLITE,GEOJSON output
+https://api-test.asf.alaska.edu/services/search/param?bbox=-150.2,65.0,-150.1,65.5,0&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?bbox=-150.2,65.0,-150.1,65.5,0&output=JSON
+https://api-test.asf.alaska.edu/services/search/param?bbox=-150.2,65.0,-150.1,65.5,0&output=JSONLITE
+https://api-test.asf.alaska.edu/services/search/param?bbox=-150.2,65.0,-150.1,65.5,0&output=GEO.JSON
+https://api-test.asf.alaska.edu/services/search/param?bbox=-150.2,65.0,-150.1&output=CSV
+
+# beamMode Invalid + CSV output
+https://api-test.asf.alaska.edu/services/search/param?beamMode=%23&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?beamMode=TEST&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?beamMode=TEST&output=CSV,COUNT
+https://api-test.asf.alaska.edu/services/search/param?beamMode=%40&output=CSV
+
+# beamSwath Invalid + CSV output
+https://api-test.asf.alaska.edu/services/search/param?beamSwath=TEST&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?beamSwath=TEST&output=CSV,COUNT
+https://api-test.asf.alaska.edu/services/search/param?beamSwath=%40&output=CSV
+
+# CollectionName Invalid + CSV output
+https://api-test.asf.alaska.edu/services/search/param?platform=ALOS&collectionName=TEST&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?platform=UAVSAR&collectionName=TEST&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1A&collectionName=ABoVE&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?platform=Sentinel&collectionName=Alaska&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?collectionName=$&output=CSV
+
+# end Invalid + CSV output
+https://api-test.asf.alaska.edu/services/search/param?end=2020-01-01T00:00:00Z&output=count
+https://api-test.asf.alaska.edu/services/search/param?end=@%&output=count
+
+# flightDirection Invalid + CSV output
+https://api-test.asf.alaska.edu/services/search/param?platform=E1&flightDirection=TEST&beamMode=STD&maxResults=100&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?platform=E1&flightDirection=$&beamMode=STD&maxResults=100&output=CSV
+
+# flightLine Invalid + CSV output
+https://api-test.asf.alaska.edu/services/search/param?platform=UAVSAR&flightLine=TEST&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?platform=AIRSAR&flightLine=03901&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?platform=AIRSAR&flightLine=$&output=CSV
+
+# frame ALOS invalid + CSV output
+https://api-test.asf.alaska.edu/services/search/param?platform=ALOS&frame=TEST&maxResults=100&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?platform=ALOS&frame=@&maxResults=100&output=CSV
+
+# granule_list Invalid + CSV output
+https://api-test.asf.alaska.edu/services/search/param?granule_list=TEST&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?granule_list$#@$&output=CSV
+
+# grouid Invalid + CSV output
+https://api-test.asf.alaska.edu/services/search/param?groupid=TEST&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?groupid=$#&output=CSV
+
+# intersectsWithPoint Invalid + CSV output
+https://api-test.asf.alaska.edu/services/search/param?intersectsWith=point(TEST,37.925)&maxResults=1000&output=CSV
+
+# intersectsWithPolygon Invalid + CSV output
+https://api-test.asf.alaska.edu/services/search/param?intersectsWith=polygon($ $, -118.443 37.7421, -118.682 36.8525, -119.77 37.0352, -119.543 37.925)&maxResults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?intersectsWith=polygon((TEST 37.925, -118.443 37.7421, -118.682 36.8525, -119.77 37.0352, -119.543 37.925))&maxResults=1000&output=CSV
+
+# intersectsWithLinestring Invalid + CSV output
+https://api-test.asf.alaska.edu/services/search/param?intersectsWith=linestring(TEST)&maxResults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?intersectsWith=linestring(%)&maxResults=1000&output=CSV
+
+# linestring Invalid + CSV output
+https://api-test.asf.alaska.edu/services/search/param?linestring=-150.2,65.0,#&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?linestring=TEST,FAIL&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?linestring(TEST)&maxResults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?linestring(%)&maxResults=1000&output=CSV
+
+# lookDirection Invalid + CSV output
+https://api-test.asf.alaska.edu/services/search/param?lookDirection=TEST&maxResults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?lookDirection=1&maxResults=1000&output=CSV
+
+# maxBaseLinePerp Invalid + CSV output
+https://api-test.asf.alaska.edu/services/search/param?maxbaselineperp=%&platform=R1&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?maxbaselineperp=TEST&platform=R1&maxresults=10&output=csv
+
+# maxDoppler Invalid + CSV output
+https://api-test.asf.alaska.edu/services/search/param?platform=Sentinel&maxDoppler=TEST&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?platform=Sentinel&maxDoppler=@&output=CSV
+
+# maxFaradayRotation boundary, invalid + CSV output
+https://api-test.asf.alaska.edu/services/search/param?platform=Sentinel&maxFaradayRotation=0&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?platform=Sentinel&maxFaradayRotation=-5.0&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?platform=Sentinel&maxFaradayRotation=TEST&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?platform=Sentinel&maxFaradayRotation=&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?platform=Sentinel&maxFaradayRotation=***&output=CSV
+
+# maxInsarStackSize Invalid + CSV output
+https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL&maxInsarStackSize=#&maxResults=100&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL&maxInsarStackSize=TEST&maxResults=100&output=CSV
+
+# maxResults Keyword Invalid
+https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=0&output=csv
+https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=0&output=json
+https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=0&output=jsonlite
+https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=0&output=geojson
+https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=a&output=csv
+https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=a&output=json
+https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=a&output=jsonlite
+https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=a&output=geojson
+https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=%&output=csv
+https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=%&output=json
+https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=%&output=jsonlite
+https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=%&output=geojson
+
+# offNadirAngle Invalid + CSV output
+https://api-test.asf.alaska.edu/services/search/param?offNadirAngle=TEST&maxResults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?offNadirAngle=$&maxResults=1000&output=CSV
+
+# output Invalid
+https://api-test.asf.alaska.edu/services/search/param?platform=UAVSAR&relativeOrbit=05905-05906&output=TEST
+https://api-test.asf.alaska.edu/services/search/param?platform=UAVSAR&relativeOrbit=05905-05906&maxResults=0.5&output=CSC
+
+# pagesize Invalid + jsonlite output
+https://api-test.asf.alaska.edu/services/search/param?platform=R1,E1&pagesize=TEST&output=jsonlite
+
+# platform Invalid + CSV,COUNT output
+https://api-test.asf.alaska.edu/services/search/param?platform=@&maxResults=10&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?platform=@&maxResults=10&output=COUNT
+https://api-test.asf.alaska.edu/services/search/param?platform=~&maxResults=10&output=COUNT
+https://api-test.asf.alaska.edu/services/search/param?platform=%&maxResults=10&output=COUNT
+https://api-test.asf.alaska.edu/services/search/param?platform=TEST&maxResults=10&output=COUNT
+
+# platform aliases Keyword Invalid + CSV output
+https://api-test.asf.alaska.edu/services/search/param?platform=S2&start=2016-01-01T00:00:00Z&end=2016-01-02T00:00:00Z&output=csv
+https://api-test.asf.alaska.edu/services/search/param?platform=SENTI&start=1+week+ago&end=now&maxresults=2000&output=csv
+https://api-test.asf.alaska.edu/services/search/param?platform=TEST&start=2016-01-01T00:00:00Z&end=2016-01-02T00:00:00Z&output=csv
+
+# platform_list Keyword Invalid + CSV output
+https://api-test.asf.alaska.edu/services/search/param?platform_list=Test,TEST&start=2016-01-01T00:00:00Z&end=2016-01-02T00:00:00Z&output=csv
+https://api-test.asf.alaska.edu/services/search/param?platform_list=#,$&start=2016-01-01T00:00:00Z&end=2016-01-02T00:00:00Z&output=csv
+
+# point Invalid + CSV output
+https://api-test.asf.alaska.edu/services/search/param?point=-150.2&maxresults=10&output=csv
+https://api-test.asf.alaska.edu/services/search/param?point=$#&maxresults=10&output=csv
+
+# polarization Invalid + CSV output
+https://api-test.asf.alaska.edu/services/search/param?platform=AIRSAR&polarization=12&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?platform=AIRSAR&polarization=%@#&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?platform=E1&polarization=^*&maxResults=1000&output=CSV
+
+# polygon invalid + CSV output
+https://api-test.asf.alaska.edu/services/search/param?polygon=-155.08,65.82,-153.5&maxResults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?polygon=-155.08,65.82&maxResults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?polygon=-155.08,65.82&maxResults=1000&output=count
+https://api-test.asf.alaska.edu/services/search/param?polygon=$$&maxResults=1000&output=count
+https://api-test.asf.alaska.edu/services/search/param?polygon=$$&maxResults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?polygon=TEST&maxResults=1000&output=CSV
+
+# processingLevel Invalid + CSV output
+https://api-test.asf.alaska.edu/services/search/param?processingLevel=@@&maxResults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?processingLevel=LSTOKES&&output=COUNT
+
+# processingDate Invalid + CSV output
+https://api-test.asf.alaska.edu/services/search/param?processingDate=$$$&maxResults=1200&output=CSV
+
+# product_list Invalid + CSV output
+https://api-test.asf.alaska.edu/services/search/param?product_list=0,1,2,3,4&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?product_list=a,b,c,d&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?product_list=#,$,%,@&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?product_list=TEST,INVALID&output=CSV
+
+# relativeOrbit Invalid + CSV,OUTPUT output
+https://api-test.asf.alaska.edu/services/search/param?relativeOrbit=671&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?relativeOrbit=TEST&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?relativeOrbit=@@&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?platform=UAVSAR&relativeOrbit=TEST&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?platform=UAVSAR&relativeOrbit=TEST&output=COUNT
+
+# season Invalid + CSV output
+https://api-test.asf.alaska.edu/services/search/param?season=-100,-3&platform=SA,SB&maxresults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?season=%,%&platform=SA,SB&maxresults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?season=december,may&platform=UA&maxresults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?season=février,juillet&platform=S1&maxresults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?season=march,august&platform=S1&maxresults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?season=-100,-3&platform=SA,SB&start=2005-01-01T00:00:00Z&end=2019-01-01T01:00:00Z&maxresults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?season=%,%&platform=SA,SB&start=2005-01-01T00:00:00Z&end=2019-01-01T01:00:00Z&maxresults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?season=december,may&platform=UA&start=2005-01-01T00:00:00Z&end=2019-01-01T01:00:00Z&maxresults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?season=février,juillet&platform=S1&start=2005-01-01T00:00:00Z&end=2019-01-01T01:00:00Z&maxresults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?season=march,august&platform=S1&start=2020-01-01T00:00:00Z&end=2019-01-01T01:00:00Z&maxresults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?season=février,juillet&platform=S1&start=now&end=1+week+ago&maxresults=1000&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?season=march,august&platform=S1&start=1+week_ago&end=nowtest&maxresults=1000&output=CSV
+
+# start-End Invalid + CSV output
+https://api-test.asf.alaska.edu/services/search/param?now&end=1+week+ago&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?start=1+week+ago&end=nowtest&output=CSV
+https://api-test.asf.alaska.edu/services/search/param?start=now&end=yesterday&output=CSV
+
+# polygon closure/winding order fixer test
+https://api-test.asf.alaska.edu/services/search/param?polygon=12.13,41.74,13.4,41.74,13.4,42.75,12.13,42.75&platform=Sentinel-1A,Sentinel-1B&processingLevel=SLC&start=2018-05-01T00:00:00UTC&output=csv
+https://api-test.asf.alaska.edu/services/search/param?polygon=12.13,41.74,13.4,41.74,13.4,42.75,12.13,42.75,12.13,41.74&platform=Sentinel-1A,Sentinel-1B&processingLevel=SLC&start=2018-05-01T00:00:00UTC&output=csv
+https://api-test.asf.alaska.edu/services/search/param?polygon=12.13,41.74,12.13,42.75,13.4,42.75,13.4,41.74,12.13,41.74&platform=Sentinel-1A,Sentinel-1B&processingLevel=SLC&start=2018-05-01T00:00:00UTC&output=csv
+https://api-test.asf.alaska.edu/services/search/param?polygon=-155.08,65.82,-153.5,61.91,-149.50,63.07,-149.94,64.55&maxResults=1000&output=CSV
+
+# queries taken from real-world usage
+https://api-test.asf.alaska.edu/services/search/param?intersectsWith=point(-168.0380672+53.9279675)&platform=Sentinel-1A,Sentinel-1B&processingLevel=GRD_HS,GRD_HD&beamMode=IW&output=count
+https://api-test.asf.alaska.edu/services/search/param?intersectsWith=linestring(-102+37.59,-94+37,-94+39,-102+39)&platform=Sentinel-1A,Sentinel-1B&processingLevel=GRD_HS,GRD_HD&beamMode=IW&output=count
+https://api-test.asf.alaska.edu/services/search/param?intersectsWith=polygon((-102+37.59,-94+37,-94+39,-102+39,-102+37.59))&platform=Sentinel-1A,Sentinel-1B&processingLevel=GRD_HS,GRD_HD&beamMode=IW&output=count
+https://api-test.asf.alaska.edu/services/search/param?output=count&frame=587%2C588%2C589%2C590%2C591%2C592%2C593&processingLevel=L0%2CL1.0%2CSLC&platform=SENTINEL-1A%2CSENTINEL-1B&maxResults=1000&relativeOrbit=128
+https://api-test.asf.alaska.edu/services/search/param?output=count&asfframe=587%2C588%2C589%2C590%2C591%2C592%2C593&processingLevel=L0%2CL1.0%2CSLC&platform=SENTINEL-1A%2CSENTINEL-1B&maxResults=1000&relativeOrbit=128
+https://api-test.asf.alaska.edu/services/search/param?platform=SA,SB&relativeOrbit=128&asfframe=587-593&start=2017-06-01&end=2018-05-30&output=csv
+https://api-test.asf.alaska.edu/services/search/param?platform=SA,SB&relativeOrbit=128&frame=587-593&start=2017-06-01&end=2018-05-30&output=csv
+https://api-test.asf.alaska.edu/services/search/param?output=csv&platform=Sentinel-1A&start=2018-05-30&end=2018-05-31%22
+https://api-test.asf.alaska.edu/services/search/param?polygon=4794886.03996192,2658783.7409794466,4911667.405803877,2658783.7409794466,4911667.405803877,2775921.3473827764,4794886.03996192,2775921.3473827764,4794886.03996192,2658783.7409794466
