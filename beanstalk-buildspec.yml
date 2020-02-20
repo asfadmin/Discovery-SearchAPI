@@ -12,7 +12,6 @@ phases:
       - chmod 600 ~/.ssh/id_rsa
       - ssh-keygen -F github.com || ssh-keyscan github.com >>~/.ssh/known_hosts
       - git config --global url."git@github.com:".insteadOf "https://github.com/"
-      - echo '{"version":"$CODEBUILD_RESOLVED_SOURCE_VERSION"}' > version.json
       - |
         if [ ! -d ".git" ]; then
           git init                                              # Initialize Git
@@ -22,6 +21,7 @@ phases:
         fi
       - git submodule init
       - git submodule update --recursive
+      - echo '{"version":"$CODEBUILD_RESOLVED_SOURCE_VERSION"}' > version.json
   build:
     commands:
       - echo 'No build steps required'
