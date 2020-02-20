@@ -25,6 +25,7 @@ phases:
         fi
       - git submodule init
       - git submodule update --recursive
+      - echo "{\"version\":\"$CODEBUILD_RESOLVED_SOURCE_VERSION\"}" > version.json
   pre_build:
     commands:
       - python -m venv ${ENV}
