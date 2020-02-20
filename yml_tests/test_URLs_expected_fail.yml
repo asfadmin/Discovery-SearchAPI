@@ -235,7 +235,7 @@ tests:
     maxresults: 1000
 
     expected file: error json
-    expected code: 400 
+    expected code: 400
 
 - linestring value specchar invalid:
     linestring: -150.2,65.0,#
@@ -555,8 +555,8 @@ tests:
 
 - platform_list Test invalid param:
     platform_list: Test,TEST
-    start: 2016-01-01T00:00:00Z
-    end: 2016-01-02T00:00:00Z
+    start: "2016-01-01T00:00:00Z"
+    end: "2016-01-02T00:00:00Z"
     output: csv
 
     expected file: error json
@@ -564,8 +564,8 @@ tests:
 
 - platform_list specchar invalid param:
     platform_list: ~,#
-    start: 2016-01-01T00:00:00Z
-    end: 2016-01-02T00:00:00Z
+    start: "2016-01-01T00:00:00Z"
+    end: "2016-01-02T00:00:00Z"
     output: csv
 
     expected file: error json
@@ -735,8 +735,8 @@ tests:
 - season negnum start end invalid:
     season: -100,-3
     platform: SA,SB
-    start: 2005-01-01T00:00:00Z
-    end: 2019-01-01T01:00:00Z
+    start: "2005-01-01T00:00:00Z"
+    end: "2019-01-01T01:00:00Z"
     maxResults: 1000
     output: csv
 
@@ -746,8 +746,8 @@ tests:
 - season specchar start end invalid:
     season: -,-
     platform: SA,SB
-    start: 2005-01-01T00:00:00Z
-    end: 2019-01-01T01:00:00Z
+    start: "2005-01-01T00:00:00Z"
+    end: "2019-01-01T01:00:00Z"
     maxResults: 1000
     output: csv
 
@@ -757,8 +757,8 @@ tests:
 - season month list start end invalid:
     season: December,May
     platform: UA
-    start: 2005-01-01T00:00:00Z
-    end: 2019-01-01T01:00:00Z
+    start: "2005-01-01T00:00:00Z"
+    end: "2019-01-01T01:00:00Z"
     maxResults: 1000
     output: csv
 
@@ -768,8 +768,8 @@ tests:
 - season french month list start end invalid:
     season: février,juillet
     platform: S1
-    start: 2005-01-01T00:00:00Z
-    end: 2019-01-01T01:00:00Z
+    start: "2005-01-01T00:00:00Z"
+    end: "2019-01-01T01:00:00Z"
     maxResults: 1000
     output: csv
 
@@ -779,8 +779,8 @@ tests:
 - season month list 2 start end invalid:
     season: March,April
     platform: S1
-    start: 2005-01-01T00:00:00Z
-    end: 2019-01-01T01:00:00Z
+    start: "2005-01-01T00:00:00Z"
+    end: "2019-01-01T01:00:00Z"
     maxResults: 1000
     output: csv
 
