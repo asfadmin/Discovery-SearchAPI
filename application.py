@@ -121,8 +121,14 @@ def proxy_search_without_stream():
 # Health check endpoint
 @application.route('/health')
 def health_check():
+    try:
+        with open('version.json') as version_file:
+            api_version = json.load(version_file)
+    except Exception as e:
+        logging.debug(e)
+        api_version = {'version': 'unknown'}
     cmr_health = get_cmr_health()
-    api_health = {'ASFSearchAPI': {'ok?': True}, 'CMRSearchAPI': cmr_health}
+    api_health = {'ASFSearchAPI': {'ok?': True, 'version': api_version['version']}, 'CMRSearchAPI': cmr_health}
     response = make_response(json.dumps(api_health, sort_keys=True, indent=2))
     response.mimetype = 'application/json; charset=utf-8'
     return response
