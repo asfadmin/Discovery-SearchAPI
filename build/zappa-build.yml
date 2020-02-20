@@ -13,5 +13,5 @@ phases:
       - . ./${ENV}/bin/activate
       - pip install -r requirements.txt
 artifacts:
-files:
-- '**/*'
+  files:
+    - '**/*'
