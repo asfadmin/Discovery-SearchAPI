@@ -12,6 +12,8 @@ phases:
       - chmod 600 ~/.ssh/id_rsa
       - ssh-keygen -F github.com || ssh-keyscan github.com >>~/.ssh/known_hosts
       - git config --global url."git@github.com:".insteadOf "https://github.com/"
+      - echo "$CODEBUILD_SOURCE_REPO_URL"
+      - echo "$CODEBUILD_RESOLVED_SOURCE_VERSION"
       - |
         if [ ! -d ".git" ]; then
           git init                                              # Initialize Git
