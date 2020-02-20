@@ -127,7 +127,6 @@ def health_check():
     except Exception as e:
         logging.debug(e)
         api_version = {'version': 'local'}
-        pass
     cmr_health = get_cmr_health()
     api_health = {'ASFSearchAPI': {'ok?': True, 'version': api_version['version']}, 'CMRSearchAPI': cmr_health}
     response = make_response(json.dumps(api_health, sort_keys=True, indent=2))
