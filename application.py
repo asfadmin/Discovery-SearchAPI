@@ -126,7 +126,7 @@ def health_check():
             api_version = json.load(version_file)
     except Exception as e:
         logging.debug(e)
-        version = {'version': 'local'}
+        api_version = {'version': 'local'}
         pass
     cmr_health = get_cmr_health()
     api_health = {'ASFSearchAPI': {'ok?': True, 'version': api_version['version']}, 'CMRSearchAPI': cmr_health}
