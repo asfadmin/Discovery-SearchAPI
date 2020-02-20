@@ -18,5 +18,6 @@ unit_tests/Resources/bulk_download_output/*
 # api jsonlite local cache
 jsonlite_cache/*
 
-# misc OS files
+# misc files
+venv/*
 .DS_Store
