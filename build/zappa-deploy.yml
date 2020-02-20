@@ -9,4 +9,5 @@ env:
 phases:
   post_build:
     commands:
+      - . ./${ENV}/bin/activate
       - zappa update ${MATURITY}
