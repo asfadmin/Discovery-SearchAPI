@@ -10,6 +10,7 @@ phases:
   post_build:
     commands:
       - ls -al
+      - pip list
       - echo $ENV
       - . ./${ENV}/bin/activate
       - zappa update ${MATURITY}
