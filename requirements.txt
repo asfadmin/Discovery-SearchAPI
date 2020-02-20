@@ -24,7 +24,7 @@ Flask==1.1.1
 Flask-Compress==1.4.0
 future==0.18.2
 geojson==2.5.0
-geomet==0.2.1
+geomet
 gitdb2==2.0.6
 GitPython==3.0.5
 hjson==3.0.1
