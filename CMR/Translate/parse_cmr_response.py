@@ -1,127 +1,124 @@
 import logging
-import json
-from functools import reduce
-import dateparser
+from lxml import etree as ET
+
 
 def parse_cmr_response(r):
     """
-    Convert umm json to results list used by output translators
+    Convert echo10 xml to results list used by output translators
     """
     logging.debug('parsing CMR results')
 
     try:
-        results = json.loads(r.text.encode('latin-1'))
-    except json.JSONDecodeError as e:
+        root = ET.fromstring(r.text.encode('latin-1'))
+    except ET.ParseError as e:
         logging.error(f'CMR parsing error: {e} when parsing: {r.text}')
         return
-    num_results = len(results.get('items', 0))
+
+    num_results = len(root.xpath('/results/result/Granule'))
     logging.debug(f'Found {num_results} results in this page')
 
-    for granule in results.get('items'):
-        yield parse_granule(granule['umm'])
+    for granule in root.xpath('/results/result/Granule'):
+        yield parse_granule(granule)
 
 
 def parse_granule(granule):
-    # Build a dict out of the list of attributes
-    def list_to_dict(list, key, path):
-        attributes = {}
-        for attr in list:
-            attributes[attr[key]] = get_val(attr, path)
-        return attributes
+    def get_val(path, default='NA'):
+        r = granule.xpath(path)
 
-    # Special case handling for some properties/groups
+        if r is not None and len(r) > 0:
+            return r[0].text
+        else:
+            return default
 
-    attributes = list_to_dict(get_val(granule, 'AdditionalAttributes'), key='Name', path='Values/[0]')
+    def get_attr(path, default='NA'):
+        return get_val(attr(path), default=default)
 
-    processing_dates = sorted(get_val(granule, 'ProviderDates'), \
-        reverse=True, \
-        key=lambda x: \
-            dateparser.parse(x['Date']) if x['Type'] in ['Insert', 'Update'] \
-            else None)
-    data_granule_identifiers = list_to_dict(get_val(granule, 'DataGranule/Identifiers'), key='IdentifierType', path='Identifier')
-    product_urls = [url['URL'] for url in get_val(granule, 'RelatedUrls') if url['Type'] == 'GET DATA']
-    browse_urls = [url['URL'] for url in get_val(granule, 'RelatedUrls') if url['Type'] == 'GET RELATED VISUALIZATION']
     shape, wkt_shape = wkt_from_gpolygon(
-        get_val(granule, 'SpatialExtent/HorizontalSpatialDomain/Geometry/GPolygons')
+        granule.xpath('./Spatial/HorizontalSpatialDomain/Geometry/GPolygon')
     )
-    frame_number = attributes.get('FRAME_NUMBER') \
-        if attributes.get('ASF_PLATFORM') in ['Sentinel-1A', 'Sentinel-1B', 'ALOS'] \
-        else attributes.get('CENTER_ESA_FRAME')
+
+    asf_platforms = ['Sentinel-1A', 'Sentinel-1B', 'ALOS']
+    frame_number = get_attr('FRAME_NUMBER') \
+        if get_attr('ASF_PLATFORM') in asf_platforms \
+        else get_attr('CENTER_ESA_FRAME')
 
     result = {
-        'granuleName':              data_granule_identifiers['ProducerGranuleId'],
-        'sizeMB':                   get_val(granule, 'DataGranule/ArchiveAndDistributionInformation/[0]/Size'),
-        'processingDate':           get_val(granule, "ProcessingDates/[0]"),
-        'startTime':                get_val(granule, "TemporalExtent/RangeDateTime/BeginningDateTime"),
-        'stopTime':                 get_val(granule, "TemporalExtent/RangeDateTime/EndingDateTime"),
-        'absoluteOrbit':            get_val(granule, "OrbitCalculatedSpatialDomains/[0]/OrbitNumber"),
-        'platform':                 attributes.get(
-                                        'ASF_PLATFORM',
-                                        get_val(granule, "Platforms/[0]/ShortName")
-                                    ),
-        'md5sum':                   attributes.get('MD5SUM'),
-        'beamMode':                 attributes.get('BEAM_MODE_TYPE'),
-        'configurationName':        attributes.get('BEAM_MODE_DESC'),
-        'bytes':                    attributes.get('BYTES'),
-        'granuleType':              attributes.get('GRANULE_TYPE'),
-        'sceneDate':                attributes.get('ACQUISITION_DATE'),
-        'flightDirection':          attributes.get('ASCENDING_DESCENDING'),
-        'thumbnailUrl':             attributes.get('THUMBNAIL_URL'),
-        'farEndLat':                attributes.get('FAR_END_LAT'),
-        'farStartLat':              attributes.get('FAR_START_LAT'),
-        'nearStartLat':             attributes.get('NEAR_START_LAT'),
-        'nearEndLat':               attributes.get('NEAR_END_LAT'),
-        'farEndLon':                attributes.get('FAR_END_LON'),
-        'farStartLon':              attributes.get('FAR_START_LON'),
-        'nearStartLon':             attributes.get('NEAR_START_LON'),
-        'nearEndLon':               attributes.get('NEAR_END_LON'),
-        'processingType':           attributes.get('PROCESSING_LEVEL'),
-        'finalFrame':               attributes.get('CENTER_ESA_FRAME'),
-        'centerLat':                attributes.get('CENTER_LAT'),
-        'centerLon':                attributes.get('CENTER_LON'),
-        'polarization':             attributes.get('POLARIZATION'),
-        'faradayRotation':          attributes.get('FARADAY_ROTATION'),
-        'stringFootprint':          wkt_shape,
-        'doppler':                  attributes.get('DOPPLER'),
-        'baselinePerp':             attributes.get('INSAR_BASELINE'),
-        'insarStackSize':           attributes.get('INSAR_STACK_SIZE'),
-        'processingDescription':    attributes.get('PROCESSING_DESCRIPTION'),
-        'percentTroposphere':       None,  # not in CMR
-        'frameNumber':              frame_number,
-        'percentCoherence':         None,  # not in CMR
-        'productName':              data_granule_identifiers['ProducerGranuleId'],
-        'masterGranule':            None,  # no longer populated in CMR
-        'percentUnwrapped':         None,  # not in CMR
-        'beamSwath':                None,  # .......complicated
-        'insarGrouping':            attributes.get('INSAR_STACK_ID'),
-        'offNadirAngle':            attributes.get('OFF_NADIR_ANGLE'),
-        'missionName':              attributes.get('MISSION_NAME'),
-        'relativeOrbit':            attributes.get('PATH_NUMBER'),
-        'flightLine':               attributes.get('FLIGHT_LINE'),
-        'processingTypeDisplay':    attributes.get('PROCESSING_TYPE_DISPLAY'),
-        'track':                    attributes.get('PATH_NUMBER'),
-        'beamModeType':             attributes.get('BEAM_MODE_TYPE'),
-        'processingLevel':          attributes.get('PROCESSING_TYPE'),
-        'lookDirection':            attributes.get('LOOK_DIRECTION'),
-        'varianceTroposphere':      None,  # not in CMR
-        'slaveGranule':             None,  # no longer populated in CMR
-        'sensor':                   get_val(granule, 'Platforms/[0]/Instruments/[0]/ShortName'),
-        'fileName':                 product_urls[0].split('/')[-1] if len(product_urls) > 0 else None,
-        'downloadUrl':              product_urls[0] if len(product_urls) > 0 else None,
-        'browse':                   browse_urls if len(browse_urls) > 0 else [],
-        'shape':                    shape,
-        'sarSceneId':               None,  # always None in API
-        'product_file_id':          get_val(granule, 'GranuleUR'),
-        'sceneId':                  data_granule_identifiers['ProducerGranuleId'],
-        'firstFrame':               attributes.get('CENTER_ESA_FRAME'),
-        'frequency':                None,  # always None in API
-        'catSceneId':               None,  # always None in API
-        'status':                   None,  # always None in API
-        'formatName':               None,  # always None in API
-        'incidenceAngle':           None,  # always None in API
-        'collectionName':           attributes.get('MISSION_NAME'),
-        'sceneDateString':          None,  # always None in API
-        'groupID':                  attributes.get('GROUP_ID'),
+        'granuleName': get_val("./DataGranule/ProducerGranuleId", default=None),
+        'sizeMB': get_val("./DataGranule/SizeMBDataGranule", default=None),
+        'processingDate':  get_val("./DataGranule/ProductionDateTime", default=None),
+        'startTime':  get_val("./Temporal/RangeDateTime/BeginningDateTime", default=None),
+        'stopTime':  get_val("./Temporal/RangeDateTime/EndingDateTime", default=None),
+        'absoluteOrbit': get_val(
+            "./OrbitCalculatedSpatialDomains/OrbitCalculatedSpatialDomain/OrbitNumber",
+            default=None
+        ),
+        'platform': get_attr(
+            'ASF_PLATFORM',
+            default=get_val("./Platforms/Platform/ShortName")
+        ),
+        'md5sum': get_attr('MD5SUM'),
+        'beamMode': get_attr('BEAM_MODE_TYPE'),
+        'configurationName': get_attr('BEAM_MODE_DESC'),
+        'bytes': get_attr("BYTES"),
+        'granuleType':  get_attr('GRANULE_TYPE'),
+        'sceneDate': get_attr('ACQUISITION_DATE'),
+        'flightDirection': get_attr('ASCENDING_DESCENDING'),
+        'thumbnailUrl': get_attr('THUMBNAIL_URL'),
+        'farEndLat':  get_attr('FAR_END_LAT'),
+        'farStartLat':  get_attr('FAR_START_LAT'),
+        'nearStartLat':  get_attr('NEAR_START_LAT'),
+        'nearEndLat':  get_attr('NEAR_END_LAT'),
+        'farEndLon':  get_attr('FAR_END_LON'),
+        'farStartLon':  get_attr('FAR_START_LON'),
+        'nearStartLon':  get_attr('NEAR_START_LON'),
+        'nearEndLon':  get_attr('NEAR_END_LON'),
+        'processingType':  get_attr('PROCESSING_LEVEL'),
+        'finalFrame':  get_attr('CENTER_ESA_FRAME'),
+        'centerLat':  get_attr('CENTER_LAT'),
+        'centerLon':  get_attr('CENTER_LON'),
+        'polarization':  get_attr('POLARIZATION'),
+        'faradayRotation':  get_attr('FARADAY_ROTATION'),
+        'stringFootprint': wkt_shape,
+        'doppler': get_attr('DOPPLER'),
+        'baselinePerp': get_attr('INSAR_BASELINE'),
+        'insarStackSize': get_attr('INSAR_STACK_SIZE'),
+        'processingDescription': get_attr('PROCESSING_DESCRIPTION'),
+        'percentTroposphere': 'NA',  # not in CMR
+        'frameNumber': frame_number,
+        'percentCoherence': 'NA',  # not in CMR
+        'productName': get_val("./DataGranule/ProducerGranuleId", default=None),
+        'masterGranule': 'NA',  # almost always None in API
+        'percentUnwrapped': 'NA',  # not in CMR
+        'beamSwath': 'NA',  # .......complicated
+        'insarGrouping': get_attr('INSAR_STACK_ID'),
+        'offNadirAngle': get_attr('OFF_NADIR_ANGLE'),
+        'missionName': get_attr('MISSION_NAME'),
+        'relativeOrbit': get_attr('PATH_NUMBER'),
+        'flightLine': get_attr('FLIGHT_LINE'),
+        'processingTypeDisplay': get_attr('PROCESSING_TYPE_DISPLAY'),
+        'track': get_attr('PATH_NUMBER'),
+        'beamModeType': get_attr('BEAM_MODE_TYPE'),
+        'processingLevel': get_attr('PROCESSING_TYPE'),
+        'lookDirection': get_attr('LOOK_DIRECTION'),
+        'varianceTroposphere': 'NA',  # not in CMR
+        'slaveGranule': 'NA',  # almost always None in API
+        'sensor': get_val('./Platforms/Platform/Instruments/Instrument/ShortName', default=None),
+        'fileName': get_val("./OnlineAccessURLs/OnlineAccessURL/URL", default=None).split('/')[-1],
+        'downloadUrl': get_val("./OnlineAccessURLs/OnlineAccessURL/URL", default=None),
+        'browse': get_browse_urls(granule, './AssociatedBrowseImageUrls'),
+        'shape': shape,
+        'sarSceneId': 'NA',  # always None in API
+        'product_file_id': get_val("./GranuleUR", default=None),
+        'sceneId': get_val("./DataGranule/ProducerGranuleId", default=None),
+        'firstFrame': get_attr('CENTER_ESA_FRAME'),
+        'frequency': 'NA',  # always None in API
+        'catSceneId': 'NA',  # always None in API
+        'status': 'NA',  # always None in API
+        'formatName': 'NA',  # always None in API
+        'incidenceAngle': 'NA',  # always None in API
+        'collectionName': get_attr('MISSION_NAME'),
+        'sceneDateString': 'NA',  # always None in API
+        'groupID': get_attr('GROUP_ID'),
     }
 
     for k in result:
@@ -130,11 +127,15 @@ def parse_granule(granule):
 
     return result
 
-def get_val(dictionary, keys, default=None):
+
+def attr(name):
     """
-    For picking out directly-locatable properties using an xmlpath-like approach with defaults along the way
+    Convenience method for handling echo10 additional attributes
     """
-    return reduce(lambda d, key: d.get(key, default) if isinstance(d, dict) else d[int(key.strip('[]'))] if isinstance(d, list) else default, keys.split("/"), dictionary)
+    return (
+        "./AdditionalAttributes/AdditionalAttribute"
+        f"[Name='{name}']/Values/Value"
+    )
 
 
 def wkt_from_gpolygon(gpoly):
@@ -144,10 +145,10 @@ def wkt_from_gpolygon(gpoly):
     shapes = []
     for g in gpoly:
         shapes.append([])
-        for point in get_val(g, 'Boundary/Points'):
+        for point in g.iter('Point'):
             shapes[-1].append({
-                'lon': point.get('Longitude', 0.0), # Use a default that'll still "work"
-                'lat': point.get('Latitude', 0.0)
+                'lon': point.findtext('PointLongitude'),
+                'lat': point.findtext('PointLatitude')
             })
 
         if shape_not_closed(shapes):
