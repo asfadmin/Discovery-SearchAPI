@@ -14,22 +14,7 @@ from werkzeug.exceptions import RequestEntityTooLarge
 import time
 import importlib
 
-# GLOBALS:
-project_root = os.path.dirname(os.path.abspath(__file__))
-bulk_download_repo = "Discovery-BulkDownload"
-utils_api_repo = "Discovery-UtilsAPI"
-
-# Submodule imports:
-sys.path.append(os.path.join(project_root, bulk_download_repo))
-BulkDownloadAPI = importlib.import_module("APIBulkDownload")
-sys.path.remove(os.path.join(project_root, bulk_download_repo))
-
-sys.path.append(os.path.join(project_root, utils_api_repo))
-FilesToWKT = importlib.import_module("FilesToWKT")
-WKTValidator = importlib.import_module("WKTValidator")
-DateValidator = importlib.import_module("DateValidator")
-MissionList = importlib.import_module("MissionList")
-sys.path.remove(os.path.join(project_root, utils_api_repo))
+import endpoints
 
 # EB looks for an 'application' callable by default.
 application = Flask(__name__)
@@ -99,7 +84,7 @@ def validate_date():
 # Convert a set of shapefiles or a geojson file to WKT
 @application.route('/services/utils/files_to_wkt', methods = ['POST'])
 def filesToWKT():
-    return FilesToWKT.FilesToWKT(request).get_response()
+    return FilesToWKT_Endpoint.get_response()
 
 # Collect a list of missions from CMR for a given platform
 @application.route('/services/utils/mission_list', methods = ['GET', 'POST'])
