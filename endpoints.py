@@ -1,10 +1,14 @@
 import requests
 from flask import Response
+import json
 import api_headers
+import logging
 
-# Note to self: Make sure you run 'pip install git+ssh://git@github.com/asfadmin/Discovery-UtilsAPI.git' first!
-from UtilsAPI import FilesToWKT
+from UtilsAPI import FilesToWKT, RepairWKT, MissionList
+from CMR.Input import parse_date
 
+
+########################################################
 class FilesToWKT_Endpoint:
     def __init__(self, request):
         # Find out if the user passed us files:
@@ -14,18 +18,95 @@ class FilesToWKT_Endpoint:
             self.files = None
 
     def get_response(self):
-        if self.files == None:
-            return {'errors': [{'type': 'POST', 'report': "Could not find 'files' in post request."}]}
-
         d = api_headers.base(mimetype='application/json')
         resp_dict = self.make_response()
-        # ###### For backwards compatibility ######################
-        # if "parsed wkt" in resp_dict:                           #
-        #     repaired_json = repairWKT(resp_dict["parsed wkt"])  #
-        #     for key, val in repaired_json.items():              #
-        #         resp_dict[key] = val                            #
-        # #########################################################
+        ###### For backwards compatibility ######################
+        if "parsed wkt" in resp_dict:                           #
+            repaired_json = RepairWKT.repairWKT(resp_dict["parsed wkt"])  #
+            for key, val in repaired_json.items():              #
+                resp_dict[key] = val                            #
+        #########################################################
         return Response(json.dumps(resp_dict, sort_keys=True, indent=4), 200, headers=d)
 
     def make_response(self):
-        return FilesToWKT(self.files)
+        if self.files == None:
+            return {'errors': [{'type': 'POST', 'report': "Could not find 'files' in post request."}]}
+        return FilesToWKT.FilesToWKT(self.files)
+
+
+########################################################
+class RepairWKT_Endpoint:
+    def __init__(self, request):
+        if 'wkt' in request.values:
+            self.wkt = request.values["wkt"].upper()
+        else:
+            self.wkt = None
+
+    def get_response(self):
+        d = api_headers.base(mimetype='application/json')
+        resp_dict = self.make_response()
+        return Response(json.dumps(resp_dict, sort_keys=True, indent=4), 200, headers=d)
+
+    def make_response(self):
+        if self.wkt == None:
+            return {'errors': [{'type': 'POST', 'report': "Could not find 'wkt' in post request."}] }
+        else:
+            return RepairWKT.repairWKT(self.wkt)
+
+
+########################################################
+class DateValidator_Endpoint:
+    def __init__(self, request):
+        if 'date' in request.values:
+            self.date = request.values['date']
+        else:
+            self.date = None
+
+    def get_response(self):
+        d = api_headers.base(mimetype='application/json')
+        resp_dict = self.make_response()
+        return Response(json.dumps(resp_dict, sort_keys=True, indent=4), 200, headers=d)
+
+    def make_response(self):
+        if self.date == None:
+            return {'errors': [{'type': 'POST', 'report': "Could not find 'date' in post request."}]}
+        try:
+            date = parse_date(self.date)
+            logging.debug(date)
+        except ValueError as e:
+            return {'errors': [{'type': 'VALUE', 'report': 'Could not parse date: {0}'.format(str(e))}]}
+        return {'date': {'original': self.date, 'parsed': date}}
+
+
+########################################################
+class MissionList_Endpoint:
+    def __init__(self, request):
+        if 'platform' in self.request.values:
+            self.platform = self.request.values['platform'].upper()
+        else:
+            self.platform = None
+
+    def get_response(self):
+        d = api_headers.base(mimetype='application/json')
+        resp_dict = self.make_response()
+        return Response(json.dumps(resp_dict, sort_keys=True, indent=4), 200, headers=d)
+
+    def make_response(self):
+        if self.platform == None:
+            return {'errors': [{'type': 'POST', 'report': "Could not find 'platform' in post request."}]}
+        # Setup data for request.
+        data = {
+            'include_facets': 'true',
+            'provider': 'ASF'
+        }
+        if self.platform == 'UAVSAR':
+            data['platform[]'] = 'G-III'
+            data['instrument[]'] = 'UAVSAR'
+        elif self.platform == 'AIRSAR':
+            data['platform[]'] = 'DC-8'
+            data['instrument[]'] = 'AIRSAR'
+        elif self.platform == 'SENTINEL-1 INTERFEROGRAM (BETA)':
+            data['platform[]'] = 'SENTINEL-1A'
+        else:
+            data['platform[]'] = self.platform
+        return MissionList.getMissions(data)
