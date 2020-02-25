@@ -74,22 +74,22 @@ def get_script():
 # Validate and/or repair a WKT to ensure it meets CMR's requirements
 @application.route('/services/utils/wkt', methods = ['GET', 'POST'])
 def validate_wkt():
-    return WKTValidator.WKTValidator(request).get_response()
+    return endpoints.RepairWKT_Endpoint(request).get_response()
 
 # Validate a date to ensure it meets our requirements
 @application.route('/services/utils/date', methods = ['GET', 'POST'])
 def validate_date():
-    return DateValidator.DateValidator(request).get_response()
+    return endpoints.DateValidator_Endpoint(request).get_response()
 
 # Convert a set of shapefiles or a geojson file to WKT
 @application.route('/services/utils/files_to_wkt', methods = ['POST'])
 def filesToWKT():
-    return FilesToWKT_Endpoint.get_response()
+    return endpoints.FilesToWKT_Endpoint(request).get_response()
 
 # Collect a list of missions from CMR for a given platform
 @application.route('/services/utils/mission_list', methods = ['GET', 'POST'])
 def missionList():
-    return MissionList.MissionList(request).get_response()
+    return endpoints.MissionList_Endpoint(request).get_response()
 
 # Fetch and convert the results from CMR
 @application.route('/services/search/param', methods = ['GET', 'POST'])
