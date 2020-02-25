@@ -7,15 +7,25 @@ env:
     VENV: "search-api-venv"
 
 phases:
+  build:
+    commands:
+      - python -m venv ${VENV}
+      - . ./${VENV}/bin/activate
+      - pip install -r requirements.txt
+version: 0.2
+
+env:
+  parameter-store:
+    build_ssh_key: "build_ssh_key"
+  variables:
+    VENV: "search-api-venv"
+
+phases:
   pre_build:
     commands:
-      - ls -al
-      - pip list
-      - echo $VENV
-      - ls -l ./${VENV}/bin/activate
+      - python -m venv ${VENV}
       - . ./${VENV}/bin/activate
-      - pip -V
-      - pip list
+      - pip install -r requirements.txt
   build:
     commands:
       - zappa update ${MATURITY}
