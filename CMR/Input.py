@@ -163,4 +163,4 @@ def parse_point_string(v):
 # NOTE: If given an empty ("POINT EMPTY") shape, will return "point:". Should it throw instead?
 def parse_wkt(v):
     # The utils library needs this function for repairWKT.
-    return parse_wkt_to_cmr(v)
+    return parse_wkt_util(v)
