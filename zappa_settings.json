@@ -1,5 +1,5 @@
 {
-    "dev": {
+    "devel": {
         "app_function": "application.application",
         "aws_region": "us-east-1",
         "project_name": "discovery-search-api",
