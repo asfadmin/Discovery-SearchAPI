@@ -1,0 +1,16 @@
+version: 0.2
+
+env:
+  parameter-store:
+    build_ssh_key: "build_ssh_key"
+  variables:
+    ENV: "search-api"
+
+phases:
+  post_build:
+    commands:
+      - ls -al
+      - pip list
+      - echo $ENV
+      - . ./${ENV}/bin/activate
+      - zappa update ${MATURITY}

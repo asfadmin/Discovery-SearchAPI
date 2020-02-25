@@ -3,9 +3,13 @@ version: 0.2
 env:
   parameter-store:
     build_ssh_key: "build_ssh_key"
+  variables:
+    ENV: "search-api"
 
 phases:
   install:
+    runtime-versions:
+      python: 3.7
     commands:
       - mkdir -p ~/.ssh
       - echo "$build_ssh_key" > ~/.ssh/id_rsa
@@ -15,17 +19,13 @@ phases:
       - |
         if [ ! -d ".git" ]; then
           git init                                              # Initialize Git
-          git remote add origin "$REPO_URL"                     # Add the remote origin so we can fetch
+          git remote add origin $REPO_URL                       # Add the remote origin so we can fetch
           git fetch                                             # Get all the things
           git checkout -f "$CODEBUILD_RESOLVED_SOURCE_VERSION"  # Checkout the specific commit we are building
         fi
       - git submodule init
       - git submodule update --recursive
       - echo "{\"version\":\"$CODEBUILD_RESOLVED_SOURCE_VERSION\"}" > version.json
-  build:
-    commands:
-      - echo 'No build steps required'
-
 artifacts:
   files:
     - '**/*'

@@ -1,0 +1,17 @@
+version: 0.2
+
+env:
+  parameter-store:
+    build_ssh_key: "build_ssh_key"
+  variables:
+    ENV: "search-api"
+
+phases:
+  build:
+    commands:
+      - python -m venv ${ENV}
+      - . ./${ENV}/bin/activate
+      - pip install -r requirements.txt
+artifacts:
+  files:
+    - '**/*'
