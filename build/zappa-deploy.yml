@@ -7,7 +7,9 @@ env:
     VENV: "search-api-venv"
 
 phases:
-  pre_build:
+  install:
+    runtime-versions:
+      python: 3.7
     commands:
       - python -m venv ${VENV}
       - . ./${VENV}/bin/activate
