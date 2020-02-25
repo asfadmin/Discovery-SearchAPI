@@ -8,6 +8,8 @@ env:
 
 phases:
   pre_build:
+    runtime-versions:
+      python: 3.7
     commands:
       - python -m venv ${VENV}
       - . ./${VENV}/bin/activate
