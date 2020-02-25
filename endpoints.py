@@ -31,7 +31,7 @@ class FilesToWKT_Endpoint:
     def make_response(self):
         if self.files == None:
             return {'errors': [{'type': 'POST', 'report': "Could not find 'files' in post request."}]}
-        return FilesToWKT.FilesToWKT(self.files)
+        return FilesToWKT.FilesToWKT(self.files).getWKT()
 
 
 ########################################################
