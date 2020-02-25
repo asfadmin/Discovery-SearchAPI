@@ -13,4 +13,5 @@ phases:
       - pip list
       - echo $ENV
       - . ./${ENV}/bin/activate
+      - pip list
       - zappa update ${MATURITY}
