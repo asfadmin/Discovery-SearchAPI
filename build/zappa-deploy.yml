@@ -4,14 +4,18 @@ env:
   parameter-store:
     build_ssh_key: "build_ssh_key"
   variables:
-    ENV: "search-api"
+    VENV: "search-api-venv"
 
 phases:
-  post_build:
+  pre_build:
     commands:
       - ls -al
       - pip list
-      - echo $ENV
-      - . ./${ENV}/bin/activate
+      - echo $VENV
+      - ls -l ./${VENV}/bin/activate
+      - . ./${VENV}/bin/activate
+      - pip -V
       - pip list
+  build:
+    commands:
       - zappa update ${MATURITY}
