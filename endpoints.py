@@ -20,12 +20,12 @@ class FilesToWKT_Endpoint:
     def get_response(self):
         d = api_headers.base(mimetype='application/json')
         resp_dict = self.make_response()
-        ###### For backwards compatibility ######################
-        if "parsed wkt" in resp_dict:                           #
-            repaired_json = RepairWKT.repairWKT(resp_dict["parsed wkt"])  #
-            for key, val in repaired_json.items():              #
-                resp_dict[key] = val                            #
-        #########################################################
+        ###### For backwards compatibility #################################
+        if "parsed wkt" in resp_dict:                                      #
+            repaired_json = RepairWKT.repairWKT(resp_dict["parsed wkt"])   #
+            for key, val in repaired_json.items():                         #
+                resp_dict[key] = val                                       #
+        ####################################################################
         return Response(json.dumps(resp_dict, sort_keys=True, indent=4), 200, headers=d)
 
     def make_response(self):
@@ -81,8 +81,8 @@ class DateValidator_Endpoint:
 ########################################################
 class MissionList_Endpoint:
     def __init__(self, request):
-        if 'platform' in self.request.values:
-            self.platform = self.request.values['platform'].upper()
+        if 'platform' in request.values:
+            self.platform = request.values['platform'].upper()
         else:
             self.platform = None
 
@@ -92,21 +92,22 @@ class MissionList_Endpoint:
         return Response(json.dumps(resp_dict, sort_keys=True, indent=4), 200, headers=d)
 
     def make_response(self):
-        if self.platform == None:
-            return {'errors': [{'type': 'POST', 'report': "Could not find 'platform' in post request."}]}
         # Setup data for request.
         data = {
             'include_facets': 'true',
             'provider': 'ASF'
         }
-        if self.platform == 'UAVSAR':
-            data['platform[]'] = 'G-III'
-            data['instrument[]'] = 'UAVSAR'
-        elif self.platform == 'AIRSAR':
-            data['platform[]'] = 'DC-8'
-            data['instrument[]'] = 'AIRSAR'
-        elif self.platform == 'SENTINEL-1 INTERFEROGRAM (BETA)':
-            data['platform[]'] = 'SENTINEL-1A'
-        else:
-            data['platform[]'] = self.platform
+        # If you set a platform:
+        if self.platform != None:
+            if self.platform == 'UAVSAR':
+                data['platform[]'] = 'G-III'
+                data['instrument[]'] = 'UAVSAR'
+            elif self.platform == 'AIRSAR':
+                data['platform[]'] = 'DC-8'
+                data['instrument[]'] = 'AIRSAR'
+            elif self.platform == 'SENTINEL-1 INTERFEROGRAM (BETA)':
+                data['platform[]'] = 'SENTINEL-1A'
+            else:
+                data['platform[]'] = self.platform
         return MissionList.getMissions(data)
+
