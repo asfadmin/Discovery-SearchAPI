@@ -2,6 +2,7 @@ from flask import Flask, make_response
 from flask import request
 from flask import Response
 from flask_compress import Compress
+from flask_talisman import Talisman
 from APIProxy import APIProxyQuery
 from urllib import parse
 import sys
@@ -19,6 +20,7 @@ import endpoints
 # EB looks for an 'application' callable by default.
 application = Flask(__name__)
 Compress(application)
+Talisman(application, content_security_policy=None)
 application.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024 # limit to 10 MB, primarily affects file uploads
 
 ########## Bulk Download API endpoints and support ##########
@@ -163,7 +165,7 @@ def postflight(exc):
 # Run a dev server
 if __name__ == '__main__':
     if 'MATURITY' not in os.environ:
-        os.environ['MATURITY'] = 'dev'
+        os.environ['MATURITY'] = 'devel'
     sys.dont_write_bytecode = True  # prevent clutter
     application.debug = True        # enable debugging mode
     FORMAT = "[%(filename)18s:%(lineno)-4s - %(funcName)18s() ] %(message)s"

@@ -5,7 +5,7 @@ def get_config():
     if 'MATURITY' not in os.environ.keys():
         logging.warning('os.environ[\'MATURITY\'] not set! Defaulting to prod config.]')
     return {
-        'dev': {
+        'devel': {
             'bulk_download_api': 'https://bulk-download.asf.alaska.edu',
             'analytics_id': 'UA-118881300-4',
             'cmr_base': 'https://cmr.uat.earthdata.nasa.gov',
