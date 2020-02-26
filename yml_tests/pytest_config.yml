@@ -33,7 +33,13 @@ test_types:
     method: test_FilesToWKTEndpoint
     variables:
       endpoint: "services/utils/files_to_wkt"
-      
+
+- Mission List Endpoint:
+    required_keys: misson_list_size_min
+    method: test_MissionListEndpoint
+    variables:
+      endpoint: "/services/utils/mission_list"
+
 - Get Data from API:
     required_keys: Null
     method: test_URLManagerSearch
