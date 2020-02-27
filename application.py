@@ -32,11 +32,10 @@ DateValidator = importlib.import_module("DateValidator")
 MissionList = importlib.import_module("MissionList")
 sys.path.remove(os.path.join(project_root, utils_api_repo))
 
-# EB looks for an 'application' callable by default.
 application = Flask(__name__)
-Compress(application)
-talisman = Talisman(application, content_security_policy=None)
 application.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024 # limit to 10 MB, primarily affects file uploads
+Compress(application)
+talisman = Talisman(application)
 
 ########## Bulk Download API endpoints and support ##########
 config = {
