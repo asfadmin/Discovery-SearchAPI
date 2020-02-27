@@ -3,6 +3,7 @@ from flask import request
 from flask import Response
 from flask_compress import Compress
 from flask_talisman import Talisman
+from flask_cors import CORS
 from APIProxy import APIProxyQuery
 from urllib import parse
 import sys
@@ -32,11 +33,11 @@ DateValidator = importlib.import_module("DateValidator")
 MissionList = importlib.import_module("MissionList")
 sys.path.remove(os.path.join(project_root, utils_api_repo))
 
-# EB looks for an 'application' callable by default.
 application = Flask(__name__)
-Compress(application)
-talisman = Talisman(application, content_security_policy=None)
 application.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024 # limit to 10 MB, primarily affects file uploads
+CORS(application)
+Compress(application)
+talisman = Talisman(application)
 
 ########## Bulk Download API endpoints and support ##########
 config = {
@@ -154,29 +155,6 @@ def preflight():
     #request.asf_start_proc_time = time.process_time()
     #request.asf_start_real_time = time.perf_counter()
     analytics_pageview()
-
-# Cleanup operations
-@application.after_request
-def add_header(response):
-    response.headers['Access-Control-Allow-Origin'] = '*'
-    return response
-
-'''
-@application.teardown_request
-def postflight(exc):
-    try:
-        if exc is not None:
-            logging.error('Postflight handler encountered exception: {0}'.format(exc))
-        end_proc_time = time.process_time()
-        total_proc_time = end_proc_time - request.asf_start_proc_time
-        end_real_time = time.perf_counter()
-        total_real_time = end_real_time - request.asf_start_real_time
-        #if total_proc_time / total_real_time > .5 or total_real_time > 10:
-        # process time (s), real time (s), proc/real time ratio, URL, params
-        logging.warning('Request timing analysis: {0}, {1}, {2}, {3}, {4}'.format(total_proc_time, total_real_time, total_proc_time / total_real_time, request.url, request.values))
-    except Exception as e:
-        logging.error('Exception encountered in postflight handler: {0}'.format(e))
-'''
 
 # Run a dev server
 if __name__ == '__main__':
