@@ -35,7 +35,7 @@ sys.path.remove(os.path.join(project_root, utils_api_repo))
 # EB looks for an 'application' callable by default.
 application = Flask(__name__)
 Compress(application)
-Talisman(application, content_security_policy=None)
+talisman = Talisman(application, content_security_policy=None)
 application.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024 # limit to 10 MB, primarily affects file uploads
 
 ########## Bulk Download API endpoints and support ##########
@@ -122,6 +122,7 @@ def proxy_search_without_stream():
 
 # Health check endpoint
 @application.route('/health')
+@talisman(force_https=False)
 def health_check():
     try:
         with open('version.json') as version_file:
