@@ -45,3 +45,9 @@ test_types:
     method: test_URLManagerSearch
     variables:
       endpoint: services/search/param?
+
+- Date Parser Endpoint:
+    required_keys: date
+    method: test_DateParserEndpoint
+    variables:
+      endpoint: "/services/utils/date"
