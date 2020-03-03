@@ -1,5 +1,4 @@
 import requests, urllib     # For talking w/ API
-import pytest, warnings     # Tests stuff
 import json, csv            # File stuff
 import re                   # Opening/Reading the file stuff
 from io import StringIO     # Opening/Reading the file stuff
@@ -140,7 +139,7 @@ class test_URL_Manager():
             # They return a number in the html. Convert to a real int:
             try:
                 file_content = countToDict(file_content)
-            except ValueError as e:
+            except ValueError:
                 assert False, "API returned html that was not a count. Test: {0}. URL: {1}.\nHTML Page: \n{2}\n".format(title, self.query, file_content)
             if file_content["count"] == 0:
                 content_type = "blank count"
@@ -296,7 +295,7 @@ class test_URL_Manager():
                 else: # Else they both are a single date. Not sure if this is needed, but...
                     earlier_date = convertTimezoneUTC(earlier_date)
                     later_date = convertTimezoneUTC(later_date)
-                    later_date >= earlier_date, "Date: {0} is earlier than date {1}. Test: '{2}'".format(later_date, earlier_date, title)
+                    assert later_date >= earlier_date, "Date: {0} is earlier than date {1}. Test: '{2}'".format(later_date, earlier_date, title)
 
             def checkSeason(title, file_start_dates, file_end_dates, season_list):
                 def date_to_nth_day(date):

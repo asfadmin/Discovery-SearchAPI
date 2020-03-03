@@ -1,6 +1,6 @@
 import dateparser
 import re
-from geomet import wkt, InvalidGeoJSONException
+from geomet import wkt
 from UtilsAPI.Input import parse_wkt_util, parse_date_util
 
 # Parse and validate a string: "abc"
