@@ -14,7 +14,7 @@ class test_date_parser():
         url_parts = [test_api, test_vars["endpoint"]]
         self.full_url = '/'.join(s.strip('/') for s in url_parts) # If both/neither have '/' between them, this still joins them correctly
         if "date" in test_info:
-        	self.full_url += "?date=" + test_info["date"]
+            self.full_url += "?date=" + test_info["date"]
         self.test_info = test_info
 
         response_json = self.makeRequest()
@@ -22,9 +22,9 @@ class test_date_parser():
         self.runAssertTests(response_json)
 
     def makeRequest(self):
-    	r = requests.get(self.full_url)
-    	content = r.content.decode("utf-8")
-    	content_type = h.headers.get('content-type').split("/")[1]
+        r = requests.get(self.full_url)
+        content = r.content.decode("utf-8")
+        content_type = h.headers.get('content-type').split("/")[1]
 
         if content_type == "json":
             file_conf = json.loads(file_conf)
