@@ -1,6 +1,9 @@
 from .input_map import input_map
 
 from CMR.Output import output_translators
+import json
+import requests
+from asf_env import get_config
 
 
 def translate_params(p):
@@ -9,13 +12,22 @@ def translate_params(p):
     """
     params = {}
 
-    for k in p:
-        if k.lower() not in input_map():
-            raise ValueError(f'Unsupported parameter: {k}')
+    for key in p:
+        val = p[key]
+        key = key.lower()
+        if key not in input_map():
+            raise ValueError(f'Unsupported parameter: {key}')
+        if key == 'intersectswith': # Gotta catch this suuuuper early
+            s = requests.Session()
+            repair_params = dict({'wkt': val})
+            response = json.loads(s.post(get_config()['this_api']+'/services/utils/wkt', data=repair_params).text)
+            if 'error' in response:
+                raise ValueError('Could not repair WKT: {0}'.format(val))
+            val = response['wkt']['wrapped']
         try:
-            params[k.lower()] = input_map()[k.lower()][2](p[k])
-        except ValueError as e:
-            raise ValueError(f'{k}: {e}')
+            params[key] = input_map()[key][2](val)
+        except ValueError as exc:
+            raise ValueError(f'{key}: {exc}')
 
     # be nice to make this not a special case
     output = 'metalink'
