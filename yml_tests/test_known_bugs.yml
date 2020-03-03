@@ -105,11 +105,11 @@ tests:
     expected code: 200
 
 
-tests:
-- Known bug - Inject urls:
-    account: FullAccess
-    inject_output: HACKED
-    products: http://IHopeThisURLDoesntExist.com/rando1.png%22%20]%0A%20%20%20%20%20%20%20%20print(%22HACKED%22)%0A%20%20%20%20%20%20%20%20[%20%221
-    expected_outcome: success
-    skip_file_check: True
-    # print: True
+# tests:
+# - Known bug - Inject urls:
+#     account: FullAccess
+#     inject_output: HACKED
+#     products: http://IHopeThisURLDoesntExist.com/rando1.png%22%20]%0A%20%20%20%20%20%20%20%20print(%22HACKED%22)%0A%20%20%20%20%20%20%20%20[%20%221
+#     expected_outcome: success
+#     skip_file_check: True
+#     # print: True
