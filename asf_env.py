@@ -6,7 +6,7 @@ def get_config():
         logging.warning('os.environ[\'MATURITY\'] not set! Defaulting to prod config.]')
     return {
         'local': {
-            'this_api': 'http://local.asf.alaska.edu',
+            'this_api': 'http://local.asf.alaska.edu:5000',
             'bulk_download_api': 'https://bulk-download.asf.alaska.edu',
             'analytics_id': None,
             'cmr_base': 'https://cmr.earthdata.nasa.gov',
