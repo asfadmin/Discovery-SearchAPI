@@ -40,8 +40,15 @@ test_types:
     variables:
       endpoint: "/services/utils/mission_list"
 
+- Date Parser Endpoint:
+    required_keys: date
+    method: test_DateParserEndpoint
+    variables:
+      endpoint: "/services/utils/date"
+
 - Get Data from API:
     required_keys: Null
     method: test_URLManagerSearch
     variables:
       endpoint: services/search/param?
+
