@@ -2,7 +2,7 @@ api: Test
 
 tests:
 - blank date:
-    date:
+    date: ""
     expected file: error json
     expected code: 200
     expected error: could not parse date

@@ -17,26 +17,38 @@ class test_date_parser():
             self.full_url += "?date=" + test_info["date"]
         self.test_info = test_info
 
-        response_json = self.makeRequest()
-
+        (status_code, content_type, content) = self.makeRequest()
+        self.applyDefaultValues()
         self.runAssertTests(response_json)
 
     def makeRequest(self):
         r = requests.get(self.full_url)
+        h = requests.head(self.full_url)
         content = r.content.decode("utf-8")
         content_type = h.headers.get('content-type').split("/")[1]
 
         if content_type == "json":
-            file_conf = json.loads(file_conf)
-            if "error" in file_conf:
+            content = json.loads(content)
+            if "error" in content:
                 content_type = "error json"
-            elif "parsed" in file_conf:
-                content_type = jsonlite
-                file_conf
 
-        return r.status_code, content_type, file_conf
 
-    def runAssertTests(self, response_json):
+        return r.status_code, content_type, content
+
+    def applyDefaultValues(self):
+        if "expected date" in self.test_info:
+            if "expected file" not in self.test_info:
+                self.test_info["expected file"] = "json"
+            if "expected code" not in self.test_info:
+                self.test_info["expected code"] = 200
+        if "expected error" in self.test_info:
+            if "expected file" not in self.test_info:
+                self.test_info["expected file"] = "error json"
+            if "expected code" not in self.test_info:
+                self.test_info["expected code"] = 200
+
+    def runAssertTests(self, status_code, content_type, content):
+
         if "expected error" in test_info:
             if "error" in file_conf:
                 assert test_info["expected error"].lower() in str(file_conf).lower(), "API returned a different error than expected. Test: '{0}'.".format(test_info["title"])
