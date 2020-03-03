@@ -144,7 +144,7 @@ def preflight():
 # Run a dev server
 if __name__ == '__main__':
     if 'MATURITY' not in os.environ:
-        os.environ['MATURITY'] = 'devel'
+        os.environ['MATURITY'] = 'local'
     sys.dont_write_bytecode = True  # prevent clutter
     application.debug = True        # enable debugging mode
     FORMAT = "[%(filename)18s:%(lineno)-4s - %(funcName)18s() ] %(message)s"
