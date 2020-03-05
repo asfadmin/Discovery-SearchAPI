@@ -20,6 +20,7 @@ def get_stack(master):
 
     # totally faking perpendicular baseline data for the moment, come at me bro
     for product in stack['results']:
+        random.seed(product['gn']) # lol
         product['pb'] = 0 if product['gn'] == master else random.randrange(-500, 500)
 
     if len(stack['warnings']) <= 0:
