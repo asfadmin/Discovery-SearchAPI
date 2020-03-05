@@ -82,7 +82,12 @@ def tweak_stack_params(params):
     def tweak_sentinel(params):
         #del params['frame'] # questionable; proof of concept used spatial AoI matching
         del params['offNadirAngle']
-        del params['polarization'] # FIXME: too loose
+        if params['polarization'] in ['HH', 'HH+HV']:
+            params['polarization'] = 'HH,HH+HV'
+        elif params['polarization'] in ['VV', 'VV+VH']:
+            params['polarization'] = 'VV,VV+VH'
+        f = params['frame']
+        params['frame'] = f'{f-2}-{f+2}' # FIXME: OG proof of concept used masster as AoI, look into that
         params['dataset'] = 'S1' # Use the API's multi-dataset alias for S1/S2 tandem stacks
         return params
 
