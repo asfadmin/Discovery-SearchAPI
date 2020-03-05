@@ -18,6 +18,14 @@ import importlib
 
 import endpoints
 
+
+project_root = os.path.dirname(os.path.abspath(__file__))
+bulk_download_repo = "Discovery-BulkDownload"
+# Submodule imports:
+sys.path.append(os.path.join(project_root, bulk_download_repo))
+BulkDownloadAPI = importlib.import_module("APIBulkDownload")
+sys.path.remove(os.path.join(project_root, bulk_download_repo))
+
 application = Flask(__name__)
 application.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024 # limit to 10 MB, primarily affects file uploads
 CORS(application)

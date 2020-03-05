@@ -24,6 +24,7 @@ To get started with a local instance for development:
 4. Use pip to install requirements:
 ```
 (ProxyAPI-env) ~$ pip install -r requirements.txt
+(ProxyAPI-env) ~$ pip install git+ssh://git@github.com/asfadmin/Discovery-Utils.git@prod --upgrade
 ```
 
   - At the time of this writing, in some situations you may encounter an SSL certificate error. If that happens, re-install pip using the following command and try step 4 again:
