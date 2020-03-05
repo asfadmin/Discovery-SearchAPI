@@ -4,7 +4,8 @@ from flask import Response
 from flask_compress import Compress
 from flask_talisman import Talisman
 from flask_cors import CORS
-from APIProxy import APIProxyQuery
+from SearchQuery import APISearchQuery
+from StackQuery import APIStackQuery
 from urllib import parse
 import sys
 import logging
@@ -105,11 +106,15 @@ def missionList():
 # Fetch and convert the results from CMR
 @application.route('/services/search/param', methods = ['GET', 'POST'])
 def proxy_search():
-    return APIProxyQuery(request, should_stream=True).get_response()
+    return APISearchQuery(request, should_stream=True).get_response()
 
 @application.route('/services/load/param', methods = ['GET', 'POST'])
 def proxy_search_without_stream():
-    return APIProxyQuery(request, should_stream=False).get_response()
+    return APISearchQuery(request, should_stream=False).get_response()
+
+@application.route('/services/search/baseline', methods = ['GET', 'POST'])
+def stack_search():
+    return APIStackQuery(request).get_response()
 
 
 ########## General endpoints ##########
