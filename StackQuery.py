@@ -22,7 +22,7 @@ class APIStackQuery:
         except ValueError as e:
             return self.validation_error(e)
 
-        resp = json.dumps(get_stack(self.params['master']), indent=2, sort_keys=True)
+        resp = json.dumps(get_stack(self.params['master']))
 
         filename = make_filename('json')
         d = api_headers.base('application/json; charset=utf-8')

@@ -8,7 +8,7 @@ from asf_env import get_config
 
 def get_stack(master):
     stack_params = get_stack_params(master)
-    stack_params['output'] = 'jsonlite'
+    stack_params['output'] = 'jsonlite2'
     s = requests.Session()
     url = get_config()['this_api'] + '/services/load/param'
     stack = json.loads(s.post(url, data=stack_params).text)
@@ -20,7 +20,7 @@ def get_stack(master):
 
     # totally faking perpendicular baseline data for the moment, come at me bro
     for product in stack['results']:
-        product['perpendicular_baseline'] = 0 if product['granuleName'] == master else random.randrange(-500, 500)
+        product['pb'] = 0 if product['gn'] == master else random.randrange(-500, 500)
 
     if len(stack['warnings']) <= 0:
         del stack['warnings']
@@ -114,20 +114,20 @@ def rename_stack_params(params):
     return renamed_params
 
 def check_master(master, stack):
-    if master not in [product['granuleName'] for product in stack['results']]:
-        master = stack[0]['granuleName']
+    if master not in [product['gn'] for product in stack['results']]:
+        master = stack[0]['gn']
         stack['warnings'].append({'NEW_MASTER': f'A new master had to be selected in order to calculate baseline values: {master}'})
     return master, stack
 
 def calculate_temporal_baselines(master, stack):
     for product in stack:
-        if product['granuleName'] == master:
-            master_start = dateparser.parse(product['startTime'])
+        if product['gn'] == master:
+            master_start = dateparser.parse(product['st'])
             break
     for product in stack:
-        if product['granuleName'] == master:
-            product['temporal_baseline'] = 0
+        if product['gn'] == master:
+            product['tb'] = 0
         else:
-            start = dateparser.parse(product['startTime'])
-            product['temporal_baseline'] = (start - master_start).days
+            start = dateparser.parse(product['st'])
+            product['tb'] = (start - master_start).days
     return stack
