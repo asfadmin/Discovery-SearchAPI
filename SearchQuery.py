@@ -12,7 +12,7 @@ from CMR.Exceptions import CMRError
 from Analytics import analytics_events
 
 
-class APIProxyQuery:
+class APISearchQuery:
 
     def __init__(self, request, should_stream=True):
         self.request = request
