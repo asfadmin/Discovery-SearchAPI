@@ -37,7 +37,7 @@ class APIStackQuery:
         valid_params = ['master', 'output']
         if get_config()['flexible_maturity']:
             valid_params.append('maturity')
-
+        
         params = {}
         try:
             for k in self.request.values:
