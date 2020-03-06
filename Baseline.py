@@ -5,8 +5,6 @@ import dateparser
 from flask import request
 import random
 
-from asf_env import get_config
-
 def get_stack(master):
     try:
         stack_params = get_stack_params(master)
