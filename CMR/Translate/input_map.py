@@ -5,12 +5,13 @@ from CMR.Input import (
     parse_coord_string, parse_bbox_string, parse_point_string
 )
 
+from asf_env import get_config
 
 def input_map():
     """
     Supported input parameters and their associated CMR parameters
     """
-    return {
+    parameter_map = {
 #       API parameter           CMR parameter               CMR format strings                  Parser
         'output':               [None,                      '{0}',                              parse_string],
         'maxresults':           [None,                      '{0}',                              parse_int],
@@ -51,3 +52,9 @@ def input_map():
         'temporal':             ['temporal',                '{0}',                              None], # start/end end up here
         'groupid':              ['attribute[]',             'string,GROUP_ID,{0}',              parse_string_list]
     }
+
+    # So the search endpoint doesn't complain if we use this
+    if get_config()['flexible_maturity']:
+        parameter_map['maturity'] = [None, '{0}', parse_string]
+
+    return parameter_map

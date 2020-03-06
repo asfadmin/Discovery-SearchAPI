@@ -7,7 +7,11 @@ import random
 from asf_env import get_config
 
 def get_stack(master):
-    stack_params = get_stack_params(master)
+    try:
+        stack_params = get_stack_params(master)
+    except ValueError as e:
+        raise e
+
     stack_params['output'] = 'jsonlite2'
     s = requests.Session()
     url = get_config()['this_api'] + '/services/load/param'
@@ -32,6 +36,8 @@ def get_stack_params(master):
     s = requests.Session()
     p = {'granule_list': master, 'output': 'jsonlite'}
     results = json.loads(s.post(url, data=p).text)['results']
+    if len(results) <= 0:
+        raise ValueError(f'Requested master not found: {master}')
 
     stack_params = {
         'beamMode': None,
@@ -57,31 +63,31 @@ def get_stack_params(master):
 # Make dataset-specific adjustments to stack constraints
 def tweak_stack_params(params):
     def tweak_alos(params):
-        del params['beamMode']
-        del params['polarization']
         return params
 
     def tweak_ers(params):
         del params['lookDirection']
         del params['offNadirAngle']
-        del params['polarization']
+
         params['dataset'] = 'ERS' # Use the API's multi-dataset alias for E1/E2 tandem stacks
+
         return params
 
     def tweak_jers(params):
         del params['lookDirection']
         del params['offNadirAngle']
-        del params['polarization']
+
         return params
 
     def tweak_rsat(params):
         del params['offNadirAngle']
-        del params['polarization']
+
         return params
 
     def tweak_sentinel(params):
         #del params['frame'] # questionable; proof of concept used spatial AoI matching
         del params['offNadirAngle']
+
         if params['polarization'] in ['HH', 'HH+HV']:
             params['polarization'] = 'HH,HH+HV'
         elif params['polarization'] in ['VV', 'VV+VH']:
@@ -89,6 +95,7 @@ def tweak_stack_params(params):
         f = params['frame']
         params['frame'] = f'{f-2}-{f+2}' # FIXME: OG proof of concept used masster as AoI, look into that
         params['dataset'] = 'S1' # Use the API's multi-dataset alias for S1/S2 tandem stacks
+
         return params
 
     tweak_map = {
