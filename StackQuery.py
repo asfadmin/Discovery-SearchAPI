@@ -31,7 +31,7 @@ class APIStackQuery:
         return Response(resp, headers=d)
 
     def validate(self):
-        valid_params = ['master']
+        valid_params = ['master', 'output']
         params = {}
         try:
             for k in self.request.values:
