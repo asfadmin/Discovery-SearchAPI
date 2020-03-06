@@ -1,9 +1,9 @@
+from flask import request
 from .input_map import input_map
 
 from CMR.Output import output_translators
 import json
 import requests
-from asf_env import get_config
 
 
 def translate_params(p):
@@ -20,7 +20,9 @@ def translate_params(p):
         if key == 'intersectswith': # Gotta catch this suuuuper early
             s = requests.Session()
             repair_params = dict({'wkt': val})
-            response = json.loads(s.post(get_config()['this_api']+'/services/utils/wkt', data=repair_params).text)
+            if hasattr(request, 'temp_maturity'):
+                repair_params['maturity'] = request.temp_maturity
+            response = json.loads(s.post(request.url_root+'services/utils/wkt', data=repair_params).text)
             if 'error' in response:
                 raise ValueError('Could not repair WKT: {0}'.format(val))
             val = response['wkt']['wrapped']

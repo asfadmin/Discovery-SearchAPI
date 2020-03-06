@@ -2,9 +2,8 @@ import logging
 import requests
 import json
 import dateparser
+from flask import request
 import random
-
-from asf_env import get_config
 
 def get_stack(master):
     try:
@@ -13,8 +12,10 @@ def get_stack(master):
         raise e
 
     stack_params['output'] = 'jsonlite2'
+    if hasattr(request, 'temp_maturity'):
+        stack_params['maturity'] = request.temp_maturity
     s = requests.Session()
-    url = get_config()['this_api'] + '/services/load/param'
+    url = request.url_root + 'services/load/param'
     stack = json.loads(s.post(url, data=stack_params).text)
     stack['warnings'] = []
 
@@ -32,9 +33,11 @@ def get_stack(master):
     return stack
 
 def get_stack_params(master):
-    url = get_config()['this_api'] + '/services/load/param'
+    url = request.url_root + 'services/load/param'
     s = requests.Session()
     p = {'granule_list': master, 'output': 'jsonlite'}
+    if hasattr(request, 'temp_maturity'):
+        p['maturity'] = request.temp_maturity
     results = json.loads(s.post(url, data=p).text)['results']
     if len(results) <= 0:
         raise ValueError(f'Requested master not found: {master}')
