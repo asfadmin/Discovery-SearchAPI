@@ -6,10 +6,18 @@ from flask import request
 import random
 
 def get_stack(master):
+    is_count = request.values.get('output', 'jsonlite2').lower() == 'count'
+
     try:
         stack_params = get_stack_params(master)
     except ValueError as e:
-        raise e
+        if is_count:
+            return 0
+        else:
+            raise e
+
+    if is_count:
+        return 1
 
     stack_params['output'] = 'jsonlite2'
     if hasattr(request, 'temp_maturity'):
