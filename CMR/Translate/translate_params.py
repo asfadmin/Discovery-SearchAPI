@@ -47,4 +47,8 @@ def translate_params(p):
             )
         del params['maxresults']
 
+    # This gets handled during pre-flight
+    if 'maturity' in params:
+        del params['maturity']
+
     return params, output, max_results

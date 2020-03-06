@@ -7,6 +7,7 @@ from datetime import datetime
 import api_headers
 from CMR.Input import parse_string
 from Baseline import get_stack
+from asf_env import get_config
 
 
 class APIStackQuery:
@@ -19,10 +20,12 @@ class APIStackQuery:
         logging.debug(self.request.values)
         try:
             self.validate()
+            stack = get_stack(self.params['master'])
+            resp = json.dumps(stack)
         except ValueError as e:
             return self.validation_error(e)
 
-        resp = json.dumps(get_stack(self.params['master']))
+        resp = json.dumps(stack)
 
         filename = make_filename('json')
         d = api_headers.base('application/json; charset=utf-8')
@@ -32,6 +35,9 @@ class APIStackQuery:
 
     def validate(self):
         valid_params = ['master', 'output']
+        if get_config()['flexible_maturity']:
+            valid_params.append('maturity')
+
         params = {}
         try:
             for k in self.request.values:
