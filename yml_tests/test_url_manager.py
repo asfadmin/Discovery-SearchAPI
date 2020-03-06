@@ -75,7 +75,10 @@ class test_URL_Manager():
 
     def runQuery(self, title):
         def countToDict(html):
-            count = int(html.rstrip())
+            try:
+                count = int(html.rstrip())
+            except ValueError:
+                assert False, "API returned html that was not a count. (Error page?) Test: {0}. URL: {1}.\nHTML Page: \n{2}\n".format(title, self.query, file_content)
             return {"count": count}
 
         def csvToDict(file_content):
@@ -132,15 +135,10 @@ class test_URL_Manager():
         # Take out the "csv; charset=utf-8", without crahsing on things without charset
         content_type = content_type.split(';')[0] if ';' in content_type else content_type
 
-        # print(file_content)
-
         ## COUNT / HTML:
         if content_type == "html":
             # They return a number in the html. Convert to a real int:
-            try:
-                file_content = countToDict(file_content)
-            except ValueError:
-                assert False, "API returned html that was not a count. Test: {0}. URL: {1}.\nHTML Page: \n{2}\n".format(title, self.query, file_content)
+            file_content = countToDict(file_content)
             if file_content["count"] == 0:
                 content_type = "blank count"
             else:
