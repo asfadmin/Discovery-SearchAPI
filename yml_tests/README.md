@@ -34,3 +34,20 @@
   	The test suite automatically checks if the file contains the expected key, if it's a key/file pair it knows how to check for.
   	Current known files: json, jsonlite, download, csv, count
   	Current known keys: Platform, absoluteOrbit, asfframe, granule_list, groupid, flightdirection, offnadirangle, polarization, relativeorbit, collectionname, beammode, processinglevel, flightline, lookdirection, start, end, season
+
+### Yml Keys for DateParser:
+  ---- Input options:
+  	* "date": (Required) Takes anything supported by python's datetime library, including statements like "a day ago".
+  ---- Assert Pass/Fail options:
+  	* "expected date": Right now the value isn't checked. If key is used, test makes sure API returns a valid date. (Problem is what 'today' returns always changes).
+  	* "expected code": Asserts code returned by API is equal to this.
+  	* "expected file": one of "json", or "error json". Verifys value is within error msg returned by api.
+  	* "expected error": Asserts the containing message is in the error returned by the API.
+
+### Yml Keys for MissionList:
+  ---- Input options:
+  	* "platform": Which platform to filter my. (Optional)
+  ---- Assert Pass/Fail options:
+  	* "misson_list_size_min": (Currently required, will change) Asserts the list returned by api is at least this size. 
+  	NOTE: exact size of list returned changes depending if test/prod cmr is used.
+
