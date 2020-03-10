@@ -15,5 +15,4 @@ phases:
       - pip install -r ./requirements.txt
       # Run the full suite:
       - python run_pytest_suites.py -sx --api ${API_URL} --dont-run-file known_failures_test_api --dont-run-file known_bugs
-      - pytest -sx test_mainManager.py --api ${API_URL} --dont-run-file known_failures_test_api --dont-run-file known_bugs
       - echo -e "\n  --- End of Running suites. All tests pass.\n"
