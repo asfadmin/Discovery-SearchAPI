@@ -53,8 +53,8 @@ class test_URL_Manager():
 
     def getKeywords(self, test_info):
         # DONT add these to url. (Used for tester). Add ALL others to allow testing keywords that don't exist
-        reserved_keywords = ["title", "print", "api", "type", "skip_file_check"]
-        asserts_keywords = ["expected file","expected code", "expected in file"]
+        reserved_keywords = ["title", "print", "api", "skip_file_check"]
+        asserts_keywords = ["expected file","expected code"]
 
 
         assert_used = 0 != len([k for k,_ in test_info.items() if k in asserts_keywords])
