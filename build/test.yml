@@ -13,8 +13,6 @@ phases:
     commands:
       # Install the dependancies:
       - pip install -r ./requirements.txt
-      - pytest -sx test_mainManager.py --api ${TmpUrl} --dont-run-file known_failures_test_api --dont-run-file known_bugs
-      # Broke apart to run threaded test seperatly, but threads break logging. Tmp dissable:
-        # - python -m pytest -s -m parallel -n auto test_mainManager.py --api ${TmpUrl}
-        # - python -m pytest -s -m serial test_mainManager.py --api ${TmpUrl}
-      - echo "End of building this..."
+      # Run the full suite:
+      - python run_pytest_suites.py -sx --api ${API_URL} --dont-run-file known_failures_test_api --dont-run-file known_bugs
+      - echo -e "\n  --- End of Running suites. All tests pass.\n"

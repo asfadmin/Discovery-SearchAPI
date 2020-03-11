@@ -23,7 +23,7 @@ def translate_params(p):
             if hasattr(request, 'temp_maturity'):
                 repair_params['maturity'] = request.temp_maturity
             response = json.loads(s.post(request.url_root+'services/utils/wkt', data=repair_params).text)
-            if 'error' in response:
+            if 'errors' in response:
                 raise ValueError('Could not repair WKT: {0}'.format(val))
             val = response['wkt']['wrapped']
         try:
