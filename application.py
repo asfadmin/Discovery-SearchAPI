@@ -145,7 +145,7 @@ def reference():
 
 @application.errorhandler(RequestEntityTooLarge)
 def handle_oversize_request(error):
-    resp = Response(json.dumps({'error': {'type': 'VALUE', 'report': 'Selected file is too large.'} }, sort_keys=True, indent=2), status=413, mimetype='application/json')
+    resp = Response(json.dumps({'errors': [{'type': 'VALUE', 'report': 'Selected file is too large.'}] }, sort_keys=True, indent=2), status=413, mimetype='application/json')
     return resp
 
 # Pre-flight operations
