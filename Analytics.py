@@ -88,6 +88,8 @@ def analytics_pageview():
         p['uip'] = request.access_route[-1]
         p['dr'] = request.referrer
         p['dl'] = request.url
+        if get_config().get('analytics_hostname') is not None:
+            p['dh'] = get_config()['analytics_hostname'] # Needed for proper hostname on AWS API Gateway
         p['ua'] = request.headers.get('User-Agent')
         s.post(url, data=p)
     except requests.RequestException as e:
