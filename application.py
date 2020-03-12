@@ -30,7 +30,7 @@ sys.path.remove(os.path.join(project_root, bulk_download_repo))
 
 application = Flask(__name__)
 application.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024 # limit to 10 MB, primarily affects file uploads
-CORS(application)
+CORS(application, send_wildcard=True)
 Compress(application)
 talisman = Talisman(application)
 
