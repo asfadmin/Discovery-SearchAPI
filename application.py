@@ -2,7 +2,8 @@ from flask import Flask, make_response
 from flask import request
 from flask import Response
 from flask_compress import Compress
-from flask_talisman import Talisman
+#from flask_talisman import Talisman
+from flask_cors import CORS
 from SearchQuery import APISearchQuery
 from StackQuery import APIStackQuery
 from urllib import parse
@@ -29,8 +30,9 @@ sys.path.remove(os.path.join(project_root, bulk_download_repo))
 
 application = Flask(__name__)
 application.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024 # limit to 10 MB, primarily affects file uploads
+CORS(application, send_wildcard=True)
 Compress(application)
-talisman = Talisman(application)
+#talisman = Talisman(application)
 
 ########## Bulk Download API endpoints and support ##########
 config = {
@@ -120,7 +122,7 @@ def stack_search():
 
 # Health check endpoint
 @application.route('/health')
-@talisman(force_https=False)
+#@talisman(force_https=False)
 def health_check():
     try:
         with open('version.json') as version_file:
@@ -153,11 +155,6 @@ def preflight():
     if get_config()['flexible_maturity']:
         if 'maturity' in request.values:
             request.temp_maturity = request.values['maturity']
-
-@application.after_request
-def add_header(response):
-    response.headers['Access-Control-Allow-Origin'] = '*'
-    return response
 
 # Run a dev server
 if __name__ == '__main__':
