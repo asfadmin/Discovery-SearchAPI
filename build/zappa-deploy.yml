@@ -18,7 +18,7 @@ phases:
     commands:
       - zappa update ${MATURITY}
       - |
-        if [ "${MATURITY: -7}" == "staging" ]; then
-          [ -z "${API_URL}" ] && echo -e "\nAPI_URL not set for staging! Quitting...\n" && exit -1;
+        if [[ "${MATURITY: -7}" == "staging" ]]; then
+          [[ -z "${API_URL}" ]] && echo -e "\nAPI_URL not set for staging! Quitting...\n" && exit -1;
           # todo, pytest command here;
         fi
