@@ -1,7 +1,6 @@
 from flask import Flask, make_response
 from flask import request
 from flask import Response
-from flask_compress import Compress
 from flask_talisman import Talisman
 from flask_cors import CORS
 from SearchQuery import APISearchQuery
@@ -31,7 +30,6 @@ sys.path.remove(os.path.join(project_root, bulk_download_repo))
 application = Flask(__name__)
 application.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024 # limit to 10 MB, primarily affects file uploads
 CORS(application, send_wildcard=True)
-Compress(application)
 talisman = Talisman(application)
 
 ########## Bulk Download API endpoints and support ##########
