@@ -13,8 +13,16 @@ phases:
     commands:
       - python -m venv ${VENV}
       - . ./${VENV}/bin/activate
-      # - pip install -r requirements.txt
+      - pip install -r requirements.txt
   build:
     commands:
-      # - zappa update ${MATURITY}
-      - if [[ "${MATURITY##*_}" == "staging" ]]; then if [[ -z "${API_URL}" ]]; then echo -e "\nAPI_URL not set for staging! Quitting...\n"; exit -1; fi; echo "running pytest suite here... eventually"; fi
+      - zappa update ${MATURITY}
+      # Note: the "${MATURITY##*_}" means everything after the last '_'.
+      - |
+        if [[ "${MATURITY##*_}" == "staging" ]]; then
+          if [[ -z "${API_URL}" ]]; then 
+            echo -e "\nAPI_URL not set for staging! Quitting...\n"
+            exit -1
+          fi
+        echo "running pytest suite here... eventually"
+        fi
