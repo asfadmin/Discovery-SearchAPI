@@ -1,5 +1,8 @@
 version: 0.2
 
+env:
+  variables:
+    VENV: "search-api-venv"
 
 phases:
   install:
