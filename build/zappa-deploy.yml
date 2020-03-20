@@ -16,7 +16,7 @@ phases:
       - pip install -r requirements.txt
   build:
     commands:
-       - zappa update ${MATURITY}
+      - zappa update ${MATURITY}
       # Note: the "${MATURITY##*_}" means everything after the last '_'.
       #- |
       #  if [ "${MATURITY##*_}" = "staging" ]; then
