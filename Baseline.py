@@ -58,7 +58,8 @@ def get_stack_params(master):
         'lookDirection': None,
         'offNadirAngle': None,
         'path': None,
-        'polarization': None
+        'polarization': None,
+        'productType': None
     }
 
     for product in results:
@@ -74,11 +75,13 @@ def get_stack_params(master):
 # Make dataset-specific adjustments to stack constraints
 def tweak_stack_params(params):
     def tweak_alos(params):
+        del params['productType']
         return params
 
     def tweak_ers(params):
         del params['lookDirection']
         del params['offNadirAngle']
+        del params['productType']
 
         params['dataset'] = 'ERS' # Use the API's multi-dataset alias for E1/E2 tandem stacks
 
@@ -87,11 +90,13 @@ def tweak_stack_params(params):
     def tweak_jers(params):
         del params['lookDirection']
         del params['offNadirAngle']
+        del params['productType']
 
         return params
 
     def tweak_rsat(params):
         del params['offNadirAngle']
+        del params['productType']
 
         return params
 
@@ -103,6 +108,8 @@ def tweak_stack_params(params):
             params['polarization'] = 'HH,HH+HV'
         elif params['polarization'] in ['VV', 'VV+VH']:
             params['polarization'] = 'VV,VV+VH'
+        if params['productType'] in ['GRD-HD', 'GRD-MD', 'GRD-MS', 'GRD-HS']:
+            params['productType'] = 'GRD-HD,GRD-MD,GRD-MS,GRD-HS'
         f = params['frame']
         params['frame'] = f'{f-2}-{f+2}' # FIXME: OG proof of concept used masster as AoI, look into that
         params['dataset'] = 'S1' # Use the API's multi-dataset alias for S1/S2 tandem stacks
@@ -130,7 +137,8 @@ def rename_stack_params(params):
         'lookDirection':    'lookdirection',
         'offNadirAngle':    'offnadirangle',
         'path':             'relativeorbit',
-        'polarization':     'polarization'
+        'polarization':     'polarization',
+        'productType':      'processingLevel'
     }
     renamed_params = {}
     for p in params.keys():
