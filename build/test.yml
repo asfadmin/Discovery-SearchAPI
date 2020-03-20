@@ -1,6 +1,8 @@
 version: 0.2
 
 env:
+  parameter-store:
+    build_ssh_key: "build_ssh_key"
   variables:
     VENV: "search-api-venv"
 
