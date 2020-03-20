@@ -13,4 +13,4 @@ phases:
       - . ./${VENV}/bin/activate
   build:
     commands:
-      - cd Discovery-PytestAutomation && pytest -s . --api --only-run-file "this doesn't exist, so every test is skipped..."
+      - cd Discovery-PytestAutomation && pytest -s . --api prod --only-run-file "this doesn't exist, so every test is skipped..."
