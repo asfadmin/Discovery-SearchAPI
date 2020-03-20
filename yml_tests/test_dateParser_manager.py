@@ -50,15 +50,15 @@ class test_date_parser():
             assert False, "API returned error page. Test: '{0}'. URL: '{1}. \nHTML:\n{2}\n".format(self.test_info['title'], self.full_url, content)
         if "expected error" in self.test_info:
             if "errors" in content:
-                assert self.test_info["expected error"].lower() in str(content).lower(), "API returned a different error than expected. Test: '{0}'.".format(self.test_info["title"])
+                assert self.test_info["expected error"].lower() in str(content).lower(), "API returned a different error than expected. Test: '{0}'. URL: '{1}'.".format(self.test_info["title"], self.full_url)
             else:
-                assert False, "API parsed value when validation error expected. Test: '{0}'.".format(self.test_info["title"])
+                assert False, "API parsed value when validation error expected. Test: '{0}'. URL: '{1}'.".format(self.test_info["title"], self.full_url)
         if "expected date" in self.test_info:
             if "date" in content:
                 try:
                     time = datetime.strptime(content["date"]["parsed"], "%Y-%m-%dT%H:%M:%SZ")
                 except ValueError as e:
-                    assert False, "API did not return the a date. Error Message: {1} Test: '{0}'.".format(self.test_info["title"], str(e))
+                    assert False, "API did not return the a date. Error Message: '{0}'' Test: '{1}'. URL: '{2}'.".format(str(e), self.test_info["title"], self.full_url)
             else:
-                assert False, "API returned an unexpected parsing error. Test: '{0}'.".format(self.test_info["title"])
+                assert False, "API returned an unexpected parsing error. Test: '{0}'. URL: '{1}'.".format(self.test_info["title"], self.full_url)
 
