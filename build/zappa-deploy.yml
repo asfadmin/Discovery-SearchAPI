@@ -17,3 +17,6 @@ phases:
   build:
     commands:
        - zappa update ${MATURITY}
+artifacts:
+  files:
+    - '**/*'
