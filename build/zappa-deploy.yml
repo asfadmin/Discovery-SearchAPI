@@ -18,8 +18,10 @@ phases:
     commands:
       # - zappa update ${MATURITY}
       - |
-        if [[ "${MATURITY: -7}" == "staging" ]]; then
-          if [[ -z "${API_URL}" ]]; then
+        if [[ "${MATURITY: -7}" == "staging" ]]
+        then
+          if [[ -z "${API_URL}" ]]
+          then
             echo -e "\nAPI_URL not set for staging! Quitting...\n"
             exit -1
           fi
