@@ -17,4 +17,4 @@ phases:
   build:
     commands:
       # - zappa update ${MATURITY}
-      - if [[ "${MATURITY:(-7)}" == "staging" ]]; then if [[ -z "${API_URL}" ]]; then echo -e "\nAPI_URL not set for staging! Quitting...\n"; exit -1; fi; echo "running pytest suite here... eventually"; fi
+      - if [[ "${MATURITY##*_}" == "staging" ]]; then if [[ -z "${API_URL}" ]]; then echo -e "\nAPI_URL not set for staging! Quitting...\n"; exit -1; fi; echo "running pytest suite here... eventually"; fi
