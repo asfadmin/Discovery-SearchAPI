@@ -1,7 +1,10 @@
+from flask import request
 from .input_map import input_map
 
 from CMR.Output import output_translators
-
+import json
+import requests
+from asf_env import get_config
 
 def translate_params(p):
     """
@@ -9,13 +12,24 @@ def translate_params(p):
     """
     params = {}
 
-    for k in p:
-        if k.lower() not in input_map():
-            raise ValueError(f'Unsupported parameter: {k}')
+    for key in p:
+        val = p[key]
+        key = key.lower()
+        if key not in input_map():
+            raise ValueError(f'Unsupported parameter: {key}')
+        if key == 'intersectswith': # Gotta catch this suuuuper early
+            s = requests.Session()
+            repair_params = dict({'wkt': val})
+            if hasattr(request, 'temp_maturity'):
+                repair_params['maturity'] = request.temp_maturity
+            response = json.loads(s.post('https://' + get_config()['this_api'] + '/services/utils/wkt', data=repair_params).text)
+            if 'errors' in response:
+                raise ValueError('Could not repair WKT: {0}'.format(val))
+            val = response['wkt']['wrapped']
         try:
-            params[k.lower()] = input_map()[k.lower()][2](p[k])
-        except ValueError as e:
-            raise ValueError(f'{k}: {e}')
+            params[key] = input_map()[key][2](val)
+        except ValueError as exc:
+            raise ValueError(f'{key}: {exc}')
 
     # be nice to make this not a special case
     output = 'metalink'
@@ -34,5 +48,9 @@ def translate_params(p):
                 'Invalid maxResults, must be > 0: {0}'.format(max_results)
             )
         del params['maxresults']
+
+    # This gets handled during pre-flight
+    if 'maturity' in params:
+        del params['maturity']
 
     return params, output, max_results

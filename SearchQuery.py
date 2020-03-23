@@ -12,7 +12,7 @@ from CMR.Exceptions import CMRError
 from Analytics import analytics_events
 
 
-class APIProxyQuery:
+class APISearchQuery:
 
     def __init__(self, request, should_stream=True):
         self.request = request
@@ -52,7 +52,7 @@ class APIProxyQuery:
         return True
 
     def check_has_search_params(self):
-        non_searchable_param = ['output', 'maxresults', 'pagesize']
+        non_searchable_param = ['output', 'maxresults', 'pagesize', 'maturity']
         searchables = [
             v for v in self.request.values if v not in non_searchable_param
         ]

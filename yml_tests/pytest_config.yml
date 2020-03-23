@@ -22,8 +22,33 @@ api_urls:
 
 
 test_types:
+- WKT Validator Endpoint:
+    required_keys: test wkt
+    method: test_WKTValidatorEndpoint
+    variables:
+      endpoint: services/utils/wkt
+
+- Files To Wkt Endpoint:
+    required_keys: file wkt
+    method: test_FilesToWKTEndpoint
+    variables:
+      endpoint: "services/utils/files_to_wkt"
+
+- Mission List Endpoint:
+    required_keys: misson_list_size_min
+    method: test_MissionListEndpoint
+    variables:
+      endpoint: "/services/utils/mission_list"
+
+- Date Parser Endpoint:
+    required_keys: date
+    method: test_DateParserEndpoint
+    variables:
+      endpoint: "/services/utils/date"
+
 - Get Data from API:
     required_keys: Null
-    method: test_URL_Manager
+    method: test_URLManagerSearch
     variables:
       endpoint: services/search/param?
+

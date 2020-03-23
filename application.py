@@ -1,8 +1,10 @@
 from flask import Flask, make_response
 from flask import request
 from flask import Response
-from flask_compress import Compress
-from APIProxy import APIProxyQuery
+from flask_talisman import Talisman
+from flask_cors import CORS
+from SearchQuery import APISearchQuery
+from StackQuery import APIStackQuery
 from urllib import parse
 import sys
 import logging
@@ -13,28 +15,22 @@ from Analytics import analytics_pageview
 from werkzeug.exceptions import RequestEntityTooLarge
 import time
 import importlib
+from asf_env import get_config
 
-# GLOBALS:
+import endpoints
+
+
 project_root = os.path.dirname(os.path.abspath(__file__))
 bulk_download_repo = "Discovery-BulkDownload"
-utils_api_repo = "Discovery-UtilsAPI"
-
 # Submodule imports:
 sys.path.append(os.path.join(project_root, bulk_download_repo))
 BulkDownloadAPI = importlib.import_module("APIBulkDownload")
 sys.path.remove(os.path.join(project_root, bulk_download_repo))
 
-sys.path.append(os.path.join(project_root, utils_api_repo))
-FilesToWKT = importlib.import_module("FilesToWKT")
-WKTValidator = importlib.import_module("WKTValidator")
-DateValidator = importlib.import_module("DateValidator")
-MissionList = importlib.import_module("MissionList")
-sys.path.remove(os.path.join(project_root, utils_api_repo))
-
-# EB looks for an 'application' callable by default.
 application = Flask(__name__)
-Compress(application)
 application.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024 # limit to 10 MB, primarily affects file uploads
+CORS(application, send_wildcard=True)
+talisman = Talisman(application)
 
 ########## Bulk Download API endpoints and support ##########
 config = {
@@ -89,37 +85,42 @@ def get_script():
 # Validate and/or repair a WKT to ensure it meets CMR's requirements
 @application.route('/services/utils/wkt', methods = ['GET', 'POST'])
 def validate_wkt():
-    return WKTValidator.WKTValidator(request).get_response()
+    return endpoints.RepairWKT_Endpoint(request).get_response()
 
 # Validate a date to ensure it meets our requirements
 @application.route('/services/utils/date', methods = ['GET', 'POST'])
 def validate_date():
-    return DateValidator.DateValidator(request).get_response()
+    return endpoints.DateValidator_Endpoint(request).get_response()
 
 # Convert a set of shapefiles or a geojson file to WKT
 @application.route('/services/utils/files_to_wkt', methods = ['POST'])
 def filesToWKT():
-    return FilesToWKT.FilesToWKT(request).get_response()
+    return endpoints.FilesToWKT_Endpoint(request).get_response()
 
 # Collect a list of missions from CMR for a given platform
 @application.route('/services/utils/mission_list', methods = ['GET', 'POST'])
 def missionList():
-    return MissionList.MissionList(request).get_response()
+    return endpoints.MissionList_Endpoint(request).get_response()
 
 # Fetch and convert the results from CMR
 @application.route('/services/search/param', methods = ['GET', 'POST'])
 def proxy_search():
-    return APIProxyQuery(request, should_stream=True).get_response()
+    return APISearchQuery(request, should_stream=True).get_response()
 
 @application.route('/services/load/param', methods = ['GET', 'POST'])
 def proxy_search_without_stream():
-    return APIProxyQuery(request, should_stream=False).get_response()
+    return APISearchQuery(request, should_stream=False).get_response()
+
+@application.route('/services/search/baseline', methods = ['GET', 'POST'])
+def stack_search():
+    return APIStackQuery(request).get_response()
 
 
 ########## General endpoints ##########
 
 # Health check endpoint
 @application.route('/health')
+@talisman(force_https=False)
 def health_check():
     try:
         with open('version.json') as version_file:
@@ -142,43 +143,21 @@ def reference():
 
 @application.errorhandler(RequestEntityTooLarge)
 def handle_oversize_request(error):
-    resp = Response(json.dumps({'error': {'type': 'VALUE', 'report': 'Selected file is too large.'} }, sort_keys=True, indent=2), status=413, mimetype='application/json')
+    resp = Response(json.dumps({'errors': [{'type': 'VALUE', 'report': 'Selected file is too large.'}] }, sort_keys=True, indent=2), status=413, mimetype='application/json')
     return resp
 
 # Pre-flight operations
 @application.before_request
 def preflight():
-    #request.asf_start_proc_time = time.process_time()
-    #request.asf_start_real_time = time.perf_counter()
     analytics_pageview()
-
-# Cleanup operations
-@application.after_request
-def add_header(response):
-    response.headers['Access-Control-Allow-Origin'] = '*'
-    return response
-
-'''
-@application.teardown_request
-def postflight(exc):
-    try:
-        if exc is not None:
-            logging.error('Postflight handler encountered exception: {0}'.format(exc))
-        end_proc_time = time.process_time()
-        total_proc_time = end_proc_time - request.asf_start_proc_time
-        end_real_time = time.perf_counter()
-        total_real_time = end_real_time - request.asf_start_real_time
-        #if total_proc_time / total_real_time > .5 or total_real_time > 10:
-        # process time (s), real time (s), proc/real time ratio, URL, params
-        logging.warning('Request timing analysis: {0}, {1}, {2}, {3}, {4}'.format(total_proc_time, total_real_time, total_proc_time / total_real_time, request.url, request.values))
-    except Exception as e:
-        logging.error('Exception encountered in postflight handler: {0}'.format(e))
-'''
+    if get_config()['flexible_maturity']:
+        if 'maturity' in request.values:
+            request.temp_maturity = request.values['maturity']
 
 # Run a dev server
 if __name__ == '__main__':
     if 'MATURITY' not in os.environ:
-        os.environ['MATURITY'] = 'dev'
+        os.environ['MATURITY'] = 'local'
     sys.dont_write_bytecode = True  # prevent clutter
     application.debug = True        # enable debugging mode
     FORMAT = "[%(filename)18s:%(lineno)-4s - %(funcName)18s() ] %(message)s"

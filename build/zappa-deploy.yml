@@ -1,0 +1,22 @@
+version: 0.2
+
+env:
+  parameter-store:
+    build_ssh_key: "build_ssh_key"
+  variables:
+    VENV: "search-api-venv"
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.7
+    commands:
+      - python -m venv ${VENV}
+      - . ./${VENV}/bin/activate
+      - pip install -r requirements.txt
+  build:
+    commands:
+       - zappa update ${MATURITY}
+artifacts:
+  files:
+    - '**/*'

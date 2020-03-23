@@ -1,0 +1,8 @@
+
+
+
+tests:
+- min size check of mission list: # More-so to check the endpoint returns a list of missions
+    misson_list_size_min: 934 # test is 934, prod is 947 rn.
+    # platform: AIRSAR
+

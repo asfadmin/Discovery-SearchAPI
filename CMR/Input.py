@@ -1,6 +1,7 @@
 import dateparser
 import re
-from geomet import wkt, InvalidGeoJSONException
+from geomet import wkt
+from UtilsAPI.Input import parse_wkt_util, parse_date_util
 
 # Parse and validate a string: "abc"
 def parse_string(v):
@@ -27,10 +28,7 @@ def parse_float(v):
 
 # Parse and validate a date: "1991-10-01T00:00:00Z"
 def parse_date(v):
-    d = dateparser.parse(v)
-    if d is None:
-        raise ValueError('Invalid date: {0}'.format(v))
-    return dateparser.parse(v).strftime('%Y-%m-%dT%H:%M:%SZ')
+    return parse_date_util(v)
 
 # Parse and validate a date range: "1991-10-01T00:00:00Z,1991-10-02T00:00:00Z"
 def parse_date_range(v):
@@ -164,26 +162,5 @@ def parse_point_string(v):
 # Parse a WKT and convert it to a coordinate string
 # NOTE: If given an empty ("POINT EMPTY") shape, will return "point:". Should it throw instead?
 def parse_wkt(v):
-    try:
-        wkt_json = wkt.loads(str(v).upper())
-    except (ValueError, AttributeError, InvalidGeoJSONException) as e:
-        raise ValueError('Cannot load WKT: {0}. Error: {1}'.format(v, str(e)))
-    # take note of the WKT type
-    if wkt_json['type'].upper() not in ["POINT","LINESTRING", "POLYGON"]:
-        raise ValueError('Unsupported WKT: {0}.'.format(v))
-    
-    if wkt_json['type'].upper() == "POLYGON":
-        coords = wkt_json['coordinates']
-        # If not an empty poly, take out the hole:
-        # (Also de-nest it in the process)
-        if len(wkt_json['coordinates']) != 0:
-            coords = coords[0]
-    elif wkt_json['type'].upper() == "LINESTRING":
-        coords = wkt_json['coordinates']
-    else: # type == POINT
-        coords = [wkt_json['coordinates']]
-    # Turn [[x,y],[x,y]] to [x,y,x,y]:
-    coords = [x for x in sum(coords, [])]
-    # Turn any "6e8" to a literal number. (As a sting):
-    coords = ['{:.16f}'.format(float(cord)) for cord in coords]
-    return '{0}:{1}'.format(wkt_json['type'].lower(), ','.join(coords))
+    # The utils library needs this function for repairWKT.
+    return parse_wkt_util(v)

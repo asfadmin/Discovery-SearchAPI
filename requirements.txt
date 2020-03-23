@@ -22,6 +22,8 @@ durationpy==0.5
 execnet==1.7.1
 Flask==1.1.1
 Flask-Compress==1.4.0
+Flask-Cors==3.0.8
+flask-talisman==0.7.0
 future==0.18.2
 geojson==2.5.0
 geomet==0.2.1
@@ -45,6 +47,7 @@ numpy==1.18.1
 packaging==20.0
 pathlib2==2.3.5
 pexpect==4.7.0
+pip-tools==4.5.0
 placebo==0.9.0
 pluggy==0.13.1
 ptyprocess==0.6.0
@@ -90,3 +93,4 @@ xmljson==0.2.0
 zappa
 zipp==0.6.0
 zope.interface==4.7.1
+git+https://git@github.com/asfadmin/Discovery-Utils.git@prod#egg=UtilsAPI

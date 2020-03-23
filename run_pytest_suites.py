@@ -54,9 +54,10 @@ if __name__ == "__main__":
     os.chdir(os.path.join(project_root, pytest_repo))
     run_suite(args.n, args.x, unknown_args)
 
-    print("\n ---- Utils API ----\n")
-    os.chdir(os.path.join(project_root, utils_api_repo, pytest_repo))
-    run_suite(args.n, args.x, unknown_args)
+    ### Moved tests to SearchAPI repo, since tests need a api to hit against:
+    # print("\n ---- Utils API ----\n")
+    # os.chdir(os.path.join(project_root, utils_api_repo, pytest_repo))
+    # run_suite(args.n, args.x, unknown_args)
 
     print("\n ---- BulkDownload API ----\n")
     os.chdir(os.path.join(project_root, bulk_download_repo, pytest_repo))
