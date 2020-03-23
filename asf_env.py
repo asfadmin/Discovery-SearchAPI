@@ -25,7 +25,7 @@ def get_maturities():
         'local': {
             'bulk_download_api': 'https://bulk-download.asf.alaska.edu',
             'analytics_id': None,
-            'analytics_hostname': None,
+            'this_api': 'local.asf.alaska.edu:5000',
             'cmr_base': 'https://cmr.earthdata.nasa.gov',
             'cmr_health': '/search/health',
             'cmr_api': '/search/granules.echo10',
@@ -38,7 +38,7 @@ def get_maturities():
         'devel': {
             'bulk_download_api': 'https://bulk-download.asf.alaska.edu',
             'analytics_id': 'UA-118881300-4',
-            'analytics_hostname': 'api-dev.asf.alaska.edu',
+            'this_api': 'api-dev.asf.alaska.edu',
             'cmr_base': 'https://cmr.uat.earthdata.nasa.gov',
             'cmr_health': '/search/health',
             'cmr_api': '/search/granules.echo10',
@@ -51,7 +51,7 @@ def get_maturities():
         'devel-beanstalk': {
             'bulk_download_api': 'https://bulk-download.asf.alaska.edu',
             'analytics_id': 'UA-118881300-4',
-            'analytics_hostname': 'api-dev.asf.alaska.edu',
+            'this_api': 'api-dev-beanstalk.asf.alaska.edu',
             'cmr_base': 'https://cmr.uat.earthdata.nasa.gov',
             'cmr_health': '/search/health',
             'cmr_api': '/search/granules.echo10',
@@ -64,7 +64,7 @@ def get_maturities():
         'test': {
             'bulk_download_api': 'https://bulk-download.asf.alaska.edu',
             'analytics_id': 'UA-118881300-3',
-            'analytics_hostname': 'api-test.asf.alaska.edu',
+            'this_api': 'api-test.asf.alaska.edu',
             'cmr_base': 'https://cmr.uat.earthdata.nasa.gov',
             'cmr_health': '/search/health',
             'cmr_api': '/search/granules.echo10',
@@ -77,7 +77,7 @@ def get_maturities():
         'test-beanstalk': {
             'bulk_download_api': 'https://bulk-download.asf.alaska.edu',
             'analytics_id': 'UA-118881300-3',
-            'analytics_hostname': 'api-test.asf.alaska.edu',
+            'this_api': 'api-test-beanstalk.asf.alaska.edu',
             'cmr_base': 'https://cmr.uat.earthdata.nasa.gov',
             'cmr_health': '/search/health',
             'cmr_api': '/search/granules.echo10',
@@ -90,7 +90,7 @@ def get_maturities():
         'prod': {
             'bulk_download_api': 'https://bulk-download.asf.alaska.edu',
             'analytics_id': 'UA-118881300-2',
-            'analytics_hostname': 'api.daac.asf.alaska.edu',
+            'this_api': 'api.daac.asf.alaska.edu',
             'cmr_base': 'https://cmr.earthdata.nasa.gov',
             'cmr_health': '/search/health',
             'cmr_api': '/search/granules.echo10',
@@ -103,7 +103,7 @@ def get_maturities():
         'prod-private': {
             'bulk_download_api': 'https://bulk-download.asf.alaska.edu',
             'analytics_id': 'UA-118881300-5',
-            'analytics_hostname': 'api-prod-private.asf.alaska.edu',
+            'this_api': 'api-prod-private.asf.alaska.edu',
             'cmr_base': 'https://cmr.earthdata.nasa.gov',
             'cmr_health': '/search/health',
             'cmr_api': '/search/granules.echo10',

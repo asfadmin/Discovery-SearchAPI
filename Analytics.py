@@ -87,8 +87,8 @@ def analytics_pageview():
         p['t'] = 'pageview'
         p['uip'] = request.access_route[-1]
         p['dr'] = request.referrer
-        if get_config().get('analytics_hostname') is not None:
-            p['dh'] = get_config()['analytics_hostname'] # Needed for proper hostname on AWS API Gateway
+        if get_config().get('this_api') is not None:
+            p['dh'] = get_config()['this_api'] # Needed for proper hostname on AWS API Gateway
             p['dp'] = request.full_path
         else:
             p['dl'] = request.url # default to just blindly using the request url

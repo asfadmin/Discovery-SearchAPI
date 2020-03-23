@@ -3,6 +3,8 @@ import requests
 import json
 import dateparser
 from flask import request
+from asf_env import get_config
+
 import random
 
 def get_stack(master):
@@ -23,7 +25,7 @@ def get_stack(master):
     if hasattr(request, 'temp_maturity'):
         stack_params['maturity'] = request.temp_maturity
     s = requests.Session()
-    url = request.url_root + 'services/load/param'
+    url = 'https://' + get_config()['this_api'] + '/services/load/param'
     stack = json.loads(s.post(url, data=stack_params).text)
     stack['warnings'] = []
 
@@ -41,7 +43,7 @@ def get_stack(master):
     return stack
 
 def get_stack_params(master):
-    url = request.url_root + 'services/load/param'
+    url = 'https://' + get_config()['this_api'] + '/services/load/param'
     s = requests.Session()
     p = {'granule_list': master, 'output': 'jsonlite'}
     if hasattr(request, 'temp_maturity'):
