@@ -4,7 +4,7 @@ from .input_map import input_map
 from CMR.Output import output_translators
 import json
 import requests
-
+from asf_env import get_config
 
 def translate_params(p):
     """
