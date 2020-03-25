@@ -11,6 +11,9 @@ phases:
     commands:
       - python -m venv ${VENV}
       - . ./${VENV}/bin/activate
+      - find . -name activate # Seeing it's path
   build:
     commands:
-      - cd Discovery-PytestAutomation && pytest #-s . --api prod --only-run-file "this doesn't exist, so every test is skipped..."
+      - echo "testing..."
+      - cd Discovery-PytestAutomation && pytest -s --collect-only .
+      # - cd Discovery-PytestAutomation && pytest #-s . --api prod --only-run-file "this doesn't exist, so every test is skipped..."
