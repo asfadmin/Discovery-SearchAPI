@@ -13,7 +13,9 @@ phases:
       - . ./${VENV}/bin/activate
   build:
     commands:
+      - echo "Check here:"
       - file ./${VENV}/bin/activate # seeing if the file exists
+      - echo $?
       - . ./${VENV}/bin/activate && python -c "import sys;print(hasattr(sys, 'real_prefix'))" # This ALWAYS prints False... Does changing shells deactivagte it???
       - echo "testing..."
       # - python -c "import sys;print(hasattr(sys, 'real_prefix'))" # Prints True/False to screen, if you're in a venv
