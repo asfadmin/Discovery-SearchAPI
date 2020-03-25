@@ -14,5 +14,6 @@ phases:
   build:
     commands:
       - echo "testing..."
-      - cd Discovery-PytestAutomation && pytest -s --collect-only .
+      - command -v pytest
+      - cd Discovery-PytestAutomation && python -m pytest -s --collect-only .
       # - cd Discovery-PytestAutomation && pytest #-s . --api prod --only-run-file "this doesn't exist, so every test is skipped..."
