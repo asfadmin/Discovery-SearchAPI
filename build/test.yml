@@ -14,6 +14,7 @@ phases:
   build:
     commands:
       - echo "testing..."
-      - command -v pytest
+      - python -c "import sys;print(hasattr(sys, 'real_prefix'))" # Prints True/False to screen, if you're in a venv
+      - command -v pytest # See if pytest exists
       - cd Discovery-PytestAutomation && python -m pytest -s --collect-only .
       # - cd Discovery-PytestAutomation && pytest #-s . --api prod --only-run-file "this doesn't exist, so every test is skipped..."
