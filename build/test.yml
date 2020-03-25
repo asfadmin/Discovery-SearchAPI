@@ -13,6 +13,7 @@ phases:
       - . ./${VENV}/bin/activate
   build:
     commands:
+      - . ./${VENV}/bin/activate # It didn't exist here with the last run.... Do you have to reactivate it?
       - echo "testing..."
       - python -c "import sys;print(hasattr(sys, 'real_prefix'))" # Prints True/False to screen, if you're in a venv
       - command -v pytest # See if pytest exists
