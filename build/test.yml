@@ -11,12 +11,8 @@ phases:
     commands:
       - python -m venv ${VENV}
       - . ./${VENV}/bin/activate
-      - pip install pytest pytest-xdist PyYAML requests
+      - pip install -r requirements.txt
   build:
     commands:
-      # - . ./${VENV}/bin/activate && python -c "import sys;print(hasattr(sys, 'real_prefix'))" # This ALWAYS prints False... Does changing shells deactivagte it???
-      # - echo "testing..."
-      # - python -c "import sys;print(hasattr(sys, 'real_prefix'))" # Prints True/False to screen, if you're in a venv
-      - command -v pytest # See if pytest exists
       - cd Discovery-PytestAutomation && python -m pytest -s --collect-only .
       # - cd Discovery-PytestAutomation && pytest #-s . --api prod --only-run-file "this doesn't exist, so every test is skipped..."
