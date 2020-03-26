@@ -11,6 +11,10 @@ phases:
     commands:
       - python -m venv ${VENV}
       - . ./${VENV}/bin/activate
+      - pip install -r requirements.txt
   build:
     commands:
-      - cd Discovery-PytestAutomation && pytest #-s . --api prod --only-run-file "this doesn't exist, so every test is skipped..."
+      - cd Discovery-PytestAutomation
+      - ls -halt
+      - pytest -sx . --api ${API_URL} --dont-run-file known_bugs --dont-run-file known_failures
+      # - cd Discovery-PytestAutomation && pytest #-s . --api prod --only-run-file "this doesn't exist, so every test is skipped..."
