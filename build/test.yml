@@ -9,13 +9,13 @@ phases:
     runtime-versions:
       python: 3.7
     commands:
-      # - python -m venv ${VENV}
-      - file ./${VENV}/bin/activate # seeing if the file exists
+      - python -m venv ${VENV}
       - . ./${VENV}/bin/activate
+      - pip install pytest pytest-xdist
   build:
     commands:
-      - . ./${VENV}/bin/activate && python -c "import sys;print(hasattr(sys, 'real_prefix'))" # This ALWAYS prints False... Does changing shells deactivagte it???
-      - echo "testing..."
+      # - . ./${VENV}/bin/activate && python -c "import sys;print(hasattr(sys, 'real_prefix'))" # This ALWAYS prints False... Does changing shells deactivagte it???
+      # - echo "testing..."
       # - python -c "import sys;print(hasattr(sys, 'real_prefix'))" # Prints True/False to screen, if you're in a venv
       - command -v pytest # See if pytest exists
       - cd Discovery-PytestAutomation && python -m pytest -s --collect-only .
