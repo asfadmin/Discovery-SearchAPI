@@ -13,11 +13,7 @@ phases:
     commands:
       - python -m venv ${VENV}
       - . ./${VENV}/bin/activate
-      # - pip install -r requirements.txt
-      - pip install pytest
-  # build:
-  #   commands:
-  #      - zappa update ${MATURITY}
-artifacts:
-  files:
-    - '**/*'
+      - pip install -r requirements.txt
+  build:
+    commands:
+       - zappa update ${MATURITY}
