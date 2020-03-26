@@ -29,6 +29,9 @@ def get_stack(master):
     stack = json.loads(s.post(url, data=stack_params).text)
     stack['warnings'] = []
 
+    if len(stack['results']) <= 0:
+        raise ValueError(f'No products found matching stack parameters')
+
     master, stack = check_master(master, stack)
 
     stack['results'] = calculate_temporal_baselines(master, stack['results'])
