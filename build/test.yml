@@ -11,7 +11,7 @@ phases:
     commands:
       - python -m venv ${VENV}
       - . ./${VENV}/bin/activate
-      - pip install pytest pytest-xdist PyYAML
+      - pip install pytest pytest-xdist PyYAML requests
   build:
     commands:
       # - . ./${VENV}/bin/activate && python -c "import sys;print(hasattr(sys, 'real_prefix'))" # This ALWAYS prints False... Does changing shells deactivagte it???
