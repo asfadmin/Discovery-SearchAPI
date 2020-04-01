@@ -24,23 +24,7 @@ class JSONStreamArray(list):
                 self.first_result = p
                 self.len = 1
                 break
-
-
-    def __iter__(self):
-        return self.streamDicts()
-
-    def __len__(self):
-        return self.len
-
-    def streamDicts(self):
-        for p in self.gen():
-            if p is not None:
-                yield self.getItem(p)
-
-    # Override this method for other json-based output formats (i.e. geojson)
-    def getItem(self, p):
-        p['browse'] = p['browse'][0] if len(p['browse']) > 0 else None
-        legacy_json_keys = [
+        self.legacy_json_keys = [
             'absoluteOrbit',
             'baselinePerp',
             'beamMode',
@@ -115,4 +99,20 @@ class JSONStreamArray(list):
             'varianceTroposphere'
         ]
 
-        return dict((k, p[k]) for k in legacy_json_keys if k in p)
+
+    def __iter__(self):
+        return self.streamDicts()
+
+    def __len__(self):
+        return self.len
+
+    def streamDicts(self):
+        for p in self.gen():
+            if p is not None:
+                yield self.getItem(p)
+
+    # Override this method for other json-based output formats (i.e. geojson)
+    def getItem(self, p):
+        p['browse'] = p['browse'][0] if len(p['browse']) > 0 else None
+
+        return dict((k, p[k]) for k in self.legacy_json_keys if k in p)
