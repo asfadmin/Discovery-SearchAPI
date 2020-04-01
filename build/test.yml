@@ -15,6 +15,5 @@ phases:
   build:
     commands:
       - cd Discovery-PytestAutomation
-      - ls -halt
-      - pytest -sx . --api ${API_URL} ${TEST_SUITE_OPTIONS}
+      - pytest ${PYTEST_OPTIONS} . --api ${API_URL} ${TEST_SUITE_OPTIONS}
       # - cd Discovery-PytestAutomation && pytest #-s . --api prod --only-run-file "this doesn't exist, so every test is skipped..."
