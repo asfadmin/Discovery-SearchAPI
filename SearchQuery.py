@@ -78,7 +78,6 @@ class APISearchQuery:
 
         query = CMRQuery(
             params=dict(self.cmr_params),
-            output=self.output,
             max_results=maxResults,
         )
 
