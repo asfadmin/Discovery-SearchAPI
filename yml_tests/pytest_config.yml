@@ -15,7 +15,7 @@
 
 api_urls:
   local: http://127.0.0.1:5000/
-  # dev: TODO - Find out if everything has dev url
+  dev: https://api-dev.asf.alaska.edu/
   test: https://api-test.asf.alaska.edu/
   prod: https://api.daac.asf.alaska.edu/
   default: prod
