@@ -1,10 +1,10 @@
 import logging
 import json
 
-def cmr_to_json(rgen):
+def cmr_to_json(rgen, includeBaseline=False, addendum=None):
     logging.debug('translating: json')
 
-    streamer = JSONStreamArray(rgen)
+    streamer = JSONStreamArray(rgen, includeBaseline)
 
     for p in json.JSONEncoder(indent=2, sort_keys=True).iterencode([streamer]):
         yield p
@@ -12,8 +12,9 @@ def cmr_to_json(rgen):
 # Some trickery is required to make JSONEncoder().iterencode take any ol' generator,
 # this approach works without slurping the list into memory
 class JSONStreamArray(list):
-    def __init__(self, gen):
+    def __init__(self, gen, includeBaseline):
         self.gen = gen
+        self.includeBaseline = includeBaseline
 
         # need to make sure we actually have results so we can intelligently set __len__, otherwise
         # iterencode behaves strangely and will output invalid json
@@ -24,7 +25,6 @@ class JSONStreamArray(list):
                 self.first_result = p
                 self.len = 1
                 break
-
 
     def __iter__(self):
         return self.streamDicts()
@@ -39,80 +39,82 @@ class JSONStreamArray(list):
 
     # Override this method for other json-based output formats (i.e. geojson)
     def getItem(self, p):
-        p['browse'] = p['browse'][0] if len(p['browse']) > 0 else None
         legacy_json_keys = [
-            'sceneSize',
             'absoluteOrbit',
-            'farEndLat',
-            'sensor',
-            'farStartLat',
-            'processingTypeName',
-            'finalFrame',
-            'lookAngle',
-            'processingType',
-            'startTime',
-            'stringFootprint',
-            'doppler',
-            'baselinePerp',
-            'sarSceneId',
-            'insarStackSize',
-            'centerLat',
-            'processingDescription',
-            'product_file_id',
-            'nearEndLon',
-            'farEndLon',
-            'percentTroposphere',
-            'frameNumber',
-            'percentCoherence',
-            'nearStartLon',
-            'sceneDate',
-            'sceneId',
-            'productName',
-            'platform',
-            'masterGranule',
-            'thumbnailUrl',
-            'percentUnwrapped',
-            'beamSwath',
-            'firstFrame',
-            'insarGrouping',
-            'centerLon',
-            'faradayRotation',
-            'fileName',
-            'offNadirAngle',
-            'granuleName',
-            'frequency',
-            'catSceneId',
-            'farStartLon',
-            'processingDate',
-            'missionName',
-            'relativeOrbit',
-            'flightDirection',
-            'granuleType',
-            'configurationName',
-            'polarization',
-            'stopTime',
-            'browse',
-            'nearStartLat',
-            'flightLine',
-            'status',
-            'formatName',
-            'nearEndLat',
-            'downloadUrl',
-            'incidenceAngle',
-            'processingTypeDisplay',
-            'thumbnail',
-            'track',
-            'collectionName',
-            'sceneDateString',
             'beamMode',
             'beamModeType',
-            'processingLevel',
-            'lookDirection',
-            'varianceTroposphere',
-            'slaveGranule',
-            'sizeMB',
+            'beamSwath',
+            'browse',
+            'catSceneId',
+            'centerLat',
+            'centerLon',
+            'collectionName',
+            'configurationName',
+            'doppler',
+            'downloadUrl',
+            'farEndLat',
+            'farEndLon',
+            'farStartLat',
+            'farStartLon',
+            'faradayRotation',
+            'fileName',
+            'finalFrame',
+            'firstFrame',
+            'flightDirection',
+            'flightLine',
+            'formatName',
+            'frameNumber',
+            'frequency',
+            'granuleName',
+            'granuleType',
             'groupID',
-            'md5sum'
+            'incidenceAngle',
+            'insarGrouping',
+            'insarStackSize',
+            'lookAngle',
+            'lookDirection',
+            'masterGranule',
+            'md5sum',
+            'missionName',
+            'nearEndLat',
+            'nearEndLon',
+            'nearStartLat',
+            'nearStartLon',
+            'offNadirAngle',
+            'percentCoherence',
+            'percentTroposphere',
+            'percentUnwrapped',
+            'platform',
+            'polarization',
+            'processingDate',
+            'processingDescription',
+            'processingLevel',
+            'processingType',
+            'processingTypeDisplay',
+            'processingTypeName',
+            'productName',
+            'product_file_id',
+            'relativeOrbit',
+            'sarSceneId',
+            'sceneDate',
+            'sceneDateString',
+            'sceneId',
+            'sceneSize',
+            'sensor',
+            'sizeMB',
+            'slaveGranule',
+            'startTime',
+            'status',
+            'stopTime',
+            'stringFootprint',
+            'thumbnail',
+            'thumbnailUrl',
+            'track',
+            'varianceTroposphere'
         ]
+        if self.includeBaseline:
+            legacy_json_keys.extend(['temporalBaseline', 'perpendicularBaseline'])
+
+        p['browse'] = p['browse'][0] if len(p['browse']) > 0 else None
 
         return dict((k, p[k]) for k in legacy_json_keys if k in p)

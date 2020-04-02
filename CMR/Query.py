@@ -7,11 +7,10 @@ from CMR.SubQuery import CMRSubQuery
 
 
 class CMRQuery:
-    def __init__(self, params=None, max_results=None, output='metalink'):
+    def __init__(self, params=None, max_results=None):
         self.max_results = max_results
         self.page_size = 2000
         self.params = params
-        self.output = output
 
         self.extra_params = [
             {'provider': 'ASF'},  # always limit the results to ASF as the provider

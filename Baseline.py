@@ -1,167 +1,139 @@
 import logging
-import requests
-import json
 import dateparser
-from flask import request
-from asf_env import get_config
+from CMR.Translate import translate_params
+from CMR.Query import CMRQuery
 
 import random
 
-def get_stack(master):
-    is_count = request.values.get('output', 'jsonlite2').lower() == 'count'
+precalc_datasets = ['AL', 'R1', 'E1', 'E2', 'J1']
+
+def get_stack(master, product_type=None, is_count=False):
+    warnings = None
 
     try:
-        stack_params = get_stack_params(master)
+        stack_params = get_stack_params(master, product_type)
     except ValueError as e:
         if is_count:
-            return 0
+            return 0, None
         else:
             raise e
 
+    logging.debug(stack_params)
     if is_count:
-        return 1
+        return 1, None
 
-    stack_params['output'] = 'jsonlite2'
-    if hasattr(request, 'temp_maturity'):
-        stack_params['maturity'] = request.temp_maturity
-    s = requests.Session()
-    url = 'https://' + get_config()['this_api'] + '/services/load/param'
-    stack = json.loads(s.post(url, data=stack_params).text)
-    stack['warnings'] = []
+    stack = query_stack(stack_params)
 
-    master, stack = check_master(master, stack)
+    if len(stack) <= 0:
+        raise ValueError(f'No products found matching stack parameters')
 
-    stack['results'] = calculate_temporal_baselines(master, stack['results'])
+    master, stack, warnings = check_master(master, stack)
 
-    # totally faking perpendicular baseline data for the moment, come at me bro
-    for product in stack['results']:
-        random.seed(product['gn']) # lol
-        product['pb'] = 0 if product['gn'] == master else random.randrange(-500, 500)
+    stack = calculate_temporal_baselines(master, stack)
 
-    if len(stack['warnings']) <= 0:
-        del stack['warnings']
-    return stack
+    if get_platform(master) in precalc_datasets:
+        stack = offset_perpendicular_baselines(master, stack)
+    else:
+        stack = calculate_perpendicular_baselines(master, stack)
 
-def get_stack_params(master):
-    url = 'https://' + get_config()['this_api'] + '/services/load/param'
-    s = requests.Session()
-    p = {'granule_list': master, 'output': 'jsonlite'}
-    if hasattr(request, 'temp_maturity'):
-        p['maturity'] = request.temp_maturity
-    results = json.loads(s.post(url, data=p).text)['results']
-    if len(results) <= 0:
+
+    return stack, warnings
+
+def get_stack_params(master, product_type):
+    params = {'granule_list': master}
+    if product_type is not None:
+        params['processingLevel'] = product_type
+    params, output, max_results = translate_params(params)
+    query = CMRQuery(
+        params=dict(params)
+    )
+    master_results = [product for product in query.get_results()]
+    if len(master_results) <= 0:
         raise ValueError(f'Requested master not found: {master}')
 
-    stack_params = {
-        'beamMode': None,
-        'dataset': None,
-        'flightDirection': None,
-        'frame': None,
-        'lookDirection': None,
-        'offNadirAngle': None,
-        'path': None,
-        'polarization': None,
-        'productType': None
-    }
+    stack_params = {}
+    if product_type is not None:
+        stack_params['processingLevel'] = product_type
 
-    for product in results:
-        for key in stack_params.keys():
-            if stack_params[key] is None and key in product and product[key] is not None:
-                stack_params[key] = product[key]
+    stack_params['platform'] = master_results[0]['platform']
 
-    stack_params = tweak_stack_params(stack_params)
-    stack_params = rename_stack_params(stack_params)
+    #shortcut the stacking for legacy datasets with precalculated stacks and baselines
+    if get_platform(master) in precalc_datasets:
+        if master_results[0]['insarGrouping'] is not None and master_results[0]['insarGrouping'] not in ['NA']:
+            stack_params['insarstackid'] = master_results[0]['insarGrouping']
+            return stack_params
+        else:
+            # if it's a precalc stack with no stack ID, we gotta bail because we don't have state vectors to fall back on
+            raise ValueError(f'Requested master did not have required baseline stack ID: {master}')
 
-    return stack_params
-
-# Make dataset-specific adjustments to stack constraints
-def tweak_stack_params(params):
-    def tweak_alos(params):
-        del params['productType']
-        return params
-
-    def tweak_ers(params):
-        del params['lookDirection']
-        del params['offNadirAngle']
-        del params['productType']
-
-        params['dataset'] = 'ERS' # Use the API's multi-dataset alias for E1/E2 tandem stacks
-
-        return params
-
-    def tweak_jers(params):
-        del params['lookDirection']
-        del params['offNadirAngle']
-        del params['productType']
-
-        return params
-
-    def tweak_rsat(params):
-        del params['offNadirAngle']
-        del params['productType']
-
-        return params
-
-    def tweak_sentinel(params):
-        #del params['frame'] # questionable; proof of concept used spatial AoI matching
-        del params['offNadirAngle']
-
+    # build a stack from scratch if it's a non-precalc dataset with state vectors
+    if get_platform(master) in ['S1']:
+        stack_params['beamMode'] = master_results[0]['beamMode']
+        stack_params['flightDirection'] = master_results[0]['flightDirection']
+        stack_params['lookDirection'] = master_results[0]['lookDirection']
+        stack_params['relativeorbit'] = master_results[0]['relativeOrbit'] # path
+        stack_params['polarization'] = master_results[0]['polarization']
         if params['polarization'] in ['HH', 'HH+HV']:
             params['polarization'] = 'HH,HH+HV'
         elif params['polarization'] in ['VV', 'VV+VH']:
             params['polarization'] = 'VV,VV+VH'
-        if params['productType'] in ['GRD-HD', 'GRD-MD', 'GRD-MS', 'GRD-HS']:
-            params['productType'] = 'GRD-HD,GRD-MD,GRD-MS,GRD-HS'
-        f = params['frame']
-        params['frame'] = f'{f-2}-{f+2}' # FIXME: OG proof of concept used masster as AoI, look into that
-        params['dataset'] = 'S1' # Use the API's multi-dataset alias for S1/S2 tandem stacks
+        stack_params['intersectsWith'] = f"POINT({master_results[0]['centerLon']} {master_results[0]['centerLat']})" # flexible alternative to frame
 
-        return params
+    return stack_params
 
-    tweak_map = {
-        'ALOS':        tweak_alos,
-        'ERS-1':       tweak_ers,
-        'ERS-2':       tweak_ers,
-        'JERS-1':      tweak_jers,
-        'RADARSAT-1':  tweak_rsat,
-        'Sentinel-1A': tweak_sentinel,
-        'Sentinel-1B': tweak_sentinel,
-    }
-    return tweak_map[params['dataset']](params)
-
-# Convenience method to convert jsonlite names to SearchAPI names
-def rename_stack_params(params):
-    rename_map = {
-        'beamMode':         'beammode',
-        'dataset':          'platform',
-        'flightDirection':  'flightdirection',
-        'frame':            'frame', # asfframe?
-        'lookDirection':    'lookdirection',
-        'offNadirAngle':    'offnadirangle',
-        'path':             'relativeorbit',
-        'polarization':     'polarization',
-        'productType':      'processingLevel'
-    }
-    renamed_params = {}
-    for p in params.keys():
-        renamed_params[rename_map[p]] = params[p]
-    return renamed_params
+def query_stack(params):
+    params, output, max_results = translate_params(params)
+    query = CMRQuery(
+        params=dict(params)
+    )
+    return [product for product in query.get_results()]
 
 def check_master(master, stack):
-    if master not in [product['gn'] for product in stack['results']]:
-        master = stack[0]['gn']
-        stack['warnings'].append({'NEW_MASTER': f'A new master had to be selected in order to calculate baseline values: {master}'})
-    return master, stack
+    warnings = None
+    if master not in [product['granuleName'] for product in stack]:
+        master = stack[0]['granuleName']
+        warnings = [{'NEW_MASTER': f'A new master had to be selected in order to calculate baseline values.'}]
+    return master, stack, warnings
+
+def get_platform(master):
+    return master[0:2].upper()
+
+def get_default_product_type(master):
+    if get_platform(master) in ['AL']:
+        return 'L1.1'
+    if get_platform(master) in ['R1', 'E1', 'E2', 'J1']:
+        return 'L0'
+    if get_platform(master) in ['S1']:
+        return 'SLC'
+    return None
 
 def calculate_temporal_baselines(master, stack):
     for product in stack:
-        if product['gn'] == master:
-            master_start = dateparser.parse(product['st'])
+        if product['granuleName'] == master:
+            master_start = dateparser.parse(product['startTime'])
             break
     for product in stack:
-        if product['gn'] == master:
-            product['tb'] = 0
+        if product['granuleName'] == master:
+            product['temporalBaseline'] = 0
         else:
-            start = dateparser.parse(product['st'])
-            product['tb'] = (start - master_start).days
+            start = dateparser.parse(product['startTime'])
+            product['temporalBaseline'] = (start - master_start).days
     return stack
+
+def offset_perpendicular_baselines(master, stack):
+    for product in stack:
+        if product['granuleName'] == master:
+            master_offset = float(product['insarBaseline'])
+            break
+    for product in stack:
+        if product['granuleName'] == master:
+            product['perpendicularBaseline'] = 0
+        else:
+            product['perpendicularBaseline'] = float(product['insarBaseline']) - master_offset
+    return stack
+
+def calculate_perpendicular_baselines(master, stack):
+    # totally faking perpendicular baseline data for the moment, come at me bro
+    for product in stack:
+        random.seed(product['granuleName']) # lol
+        product['perpendicularBaseline'] = 0 if product['granuleName'] == master else random.randrange(-500, 500)

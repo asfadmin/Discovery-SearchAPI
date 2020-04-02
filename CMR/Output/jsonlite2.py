@@ -2,21 +2,20 @@ import logging
 import json
 from .jsonlite import JSONLiteStreamArray
 
-def cmr_to_jsonlite2(rgen):
+def cmr_to_jsonlite2(rgen, includeBaseline=False, addendum=None):
     logging.debug('translating: jsonlite')
 
-    streamer = JSONLite2StreamArray(rgen)
+    streamer = JSONLite2StreamArray(rgen, includeBaseline)
 
     for p in json.JSONEncoder(sort_keys=True, separators=(',', ':')).iterencode({'results': streamer}):
         yield p
 
 class JSONLite2StreamArray(JSONLiteStreamArray):
-    @staticmethod
-    def getItem(p):
+    def getItem(self, p):
          # pre-processing of the result is the same as in the base jsonlite streamer,
          # so use that and then rename/substitute fields
-        p = JSONLiteStreamArray.getItem(p)
-        return {
+        p = super().getItem(p)
+        result = {
             # Mandatory:
             'd': p['dataset'],
             'du': p['downloadUrl'].replace(p['granuleName'], '{gn}'),
@@ -46,3 +45,9 @@ class JSONLite2StreamArray(JSONLiteStreamArray):
             'fr': p['faradayRotation'], # ALOS
             'on': p['offNadirAngle'] # ALOS
         }
+
+        if self.includeBaseline:
+            result['tb'] = p['temporalBaseline']
+            result['pb'] = p['perpendicularBaseline']
+
+        return result

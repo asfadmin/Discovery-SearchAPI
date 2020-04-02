@@ -2,10 +2,10 @@ import logging
 import json
 from .json import JSONStreamArray
 
-def cmr_to_geojson(rgen):
+def cmr_to_geojson(rgen, includeBaseline=False, addendum=None):
     logging.debug('translating: geojson')
 
-    streamer = GeoJSONStreamArray(rgen)
+    streamer = GeoJSONStreamArray(rgen, includeBaseline)
 
     for p in json.JSONEncoder(indent=2, sort_keys=True).iterencode({'type': 'FeatureCollection','features':streamer}):
         yield p
@@ -25,7 +25,7 @@ class GeoJSONStreamArray(JSONStreamArray):
         except TypeError:
             pass
 
-        return {
+        result = {
             'type': 'Feature',
             'geometry': {
                 'type': 'Polygon',
@@ -58,3 +58,8 @@ class GeoJSONStreamArray(JSONStreamArray):
                 'url': p['downloadUrl']
             }
         }
+        if self.includeBaseline:
+            result['properties']['temporalBaseline'] = p['temporalBaseline']
+            result['properties']['perpendicularBaseline'] = p['perpendicularBaseline']
+
+        return result
