@@ -2,7 +2,7 @@ import logging
 import requests
 from asf_env import get_config
 
-def cmr_to_download(rgen):
+def cmr_to_download(rgen, includeBaseline=False):
     logging.debug('translating: bulk download script')
     plist = [p['downloadUrl'] for p in rgen()]
     bd_res = requests.post(get_config()['bulk_download_api'], data={'products': ','.join(plist)})

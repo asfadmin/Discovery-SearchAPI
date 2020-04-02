@@ -77,6 +77,7 @@ def parse_granule(granule):
         'granuleType':  get_attr('GRANULE_TYPE'),
         'groupID': get_attr('GROUP_ID'),
         'incidenceAngle': 'NA',  # always None in API
+        'insarBaseline': get_attr('INSAR_BASELINE'),
         'insarGrouping': get_attr('INSAR_STACK_ID'),
         'insarStackSize': get_attr('INSAR_STACK_SIZE'),
         'lookDirection': get_attr('LOOK_DIRECTION'),
