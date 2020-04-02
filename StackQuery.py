@@ -26,8 +26,16 @@ class APIStackQuery:
             if 'output' not in self.params:
                 self.params['output'] = 'metalink'
 
-            stack, warnings = get_stack(self.params['master'], product_type=self.params['processingLevel'])
 
+            is_count = self.params['output'].lower() == 'count'
+            stack, warnings = get_stack(
+                self.params['master'],
+                product_type=self.params['processingLevel'],
+                is_count=is_count)
+
+            if is_count:
+                return make_response(f'{stack}\n')
+            
             translators = output_translators()
             translator, mimetype, suffix = translators.get(self.params['output'], translators['metalink'])
 
@@ -44,7 +52,7 @@ class APIStackQuery:
                 translator(stack_generator,
                     includeBaseline=True,
                     addendum={'warnings': warnings} if warnings is not None else None))
-            
+
             return Response(resp, headers=d)
 
         except ValueError as e:

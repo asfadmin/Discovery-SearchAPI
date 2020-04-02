@@ -1,6 +1,5 @@
 import logging
 import dateparser
-from flask import request
 from CMR.Translate import translate_params
 from CMR.Query import CMRQuery
 
@@ -8,21 +7,20 @@ import random
 
 precalc_datasets = ['AL', 'R1', 'E1', 'E2', 'J1']
 
-def get_stack(master, product_type=None):
+def get_stack(master, product_type=None, is_count=False):
     warnings = None
-    is_count = request.values.get('output', 'jsonlite2').lower() == 'count'
 
     try:
         stack_params = get_stack_params(master, product_type)
     except ValueError as e:
         if is_count:
-            return 0
+            return 0, None
         else:
             raise e
 
     logging.debug(stack_params)
     if is_count:
-        return 1
+        return 1, None
 
     stack = query_stack(stack_params)
 
