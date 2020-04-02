@@ -38,11 +38,13 @@ class APIStackQuery:
             # yick
             def stack_generator():
                 for product in stack:
-                    product['__isBaseline'] = True # A flag for some output translators
                     yield product
 
-            resp = ''.join(translator(stack_generator, includeBaseline=True))
-
+            resp = ''.join(
+                translator(stack_generator,
+                    includeBaseline=True,
+                    addendum={'warnings': warnings} if warnings is not None else None))
+            
             return Response(resp, headers=d)
 
         except ValueError as e:

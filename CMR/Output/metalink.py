@@ -1,7 +1,7 @@
 import logging
 from jinja2 import Environment, PackageLoader
 
-def cmr_to_metalink(rgen, includeBaseline=False):
+def cmr_to_metalink(rgen, includeBaseline=False, addendum=None):
     logging.debug('translating: metalink')
 
     templateEnv = Environment(

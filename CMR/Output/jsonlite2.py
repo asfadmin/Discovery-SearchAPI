@@ -2,7 +2,7 @@ import logging
 import json
 from .jsonlite import JSONLiteStreamArray
 
-def cmr_to_jsonlite2(rgen, includeBaseline=False):
+def cmr_to_jsonlite2(rgen, includeBaseline=False, addendum=None):
     logging.debug('translating: jsonlite')
 
     streamer = JSONLite2StreamArray(rgen, includeBaseline)

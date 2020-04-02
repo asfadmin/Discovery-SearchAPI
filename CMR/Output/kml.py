@@ -1,7 +1,7 @@
 import logging
 from jinja2 import Environment, PackageLoader
 
-def cmr_to_kml(rgen, includeBaseline=False):
+def cmr_to_kml(rgen, includeBaseline=False, addendum=None):
     logging.debug('translating: kml')
 
     templateEnv = Environment(

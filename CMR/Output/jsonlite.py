@@ -4,12 +4,15 @@ from geomet import wkt
 
 from .json import JSONStreamArray
 
-def cmr_to_jsonlite(rgen, includeBaseline=False):
+def cmr_to_jsonlite(rgen, includeBaseline=False, addendum=None):
     logging.debug('translating: jsonlite')
 
     streamer = JSONLiteStreamArray(rgen, includeBaseline)
-
-    for p in json.JSONEncoder(indent=2, sort_keys=True).iterencode({'results': streamer}):
+    jsondata = {'results': streamer}
+    if addendum is not None:
+        jsondata.update(addendum)
+    
+    for p in json.JSONEncoder(indent=2, sort_keys=True).iterencode(jsondata):
         yield p
 
 def unwrap_wkt(wkt_str):

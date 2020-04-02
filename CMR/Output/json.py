@@ -1,7 +1,7 @@
 import logging
 import json
 
-def cmr_to_json(rgen, includeBaseline=False):
+def cmr_to_json(rgen, includeBaseline=False, addendum=None):
     logging.debug('translating: json')
 
     streamer = JSONStreamArray(rgen, includeBaseline)

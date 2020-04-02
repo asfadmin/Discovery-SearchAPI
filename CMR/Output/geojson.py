@@ -2,7 +2,7 @@ import logging
 import json
 from .json import JSONStreamArray
 
-def cmr_to_geojson(rgen, includeBaseline=False):
+def cmr_to_geojson(rgen, includeBaseline=False, addendum=None):
     logging.debug('translating: geojson')
 
     streamer = GeoJSONStreamArray(rgen, includeBaseline)
