@@ -13,7 +13,7 @@ def cmr_to_geojson(rgen, includeBaseline=False):
 
 class GeoJSONStreamArray(JSONStreamArray):
 
-    def getItem(self, p, includeBaseline=False):
+    def getItem(self, p):
         for i in p.keys():
             if p[i] == 'NA' or p[i] == '':
                 p[i] = None

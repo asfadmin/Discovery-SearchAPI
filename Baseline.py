@@ -1,9 +1,6 @@
 import logging
-import requests
-import json
 import dateparser
 from flask import request
-from asf_env import get_config
 from CMR.Translate import translate_params
 from CMR.Query import CMRQuery
 
