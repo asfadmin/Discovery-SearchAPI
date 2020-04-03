@@ -43,82 +43,83 @@ def parse_granule(granule):
         else get_attr('CENTER_ESA_FRAME')
 
     result = {
-        'granuleName': get_val("./DataGranule/ProducerGranuleId", default=None),
-        'sizeMB': get_val("./DataGranule/SizeMBDataGranule", default=None),
-        'processingDate':  get_val("./DataGranule/ProductionDateTime", default=None),
-        'startTime':  get_val("./Temporal/RangeDateTime/BeginningDateTime", default=None),
-        'stopTime':  get_val("./Temporal/RangeDateTime/EndingDateTime", default=None),
         'absoluteOrbit': get_val(
             "./OrbitCalculatedSpatialDomains/OrbitCalculatedSpatialDomain/OrbitNumber",
             default=None
         ),
+        'baselinePerp': get_attr('INSAR_BASELINE'),
+        'beamMode': get_attr('BEAM_MODE_TYPE'),
+        'beamModeType': get_attr('BEAM_MODE_TYPE'),
+        'beamSwath': 'NA',  # .......complicated
+        'browse': get_browse_urls(granule, './AssociatedBrowseImageUrls'),
+        'bytes': get_attr("BYTES"),
+        'catSceneId': 'NA',  # always None in API
+        'centerLat':  get_attr('CENTER_LAT'),
+        'centerLon':  get_attr('CENTER_LON'),
+        'collectionName': get_attr('MISSION_NAME'),
+        'configurationName': get_attr('BEAM_MODE_DESC'),
+        'doppler': get_attr('DOPPLER'),
+        'downloadUrl': get_val("./OnlineAccessURLs/OnlineAccessURL/URL", default=None),
+        'farEndLat':  get_attr('FAR_END_LAT'),
+        'farEndLon':  get_attr('FAR_END_LON'),
+        'farStartLat':  get_attr('FAR_START_LAT'),
+        'farStartLon':  get_attr('FAR_START_LON'),
+        'faradayRotation':  get_attr('FARADAY_ROTATION'),
+        'fileName': get_val("./OnlineAccessURLs/OnlineAccessURL/URL", default=None).split('/')[-1],
+        'finalFrame':  get_attr('CENTER_ESA_FRAME'),
+        'firstFrame': get_attr('CENTER_ESA_FRAME'),
+        'flightDirection': get_attr('ASCENDING_DESCENDING'),
+        'flightLine': get_attr('FLIGHT_LINE'),
+        'formatName': 'NA',  # always None in API
+        'frameNumber': frame_number,
+        'frequency': 'NA',  # always None in API
+        'granuleName': get_val("./DataGranule/ProducerGranuleId", default=None),
+        'granuleType':  get_attr('GRANULE_TYPE'),
+        'groupID': get_attr('GROUP_ID'),
+        'incidenceAngle': 'NA',  # always None in API
+        'insarBaseline': get_attr('INSAR_BASELINE'),
+        'insarGrouping': get_attr('INSAR_STACK_ID'),
+        'insarStackSize': get_attr('INSAR_STACK_SIZE'),
+        'lookDirection': get_attr('LOOK_DIRECTION'),
+        'masterGranule': 'NA',  # almost always None in API
+        'md5sum': get_attr('MD5SUM'),
+        'missionName': get_attr('MISSION_NAME'),
+        'nearEndLat':  get_attr('NEAR_END_LAT'),
+        'nearEndLon':  get_attr('NEAR_END_LON'),
+        'nearStartLat':  get_attr('NEAR_START_LAT'),
+        'nearStartLon':  get_attr('NEAR_START_LON'),
+        'offNadirAngle': get_attr('OFF_NADIR_ANGLE'),
+        'percentCoherence': 'NA',  # not in CMR
+        'percentTroposphere': 'NA',  # not in CMR
+        'percentUnwrapped': 'NA',  # not in CMR
         'platform': get_attr(
             'ASF_PLATFORM',
             default=get_val("./Platforms/Platform/ShortName")
         ),
-        'md5sum': get_attr('MD5SUM'),
-        'beamMode': get_attr('BEAM_MODE_TYPE'),
-        'configurationName': get_attr('BEAM_MODE_DESC'),
-        'bytes': get_attr("BYTES"),
-        'granuleType':  get_attr('GRANULE_TYPE'),
-        'sceneDate': get_attr('ACQUISITION_DATE'),
-        'flightDirection': get_attr('ASCENDING_DESCENDING'),
-        'thumbnailUrl': get_attr('THUMBNAIL_URL'),
-        'farEndLat':  get_attr('FAR_END_LAT'),
-        'farStartLat':  get_attr('FAR_START_LAT'),
-        'nearStartLat':  get_attr('NEAR_START_LAT'),
-        'nearEndLat':  get_attr('NEAR_END_LAT'),
-        'farEndLon':  get_attr('FAR_END_LON'),
-        'farStartLon':  get_attr('FAR_START_LON'),
-        'nearStartLon':  get_attr('NEAR_START_LON'),
-        'nearEndLon':  get_attr('NEAR_END_LON'),
-        'processingType':  get_attr('PROCESSING_LEVEL'),
-        'finalFrame':  get_attr('CENTER_ESA_FRAME'),
-        'centerLat':  get_attr('CENTER_LAT'),
-        'centerLon':  get_attr('CENTER_LON'),
         'polarization':  get_attr('POLARIZATION'),
-        'faradayRotation':  get_attr('FARADAY_ROTATION'),
-        'stringFootprint': wkt_shape,
-        'doppler': get_attr('DOPPLER'),
-        'baselinePerp': get_attr('INSAR_BASELINE'),
-        'insarStackSize': get_attr('INSAR_STACK_SIZE'),
+        'processingDate':  get_val("./DataGranule/ProductionDateTime", default=None),
         'processingDescription': get_attr('PROCESSING_DESCRIPTION'),
-        'percentTroposphere': 'NA',  # not in CMR
-        'frameNumber': frame_number,
-        'percentCoherence': 'NA',  # not in CMR
-        'productName': get_val("./DataGranule/ProducerGranuleId", default=None),
-        'masterGranule': 'NA',  # almost always None in API
-        'percentUnwrapped': 'NA',  # not in CMR
-        'beamSwath': 'NA',  # .......complicated
-        'insarGrouping': get_attr('INSAR_STACK_ID'),
-        'offNadirAngle': get_attr('OFF_NADIR_ANGLE'),
-        'missionName': get_attr('MISSION_NAME'),
-        'relativeOrbit': get_attr('PATH_NUMBER'),
-        'flightLine': get_attr('FLIGHT_LINE'),
-        'processingTypeDisplay': get_attr('PROCESSING_TYPE_DISPLAY'),
-        'track': get_attr('PATH_NUMBER'),
-        'beamModeType': get_attr('BEAM_MODE_TYPE'),
         'processingLevel': get_attr('PROCESSING_TYPE'),
-        'lookDirection': get_attr('LOOK_DIRECTION'),
-        'varianceTroposphere': 'NA',  # not in CMR
-        'slaveGranule': 'NA',  # almost always None in API
-        'sensor': get_val('./Platforms/Platform/Instruments/Instrument/ShortName', default=None),
-        'fileName': get_val("./OnlineAccessURLs/OnlineAccessURL/URL", default=None).split('/')[-1],
-        'downloadUrl': get_val("./OnlineAccessURLs/OnlineAccessURL/URL", default=None),
-        'browse': get_browse_urls(granule, './AssociatedBrowseImageUrls'),
-        'shape': shape,
-        'sarSceneId': 'NA',  # always None in API
+        'processingType':  get_attr('PROCESSING_LEVEL'),
+        'processingTypeDisplay': get_attr('PROCESSING_TYPE_DISPLAY'),
+        'productName': get_val("./DataGranule/ProducerGranuleId", default=None),
         'product_file_id': get_val("./GranuleUR", default=None),
-        'sceneId': get_val("./DataGranule/ProducerGranuleId", default=None),
-        'firstFrame': get_attr('CENTER_ESA_FRAME'),
-        'frequency': 'NA',  # always None in API
-        'catSceneId': 'NA',  # always None in API
-        'status': 'NA',  # always None in API
-        'formatName': 'NA',  # always None in API
-        'incidenceAngle': 'NA',  # always None in API
-        'collectionName': get_attr('MISSION_NAME'),
+        'relativeOrbit': get_attr('PATH_NUMBER'),
+        'sarSceneId': 'NA',  # always None in API
+        'sceneDate': get_attr('ACQUISITION_DATE'),
         'sceneDateString': 'NA',  # always None in API
-        'groupID': get_attr('GROUP_ID'),
+        'sceneId': get_val("./DataGranule/ProducerGranuleId", default=None),
+        'sensor': get_val('./Platforms/Platform/Instruments/Instrument/ShortName', default=None),
+        'shape': shape,
+        'sizeMB': get_val("./DataGranule/SizeMBDataGranule", default=None),
+        'slaveGranule': 'NA',  # almost always None in API
+        'startTime':  get_val("./Temporal/RangeDateTime/BeginningDateTime", default=None),
+        'status': 'NA',  # always None in API
+        'stopTime':  get_val("./Temporal/RangeDateTime/EndingDateTime", default=None),
+        'stringFootprint': wkt_shape,
+        'thumbnailUrl': get_attr('THUMBNAIL_URL'),
+        'track': get_attr('PATH_NUMBER'),
+        'varianceTroposphere': 'NA'  # not in CMR
     }
 
     for k in result:

@@ -1,14 +1,18 @@
 import logging
 import json
 from geomet import wkt
+
 from .json import JSONStreamArray
 
-def cmr_to_jsonlite(rgen):
+def cmr_to_jsonlite(rgen, includeBaseline=False, addendum=None):
     logging.debug('translating: jsonlite')
 
-    streamer = JSONLiteStreamArray(rgen)
-
-    for p in json.JSONEncoder(indent=2, sort_keys=True).iterencode({'results': streamer}):
+    streamer = JSONLiteStreamArray(rgen, includeBaseline)
+    jsondata = {'results': streamer}
+    if addendum is not None:
+        jsondata.update(addendum)
+    
+    for p in json.JSONEncoder(indent=2, sort_keys=True).iterencode(jsondata):
         yield p
 
 def unwrap_wkt(wkt_str):
@@ -23,8 +27,7 @@ def unwrap_wkt(wkt_str):
     return wkt_str
 
 class JSONLiteStreamArray(JSONStreamArray):
-    @staticmethod
-    def getItem(p):
+    def getItem(self, p):
         for i in p.keys():
             if p[i] == 'NA' or p[i] == '':
                 p[i] = None
@@ -66,7 +69,7 @@ class JSONLiteStreamArray(JSONStreamArray):
         except TypeError:
             pass
 
-        return {
+        result = {
             # Mandatory:
             'dataset': p['platform'],
             'downloadUrl': p['downloadUrl'],
@@ -96,3 +99,9 @@ class JSONLiteStreamArray(JSONStreamArray):
             'faradayRotation': p['faradayRotation'], # ALOS
             'offNadirAngle': p['offNadirAngle'] # ALOS
         }
+
+        if self.includeBaseline:
+            result['temporalBaseline'] = p['temporalBaseline']
+            result['perpendicularBaseline'] = p['perpendicularBaseline']
+
+        return result
