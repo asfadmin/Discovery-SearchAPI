@@ -104,6 +104,15 @@ tests:
     expected file: csv
     expected code: 200
 
+# DS-3093
+- min and max Doppler negative:
+    minDoppler: -20000
+    maxDoppler: -1
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
 
 # tests:
 # - Known bug - Inject urls:
