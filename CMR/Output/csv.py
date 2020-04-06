@@ -1,7 +1,7 @@
 import logging
 from jinja2 import Environment, PackageLoader
 
-def cmr_to_csv(rgen):
+def cmr_to_csv(rgen, includeBaseline=False, addendum=None):
     logging.debug('translating: csv')
 
     templateEnv = Environment(
@@ -10,5 +10,5 @@ def cmr_to_csv(rgen):
     )
 
     template = templateEnv.get_template('template.csv')
-    for l in template.stream(results=rgen()):
+    for l in template.stream(includeBaseline=includeBaseline, results=rgen()):
         yield l

@@ -6,7 +6,8 @@ from datetime import datetime
 
 import api_headers
 from CMR.Input import parse_string
-from Baseline import get_stack
+from CMR.Output import output_translators
+from Baseline import get_stack, get_default_product_type
 from asf_env import get_config
 
 
@@ -20,8 +21,40 @@ class APIStackQuery:
         logging.debug(self.request.values)
         try:
             self.validate()
-            stack = get_stack(self.params['master'])
-            resp = json.dumps(stack)
+            if 'processinglevel' not in self.params:
+                self.params['processinglevel'] = get_default_product_type(self.params['master'])
+            if 'output' not in self.params:
+                self.params['output'] = 'metalink'
+
+
+            is_count = self.params['output'].lower() == 'count'
+            stack, warnings = get_stack(
+                self.params['master'],
+                product_type=self.params['processinglevel'],
+                is_count=is_count)
+
+            if is_count:
+                return make_response(f'{stack}\n')
+
+            translators = output_translators()
+            translator, mimetype, suffix = translators.get(self.params['output'], translators['metalink'])
+
+            filename = make_filename(suffix)
+            d = api_headers.base(mimetype)
+            d.add('Content-Disposition', 'attachment', filename=filename)
+
+            # yick
+            def stack_generator():
+                for product in stack:
+                    yield product
+
+            resp = ''.join(
+                translator(stack_generator,
+                    includeBaseline=True,
+                    addendum={'warnings': warnings} if warnings is not None else None))
+
+            return Response(resp, headers=d)
+
         except ValueError as e:
             return self.validation_error(e)
 
@@ -34,7 +67,7 @@ class APIStackQuery:
         return Response(resp, headers=d)
 
     def validate(self):
-        valid_params = ['master', 'output']
+        valid_params = ['master', 'output', 'processinglevel']
         if get_config()['flexible_maturity']:
             valid_params.append('maturity')
 

@@ -511,14 +511,6 @@ tests:
     expected file: csv
     expected code: 200
 
-- intersectsWith polygon:
-    intersectsWith: polygon%28%28-119.543 37.925+ -118.443 37.7421+ -118.682 36.8525+ -119.77 37.0352+ -119.543 37.925%29%29
-    maxResults: 100
-    output: CSV
-
-    expected file: csv
-    expected code: 200
-
 - intersectsWith linestring:
     intersectsWith: linestring(-119.543 37.925, -118.443 37.7421)
     maxResults: 1000
@@ -669,16 +661,7 @@ tests:
 
     expected file: csv
     expected code: 200
-
-- min and max Doppler negative:
-    minDoppler: -20000
-    maxDoppler: -1
-    maxResults: 10
-    output: csv
-
-    expected file: csv
-    expected code: 200
-
+    
 - maxInsarStackSize:
     maxInsarStackSize: 50
     maxResults: 10
@@ -881,15 +864,6 @@ tests:
     expected file: csv
     expected code: 200
 
-- platform SB:
-    platform: SB
-    start: 1+year+ago
-    end: now
-    maxResults: 2000
-    output: csv
-
-    expected file: csv
-    expected code: 200
 
 - platform J1:
     platform: J1
@@ -2096,16 +2070,6 @@ tests:
     expected file: csv
     expected code: 200
 
-- season 1-100 S1 2years:
-    season: 1,100
-    platform: sa,sb
-    start: 2+year+ago
-    end: now
-    maxResults: 1000
-    output: csv
-
-    expected file: csv
-    expected code: 200
 
 - season 1-175 SMAP July 2015-now:
     season: 1,175
@@ -2129,16 +2093,7 @@ tests:
     expected file: csv
     expected code: 200
 
-- season 1-100 S1 1year:
-    season: 1,100
-    platform: SA,Sb
-    start: 1+year+ago
-    end: now
-    maxResults: 1000
-    output: csv
 
-    expected file: csv
-    expected code: 200
 
 - season 1-175 SMAP 3year:
     season: 1,175
