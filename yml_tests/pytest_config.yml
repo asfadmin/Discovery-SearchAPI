@@ -46,8 +46,13 @@ test_types:
     variables:
       endpoint: "/services/utils/date"
 
+- Baseline Endpoint:
+    required_keys: master
+    method: test_BaselineEndpoint
+    variables:
+      endpoint: "/services/search/baseline?"
+
 - Get Data from API:
     method: test_URLManagerSearch
     variables:
       endpoint: "/services/search/param?"
-
