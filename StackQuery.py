@@ -21,8 +21,8 @@ class APIStackQuery:
         logging.debug(self.request.values)
         try:
             self.validate()
-            if 'processingLevel' not in self.params:
-                self.params['processingLevel'] = get_default_product_type(self.params['master'])
+            if 'processinglevel' not in self.params:
+                self.params['processinglevel'] = get_default_product_type(self.params['master'])
             if 'output' not in self.params:
                 self.params['output'] = 'metalink'
 
@@ -30,12 +30,12 @@ class APIStackQuery:
             is_count = self.params['output'].lower() == 'count'
             stack, warnings = get_stack(
                 self.params['master'],
-                product_type=self.params['processingLevel'],
+                product_type=self.params['processinglevel'],
                 is_count=is_count)
 
             if is_count:
                 return make_response(f'{stack}\n')
-            
+
             translators = output_translators()
             translator, mimetype, suffix = translators.get(self.params['output'], translators['metalink'])
 
@@ -67,7 +67,7 @@ class APIStackQuery:
         return Response(resp, headers=d)
 
     def validate(self):
-        valid_params = ['master', 'output', 'processingLevel']
+        valid_params = ['master', 'output', 'processinglevel']
         if get_config()['flexible_maturity']:
             valid_params.append('maturity')
 

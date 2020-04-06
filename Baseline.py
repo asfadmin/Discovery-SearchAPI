@@ -49,7 +49,7 @@ def get_stack_params(master, product_type):
     )
     master_results = [product for product in query.get_results()]
     if len(master_results) <= 0:
-        raise ValueError(f'Requested master not found: {master}')
+        raise ValueError(f'Requested master not found, or no {product_type} product is available: {master}')
 
     stack_params = {}
     if product_type is not None:
@@ -59,12 +59,12 @@ def get_stack_params(master, product_type):
 
     #shortcut the stacking for legacy datasets with precalculated stacks and baselines
     if get_platform(master) in precalc_datasets:
-        if master_results[0]['insarGrouping'] is not None and master_results[0]['insarGrouping'] not in ['NA']:
+        if master_results[0]['insarGrouping'] is not None and master_results[0]['insarGrouping'] not in ['NA', 0, '0']:
             stack_params['insarstackid'] = master_results[0]['insarGrouping']
             return stack_params
         else:
             # if it's a precalc stack with no stack ID, we gotta bail because we don't have state vectors to fall back on
-            raise ValueError(f'Requested master did not have required baseline stack ID: {master}')
+            raise ValueError(f'Requested master did not have a baseline stack ID: {master}')
 
     # build a stack from scratch if it's a non-precalc dataset with state vectors
     if get_platform(master) in ['S1']:
