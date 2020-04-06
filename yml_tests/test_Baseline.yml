@@ -1,0 +1,61 @@
+api: Test
+
+
+tests:
+- baseline test:
+    master: E1_23942_STD_F155
+    maturity: prod
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- baseline count:
+    master: E1_23942_STD_F155
+    output: count
+    maturity: prod
+
+    expected file: count
+    expected code: 200
+
+- baseline processing level:
+    master: ALPSRP279071410
+    output: csv
+    processingLevel: L1.0
+    maturity: prod
+
+    expected file: csv
+    expected code: 200
+
+- baseline processing level:
+    master: ALPSRP279071410
+    output: csv
+    processingLevel: L1.5
+    maturity: prod
+
+    expected file: csv
+    expected code: 200
+
+
+###URL test example
+# - absoluteOrbit single:
+#     absoluteOrbit: 5542
+#     maxresults: 10
+#     output: CSV
+
+#     expected file: csv
+#     expected code: 200
+
+
+### Date example
+# - blank date:
+#     date: ""
+#     expected file: error json
+#     expected code: 200
+#     expected error: could not parse date
+
+# - today:
+#     date: today
+#     expected file: json
+#     expected code: 200
+#     expected date: parsed
