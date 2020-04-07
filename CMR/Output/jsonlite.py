@@ -11,7 +11,7 @@ def cmr_to_jsonlite(rgen, includeBaseline=False, addendum=None):
     jsondata = {'results': streamer}
     if addendum is not None:
         jsondata.update(addendum)
-    
+
     for p in json.JSONEncoder(indent=2, sort_keys=True).iterencode(jsondata):
         yield p
 
@@ -76,6 +76,7 @@ class JSONLiteStreamArray(JSONStreamArray):
             'fileName': p['fileName'],
             'granuleName': p['granuleName'],
             'groupID': p['groupID'],
+            'instrument': p['sensor'],
             'productID': p['product_file_id'],
             'productType': p['processingLevel'],
             'productTypeDisplay': p['processingTypeDisplay'],
