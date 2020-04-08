@@ -1,7 +1,6 @@
 import logging
 import json
 from geomet import wkt
-import dateparser
 
 from .json import JSONStreamArray
 
@@ -26,6 +25,21 @@ def unwrap_wkt(wkt_str):
     except ValueError as e:
         return wkt_str
     return wkt_str
+
+def canInsar(p):
+    if p['platform'] in ['ALOS', 'RADARSAT-1', 'JERS-1', 'ERS-1', 'ERS-2'] and \
+        p.get('insarGrouping') not in [None, 0, '0', 'NA']:
+        return True
+    elif None not in [
+        p['sv_x_pos_pre'],  p['sv_y_pos_pre'],  p['sv_z_pos_pre'],
+        p['sv_x_pos_post'], p['sv_y_pos_post'], p['sv_z_pos_post'],
+        p['sv_x_vel_pre'],  p['sv_y_vel_pre'],  p['sv_z_vel_pre'],
+        p['sv_x_vel_post'], p['sv_z_vel_post'], p['sv_z_vel_post'],
+        p['sv_t_pos_pre'], p['sv_t_pos_post'],
+        p['sv_t_vel_pre'], p['sv_t_vel_post']]:
+        return True
+    else:
+        return False
 
 class JSONLiteStreamArray(JSONStreamArray):
     def getItem(self, p):
@@ -72,7 +86,7 @@ class JSONLiteStreamArray(JSONStreamArray):
 
         result = {            'beamMode': p['beamMode'],
             'browse': p['browse'],
-            'canInSAR': False,
+            'canInSAR': canInsar(p),
             'dataset': p['platform'],
             'downloadUrl': p['downloadUrl'],
             'faradayRotation': p['faradayRotation'], # ALOS
@@ -98,24 +112,6 @@ class JSONLiteStreamArray(JSONStreamArray):
             'wkt': p['stringFootprint'],
             'wkt_unwrapped': unwrap_wkt(p['stringFootprint'])
         }
-
-        def float_or_none(a):
-            try:
-                return float(a)
-            except ValueError:
-                return None
-
-        if p['platform'] in ['ALOS', 'RADARSAT-1', 'JERS-1', 'ERS-1', 'ERS-2'] and \
-            p.get('insarGrouping') not in [None, 0, '0', 'NA']:
-            result['canInSAR'] = True
-        elif None not in [
-            p['sv_x_pos_pre'],  p['sv_y_pos_pre'],  p['sv_z_pos_pre'],
-            p['sv_x_pos_post'], p['sv_y_pos_post'], p['sv_z_pos_post'],
-            p['sv_x_vel_pre'],  p['sv_y_vel_pre'],  p['sv_z_vel_pre'],
-            p['sv_x_vel_post'], p['sv_z_vel_post'], p['sv_z_vel_post'],
-            p['sv_t_pos_pre'], p['sv_t_pos_post'],
-            p['sv_t_vel_pre'], p['sv_t_vel_post']]:
-            result['canInSAR'] = True
 
         if self.includeBaseline:
             result['temporalBaseline'] = p['temporalBaseline']
