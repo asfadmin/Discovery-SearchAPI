@@ -22,6 +22,7 @@ class JSONLite2StreamArray(JSONLiteStreamArray):
             'fn': p['fileName'].replace(p['granuleName'], '{gn}'),
             'gn': p['granuleName'],
             'gid': p['groupID'].replace(p['granuleName'], '{gn}'),
+            'i': p['instrument'],
             'pid': p['productID'].replace(p['granuleName'], '{gn}'),
             'pt': p['productType'],
             'ptd': p['productTypeDisplay'],

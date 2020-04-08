@@ -51,7 +51,8 @@ def input_map():
         'season':               [None,                      '{0}',                              parse_int_list],
         'temporal':             ['temporal',                '{0}',                              None], # start/end end up here
         'groupid':              ['attribute[]',             'string,GROUP_ID,{0}',              parse_string_list],
-        'insarstackid':         ['attribute[]',             'int,INSAR_STACK_ID,{0}',           parse_string]
+        'insarstackid':         ['attribute[]',             'int,INSAR_STACK_ID,{0}',           parse_string],
+        'instrument':           ['instrument[]',            '{0}',                              parse_string]
     }
 
     # So the search endpoint doesn't complain if we use this
