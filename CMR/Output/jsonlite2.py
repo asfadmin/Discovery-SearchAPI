@@ -16,35 +16,33 @@ class JSONLite2StreamArray(JSONLiteStreamArray):
          # so use that and then rename/substitute fields
         p = super().getItem(p)
         result = {
-            # Mandatory:
+            'b': [a.replace(p['granuleName'], '{gn}') for a in p['browse']] if p['browse'] is not None else p['browse'],
+            'bm': p['beamMode'],
             'd': p['dataset'],
             'du': p['downloadUrl'].replace(p['granuleName'], '{gn}'),
-            'fn': p['fileName'].replace(p['granuleName'], '{gn}'),
-            'gn': p['granuleName'],
-            'gid': p['groupID'].replace(p['granuleName'], '{gn}'),
-            'i': p['instrument'],
-            'pid': p['productID'].replace(p['granuleName'], '{gn}'),
-            'pt': p['productType'],
-            'ptd': p['productTypeDisplay'],
-            'st': p['startTime'],
-            'w': p['wkt'],
-            'wu': p['wkt_unwrapped'],
-            # Optional:
-            'bm': p['beamMode'],
-            'b': [a.replace(p['granuleName'], '{gn}') for a in p['browse']] if p['browse'] is not None else p['browse'],
+            'f': p['frame'],
             'fd': p['flightDirection'],
             'fl': p['flightLine'],
-            'f': p['frame'],
+            'fn': p['fileName'].replace(p['granuleName'], '{gn}'),
+            'fr': p['faradayRotation'], # ALOS
+            'gid': p['groupID'].replace(p['granuleName'], '{gn}'),
+            'gn': p['granuleName'],
+            'i': p['instrument'],
+            'in': p['canInSAR'],
             'mn': p['missionName'],
             'o': p['orbit'],
+            'on': p['offNadirAngle'], # ALOS
             'p': p['path'],
+            'pid': p['productID'].replace(p['granuleName'], '{gn}'),
             'po': p['polarization'],
+            'pt': p['productType'],
+            'ptd': p['productTypeDisplay'],
             's': p['sizeMB'],
             'ss': p['stackSize'], # Used for datasets with precalculated stacks
+            'st': p['startTime'],
             't': p['thumb'].replace(p['granuleName'], '{gn}') if p['thumb'] is not None else p['thumb'],
-            # Dataset-specific:
-            'fr': p['faradayRotation'], # ALOS
-            'on': p['offNadirAngle'] # ALOS
+            'w': p['wkt'],
+            'wu': p['wkt_unwrapped']
         }
 
         if self.includeBaseline:
