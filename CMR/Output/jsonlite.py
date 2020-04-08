@@ -26,6 +26,21 @@ def unwrap_wkt(wkt_str):
         return wkt_str
     return wkt_str
 
+def canInsar(p):
+    if p['platform'] in ['ALOS', 'RADARSAT-1', 'JERS-1', 'ERS-1', 'ERS-2'] and \
+        p.get('insarGrouping') not in [None, 0, '0', 'NA']:
+        return True
+    elif None not in [
+        p['sv_x_pos_pre'],  p['sv_y_pos_pre'],  p['sv_z_pos_pre'],
+        p['sv_x_pos_post'], p['sv_y_pos_post'], p['sv_z_pos_post'],
+        p['sv_x_vel_pre'],  p['sv_y_vel_pre'],  p['sv_z_vel_pre'],
+        p['sv_x_vel_post'], p['sv_z_vel_post'], p['sv_z_vel_post'],
+        p['sv_t_pos_pre'], p['sv_t_pos_post'],
+        p['sv_t_vel_pre'], p['sv_t_vel_post']]:
+        return True
+    else:
+        return False
+
 class JSONLiteStreamArray(JSONStreamArray):
     def getItem(self, p):
         for i in p.keys():
@@ -69,36 +84,33 @@ class JSONLiteStreamArray(JSONStreamArray):
         except TypeError:
             pass
 
-        result = {
-            # Mandatory:
+        result = {            'beamMode': p['beamMode'],
+            'browse': p['browse'],
+            'canInSAR': canInsar(p),
             'dataset': p['platform'],
             'downloadUrl': p['downloadUrl'],
+            'faradayRotation': p['faradayRotation'], # ALOS
             'fileName': p['fileName'],
-            'granuleName': p['granuleName'],
-            'groupID': p['groupID'],
-            'instrument': p['sensor'],
-            'productID': p['product_file_id'],
-            'productType': p['processingLevel'],
-            'productTypeDisplay': p['processingTypeDisplay'],
-            'startTime': p['startTime'],
-            'wkt': p['stringFootprint'],
-            'wkt_unwrapped': unwrap_wkt(p['stringFootprint']),
-            # Optional:
-            'beamMode': p['beamMode'],
-            'browse': p['browse'],
             'flightDirection': p['flightDirection'],
             'flightLine': p['flightLine'],
             'frame': p['frameNumber'],
+            'granuleName': p['granuleName'],
+            'groupID': p['groupID'],
+            'instrument': p['sensor'],
             'missionName': p['missionName'],
+            'offNadirAngle': p['offNadirAngle'], # ALOS
             'orbit': p['absoluteOrbit'],
             'path': p['relativeOrbit'],
             'polarization': p['polarization'],
+            'productID': p['product_file_id'],
+            'productType': p['processingLevel'],
+            'productTypeDisplay': p['processingTypeDisplay'],
             'sizeMB': p['sizeMB'],
             'stackSize': p['insarStackSize'], # Used for datasets with precalculated stacks
+            'startTime': p['startTime'],
             'thumb': p['thumbnailUrl'],
-            # Dataset-specific:
-            'faradayRotation': p['faradayRotation'], # ALOS
-            'offNadirAngle': p['offNadirAngle'] # ALOS
+            'wkt': p['stringFootprint'],
+            'wkt_unwrapped': unwrap_wkt(p['stringFootprint'])
         }
 
         if self.includeBaseline:
