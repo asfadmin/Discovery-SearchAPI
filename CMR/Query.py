@@ -91,7 +91,7 @@ def subquery_list_from(params):
 
     subquery_params, list_params = {}, {}
 
-    list_param_names = ['granule_list', 'product_list', 'platform']
+    list_param_names = ['granule_list', 'product_list', 'platform'] # these parameters will dodge the subquery system
     for k, v in params.items():
         if k in list_param_names:
             list_params[k] = v
