@@ -33,7 +33,7 @@
         "slim_handler": true,
         "environment_variables": {"MATURITY": "test"},
         "timeout_seconds": 60,
-        "domain": "api-test-staging.asf.alaska.edu"
+        "domain": "api-test.asf.alaska.edu"
     },
     "test_staging": {
         "app_function": "application.application",
@@ -45,7 +45,7 @@
         "slim_handler": true,
         "environment_variables": {"MATURITY": "test"},
         "timeout_seconds": 60,
-        "domain": "api-test.asf.alaska.edu"
+        "domain": "api-test-staging.asf.alaska.edu"
     },
     "prod": {
         "app_function": "application.application",
