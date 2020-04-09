@@ -102,6 +102,7 @@ class JSONLiteStreamArray(JSONStreamArray):
             'orbit': p['absoluteOrbit'],
             'path': p['relativeOrbit'],
             'polarization': p['polarization'],
+            'pointingAngle': p['pointingAngle'],
             'productID': p['product_file_id'],
             'productType': p['processingLevel'],
             'productTypeDisplay': p['processingTypeDisplay'],

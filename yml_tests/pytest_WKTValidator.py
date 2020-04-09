@@ -6,8 +6,11 @@ from helpers import make_request, request_to_json
 
 class test_files_to_wkt():
     def __init__(self, test_info, file_conf, cli_args, test_vars):
-        if "api" not in cli_args:
-            assert False, "Endpoint test ran, but '--api' not declared in CLI (test_files_to_wkt).\nCan also add 'default' api to use in yml_tests/pytest_config.yml.\n"
+        # I replace '{0}' with itself, so that you can format that in later, and everything else is populated already:
+        self.error_msg = "Reason: {0}\n - File: '{1}'\n - Test: '{2}'".format('{0}', file_conf["yml name"], test_info["title"])
+
+        assert "api" in cli_args, self.error_msg.format("Endpoint test ran, but '--api' not declared in CLI. Can also add 'default' api to use in yml_tests/pytest_config.yml.\n")
+        
         # Join the url 'start' to the endpoint, even if they both/neither have '/' between them:
         url_parts = [ cli_args["api"], test_vars["endpoint"] ]
         full_url = '/'.join(s.strip('/') for s in url_parts)
@@ -59,7 +62,7 @@ class test_files_to_wkt():
                 # Save it in the format the api is expecting:
                 files_that_exist.append(('files', open(file_path, 'rb')))
             else:
-                assert False, "File not found: {0}. (Test: '{1}') \nFile paths should start after: '{2}'.".format(file_path, test_info["title"], resources_dir)
+                assert False, self.error_msg.format("File in 'file wkt' not found: {0}.")
         # Override with the new files:
         test_info["file wkt"] = files_that_exist
         return test_info
@@ -69,23 +72,27 @@ class test_files_to_wkt():
             if "parsed wkt" in response_json:
                 lhs = geomet.wkt.loads(response_json["parsed wkt"])
                 rhs = geomet.wkt.loads(test_info["parsed wkt"])
-                assert lhs == rhs, "Parsed wkt returned from API did not match 'parsed wkt'. Title: '{0}'.".format(test_info["title"])
+                assert lhs == rhs, self.error_msg.format("Parsed wkt returned from API did not match 'parsed wkt'.")
             else:
-                assert False, "API did not return a WKT. Test: '{0}'.\nContent: '{1}'.\n".format(test_info["title"], str(response_json))
+                content 
+                # Here, I want content to be last. sometimes it explodes in length...                
+                assert False, self.error_msg.format("API did not return a WKT.") + "\n - Content: "+str(response_json)
         if test_info["check errors"] == True:
             # Give errors a value to stop key-errors, and force the len() test to always happen:
             if "errors" not in response_json:
                 response_json["errors"] = []
             for error in test_info["errors"]:
-                assert str(error) in str(response_json["errors"]), "Response did not contain expected error. Test: '{0}'.\nExpected: '{1}'\nNot found in:\n{2}\n".format(test_info["title"], error, response_json["errors"])
-            assert len(test_info["errors"]) == len(response_json["errors"]), "Number of errors declared did not line up with number of expected errors. Test: '{0}'.\nWarnings in response:\n{1}\n".format(test_info["title"], response_json["errors"])
+                assert str(error) in str(response_json["errors"]), self.error_msg.format("Response did not contain expected error.\nExpected: '{0}'\nNot found in:\n{1}\n".format(error, response_json["errors"]))
+            assert len(test_info["errors"]) == len(response_json["errors"]), self.error_msg.format("Number of errors declared did not line up with number of expected errors.\nWarnings in response:\n{0}\n".format(response_json["errors"]))
 
 
 
 class test_repair_wkt():
     def __init__(self, test_info, file_conf, cli_args, test_vars):
-        if "api" not in cli_args or cli_args["api"] == None:
-            assert False, "Endpoint test ran, but '--api' not declared in CLI. (test_repair_wkt)"
+        self.error_msg = "Reason: {0}\n - File: '{1}'\n - Test: '{2}'".format('{0}', file_conf["yml name"], test_info["title"])
+
+        assert "api" in cli_args, self.error_msg.format("Endpoint test ran, but '--api' not declared in CLI. Can also add 'default' api to use in yml_tests/pytest_config.yml.\n")
+
         # Join the url 'start' to the endpoint, even if they both/neither have '/' between them:
         url_parts = [ cli_args["api"], test_vars["endpoint"] ]
         full_url = '/'.join(s.strip('/') for s in url_parts)
@@ -135,25 +142,25 @@ class test_repair_wkt():
     def runAssertTests(self, test_info, response_json):
         if "repaired wkt wrapped" in test_info:
             if "wkt" in response_json:
-                assert shapely.wkt.loads(response_json["wkt"]["wrapped"]) == shapely.wkt.loads(test_info["repaired wkt wrapped"]), "WKT wrapped failed to match the result. Test: '{0}'\nExpected: {1}\nActual: {2}\n".format(test_info["title"], test_info["repaired wkt wrapped"], response_json["wkt"]["wrapped"])
+                assert shapely.wkt.loads(response_json["wkt"]["wrapped"]) == shapely.wkt.loads(test_info["repaired wkt wrapped"]), self.error_msg.format("WKT wrapped failed to match the result.\nExpected: {0}\nActual: {1}\n".format(test_info["repaired wkt wrapped"], response_json["wkt"]["wrapped"]))
             else:
                 assert False, "WKT not found in response from API. Test: '{0}'. Response: {1}.".format(test_info["title"], response_json)
         if "repaired wkt unwrapped" in test_info:
             if "wkt" in response_json:
-                assert shapely.wkt.loads(response_json["wkt"]["unwrapped"]) == shapely.wkt.loads(test_info["repaired wkt unwrapped"]), "WKT unwrapped failed to match the result. Test: '{0}'\nExpected: {1}\nActual: {2}\n".format(test_info["title"], test_info["repaired wkt wrapped"], response_json["wkt"]["wrapped"])
+                assert shapely.wkt.loads(response_json["wkt"]["unwrapped"]) == shapely.wkt.loads(test_info["repaired wkt unwrapped"]), self.error_msg.format("WKT unwrapped failed to match the result.\nExpected: {0}\nActual: {1}\n".format(test_info["repaired wkt wrapped"], response_json["wkt"]["wrapped"]))
             else:
-                assert False, "WKT not found in response from API. Test: '{0}'. Response: {1}.".format(test_info["title"], response_json)
+                assert False, self.error_msg.format("WKT not found in response from API. Response: {0}.".format(response_json))
 
         if test_info["check repair"]:
             if "repairs" in response_json:
                 for repair in test_info["repair"]:
-                    assert repair in str(response_json["repairs"]), "Expected repair was not found in results. Test: '{0}'. Repairs done: {1}".format(test_info["title"], response_json["repairs"])
-                assert len(response_json["repairs"]) == len(test_info["repair"]), "Number of repairs doesn't equal number of repaired repairs. Test: '{0}'. Repairs done: {1}.".format(test_info["title"],response_json["repairs"])
+                    assert repair in str(response_json["repairs"]), self.error_msg.format("Expected repair was not found in results. Repairs done: {0}".format(response_json["repairs"]))
+                assert len(response_json["repairs"]) == len(test_info["repair"]), self.error_msg.format("Number of repairs doesn't equal number of repaired repairs. Repairs done: {0}.".format(response_json["repairs"]))
             else:
                 assert False, "Unexpected WKT returned: {0}. Test: '{1}'".format(response_json, test_info["title"])
         if "repaired error msg" in test_info:
             if "error" in response_json:
-                assert test_info["repaired error msg"] in response_json["error"]["report"], "Got different error message than expected. Test: '{0}'.\nError returned: {1}".format(test_info["title"], response_json["error"]["report"])
+                assert test_info["repaired error msg"] in response_json["error"]["report"], self.error_msg.format("Got different error message than expected. Error returned: {0}".format(response_json["error"]["report"]))
             else:
-                assert False, "Unexpected WKT returned: {0}. Test: '{1}'\nResponse: {2}.".format(response_json, test_info["title"], response_json)
+                assert False, self.error_msg.format("Unexpected WKT returned: {0}.\nResponse: {1}.".format(response_json, response_json))
 
