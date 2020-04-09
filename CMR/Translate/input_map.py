@@ -1,6 +1,6 @@
 from CMR.Input import (
     parse_int, parse_float, parse_string, parse_wkt, parse_date,
-    parse_string_list, parse_int_list, parse_int_or_range_list,
+    parse_string_list, parse_int_list, parse_float_list, parse_int_or_range_list,
     parse_float_or_range_list,
     parse_coord_string, parse_bbox_string, parse_point_string
 )
@@ -52,7 +52,8 @@ def input_map():
         'temporal':             ['temporal',                '{0}',                              None], # start/end end up here
         'groupid':              ['attribute[]',             'string,GROUP_ID,{0}',              parse_string_list],
         'insarstackid':         ['attribute[]',             'int,INSAR_STACK_ID,{0}',           parse_string],
-        'instrument':           ['instrument[]',            '{0}',                              parse_string]
+        'instrument':           ['instrument[]',            '{0}',                              parse_string],
+        'pointingAngle':        ['attribute[]',             'float,POINTING_ANGLE,{0}',         parse_float_list]
     }
 
     # So the search endpoint doesn't complain if we use this

@@ -85,6 +85,7 @@ class JSONStreamArray(list):
             'percentTroposphere',
             'percentUnwrapped',
             'platform',
+            'pointingAngle',
             'polarization',
             'processingDate',
             'processingDescription',
