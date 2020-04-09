@@ -97,6 +97,7 @@ def parse_granule(granule):
             'ASF_PLATFORM',
             default=get_val("./Platforms/Platform/ShortName")
         ),
+        'pointingAngle': get_attr('POINTING_ANGLE', default=None),
         'polarization':  get_attr('POLARIZATION'),
         'processingDate':  get_val("./DataGranule/ProductionDateTime", default=None),
         'processingDescription': get_attr('PROCESSING_DESCRIPTION'),
