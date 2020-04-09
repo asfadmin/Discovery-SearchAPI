@@ -1,6 +1,6 @@
 from CMR.Input import (
     parse_int, parse_float, parse_string, parse_wkt, parse_date,
-    parse_string_list, parse_int_list, parse_int_or_range_list,
+    parse_string_list, parse_int_list, parse_float_list, parse_int_or_range_list,
     parse_float_or_range_list,
     parse_coord_string, parse_bbox_string, parse_point_string
 )
