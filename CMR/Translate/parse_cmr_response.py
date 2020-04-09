@@ -1,5 +1,6 @@
 import logging
 from lxml import etree as ET
+import dateparser
 
 
 def parse_cmr_response(r):
@@ -96,6 +97,7 @@ def parse_granule(granule):
             'ASF_PLATFORM',
             default=get_val("./Platforms/Platform/ShortName")
         ),
+        'pointingAngle': get_attr('POINTING_ANGLE', default=None),
         'polarization':  get_attr('POLARIZATION'),
         'processingDate':  get_val("./DataGranule/ProductionDateTime", default=None),
         'processingDescription': get_attr('PROCESSING_DESCRIPTION'),
@@ -121,6 +123,24 @@ def parse_granule(granule):
         'track': get_attr('PATH_NUMBER'),
         'varianceTroposphere': 'NA'  # not in CMR
     }
+
+
+    def float_or_none(a):
+        try:
+            return float(a)
+        except ValueError:
+            return None
+
+    def parse_sv(sv):
+        if sv is None:
+            return (None, None, None, None)
+        (x, y, z, t) = sv.split(',')
+        return (float_or_none(x), float_or_none(y), float_or_none(z), t if dateparser.parse(t) is not None else None)
+
+    result['sv_x_pos_pre'],  result['sv_y_pos_pre'],  result['sv_z_pos_pre'],  result['sv_t_pos_pre'] =  parse_sv(get_attr('SV_POSITION_PRE', default=None))
+    result['sv_x_pos_post'], result['sv_y_pos_post'], result['sv_z_pos_post'], result['sv_t_pos_post'] = parse_sv(get_attr('SV_POSITION_POST', default=None))
+    result['sv_x_vel_pre'],  result['sv_y_vel_pre'],  result['sv_z_vel_pre'],  result['sv_t_vel_pre'] =  parse_sv(get_attr('SV_VELOICTY_PRE', default=None))
+    result['sv_x_vel_post'], result['sv_y_vel_post'], result['sv_z_vel_post'], result['sv_t_vel_post'] = parse_sv(get_attr('SV_VELOCITY_POST', default=None))
 
     for k in result:
         if result[k] == 'NULL':
