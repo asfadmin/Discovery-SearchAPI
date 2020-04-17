@@ -40,7 +40,7 @@ class test_baseline():
         if "print" not in test_info:
             test_info["print"] = False if assert_used else True
 
-        status_code, content_type, file_content = self.runQuery(test_info["title"])
+        status_code, content_type, file_content = self.runQuery()
 
         if test_info["print"]:
             print()
@@ -76,7 +76,7 @@ class test_baseline():
                 keywords.append(str(key)+"="+str(val))
         return keywords, assert_used
 
-    def runQuery(self, title):
+    def runQuery(self):
         def countToDict(html):
             try:
                 count = int(html.rstrip())
