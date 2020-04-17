@@ -12,7 +12,7 @@ tests:
     output: csv
 
     expected file: csv
-    expected code: 400
+    expected code: 200
 
 - baseline J1:
     master: J1_36421_STD_F275
