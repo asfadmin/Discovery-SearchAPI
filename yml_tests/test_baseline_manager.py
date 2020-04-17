@@ -22,11 +22,13 @@ class test_baseline():
             test_api = file_conf["api"]
         else:
             assert False, self.error_msg.format("Endpoint test ran, but '--api' not declared in CLI. You can also add 'default' api to use in yml_tests/pytest_config.yml.")
-        
+
         url_parts = [test_api, test_vars["endpoint"]+"?"]
         full_url = '/'.join(s.strip('/') for s in url_parts) # If both/neither have '/' between them, this still joins them correctly
 
-        if "maturity" not in test_vars or test_vars["maturity"].lower() == 'prod':
+        #To run on Prod maturity, == 'prod' will not add the maturity param to the URL
+        #To run on Test maturity, != 'prod' will add the maturity param to the URL
+        if "maturity" not in test_vars or test_vars["maturity"].lower() != 'prod':
             test_vars["maturity"] = None
 
         # Get the url string and (bool)if assert was used:
