@@ -1,5 +1,4 @@
 import os           # Generic imports
-import pytest, warnings  # For testing 
 import shapely.wkt, geomet.wkt      # For comparing wkt's
 
 from helpers import make_request, request_to_json
@@ -161,5 +160,5 @@ class test_repair_wkt():
             if "error" in response_json:
                 assert test_info["repaired error msg"] in response_json["error"]["report"], self.error_msg.format("Got different error message than expected. Error returned: {0}".format(response_json["error"]["report"]))
             else:
-                assert False, self.error_msg.format("Unexpected WKT returned: {0}.\nResponse: {1}.".format(response_json, response_json))
+                assert False, self.error_msg.format("Unexpected WKT returned. Response: {0}.".format(response_json))
 
