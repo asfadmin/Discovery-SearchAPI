@@ -17,7 +17,10 @@ api_urls:
   local: http://127.0.0.1:5000/
   dev: https://api-dev.asf.alaska.edu/
   test: https://api-test.asf.alaska.edu/
+  test-beanstalk: https://api-test-beanstalk.asf.alaska.edu/
   prod: https://api.daac.asf.alaska.edu/
+  prod-private: https://api-prod-private.asf.alaska.edu/
+
   default: prod
 
 
@@ -50,9 +53,10 @@ test_types:
     required_keys: master
     method: test_BaselineEndpoint
     variables:
-      endpoint: "/services/search/baseline?"
+      endpoint: "/services/search/baseline"
+      maturity: prod
 
 - Get Data from API:
     method: test_URLManagerSearch
     variables:
-      endpoint: "/services/search/param?"
+      endpoint: "/services/search/param"
