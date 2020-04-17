@@ -1,5 +1,4 @@
 api: Test
-maturity: prod
 
 # /services/search/baseline
 # available parameters:
@@ -11,7 +10,6 @@ maturity: prod
 tests:
 - baseline E1:
     master: E1_23942_STD_F155
-    # maturity: prod
     output: csv
 
     expected file: csv
