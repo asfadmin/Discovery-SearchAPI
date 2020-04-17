@@ -74,7 +74,6 @@ class test_files_to_wkt():
                 rhs = geomet.wkt.loads(test_info["parsed wkt"])
                 assert lhs == rhs, self.error_msg.format("Parsed wkt returned from API did not match 'parsed wkt'.")
             else:
-                content 
                 # Here, I want content to be last. sometimes it explodes in length...                
                 assert False, self.error_msg.format("API did not return a WKT.") + "\n - Content: "+str(response_json)
         if test_info["check errors"] == True:
