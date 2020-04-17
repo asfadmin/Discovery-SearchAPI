@@ -14,28 +14,33 @@ sys.path.remove(project_root)
 
 class test_baseline():
     def __init__(self, test_info, file_conf, cli_args, test_vars):
+        # I replace '{0}' with itself, so that you can format that in later, and everything else is populated already:
+        self.error_msg = "Reason: {0}\n - File: '{1}'\n - Test: '{2}'".format('{0}', file_conf["yml name"], test_info["title"])
         if cli_args["api"] != None:
             test_api = cli_args["api"]
         elif "api" in file_conf:
             test_api = file_conf["api"]
         else:
-            assert False, "Endpoint test ran, but '--api' not declared in CLI (test_files_to_wkt).\nCan also add 'default' api to use in yml_tests/pytest_config.yml.\n"
-        url_parts = [test_api, test_vars["endpoint"]]
-        if "maturity" in file_conf:
-            if cli_args['api'].lower() != 'prod':
-                url_parts += 'maturity=' + file_conf['maturity'] + '&'
+            assert False, self.error_msg.format("Endpoint test ran, but '--api' not declared in CLI. You can also add 'default' api to use in yml_tests/pytest_config.yml.")
+        
+        url_parts = [test_api, test_vars["endpoint"]+"?"]
         full_url = '/'.join(s.strip('/') for s in url_parts) # If both/neither have '/' between them, this still joins them correctly
 
+        if "maturity" not in test_vars or test_vars["maturity"].lower() == 'prod':
+            test_vars["maturity"] = None
 
         # Get the url string and (bool)if assert was used:
         keywords, assert_used = self.getKeywords(test_info)
+        if test_vars["maturity"] != None:
+            keywords.append("maturity=" + test_vars["maturity"])
         self.query = full_url + "&".join(keywords)
+        self.error_msg += "\n - URL: '{0}'".format(self.query)
 
         # Figure out if you should print stuff:
         if "print" not in test_info:
             test_info["print"] = False if assert_used else True
 
-        status_code, content_type, file_content = self.runQuery(test_info["title"])
+        status_code, content_type, file_content = self.runQuery()
 
         if test_info["print"]:
             print()
@@ -52,9 +57,8 @@ class test_baseline():
 
     def getKeywords(self, test_info):
         # DONT add these to url. (Used for tester). Add ALL others to allow testing keywords that don't exist
-        reserved_keywords = ["title", "print", "api", "skip_file_check"]
+        reserved_keywords = ["title", "print", "skip_file_check", "maturity"]
         asserts_keywords = ["expected file","expected code"]
-
 
         assert_used = 0 != len([k for k,_ in test_info.items() if k in asserts_keywords])
         keywords = []
@@ -72,13 +76,13 @@ class test_baseline():
                 keywords.append(str(key)+"="+str(val))
         return keywords, assert_used
 
-    def runQuery(self, title):
+    def runQuery(self):
         def countToDict(html):
             try:
                 count = int(html.rstrip())
             except ValueError:
-                assert False, "API returned html that was not a count. (Error page?) Test: {0}. URL: {1}.\nHTML Page: \n{2}\n".format(title, self.query, file_content)
-            return {"count": count}
+                assert False, self.error_msg.format("API returned html that was not a count. (Error page?) HTML Page: \n{0}\n".format(file_content))
+            return { "count": count }
 
         def csvToDict(file_content):
             file_content = csv.reader(StringIO(file_content), delimiter=',')
@@ -130,7 +134,7 @@ class test_baseline():
         try:
             content_type = content_header.split('/')[1]
         except AttributeError:
-            assert False, "Header is not formatted as expected. Test: {0}. Header: {1}. URL: {2}.\nFile Content: \n{3}\n".format(title, content_header, self.query, file_content)
+            assert False, self.error_msg.format("Header is not formatted as expected. Header: {0}. File Content: \n{1}\n".format(content_header, file_content))
         # Take out the "csv; charset=utf-8", without crahsing on things without charset
         content_type = content_type.split(';')[0] if ';' in content_type else content_type
 
@@ -199,9 +203,9 @@ class test_baseline():
 
     def runAssertTests(self, test_info, status_code, content_type, file_content):
         if "expected code" in test_info:
-            assert test_info["expected code"] == status_code, "Status codes is different than expected. Test: {0}. URL: {1}.".format(test_info["title"], self.query)
+            assert test_info["expected code"] == status_code, self.error_msg.format("Status codes is different than expected.")
         if "expected file" in test_info:
-            assert test_info["expected file"] == content_type, "Different file type returned than expected. Test: '{0}'. URL: {1}.".format(test_info["title"], self.query)
+            assert test_info["expected file"] == content_type, self.error_msg.format("Different file type returned than expected.")
             # If the tester added the override, don't check its contents:
             if "skip_file_check" in test_info and test_info["skip_file_check"] == True:
                 return
@@ -240,7 +244,7 @@ class test_baseline():
                         # If inner for-loop found it, break out of this one too:
                         if found_in_list == True:
                             break
-                    assert found_in_list, key + " declared, but not found in file. Test: '{0}'. URL: '{1}'.".format(test_info["title"], self.query)
+                    assert found_in_list, self.error_msg.format(key + " declared, but not found in file.")
 
             checkFileContainsExpected("processinglevel", test_info, file_content)
 
