@@ -1,14 +1,13 @@
 api: Test
 maturity: prod
 
-# /services/search/baseline
-# available parameters:
-# master=<granule name> (mandatory)
-# output=<format> (optional)
-# processingLevel=<level> (optional)
-# maturity=<maturity> (optional, only available on test/dev/local maturities)
-
 tests:
+# - available params:
+#     master: <granule name> mandatory
+#     output: <optional>
+#     processingLevel: <optional>
+#     maturity: <optional> only on dev/test/local - CMR maturity
+
 - baseline E1:
     master: E1_23942_STD_F155
     # maturity: prod
@@ -33,6 +32,13 @@ tests:
     expected file: csv
     expected code: 200
 
+- baseline ALOS:
+    master: ALPSRP279071320
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
 - baseline Sentinel:
     master: S1B_IW_SLC__1SDV_20190610T143518_20190610T143545_016635_01F4F7_6EA1
     # maturity: prod
@@ -40,20 +46,6 @@ tests:
 
     expected file: csv
     expected code: 200
-
-- Sentinel RAW without baseline:
-    master: S1B_EW_RAW__0SDH_20200408T180120_20200408T180228_021056_027F1A_8312
-    # maturity: prod
-
-    expected file: error json
-    expected code: 400
-
-- Sentinel GRD without baseline:
-    master: S1A_IW_GRDH_1SDV_20200408T164643_20200408T164708_032038_03B3AF_87FC
-    # maturity: prod
-
-    expected file: error json
-    expected code: 400
 
 - baseline processing level:
     master: ALPSRP279071410
@@ -173,6 +165,20 @@ tests:
 
 - multiple masters:
     master: ALPSRP064337140,ALPSRP279057140
+
+    expected file: error json
+    expected code: 400
+
+- Sentinel RAW without baseline:
+    master: S1B_EW_RAW__0SDH_20200408T180120_20200408T180228_021056_027F1A_8312
+    # maturity: prod
+
+    expected file: error json
+    expected code: 400
+
+- Sentinel GRD without baseline:
+    master: S1A_IW_GRDH_1SDV_20200408T164643_20200408T164708_032038_03B3AF_87FC
+    # maturity: prod
 
     expected file: error json
     expected code: 400
