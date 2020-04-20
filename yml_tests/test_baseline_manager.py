@@ -14,6 +14,7 @@ sys.path.remove(project_root)
 
 class test_baseline():
     def __init__(self, test_info, file_conf, cli_args, test_vars):
+
         # I replace '{0}' with itself, so that you can format that in later, and everything else is populated already:
         self.error_msg = "Reason: {0}\n - File: '{1}'\n - Test: '{2}'".format('{0}', file_conf["yml name"], test_info["title"])
         if cli_args["api"] != None:
@@ -21,19 +22,21 @@ class test_baseline():
         elif "api" in file_conf:
             test_api = file_conf["api"]
         else:
-            assert False, self.error_msg.format("Endpoint test ran, but '--api' not declared in CLI. You can also add 'default' api to use in yml_tests/pytest_config.yml.")
+            assert False, self.error_msg.format("Endpoint test ran, but '--api' not declared in CLI. You can also add 'default' api to use in yml_tests/pytest_config.yml, or add 'api: *url*' to each test.")
 
         url_parts = [test_api, test_vars["endpoint"]+"?"]
         full_url = '/'.join(s.strip('/') for s in url_parts) # If both/neither have '/' between them, this still joins them correctly
 
-        #To run on Prod maturity, == 'prod' will not add the maturity param to the URL
-        #To run on Test maturity, != 'prod' will add the maturity param to the URL
-        if "maturity" not in test_vars or test_vars["maturity"].lower() != 'prod':
-            test_vars["maturity"] = None
+        # If you're overriding if you want to show the maturity:
+        if "use_maturity" in test_info:
+            use_cmr_maturity = test_info["use_maturity"]
+        # Defalut use it, if you're not running against a prod api:
+        else:
+            use_cmr_maturity = cli_args["api"] not in cli_args["api prod list"]
 
         # Get the url string and (bool)if assert was used:
         keywords, assert_used = self.getKeywords(test_info)
-        if test_vars["maturity"] != None:
+        if use_cmr_maturity:
             keywords.append("maturity=" + test_vars["maturity"])
         self.query = full_url + "&".join(keywords)
         self.error_msg += "\n - URL: '{0}'".format(self.query)
@@ -59,7 +62,7 @@ class test_baseline():
 
     def getKeywords(self, test_info):
         # DONT add these to url. (Used for tester). Add ALL others to allow testing keywords that don't exist
-        reserved_keywords = ["title", "print", "skip_file_check", "maturity"]
+        reserved_keywords = ["title", "print", "skip_file_check", "maturity", "use_maturity"]
         asserts_keywords = ["expected file","expected code"]
 
         assert_used = 0 != len([k for k,_ in test_info.items() if k in asserts_keywords])
