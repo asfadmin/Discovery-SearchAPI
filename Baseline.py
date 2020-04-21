@@ -137,3 +137,4 @@ def calculate_perpendicular_baselines(master, stack):
     for product in stack:
         random.seed(product['granuleName']) # lol
         product['perpendicularBaseline'] = 0 if product['granuleName'] == master else random.randrange(-500, 500)
+    return stack

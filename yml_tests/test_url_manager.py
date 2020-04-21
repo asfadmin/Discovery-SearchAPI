@@ -25,7 +25,7 @@ class test_URL_Manager():
             test_api = file_conf["api"]
         else:
             assert False, "Endpoint test ran, but '--api' not declared in CLI (test_files_to_wkt).\nCan also add 'default' api to use in yml_tests/pytest_config.yml.\n"
-        url_parts = [test_api, test_vars["endpoint"]]
+        url_parts = [test_api, test_vars["endpoint"]+"?"]
         full_url = '/'.join(s.strip('/') for s in url_parts) # If both/neither have '/' between them, this still joins them correctly
         
         # Get the url string and (bool)if assert was used:
