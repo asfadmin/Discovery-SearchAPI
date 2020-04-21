@@ -89,7 +89,7 @@ def get_maturities():
         },
         'prod': {
             'bulk_download_api': 'https://bulk-download.asf.alaska.edu',
-            'analytics_id': 'UA-118881300-2',
+            'analytics_id': None,
             'this_api': 'api.daac.asf.alaska.edu',
             'cmr_base': 'https://cmr.earthdata.nasa.gov',
             'cmr_health': '/search/health',
