@@ -1,0 +1,184 @@
+api: Test
+
+tests:
+# - available params:
+#     master: <granule name> mandatory
+#     output: <optional>
+#     processingLevel: <optional>
+#     maturity: <optional> only on dev/test/local - CMR maturity
+
+- baseline E1:
+    master: E1_23942_STD_F155
+    output: csv
+    # use_maturity: True
+
+    expected file: csv
+    expected code: 200
+
+- baseline J1:
+    master: J1_36421_STD_F275
+    # maturity: prod
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- baseline R1:
+    master: R1_65207_ST1_F162
+    # maturity: prod
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- baseline ALOS:
+    master: ALPSRP279071320
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- baseline Sentinel:
+    master: S1B_IW_SLC__1SDV_20190610T143518_20190610T143545_016635_01F4F7_6EA1
+    # maturity: prod
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- baseline processing level:
+    master: ALPSRP279071410
+    output: csv
+    processingLevel: L1.5
+    # maturity: prod
+
+    expected file: csv
+    expected code: 200
+
+- baseline processing level list:
+    master: ALPSRP279071410
+    output: csv
+    processingLevel: L1.5,L1.0
+    # maturity: prod
+
+    expected file: csv
+    expected code: 200
+
+- baseline count:
+    master: E1_23942_STD_F155
+    output: count
+    # maturity: prod
+
+    expected file: count
+    expected code: 200
+
+- baseline download:
+    master: R1_59719_ST5_F155
+    output: download
+    # maturity: prod
+
+    expected file: download
+    expected code: 200
+
+- baseline geojson:
+    master: S1B_IW_SLC__1SDV_20180112T141823_20180112T141850_009139_0105AA_E6F5
+    output: geojson
+    # maturity: prod
+
+    expected file: geojson
+    expected code: 200
+
+- baseline json:
+    master: S1A_IW_SLC__1SSV_20160528T141908_20160528T141938_011460_011746_335C
+    output: json
+    # maturity: prod
+
+    expected file: json
+    expected code: 200
+
+- baseline jsonlite:
+    master: ALPSRP064351410
+    output: jsonlite
+    # maturity: prod
+
+    expected file: jsonlite
+    expected code: 200
+
+- baseline kml:
+    master: ALPSRP171711410
+    output: kml
+    # maturity: prod
+
+    expected file: kml
+    expected code: 200
+
+- baseline metalink:
+    master: J1_23900_STD_F275
+    output: metalink
+    # maturity: prod
+
+    expected file: metalink
+    expected code: 200
+
+- no output specified:
+    master: J1_08743_STD_F275
+    # maturity: prod
+
+    expected file: metalink
+    expected code: 200
+
+- invalid master:
+    master: ALPSinvalid
+
+    expected file: error json
+    expected code: 400
+
+- blank master:
+    output: count
+
+    expected file: error json
+    expected code: 400
+
+- default processingLevel does not exist:
+    master: ALPSRS279162350
+    # maturity: prod
+
+    expected file: error json
+    expected code: 400
+
+- requested processingLevel does not exist:
+    master: E1_20936_STD_F155
+    processingLevel: L0.5
+    # maturity: prod
+
+    expected file: error json
+    expected code: 400
+
+- missing stack ID:
+    master: ALPSRS279162650
+    processinglevel: L1.0
+    # maturity: prod
+
+    expected file: error json
+    expected code: 400
+
+- multiple masters:
+    master: ALPSRP064337140,ALPSRP279057140
+
+    expected file: error json
+    expected code: 400
+
+- Sentinel RAW without baseline:
+    master: S1B_EW_RAW__0SDH_20200408T180120_20200408T180228_021056_027F1A_8312
+    # maturity: prod
+
+    expected file: error json
+    expected code: 400
+
+- Sentinel GRD without baseline:
+    master: S1A_IW_GRDH_1SDV_20200408T164643_20200408T164708_032038_03B3AF_87FC
+    # maturity: prod
+
+    expected file: error json
+    expected code: 400
+
