@@ -13,6 +13,14 @@ tests:
     expected file: csv
     expected code: 200
 
+- processingDate 1weekago:
+    processingDate: 1+week+ago
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
 - start yesterday count:
     start: yesterday
     output: count

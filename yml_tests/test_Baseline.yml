@@ -38,14 +38,6 @@ tests:
     expected file: csv
     expected code: 200
 
-- baseline Sentinel:
-    master: S1B_IW_SLC__1SDV_20190610T143518_20190610T143545_016635_01F4F7_6EA1
-    # maturity: prod
-    output: csv
-
-    expected file: csv
-    expected code: 200
-
 - baseline processing level:
     master: ALPSRP279071410
     output: csv
@@ -78,22 +70,6 @@ tests:
     # maturity: prod
 
     expected file: download
-    expected code: 200
-
-- baseline geojson:
-    master: S1B_IW_SLC__1SDV_20180112T141823_20180112T141850_009139_0105AA_E6F5
-    output: geojson
-    # maturity: prod
-
-    expected file: geojson
-    expected code: 200
-
-- baseline json:
-    master: S1A_IW_SLC__1SSV_20160528T141908_20160528T141938_011460_011746_335C
-    output: json
-    # maturity: prod
-
-    expected file: json
     expected code: 200
 
 - baseline jsonlite:
@@ -158,12 +134,6 @@ tests:
     master: ALPSRS279162650
     processinglevel: L1.0
     # maturity: prod
-
-    expected file: error json
-    expected code: 400
-
-- multiple masters:
-    master: ALPSRP064337140,ALPSRP279057140
 
     expected file: error json
     expected code: 400
