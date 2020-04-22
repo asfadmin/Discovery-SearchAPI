@@ -661,7 +661,7 @@ tests:
 
     expected file: csv
     expected code: 200
-    
+
 - maxInsarStackSize:
     maxInsarStackSize: 50
     maxResults: 10
@@ -1866,14 +1866,6 @@ tests:
 
 - processingDate yearago:
     processingDate: 1+year+ago
-    maxResults: 10
-    output: csv
-
-    expected file: csv
-    expected code: 200
-
-- processingDate 1weekago:
-    processingDate: 1+week+ago
     maxResults: 10
     output: csv
 
