@@ -31,10 +31,8 @@ def canInsar(p):
         p.get('insarGrouping') not in [None, 0, '0', 'NA']:
         return True
     elif None not in [
-        p['sv_x_pos_pre'],  p['sv_y_pos_pre'],  p['sv_z_pos_pre'],
-        p['sv_x_pos_post'], p['sv_y_pos_post'], p['sv_z_pos_post'],
-        p['sv_x_vel_pre'],  p['sv_y_vel_pre'],  p['sv_z_vel_pre'],
-        p['sv_x_vel_post'], p['sv_z_vel_post'], p['sv_z_vel_post'],
+        p['sv_pos_pre'], p['sv_pos_post'],
+        p['sv_vel_pre'], p['sv_vel_post'],
         p['sv_t_pos_pre'], p['sv_t_pos_post'],
         p['sv_t_vel_pre'], p['sv_t_vel_post']]:
         return True

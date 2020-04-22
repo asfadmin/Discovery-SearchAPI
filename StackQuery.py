@@ -30,11 +30,9 @@ class APIStackQuery:
             is_count = self.params['output'].lower() == 'count'
             stack, warnings = get_stack(
                 self.params['master'],
-                product_type=self.params['processinglevel'],
-                is_count=is_count)
-
+                product_type=self.params['processinglevel'])
             if is_count:
-                return make_response(f'{stack}\n')
+                return make_response(f'{len(stack)}\n')
 
             translators = output_translators()
             translator, mimetype, suffix = translators.get(self.params['output'], translators['metalink'])
@@ -45,6 +43,8 @@ class APIStackQuery:
 
             # yick
             def stack_generator():
+                if stack is None:
+                    return
                 for product in stack:
                     yield product
 
