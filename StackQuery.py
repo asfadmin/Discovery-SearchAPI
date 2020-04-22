@@ -20,9 +20,7 @@ class APIStackQuery:
     def get_response(self):
         logging.debug(self.request.values)
         try:
-            logging.debug('validating')
             self.validate()
-            logging.debug('validated')
             if 'processinglevel' not in self.params:
                 self.params['processinglevel'] = get_default_product_type(self.params['master'])
             if 'output' not in self.params:
@@ -30,15 +28,12 @@ class APIStackQuery:
 
 
             is_count = self.params['output'].lower() == 'count'
-            logging.debug('getting stack')
             stack, warnings = get_stack(
                 self.params['master'],
                 product_type=self.params['processinglevel'])
-            logging.debug('got stack')
             if is_count:
                 return make_response(f'{len(stack)}\n')
 
-            logging.debug('translating')
             translators = output_translators()
             translator, mimetype, suffix = translators.get(self.params['output'], translators['metalink'])
 
@@ -53,7 +48,6 @@ class APIStackQuery:
                 for product in stack:
                     yield product
 
-            logging.debug('building response')
             resp = ''.join(
                 translator(stack_generator,
                     includeBaseline=True,
