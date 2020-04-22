@@ -1,7 +1,6 @@
-from math import sqrt, pow, cos, sin, radians, degrees
+from math import sqrt, cos, sin, radians
 import numpy as np
 import dateparser
-import logging
 
 # WGS84 constants
 a = 6378137
@@ -129,7 +128,7 @@ def get_vel_at_rel_time(granule, relative_time):
 
     vec_a = granule['sv_vel_pre']
     vec_b = granule['sv_vel_post']
-    
+
     v = [
         interpolate(vec_a[0], vec_b[0], factor),
         interpolate(vec_a[1], vec_b[1], factor),
@@ -138,8 +137,8 @@ def get_vel_at_rel_time(granule, relative_time):
     return v
 
 # convenience 1d linear interp
-def interpolate(a, b, f):
-    return (a * (1.0 - f)) + (b * f)
+def interpolate(p0, p1, x):
+    return (p0 * (1.0 - x)) + (p1 * x)
 
 # Bump the provided sat pos out to a radius interpolated between the start and end sat pos vectors
 def radius_fix(granule, sat_pos, relative_time):
