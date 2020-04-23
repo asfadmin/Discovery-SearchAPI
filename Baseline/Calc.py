@@ -11,6 +11,10 @@ f = pow((1.0 - 1 / 298.257224), 2)
 
 def calculate_perpendicular_baselines(master, stack):
     for product in stack:
+        if None in [product['sv_t_pos_pre'], product['sv_t_pos_post'], product['sv_pos_pre'], product['sv_pos_post']]:
+            product['noStateVectors'] = True
+            continue
+
         asc_node_time = dateparser.parse(product['ascendingNodeTime']).timestamp()
 
         start = dateparser.parse(product['startTime']).timestamp()
@@ -25,7 +29,6 @@ def calculate_perpendicular_baselines(master, stack):
         product['relative_sv_pre_time'] = t_pre - asc_node_time
         product['relative_sv_post_time'] = t_post - asc_node_time
 
-
     for product in stack:
         if product['granuleName'] == master:
             master = product
@@ -35,6 +38,10 @@ def calculate_perpendicular_baselines(master, stack):
             break
 
     for secondary in stack:
+        if secondary.get('noStateVectors'):
+            secondary['perpendicularBaseline'] = None
+            continue
+
         shared_rel_time = get_shared_sv_time(master, secondary)
 
         master_shared_pos = get_pos_at_rel_time(master, shared_rel_time)
