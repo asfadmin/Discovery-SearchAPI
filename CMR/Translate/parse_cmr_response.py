@@ -48,6 +48,7 @@ def parse_granule(granule):
             "./OrbitCalculatedSpatialDomains/OrbitCalculatedSpatialDomain/OrbitNumber",
             default=None
         ),
+        'ascendingNodeTime': get_attr('ASC_NODE_TIME'),
         'baselinePerp': get_attr('INSAR_BASELINE'),
         'beamMode': get_attr('BEAM_MODE_TYPE'),
         'beamModeType': get_attr('BEAM_MODE_TYPE'),
@@ -133,14 +134,18 @@ def parse_granule(granule):
 
     def parse_sv(sv):
         if sv is None:
-            return (None, None, None, None)
+            return (None, None)
         (x, y, z, t) = sv.split(',')
-        return (float_or_none(x), float_or_none(y), float_or_none(z), t if dateparser.parse(t) is not None else None)
+        v = [float_or_none(x), float_or_none(y), float_or_none(z)]
+        if None not in v:
+            return (v, t if dateparser.parse(t) is not None else None)
+        else:
+            return (None, None)
 
-    result['sv_x_pos_pre'],  result['sv_y_pos_pre'],  result['sv_z_pos_pre'],  result['sv_t_pos_pre'] =  parse_sv(get_attr('SV_POSITION_PRE', default=None))
-    result['sv_x_pos_post'], result['sv_y_pos_post'], result['sv_z_pos_post'], result['sv_t_pos_post'] = parse_sv(get_attr('SV_POSITION_POST', default=None))
-    result['sv_x_vel_pre'],  result['sv_y_vel_pre'],  result['sv_z_vel_pre'],  result['sv_t_vel_pre'] =  parse_sv(get_attr('SV_VELOICTY_PRE', default=None))
-    result['sv_x_vel_post'], result['sv_y_vel_post'], result['sv_z_vel_post'], result['sv_t_vel_post'] = parse_sv(get_attr('SV_VELOCITY_POST', default=None))
+    result['sv_pos_pre'],  result['sv_t_pos_pre'] =  parse_sv(get_attr('SV_POSITION_PRE', default=None))
+    result['sv_pos_post'], result['sv_t_pos_post'] = parse_sv(get_attr('SV_POSITION_POST', default=None))
+    result['sv_vel_pre'],  result['sv_t_vel_pre'] =  parse_sv(get_attr('SV_VELOCITY_PRE', default=None))
+    result['sv_vel_post'], result['sv_t_vel_post'] = parse_sv(get_attr('SV_VELOCITY_POST', default=None))
 
     for k in result:
         if result[k] == 'NULL':

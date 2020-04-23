@@ -1,26 +1,17 @@
-import logging
 import dateparser
 from CMR.Translate import translate_params
 from CMR.Query import CMRQuery
-
-import random
+from .Calc import calculate_perpendicular_baselines
 
 precalc_datasets = ['AL', 'R1', 'E1', 'E2', 'J1']
 
-def get_stack(master, product_type=None, is_count=False):
+def get_stack(master, product_type=None):
     warnings = None
 
     try:
         stack_params = get_stack_params(master, product_type)
     except ValueError as e:
-        if is_count:
-            return 0, None
-        else:
-            raise e
-
-    logging.debug(stack_params)
-    if is_count:
-        return 1, None
+        raise e
 
     stack = query_stack(stack_params)
 
@@ -35,7 +26,6 @@ def get_stack(master, product_type=None, is_count=False):
         stack = offset_perpendicular_baselines(master, stack)
     else:
         stack = calculate_perpendicular_baselines(master, stack)
-
 
     return stack, warnings
 
@@ -73,11 +63,11 @@ def get_stack_params(master, product_type):
         stack_params['lookDirection'] = master_results[0]['lookDirection']
         stack_params['relativeorbit'] = master_results[0]['relativeOrbit'] # path
         stack_params['polarization'] = master_results[0]['polarization']
-        if params['polarization'] in ['HH', 'HH+HV']:
-            params['polarization'] = 'HH,HH+HV'
-        elif params['polarization'] in ['VV', 'VV+VH']:
-            params['polarization'] = 'VV,VV+VH'
-        stack_params['intersectsWith'] = f"POINT({master_results[0]['centerLon']} {master_results[0]['centerLat']})" # flexible alternative to frame
+        if stack_params['polarization'] in ['HH', 'HH+HV']:
+            stack_params['polarization'] = 'HH,HH+HV'
+        elif stack_params['polarization'] in ['VV', 'VV+VH']:
+            stack_params['polarization'] = 'VV,VV+VH'
+        stack_params['point'] = f"{master_results[0]['centerLon']},{master_results[0]['centerLat']}" # flexible alternative to frame
 
     return stack_params
 
@@ -130,11 +120,4 @@ def offset_perpendicular_baselines(master, stack):
             product['perpendicularBaseline'] = 0
         else:
             product['perpendicularBaseline'] = float(product['insarBaseline']) - master_offset
-    return stack
-
-def calculate_perpendicular_baselines(master, stack):
-    # totally faking perpendicular baseline data for the moment, come at me bro
-    for product in stack:
-        random.seed(product['granuleName']) # lol
-        product['perpendicularBaseline'] = 0 if product['granuleName'] == master else random.randrange(-500, 500)
     return stack
