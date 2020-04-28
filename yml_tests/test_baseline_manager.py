@@ -43,7 +43,7 @@ class test_baseline():
 
         # Figure out if you should print stuff:
         if "print" not in test_info:
-            test_info["print"] = False if assert_used else True
+            test_info["print"] = not assert_used
 
         status_code, content_type, file_content = self.runQuery()
 

@@ -18,7 +18,7 @@ tests:
     expected file: csv
     expected code: 200
 - intersectsWith polygon:
-    intersectsWith: polygon%28%28-119.543 37.925+ -118.443 37.7421+ -118.682 36.8525+ -119.77 37.0352+ -119.543 37.925%29%29
+    intersectsWith: polygon((-119.543 37.925, -118.443 37.7421, -118.682 36.8525, -119.77 37.0352, -119.543 37.925))
     maxResults: 100
     output: CSV
 

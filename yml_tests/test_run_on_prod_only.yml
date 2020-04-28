@@ -1,8 +1,7 @@
 api: Test
 
 #This file contains test cases that are known failures on api-test. These will fail if run, and will block the AWS pipeline.
-#Run this file on api-prod
-#Failures are due to no recent data in api-test & will be removed as data is added
+#Run this file on api-prod & api-prod-private ONLY
 
 tests:
 - processingDate yesterday:
@@ -80,3 +79,11 @@ tests:
 
     expected file: count
     expected code: 200
+
+- Use maturity param on prod:
+    master: S1B_IW_SLC__1SDV_20190610T143518_20190610T143545_016635_01F4F7_6EA1
+    use_maturity: True
+    output: csv
+
+    expected file: error json
+    expected code: 400

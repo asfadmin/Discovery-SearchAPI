@@ -19,24 +19,27 @@ sys.path.remove(project_root)
 
 class test_URL_Manager():
     def __init__(self, test_info, file_conf, cli_args, test_vars):
+        self.error_msg = "Reason: {0}\n - File: '{1}'\n - Test: '{2}'".format('{0}', file_conf["yml name"], test_info["title"])
         if cli_args["api"] != None:
             test_api = cli_args["api"]
         elif "api" in file_conf:
             test_api = file_conf["api"]
         else:
-            assert False, "Endpoint test ran, but '--api' not declared in CLI (test_files_to_wkt).\nCan also add 'default' api to use in yml_tests/pytest_config.yml.\n"
+            assert False, self.error_msg.format("Endpoint test ran, but '--api' not declared in CLI. You can also add 'default' api to use in yml_tests/pytest_config.yml, or add 'api: *url*' to each test.")
+        
         url_parts = [test_api, test_vars["endpoint"]+"?"]
         full_url = '/'.join(s.strip('/') for s in url_parts) # If both/neither have '/' between them, this still joins them correctly
         
         # Get the url string and (bool)if assert was used:
         keywords, assert_used = self.getKeywords(test_info)
         self.query = full_url + "&".join(keywords)
+        self.error_msg += "\n - URL: '{0}'".format(self.query)
 
         # Figure out if you should print stuff:
         if "print" not in test_info:
             test_info["print"] = False if assert_used else True
 
-        status_code, content_type, file_content = self.runQuery(test_info["title"])
+        status_code, content_type, file_content = self.runQuery()
 
         if test_info["print"]:
             print()
@@ -73,12 +76,12 @@ class test_URL_Manager():
                 keywords.append(str(key)+"="+str(val))
         return keywords, assert_used
 
-    def runQuery(self, title):
+    def runQuery(self):
         def countToDict(html):
             try:
                 count = int(html.rstrip())
             except ValueError:
-                assert False, "API returned html that was not a count. (Error page?) Test: {0}. URL: {1}.\nHTML Page: \n{2}\n".format(title, self.query, file_content)
+                assert False, self.error_msg.format("API returned html that was not a count. (Error page?) \nHTML Page (First 500 chars): \n{0}\n".format(file_content[:500]))
             return {"count": count}
 
         def csvToDict(file_content):
@@ -86,6 +89,7 @@ class test_URL_Manager():
             file_content = [a for a in file_content]
             # Rotate it counter-clockwise, so that row[0] == key of csv. (based on https://stackoverflow.com/questions/8421337/rotating-a-two-dimensional-array-in-python)
             rotated_content = list(map(type([]), zip(*file_content)))
+            assert len(rotated_content) > 1, self.error_msg.format("API did not return a CSV.\nReturned content: (First 500 chars): \n{0}\n".format(file_content[:500]))
             file_content = {}
             for column in rotated_content:
                 file_content[column[0]] = column[1:]
@@ -96,7 +100,7 @@ class test_URL_Manager():
             # Grab everything in the self.files field of the download script:
             files = re.search(r'self.files\s*=\s*\[.*?\]', bulk_download_file, re.DOTALL)
             if files == None:
-                assert False, "Problem reading download script! URL: {0}. File: {1}.".format(self.query, bulk_download_file)
+                assert False, self.error_msg.format("Problem reading download script! \nReturned content: (First 500 chars): \n{0}\n".format(bulk_download_file[:500]))
             # Parse out each file-names, and make each one a str in a list:
             files = re.findall('"(.*?)"', files.group(0))
             # add the fields and return:
@@ -131,8 +135,8 @@ class test_URL_Manager():
         try:
             content_type = content_header.split('/')[1]
         except AttributeError:
-            assert False, "Header is not formatted as expected. Test: {0}. Header: {1}. URL: {2}.\nFile Content: \n{3}\n".format(title, content_header, self.query, file_content)
-        # Take out the "csv; charset=utf-8", without crahsing on things without charset
+            assert False, self.error_msg.format("Header is not formatted as expected. Header: {0}.\nFile Content (First 500 char): \n{1}\n".format(content_header, file_content[:500]))
+        # Take out the "csv; charset=utf-8", without crahsing on things that don't have a charset
         content_type = content_type.split(';')[0] if ';' in content_type else content_type
 
         ## COUNT / HTML:
@@ -177,7 +181,10 @@ class test_URL_Manager():
                     file_content = jsonToDict(file_content)
             ## JSON
             else:
-                json_data = file_content[0]
+                try:
+                    json_data = file_content[0]
+                except KeyError:
+                    assert False, self.error_msg.format("Test returned json header, with unknown format for the content.\nContent (First 500 char):\n0\n".format(file_content))
                 if json_data == []:
                     content_type = "blank json"
                 else:
@@ -200,11 +207,11 @@ class test_URL_Manager():
 
     def runAssertTests(self, test_info, status_code, content_type, file_content):
         if "expected code" in test_info:
-            assert test_info["expected code"] == status_code, "Status codes is different than expected. Test: {0}. URL: {1}.".format(test_info["title"], self.query)
+            assert test_info["expected code"] == status_code, self.error_msg.format("Status codes is different than expected.")
         if "count" in file_content and "maxResults" in test_info:
-            assert test_info["maxResults"] >= file_content["count"], "API returned too many results. Test: {0}. URL: {1}.".format(test_info["title"], self.query)
+            assert test_info["maxResults"] >= file_content["count"], self.error_msg.format("API returned too many results.")
         if "expected file" in test_info:
-            assert test_info["expected file"] == content_type, "Different file type returned than expected. Test: '{0}'. URL: {1}.".format(test_info["title"], self.query)
+            assert test_info["expected file"] == content_type, self.error_msg.format("Different file type returned than expected.")
             # If the tester added the override, don't check its contents:
             if "skip_file_check" in test_info and test_info["skip_file_check"] == True:
                 return
@@ -244,17 +251,17 @@ class test_URL_Manager():
                         # If inner for-loop found it, break out of this one too:
                         if found_in_list == True:
                             break
-                    assert found_in_list, key + " declared, but not found in file. Test: '{0}'. URL: '{1}'.".format(test_info["title"], self.query)
+                    assert found_in_list, self.error_msg.format(key + " declared, but not found in file.")
             
             def checkMinMax(key, test_info, file_dict):
                 if "min"+key in test_info and key in file_dict:
                     for value in file_dict[key]:
                         number_type = type(test_info["min"+key])
-                        assert number_type(value) >= test_info["min"+key], "Value found smaller than min key. Test: '{0}'. URL: {1}.".format(test_info["title"], self.query)
+                        assert number_type(value) >= test_info["min"+key], self.error_msg.format("Value found smaller than min key.")
                 if "max"+key in test_info and key in file_dict:
                     for value in file_dict[key]:
                         number_type = type(test_info["max"+key])
-                        assert number_type(value) <= test_info["max"+key], "Value found greater than max key. Test: '{0}'. URL: {1}.".format(test_info["title"], self.query)
+                        assert number_type(value) <= test_info["max"+key], self.error_msg.format("Value found greater than max key.")
 
             # FOR tz_orig: The timezone the string came from.
             #       Alaska = "US/Alaska", UTC = "UTC", Blank = whatever timezone you're in now
@@ -277,23 +284,23 @@ class test_URL_Manager():
                 # Change it to UTC and return it:
                 return time.astimezone(timezone("UTC"))
 
-            def checkDate(title, later_date=None, earlier_date=None):
+            def checkDate(later_date=None, earlier_date=None):
                 # Figure out which is the list of dates:
                 # (assuming whichever is the list, is loaded from downloads. The other is from yml file)
                 if isinstance(later_date, type([])):
                     earlier_date = convertTimezoneUTC(earlier_date)
                     for theDate in later_date:
                         theDate = convertTimezoneUTC(theDate, tz_orig="UTC")
-                        assert theDate >= earlier_date, "File has too small of a date. File: {0}, earlier than test date: {1}. Test: '{2}'. URL: {3}.".format(theDate, earlier_date, title, self.query)
+                        assert theDate >= earlier_date, self.error_msg.format("File has too small of a date. File: {0}, earlier than test date: {1}.".format(theDate, earlier_date))
                 elif isinstance(earlier_date, type([])):
                     later_date = convertTimezoneUTC(later_date)
                     for theDate in earlier_date:
                         theDate = convertTimezoneUTC(theDate, tz_orig="UTC")
-                        assert later_date >= theDate, "File has too large of a date. File: {0}, later than test date: {1}. Test: '{2}'. URL: {3}.".format(theDate, later_date, title, self.query)
+                        assert later_date >= theDate, self.error_msg.format("File has too large of a date. File: {0}, later than test date: {1}.".format(theDate, later_date))
                 else: # Else they both are a single date. Not sure if this is needed, but...
                     earlier_date = convertTimezoneUTC(earlier_date)
                     later_date = convertTimezoneUTC(later_date)
-                    assert later_date >= earlier_date, "Date: {0} is earlier than date {1}. Test: '{2}'".format(later_date, earlier_date, title)
+                    assert later_date >= earlier_date, self.error_msg.format("Date: {0} is earlier than date {1}.".format(later_date, earlier_date))
 
             def checkSeason(title, file_start_dates, file_end_dates, season_list):
                 def date_to_nth_day(date):
@@ -304,7 +311,7 @@ class test_URL_Manager():
                 if len(file_start_dates) == len(file_end_dates):
                     file_dates = zip(file_start_dates, file_end_dates)
                 else:
-                    assert False, "Error running test! Not same number of start and end dates. Test: '{0}'. URL: '{1}'.".format(title, self.query)
+                    assert False, self.error_msg.format("Error running test! Not same number of start and end dates.")
                 
                 # If it's [300,5], turn it into [[300,365],[1,5]]. Else make it [[x,y]]
                 if season_list[0] > season_list[1]:
@@ -342,7 +349,7 @@ class test_URL_Manager():
                                 season_range_hit = True
                                 break
 
-                    assert season_range_hit, "Seasons not found in file. file ranges: {0}. yml range: {1}. Test: {2}. URL: {3}.".format(days_ranges, season_list, title, self.query)
+                    assert season_range_hit, self.error_msg.format("Seasons not found in file. file ranges: {0}. yml range: {1}.".format(days_ranges, season_list))
 
 
             checkFileContainsExpected("Platform", test_info, file_content)
@@ -362,12 +369,12 @@ class test_URL_Manager():
 
             # Processing Date (can not validate because it uses a field from CMR not in the API):
             # if "processingdate" in file_content and "processingdate" in test_info:
-            #     checkDate(test_info["title"], later_date=file_content["processingdate"], earlier_date=test_info["processingdate"])
+            #     checkDate(later_date=file_content["processingdate"], earlier_date=test_info["processingdate"])
             # Start & End:
             if "starttime" in file_content and "start" in test_info:
-                checkDate(test_info["title"], later_date=file_content["starttime"], earlier_date=test_info["start"])
+                checkDate(later_date=file_content["starttime"], earlier_date=test_info["start"])
             if "starttime" in file_content and "end" in test_info:
-                checkDate(test_info["title"], later_date=test_info["end"], earlier_date=file_content["starttime"])
+                checkDate(later_date=test_info["end"], earlier_date=file_content["starttime"])
 
             if "starttime" in file_content and "endtime" in file_content and "season" in test_info:
                 checkSeason(test_info["title"], file_content["starttime"], file_content["endtime"], test_info["season"])
@@ -461,7 +468,7 @@ class test_URL_Manager():
                     mutatable_dict[key.lower()[0:3]+"faradayrotation"] = test_input.parse_float(val)
 
         except ValueError as e:
-            assert False, "Test: '{0}'. Incorrect parameter: {1}. URL: {2}.".format(test_info["title"], str(e), self.query)
+            assert False, self.error_msg.format("ValueError: {0}.".format(str(e)))
 
         # If start is larger than end, swap them:
         if "start" in mutatable_dict and "end" in mutatable_dict:

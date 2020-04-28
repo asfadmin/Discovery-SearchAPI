@@ -864,6 +864,15 @@ tests:
     expected file: csv
     expected code: 200
 
+- platform SB:
+    platform: SB
+    start: 1+year+ago
+    end: now
+    maxResults: 2000
+    output: csv
+
+    expected file: csv
+    expected code: 200
 
 - platform J1:
     platform: J1
@@ -2039,12 +2048,22 @@ tests:
     expected file: csv
     expected code: 200
 
-#open bug for this - DS-2809
-- season 1-175 UAVSAR Start End:
-    season: 1,175
-    platform: Ua
-    start: "2005-01-01T00:00:00Z"
-    end: "2019-01-01T01:00:00Z"
+- season 1-100 S1 1year:
+    season: 1,100
+    platform: SA,Sb
+    start: 1+year+ago
+    end: now
+    maxResults: 1000
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- season 1-100 S1 2years:
+    season: 1,100
+    platform: sa,sb
+    start: 2+year+ago
+    end: now
     maxResults: 1000
     output: csv
 
