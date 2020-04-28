@@ -4,7 +4,26 @@ api: Test
 ## This file contains test cases with known bugs. Bug is listed above each group. These will fail if run, and will block the AWS pipeline
 
 tests:
-#No Bug Entered - Still researching "today" failures, due to CMR issue
+#DS-3121 open bug - multiple masters should not be allowed. Currently it retuns a 200 http code with results
+- multiple masters:
+    master: ALPSRP064337140,ALPSRP279057140
+
+    expected file: error json
+    expected code: 400
+
+# DS-2809 - open bug for this - some UAVSAR scenes span multiple years, so outside the seasons specified
+- season 1-175 UAVSAR Start End:
+    season: 1,175
+    platform: Ua
+    start: "2005-01-01T00:00:00Z"
+    end: "2019-01-01T01:00:00Z"
+    maxResults: 1000
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+#DS-3133 opened - appears CMR indexing did not resolve - today returns 0 count... today's date returns a count
 - processingDate today:
     processingDate: today
     maxResults: 10
