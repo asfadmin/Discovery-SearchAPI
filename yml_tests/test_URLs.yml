@@ -377,14 +377,6 @@ tests:
     expected file: json
     expected code: 200
 
-- frame list:
-    frame: 1100,1101,1102
-    maxresults: 10
-    output: csv
-
-    expected file: csv
-    expected code: 200
-
 - frame list range:
     frame: 6714,1100-1105
     maxresults: 10
