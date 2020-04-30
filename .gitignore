@@ -21,3 +21,5 @@ jsonlite_cache/*
 # misc files
 venv/*
 .DS_Store
+.vscode
+

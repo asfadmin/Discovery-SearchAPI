@@ -3,6 +3,7 @@ import json, csv            # File stuff
 import re                   # Opening/Reading the file stuff
 from io import StringIO     # Opening/Reading the file stuff
 from copy import deepcopy   # For making duplicate dicts
+# from error_msg import error_msg
 
 # For timezone/timestamp verification:
 from datetime import datetime
@@ -167,7 +168,10 @@ class test_URL_Manager():
 
         ## JSON / JSONLITE / ERROR
         elif content_type == "json":
-            file_content = json.loads(file_content)
+            try:
+                file_content = json.loads(file_content)
+            except json.decoder.JSONDecodeError:
+                self.error_msg.format("Test returned json header, but content failed to load.\nContent (First 500 char):\n{0}\n".format(file_content))
             ## ERROR
             if "error" in file_content:
                 content_type = "error json"
@@ -181,10 +185,8 @@ class test_URL_Manager():
                     file_content = jsonToDict(file_content)
             ## JSON
             else:
-                try:
-                    json_data = file_content[0]
-                except KeyError:
-                    assert False, self.error_msg.format("Test returned json header, with unknown format for the content.\nContent (First 500 char):\n0\n".format(file_content))
+                assert isinstance(file_content, type([])), self.error_msg.format("Response did not contain a list of results.\nContent (First 500 char):\n{0}\n".format(file_content))
+                json_data = file_content[0]
                 if json_data == []:
                     content_type = "blank json"
                 else:
@@ -251,7 +253,7 @@ class test_URL_Manager():
                         # If inner for-loop found it, break out of this one too:
                         if found_in_list == True:
                             break
-                    assert found_in_list, self.error_msg.format(key + " declared, but not found in file.")
+                    assert found_in_list, self.error_msg.format(key + " declared, but not found in file. File contents for key:\n{0}\n".format(file_dict[key]))
             
             def checkMinMax(key, test_info, file_dict):
                 if "min"+key in test_info and key in file_dict:
@@ -302,7 +304,7 @@ class test_URL_Manager():
                     later_date = convertTimezoneUTC(later_date)
                     assert later_date >= earlier_date, self.error_msg.format("Date: {0} is earlier than date {1}.".format(later_date, earlier_date))
 
-            def checkSeason(title, file_start_dates, file_end_dates, season_list):
+            def checkSeason(file_start_dates, file_end_dates, season_list):
                 def date_to_nth_day(date):
                     start_of_year = datetime(year=date.year, month=1, day=1)
                     start_of_year = convertTimezoneUTC(start_of_year, tz_orig="UTC")
@@ -377,7 +379,7 @@ class test_URL_Manager():
                 checkDate(later_date=test_info["end"], earlier_date=file_content["starttime"])
 
             if "starttime" in file_content and "endtime" in file_content and "season" in test_info:
-                checkSeason(test_info["title"], file_content["starttime"], file_content["endtime"], test_info["season"])
+                checkSeason(file_content["starttime"], file_content["endtime"], test_info["season"])
 
             checkMinMax("baselineperp", test_info, file_content)
             checkMinMax("doppler", test_info, file_content)
@@ -602,6 +604,7 @@ class test_URL_Manager():
                     del json_dict["Platform"][i]
                     json_dict["Platform"].append("Sentinel-1A")
                     json_dict["Platform"].append("Sentinel-1B")
+                    json_dict["Platform"].append("Sentinel-1 Interferogram (BETA)")
                 # Sentinel-1A
                 elif platform in ["SENTINEL-1A", "SA"]:
                     json_dict["Platform"][i] = "Sentinel-1A"

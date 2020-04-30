@@ -20,11 +20,11 @@ phases:
         if [ ! -d ".git" ]; then
           git init                                              # Initialize Git
           git remote add origin $REPO_URL                       # Add the remote origin so we can fetch
-          git fetch                                             # Get all the things
+          git fetch --depth=1                                   # Get all the things
           git checkout -f "$CODEBUILD_RESOLVED_SOURCE_VERSION"  # Checkout the specific commit we are building
         fi
       - git submodule init
-      - git submodule update --recursive
+      - git submodule update --recursive --depth=1
       - echo "{\"version\":\"$CODEBUILD_RESOLVED_SOURCE_VERSION\"}" > version.json
 artifacts:
   files:

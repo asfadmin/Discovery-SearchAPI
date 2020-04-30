@@ -4,7 +4,7 @@ import time
 
 import requests
 from flask import request
-
+from urllib.parse import urlparse
 from asf_env import get_config
 
 
@@ -87,8 +87,11 @@ def analytics_pageview():
         p['t'] = 'pageview'
         p['uip'] = request.access_route[-1]
         p['dr'] = request.referrer
-        if get_config().get('this_api') is not None:
-            p['dh'] = get_config()['this_api'] # Needed for proper hostname on AWS API Gateway
+        api_url = get_config().get('this_api')
+        if api_url is not None:
+            api_url = urlparse(api_url)
+            api_url = api_url.geturl().replace(api_url.scheme + "://", "") # take out the scheme
+            p['dh'] = api_url                                              # Needed for proper hostname on AWS API Gateway
             p['dp'] = request.full_path
         else:
             p['dl'] = request.url # default to just blindly using the request url

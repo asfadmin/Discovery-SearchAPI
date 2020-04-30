@@ -16,6 +16,8 @@ class test_date_parser():
         self.full_url = '/'.join(s.strip('/') for s in url_parts) # If both/neither have '/' between them, this still joins them correctly
         if "date" in test_info:
             self.full_url += "?date=" + test_info["date"]
+        self.error_msg += "\n - URL: '{0}'.".format(self.full_url)
+
         self.test_info = test_info
 
         (status_code, content_type, content) = self.makeRequest()
@@ -64,7 +66,7 @@ class test_date_parser():
                 try:
                     datetime.strptime(content["date"]["parsed"], "%Y-%m-%dT%H:%M:%SZ")
                 except (ValueError, TypeError) as e:
-                    assert False, self.error_msg.format("API did not return a date. Error Message: '{0}'.".format(str(e)))
+                    assert False, self.error_msg.format("API did not return a date. Error Message: '{0}'.\n - API Returned: {1}.\n".format(str(e), content))
             else:
                 assert False, self.error_msg.format("API did not return a date. Returned (First 500 char):\n{0}\n".format(content[:500]))
 
