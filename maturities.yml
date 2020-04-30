@@ -6,11 +6,11 @@ local:
     cmr_health: /search/health
     cmr_api: /search/granules.echo10
     cmr_collections: /search/collections
-    cmr_headers: 
+    cmr_headers:
         Client-Id: vertex_asf
     flexible_maturity: True
-    
-devel: 
+
+devel:
     bulk_download_api: https://bulk-download.asf.alaska.edu
     analytics_id: UA-118881300-4
     this_api: https://api-dev.asf.alaska.edu
@@ -18,11 +18,11 @@ devel:
     cmr_health: /search/health
     cmr_api: /search/granules.echo10
     cmr_collections: /search/collections
-    cmr_headers: 
+    cmr_headers:
         Client-Id: vertex_alocal.asf.alaska.edusf
     flexible_maturity: True
 
-devel-beanstalk: 
+devel-beanstalk:
     bulk_download_api: https://bulk-download.asf.alaska.edu
     analytics_id: UA-118881300-4
     this_api: https://api-dev-beanstalk.asf.alaska.edu
@@ -30,11 +30,11 @@ devel-beanstalk:
     cmr_health: /search/health
     cmr_api: /search/granules.echo10
     cmr_collections: /search/collections
-    cmr_headers: 
+    cmr_headers:
         Client-Id: vertex_asf
     flexible_maturity: True
 
-test: 
+test:
     bulk_download_api: https://bulk-download.asf.alaska.edu
     analytics_id: UA-118881300-3
     this_api: https://api-test.asf.alaska.edu
@@ -42,11 +42,11 @@ test:
     cmr_health: /search/health
     cmr_api: /search/granules.echo10
     cmr_collections: /search/collections
-    cmr_headers: 
+    cmr_headers:
         Client-Id: vertex_asf
     flexible_maturity: True
 
-test-beanstalk: 
+test-beanstalk:
     bulk_download_api: https://bulk-download.asf.alaska.edu
     analytics_id: UA-118881300-3
     this_api: https://api-test-beanstalk.asf.alaska.edu
@@ -54,11 +54,11 @@ test-beanstalk:
     cmr_health: /search/health
     cmr_api: /search/granules.echo10
     cmr_collections: /search/collections
-    cmr_headers: 
+    cmr_headers:
         Client-Id: vertex_asf
     flexible_maturity: True
 
-prod: 
+prod:
     bulk_download_api: https://bulk-download.asf.alaska.edu
     analytics_id: None
     this_api: https://api.daac.asf.alaska.edu
@@ -66,11 +66,11 @@ prod:
     cmr_health: /search/health
     cmr_api: /search/granules.echo10
     cmr_collections: /search/collections
-    cmr_headers: 
+    cmr_headers:
         Client-Id: vertex_asf
     flexible_maturity: False
 
-prod-private: 
+prod-private:
     bulk_download_api: https://bulk-download.asf.alaska.edu
     analytics_id: UA-118881300-5
     this_api: https://api-prod-private.asf.alaska.edu
@@ -78,8 +78,6 @@ prod-private:
     cmr_health: /search/health
     cmr_api: /search/granules.echo10
     cmr_collections: /search/collections
-    cmr_headers: 
+    cmr_headers:
         Client-Id: vertex_asf
     flexible_maturity: False
-
-    
