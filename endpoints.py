@@ -1,4 +1,3 @@
-import requests
 from flask import Response
 import json
 import api_headers
