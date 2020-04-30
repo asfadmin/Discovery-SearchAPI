@@ -184,7 +184,7 @@ class test_URL_Manager():
                 try:
                     json_data = file_content[0]
                 except KeyError:
-                    assert False, self.error_msg.format("Test returned json header, with unknown format for the content.\nContent (First 500 char):\n0\n".format(file_content))
+                    assert False, self.error_msg.format("Test returned json header, with unknown format for the content.\nContent (First 500 char):\n{0}\n".format(file_content))
                 if json_data == []:
                     content_type = "blank json"
                 else:
@@ -602,6 +602,7 @@ class test_URL_Manager():
                     del json_dict["Platform"][i]
                     json_dict["Platform"].append("Sentinel-1A")
                     json_dict["Platform"].append("Sentinel-1B")
+                    json_dict["Platform"].append("Sentinel-1 Interferogram (BETA)")
                 # Sentinel-1A
                 elif platform in ["SENTINEL-1A", "SA"]:
                     json_dict["Platform"][i] = "Sentinel-1A"
