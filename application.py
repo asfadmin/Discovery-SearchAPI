@@ -149,8 +149,8 @@ def handle_oversize_request(error):
 # Pre-flight operations
 @application.before_request
 def preflight():
-    analytics_pageview()
     load_config()
+    analytics_pageview()
     if get_config()['flexible_maturity']:
         if 'maturity' in request.values:
             request.temp_maturity = request.values['maturity']
