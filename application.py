@@ -15,7 +15,7 @@ from Analytics import analytics_pageview
 from werkzeug.exceptions import RequestEntityTooLarge
 import time
 import importlib
-from asf_env import get_config
+from asf_env import get_config, load_config
 
 import endpoints
 
@@ -150,6 +150,7 @@ def handle_oversize_request(error):
 @application.before_request
 def preflight():
     analytics_pageview()
+    load_config()
     if get_config()['flexible_maturity']:
         if 'maturity' in request.values:
             request.temp_maturity = request.values['maturity']
