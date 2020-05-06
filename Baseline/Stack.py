@@ -45,8 +45,6 @@ def get_stack_params(master, product_type):
     if product_type is not None:
         stack_params['processingLevel'] = product_type
 
-    stack_params['platform'] = get_platform(master)
-
     #shortcut the stacking for legacy datasets with precalculated stacks and baselines
     if get_platform(master) in precalc_datasets:
         if master_results[0]['insarGrouping'] is not None and master_results[0]['insarGrouping'] not in ['NA', 0, '0']:
@@ -58,6 +56,7 @@ def get_stack_params(master, product_type):
 
     # build a stack from scratch if it's a non-precalc dataset with state vectors
     if get_platform(master) in ['S1']:
+        stack_params['platform'] = get_platform(master)
         stack_params['beamMode'] = master_results[0]['beamMode']
         stack_params['flightDirection'] = master_results[0]['flightDirection']
         stack_params['lookDirection'] = master_results[0]['lookDirection']
