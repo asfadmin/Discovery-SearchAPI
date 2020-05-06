@@ -16,13 +16,16 @@
 api_urls:
   local: http://127.0.0.1:5000/
   dev: https://api-dev.asf.alaska.edu/
+  dev-staging: https://api-dev-staging.asf.alaska.edu
   test: https://api-test.asf.alaska.edu/
+  test-staging: https://api-test-staging.asf.alaska.edu
   test-beanstalk: https://api-test-beanstalk.asf.alaska.edu/
   prod: https://api.daac.asf.alaska.edu/
+  prod-staging: https://api-prod-private-staging.asf.alaska.edu/
   prod-private: https://api-prod-private.asf.alaska.edu/
 
   default: prod
-  api_prod_list: [ prod, prod-private ]
+  api_prod_list: [ prod, prod-staging, prod-private, dev-staging ]
 
 
 test_types:
