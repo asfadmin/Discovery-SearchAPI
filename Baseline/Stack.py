@@ -1,5 +1,5 @@
 import dateparser
-from CMR.Translate import translate_params
+from CMR.Translate import translate_params, input_fixer
 from CMR.Query import CMRQuery
 from .Calc import calculate_perpendicular_baselines
 
@@ -45,7 +45,7 @@ def get_stack_params(master, product_type):
     if product_type is not None:
         stack_params['processingLevel'] = product_type
 
-    stack_params['platform'] = master_results[0]['platform']
+    stack_params['platform'] = get_platform(master)
 
     #shortcut the stacking for legacy datasets with precalculated stacks and baselines
     if get_platform(master) in precalc_datasets:
@@ -73,6 +73,7 @@ def get_stack_params(master, product_type):
 
 def query_stack(params):
     params, output, max_results = translate_params(params)
+    params = input_fixer(params)
     query = CMRQuery(
         params=dict(params)
     )
