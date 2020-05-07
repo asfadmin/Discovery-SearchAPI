@@ -56,7 +56,7 @@
         "memory_size": 1524,
         "slim_handler": true,
         "environment_variables": {"MATURITY": "prod-private"},
-        "timeout_seconds": 60
+        "timeout_seconds": 200
     },
     "prod_staging": {
         "app_function": "application.application",
