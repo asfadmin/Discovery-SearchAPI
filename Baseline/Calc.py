@@ -53,10 +53,13 @@ def calculate_perpendicular_baselines(master, stack):
         master['alongBeamVector'] = get_along_beam_vector(master_shared_pos, master['granulePosition'])
         master['upBeamVector'] = get_up_beam_vector(master_shared_vel, master['alongBeamVector'])
 
-        secondary['perpendicularBaseline'] = get_paired_granule_baseline(
+        perpendicular_baseline = get_paired_granule_baseline(
             master['granulePosition'],
             master['upBeamVector'],
             secondary_shared_pos)
+        if abs(perpendicular_baseline) > 100000:
+            perpendicular_baseline = None
+        secondary['perpendicularBaseline'] = perpendicular_baseline
 
     return stack
 
