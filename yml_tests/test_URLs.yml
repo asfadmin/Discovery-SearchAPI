@@ -816,7 +816,7 @@ tests:
 
 - output json:
     platform: SB
-    maxResults: 2000
+    maxResults: 1000
     output: json
 
     expected file: json
