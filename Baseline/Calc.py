@@ -91,7 +91,7 @@ def get_up_beam_vector(satellite_velocity, along_beam_vector):
 def get_paired_granule_baseline(master_granule_position, master_up_beam_vector, paired_satellite_position):
     posd = np.subtract(paired_satellite_position, master_granule_position)
     baseline = np.dot(master_up_beam_vector, posd)
-    return(baseline)
+    return(int(round(baseline)))
 
 # Find a relative orbit time covered by both granules' SVs
 def get_shared_sv_time(master, secondary):
