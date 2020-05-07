@@ -25,7 +25,7 @@ api_urls:
   prod-private: https://api-prod-private.asf.alaska.edu/
 
   default: prod
-  api_prod_list: [ prod, prod-staging, prod-private, dev-staging ]
+  api_prod_list: [ prod, prod-staging, prod-private ]
 
 
 test_types:
