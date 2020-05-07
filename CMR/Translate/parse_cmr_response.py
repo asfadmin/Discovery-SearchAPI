@@ -1,6 +1,6 @@
 import logging
 from lxml import etree as ET
-import dateparser
+import datetime
 
 
 def parse_cmr_response(r):
@@ -138,7 +138,7 @@ def parse_granule(granule):
         (x, y, z, t) = sv.split(',')
         v = [float_or_none(x), float_or_none(y), float_or_none(z)]
         if None not in v:
-            return (v, t if dateparser.parse(t) is not None else None)
+            return (v, t if datetime.datetime.strptime(t, '%Y-%m-%dT%H:%M:%S.%f') is not None else None)
         else:
             return (None, None)
 
