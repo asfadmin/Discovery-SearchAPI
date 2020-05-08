@@ -64,3 +64,4 @@ test_types:
     method: test_URLManagerSearch
     variables:
       endpoint: "/services/search/param"
+      maturity: prod
