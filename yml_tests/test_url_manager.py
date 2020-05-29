@@ -27,12 +27,21 @@ class test_URL_Manager():
             test_api = file_conf["api"]
         else:
             assert False, self.error_msg.format("Endpoint test ran, but '--api' not declared in CLI. You can also add 'default' api to use in yml_tests/pytest_config.yml, or add 'api: *url*' to each test.")
-        
+
         url_parts = [test_api, test_vars["endpoint"]+"?"]
         full_url = '/'.join(s.strip('/') for s in url_parts) # If both/neither have '/' between them, this still joins them correctly
-        
+
+        # If you're overriding if you want to show the maturity:
+        if "use_maturity" in test_info:
+            use_cmr_maturity = test_info["use_maturity"]
+        # Defalut use it, if you're not running against a prod api:
+        else:
+            use_cmr_maturity = cli_args["api"] not in cli_args["api prod list"]
+
         # Get the url string and (bool)if assert was used:
         keywords, assert_used = self.getKeywords(test_info)
+        if use_cmr_maturity:
+            keywords.append("maturity=" + test_vars["maturity"])
         self.query = full_url + "&".join(keywords)
         self.error_msg += "\n - URL: '{0}'".format(self.query)
 
@@ -57,7 +66,7 @@ class test_URL_Manager():
 
     def getKeywords(self, test_info):
         # DONT add these to url. (Used for tester). Add ALL others to allow testing keywords that don't exist
-        reserved_keywords = ["title", "print", "api", "skip_file_check"]
+        reserved_keywords = ["title", "print", "api", "skip_file_check", "maturity", "use_maturity"]
         asserts_keywords = ["expected file","expected code"]
 
 
@@ -96,7 +105,7 @@ class test_URL_Manager():
                 file_content[column[0]] = column[1:]
             file_content["count"] = len(file_content["Platform"])
             return file_content
-        
+
         def downloadToDict(bulk_download_file):
             # Grab everything in the self.files field of the download script:
             files = re.search(r'self.files\s*=\s*\[.*?\]', bulk_download_file, re.DOTALL)
@@ -254,7 +263,7 @@ class test_URL_Manager():
                         if found_in_list == True:
                             break
                     assert found_in_list, self.error_msg.format(key + " declared, but not found in file. File contents for key:\n{0}\n".format(file_dict[key]))
-            
+
             def checkMinMax(key, test_info, file_dict):
                 if "min"+key in test_info and key in file_dict:
                     for value in file_dict[key]:
@@ -271,7 +280,7 @@ class test_URL_Manager():
                 # Assume if tz_orig is overriden, it's a string of what timezone they want. Else, get whatever timezone you're in
                 tz_orig = get_localzone() if tz_orig == None else timezone(tz_orig)
 
-                # If it's a string, convert it to datetime and localize it. 
+                # If it's a string, convert it to datetime and localize it.
                 # Else it's already datetime, just localize to the timezone:
                 if isinstance(time, type("")):
                     # Strip down a string, so it can be used in the format: "%Y-%m-%dT%H:%M:%S"
@@ -314,7 +323,7 @@ class test_URL_Manager():
                     file_dates = zip(file_start_dates, file_end_dates)
                 else:
                     assert False, self.error_msg.format("Error running test! Not same number of start and end dates.")
-                
+
                 # If it's [300,5], turn it into [[300,365],[1,5]]. Else make it [[x,y]]
                 if season_list[0] > season_list[1]:
                     season_list = [ [season_list[0],365],[1,season_list[1]] ]
@@ -652,7 +661,7 @@ class test_URL_Manager():
                 # making all results UPPER case, except Dual
                 if polarization[0:4].upper() == "DUAL":
                     polarization = "Dual" + polarization[4:].upper()
-                else:                
+                else:
                     polarization = polarization.upper()
                 json_dict["polarization"][i] = polarization
         if "collectionname" in json_dict:
