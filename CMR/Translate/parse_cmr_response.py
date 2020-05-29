@@ -38,9 +38,14 @@ def parse_granule(granule):
         granule.xpath('./Spatial/HorizontalSpatialDomain/Geometry/GPolygon')
     )
 
-    asf_platforms = ['Sentinel-1A', 'Sentinel-1B', 'ALOS']
+    platform = get_attr(
+        'ASF_PLATFORM',
+        default=get_val("./Platforms/Platform/ShortName")
+    )
+
+    asf_frame_platforms = ['Sentinel-1A', 'Sentinel-1B', 'ALOS']
     frame_number = get_attr('FRAME_NUMBER') \
-        if get_attr('ASF_PLATFORM') in asf_platforms \
+        if platform in asf_frame_platforms \
         else get_attr('CENTER_ESA_FRAME')
 
     result = {
@@ -94,10 +99,7 @@ def parse_granule(granule):
         'percentCoherence': 'NA',  # not in CMR
         'percentTroposphere': 'NA',  # not in CMR
         'percentUnwrapped': 'NA',  # not in CMR
-        'platform': get_attr(
-            'ASF_PLATFORM',
-            default=get_val("./Platforms/Platform/ShortName")
-        ),
+        'platform': platform,
         'pointingAngle': get_attr('POINTING_ANGLE', default=None),
         'polarization':  get_attr('POLARIZATION'),
         'processingDate':  get_val("./DataGranule/ProductionDateTime", default=None),
