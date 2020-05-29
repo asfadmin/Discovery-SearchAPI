@@ -4,86 +4,19 @@ api: Test
 #Run this file on api-prod & api-prod-private ONLY
 
 tests:
-- processingDate yesterday:
-    processingDate: yesterday
-    maxResults: 10
-    output: csv
-
-    expected file: csv
-    expected code: 200
-
-- processingDate 1weekago:
-    processingDate: 1+week+ago
-    maxResults: 10
-    output: csv
-
-    expected file: csv
-    expected code: 200
-
-- start yesterday count:
-    start: yesterday
-    output: count
-
-    expected file: count
-    expected code: 200
-
-- start 1weekago count:
-    start: 1+week+ago
-    output: count
-
-    expected file: count
-    expected code: 200
-
-- start 1dayago count:
-    start: 1+day+ago
-    output: count
-
-    expected file: count
-    expected code: 200
-
-- start now end yesterday reversed:
-    start: now
-    end: yesterday
-    output: csv
-    maxResults: 10
-
-    expected file: csv
-    expected code: 200
-
-- realworld 1:
-    intersectsWith: point(-168.0380672+53.9279675)
-    platform: Sentinel-1A,Sentinel-1B
-    processingLevel: GRD_HS,GRD_HD
-    beamMode: IW
-    output: count
-
-    expected file: count
-    expected code: 200
-
-- realworld 2:
-    intersectsWith: linestring(-102+37.59,-94+37,-94+39,-102+39)
-    platform: Sentinel-1A,Sentinel-1B
-    processingLevel: GRD_HS,GRD_HD
-    beamMode: IW
-    output: count
-
-    expected file: count
-    expected code: 200
-
-- realworld 3:
-    intersectsWith: polygon((-102+37.59,-94+37,-94+39,-102+39,-102+37.59))
-    platform: Sentinel-1A,Sentinel-1B
-    processingLevel: GRD_HS,GRD_HD
-    beamMode: IW
-    output: count
-
-    expected file: count
-    expected code: 200
-
-- Use maturity param on prod:
+- Use maturity param on api-prod:
     master: S1B_IW_SLC__1SDV_20190610T143518_20190610T143545_016635_01F4F7_6EA1
     use_maturity: True
     output: csv
+
+    expected file: error json
+    expected code: 400
+
+- Maturity param on search endpoint api-prod:
+    platform: SA,SB
+    maxResults: 100
+    output: csv
+    use_maturity: True
 
     expected file: error json
     expected code: 400

@@ -1889,6 +1889,22 @@ tests:
     expected file: csv
     expected code: 200
 
+- processingDate yesterday:
+    processingDate: yesterday
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- processingDate 1weekago:
+    processingDate: 1+week+ago
+    maxResults: 10
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
 - product_list S1:
     product_list: S1B_IW_GRDH_1SDV_20190410T153301_20190410T153328_015746_01D8D2_0E9B-GRD_HD,S1B_S6_GRDH_1SDV_20190911T214309_20190911T214338_017995_021E10_5CCB-GRD_HD,S1B_IW_SLC__1SDV_20180517T005744_20180517T005757_010954_0140DF_9891-SLC,S1B_WV_OCN__2SSV_20180513T055028_20180513T062610_010898_013F0C_059A-METADATA_OCN
     output: json
@@ -2199,8 +2215,58 @@ tests:
     expected file: csv
     expected code: 200
 
+- start yesterday count:
+    start: yesterday
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- start 1weekago count:
+    start: 1+week+ago
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- start 1dayago count:
+    start: 1+day+ago
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- start now end yesterday reversed:
+    start: now
+    end: yesterday
+    output: csv
+    maxResults: 10
+
+    expected file: csv
+    expected code: 200
+
+- realworld 1:
+    intersectsWith: point(-168.0380672+53.9279675)
+    platform: Sentinel-1A,Sentinel-1B
+    processingLevel: GRD_HS,GRD_HD
+    beamMode: IW
+    output: count
+
+    expected file: count
+    expected code: 200
+
 - realworld 1 modified:
     intersectsWith: point(-162.4535+61.4945)
+    platform: Sentinel-1A,Sentinel-1B
+    processingLevel: GRD_HS,GRD_HD
+    beamMode: IW
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- realworld 2:
+    intersectsWith: linestring(-102+37.59,-94+37,-94+39,-102+39)
     platform: Sentinel-1A,Sentinel-1B
     processingLevel: GRD_HS,GRD_HD
     beamMode: IW
@@ -2214,6 +2280,16 @@ tests:
     platform: Sentinel-1A,Sentinel-1B
     processingLevel: GRD_HS,GRD_HD
     beamMode: S4
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- realworld 3:
+    intersectsWith: polygon((-102+37.59,-94+37,-94+39,-102+39,-102+37.59))
+    platform: Sentinel-1A,Sentinel-1B
+    processingLevel: GRD_HS,GRD_HD
+    beamMode: IW
     output: count
 
     expected file: count
