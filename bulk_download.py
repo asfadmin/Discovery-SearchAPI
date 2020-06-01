@@ -17,7 +17,7 @@
 #    If downloading from a trusted source with invalid SSL Certs, use --insecure to ignore
 #
 #    For more information on bulk downloads, navigate to:
-#        https://www.asf.alaska.edu/data-tools/bulk-download/
+#        https://asf.alaska.edu/how-to/data-tools/data-tools/#bulk_download
 #
 #
 #
