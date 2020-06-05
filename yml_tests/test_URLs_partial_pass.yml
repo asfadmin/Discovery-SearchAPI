@@ -226,6 +226,13 @@ tests:
     expected file: blank json
     expected code: 200
 
+- instrument test:
+    instrument: test
+    output: json
+
+    expected file: blank json
+    expected code: 200
+
 - output test:
     platform: S1
     relativeOrbit: 85-90
