@@ -233,6 +233,22 @@ tests:
     expected file: blank json
     expected code: 200
 
+- instrument notvalid:
+    platform: ALOS
+    instrument: notvalid
+    output: json
+
+    expected file: blank json
+    expected code: 200
+
+- instrument with invalid dataset:
+    platform: S1
+    instrument: SA
+    output: json
+
+    expected file: blank json
+    expected code: 200
+
 - output test:
     platform: S1
     relativeOrbit: 85-90
