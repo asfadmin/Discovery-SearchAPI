@@ -4,6 +4,16 @@ api: Test
 ## This file contains test cases with known bugs. Bug is listed above each group. These will fail if run, and will block the AWS pipeline
 
 tests:
+#DS-3175 open bug - pointingAngle keyword gives validation error
+#Add more TCs when resolved
+- pointing angle:
+    pointingAngle: 0.0
+    output: csv
+    maxResults: 1
+
+    expected file: csv
+    expected code: 200
+
 #DS-3121 open bug - multiple masters should not be allowed. Currently it retuns a 200 http code with results
 - multiple masters:
     master: ALPSRP064337140,ALPSRP279057140

@@ -119,5 +119,5 @@ def offset_perpendicular_baselines(master, stack):
         if product['granuleName'] == master:
             product['perpendicularBaseline'] = 0
         else:
-            product['perpendicularBaseline'] = float(product['insarBaseline']) - master_offset
+            product['perpendicularBaseline'] = round(float(product['insarBaseline']) - master_offset)
     return stack
