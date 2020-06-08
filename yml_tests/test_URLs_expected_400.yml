@@ -197,6 +197,21 @@ tests:
     expected file: error json
     expected code: 400
 
+- instrument empty string invalid:
+    instrument: ""
+    output: csv
+
+    expected file: error json
+    expected code: 400
+
+- instrument and platform empty string invalid:
+    platform: A3
+    instrument: ""
+    output: csv
+
+    expected file: error json
+    expected code: 400
+
 - intersectsWith linestring invalid:
     intersectsWith: linestring(TEST)
     output: csv
