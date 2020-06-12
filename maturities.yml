@@ -1,5 +1,5 @@
 local:
-    bulk_download_api: https://bulk-download.asf.alaska.edu
+    bulk_download_api: https://bulk-download.asf.alaska.eduasdfasdf
     analytics_id: None
     this_api: http://127.0.0.1:5000
     cmr_base: https://cmr.earthdata.nasa.gov
@@ -11,7 +11,7 @@ local:
     flexible_maturity: True
 
 devel:
-    bulk_download_api: https://bulk-download.asf.alaska.edu
+    bulk_download_api: https://bulk-download-dev.asf.alaska.edu
     analytics_id: UA-118881300-4
     this_api: https://api-dev.asf.alaska.edu
     cmr_base: https://cmr.uat.earthdata.nasa.gov
@@ -35,7 +35,7 @@ devel-beanstalk:
     flexible_maturity: True
 
 test:
-    bulk_download_api: https://bulk-download.asf.alaska.edu
+    bulk_download_api: https://bulk-download-test.asf.alaska.edu
     analytics_id: UA-118881300-3
     this_api: https://api-test.asf.alaska.edu
     cmr_base: https://cmr.uat.earthdata.nasa.gov
@@ -47,7 +47,7 @@ test:
     flexible_maturity: True
 
 test-beanstalk:
-    bulk_download_api: https://bulk-download.asf.alaska.edu
+    bulk_download_api: https://bulk-download-test.asf.alaska.edu
     analytics_id: UA-118881300-3
     this_api: https://api-test-beanstalk.asf.alaska.edu
     cmr_base: https://cmr.uat.earthdata.nasa.gov
