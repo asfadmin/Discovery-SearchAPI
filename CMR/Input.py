@@ -1,7 +1,7 @@
 import dateparser
 import re
 from geomet import wkt
-from UtilsAPI.Input import parse_wkt_util, parse_date_util
+from UtilsAPI.Input import parse_wkt_util
 
 # Parse and validate a string: "abc"
 def parse_string(v):
