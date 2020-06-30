@@ -7,8 +7,9 @@ from CMR.SubQuery import CMRSubQuery
 
 
 class CMRQuery:
-    def __init__(self, params=None, max_results=None):
+    def __init__(self, req_fields, params=None, max_results=None):
         self.max_results = max_results
+        self.req_fields = req_fields
         self.page_size = 2000
         self.params = params
 
@@ -30,8 +31,9 @@ class CMRQuery:
 
         self.sub_queries = [
             CMRSubQuery(
+                self.req_fields,
                 params=list(query),
-                extra_params=self.extra_params,
+                extra_params=self.extra_params
             )
             for query in subquery_list_from(self.params)
         ]

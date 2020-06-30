@@ -76,18 +76,17 @@ class APISearchQuery:
         if is_max_results_with_json_output(maxResults, self.output):
             maxResults += 1
 
+        translators = output_translators()
+        translator, mimetype, suffix, req_fields = translators.get(self.output, translators['metalink'])
+
         query = CMRQuery(
+            req_fields,
             params=dict(self.cmr_params),
-            max_results=maxResults,
+            max_results=maxResults
         )
 
         if self.output == 'count':
             return make_response(f'{query.get_count()}\n')
-
-        translators = output_translators()
-
-        translator, mimetype, suffix = translators \
-            .get(self.output, translators['metalink'])
 
         filename = make_filename(suffix)
         d = api_headers.base(mimetype)

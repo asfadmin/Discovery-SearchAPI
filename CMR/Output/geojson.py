@@ -2,6 +2,35 @@ import logging
 import json
 from .json import JSONStreamArray
 
+def req_fields_geojson():
+    fields = [
+        'beamModeType',
+        'browse',
+        'bytes',
+        'faradayRotation',
+        'product_file_id',
+        'fileName',
+        'flightDirection',
+        'frameNumber',
+        'granuleType',
+        'md5sum',
+        'offNadirAngle',
+        'absoluteOrbit',
+        'relativeOrbit',
+        'platform',
+        'pointingAngle',
+        'polarization',
+        'processingDate',
+        'processingLevel',
+        'granuleName',
+        'sensor',
+        'shape',
+        'startTime',
+        'stopTime',
+        'downloadUrl'
+    ]
+    return fields
+
 def cmr_to_geojson(rgen, includeBaseline=False, addendum=None):
     logging.debug('translating: geojson')
 

@@ -11,9 +11,10 @@ from CMR.Exceptions import CMRError
 
 
 class CMRSubQuery:
-    def __init__(self, params, extra_params):
+    def __init__(self, req_fields, params, extra_params):
         self.params = params
         self.extra_params = extra_params
+        self.req_fields = req_fields
         self.sid = None
         self.hits = 0
         self.results = []
@@ -109,7 +110,7 @@ class CMRSubQuery:
         logging.debug(f'CMR reported {self.hits} hits for session {self.sid}')
         logging.debug('Parsing page 1')
 
-        for p in parse_cmr_response(response):
+        for p in parse_cmr_response(response, self.req_fields):
             yield p
 
         hits = float(self.hits)
@@ -127,7 +128,7 @@ class CMRSubQuery:
 
             logging.debug('Parsing page {0}'.format(page_num))
 
-            for parsed_page in parse_cmr_response(page):
+            for parsed_page in parse_cmr_response(page, self.req_fields):
                 yield parsed_page
 
             logging.debug(f'Parsing page {page_num} complete')

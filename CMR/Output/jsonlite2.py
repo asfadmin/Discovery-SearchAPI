@@ -1,6 +1,9 @@
 import logging
 import json
-from .jsonlite import JSONLiteStreamArray
+from .jsonlite import JSONLiteStreamArray, req_fields_jsonlite
+
+def req_fields_jsonlite2():
+    return req_fields_jsonlite()
 
 def cmr_to_jsonlite2(rgen, includeBaseline=False, addendum=None):
     logging.debug('translating: jsonlite')
