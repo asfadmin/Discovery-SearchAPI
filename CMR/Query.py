@@ -10,7 +10,7 @@ class CMRQuery:
     def __init__(self, req_fields, params=None, max_results=None):
         self.max_results = max_results
         self.req_fields = req_fields
-        self.page_size = 2000
+        self.page_size = 500
         self.params = params
 
         self.extra_params = [

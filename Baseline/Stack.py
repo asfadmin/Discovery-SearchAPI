@@ -2,7 +2,6 @@ import dateparser
 from CMR.Translate import translate_params, input_fixer
 from CMR.Query import CMRQuery
 from .Calc import calculate_perpendicular_baselines
-import logging
 
 precalc_datasets = ['AL', 'R1', 'E1', 'E2', 'J1']
 

@@ -1,4 +1,3 @@
-import logging
 import dateparser
 from CMR.Translate import translate_params
 from CMR.Query import CMRQuery
