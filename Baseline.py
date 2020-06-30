@@ -7,7 +7,7 @@ import random
 
 precalc_datasets = ['AL', 'R1', 'E1', 'E2', 'J1']
 
-def get_stack(master, req_fields, product_type=None, is_count=False):
+def get_stack(master, req_fields=None, product_type=None, is_count=False):
     warnings = None
 
     try:
@@ -18,7 +18,6 @@ def get_stack(master, req_fields, product_type=None, is_count=False):
         else:
             raise e
 
-    logging.debug(stack_params)
     if is_count:
         return 1, None
 

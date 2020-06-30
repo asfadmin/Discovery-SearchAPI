@@ -28,13 +28,11 @@ class APIStackQuery:
 
             translators = output_translators()
             translator, mimetype, suffix, req_fields = translators.get(self.params['output'], translators['metalink'])
-            if 'stateVectors' not in req_fields:
-                req_fields.append('stateVectors')
 
             is_count = self.params['output'].lower() == 'count'
             stack, warnings = get_stack(
-                self.params['master'],
-                req_fields,
+                master=self.params['master'],
+                req_fields=req_fields,
                 product_type=self.params['processinglevel'])
             if is_count:
                 return make_response(f'{len(stack)}\n')

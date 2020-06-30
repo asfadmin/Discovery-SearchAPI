@@ -12,7 +12,6 @@ def req_fields_kml():
         'frameNumber',
         'granuleName',
         'offNadirAngle',
-        #'perpendicularBaseline',
         'platform',
         'pointingAngle',
         'processingTypeDisplay',
@@ -21,7 +20,6 @@ def req_fields_kml():
         'shape',
         'startTime',
         'stopTime',
-        #'temporalBaseline',
         'thumbnailUrl'
     ]
     return fields
