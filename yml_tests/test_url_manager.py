@@ -377,6 +377,7 @@ class test_URL_Manager():
             checkFileContainsExpected("processinglevel", test_info, file_content)
             checkFileContainsExpected("flightline", test_info, file_content)
             checkFileContainsExpected("lookdirection", test_info, file_content)
+            checkFileContainsExpected("instrument", test_info, file_content)
 
             # Processing Date (can not validate because it uses a field from CMR not in the API):
             # if "processingdate" in file_content and "processingdate" in test_info:
@@ -447,6 +448,9 @@ class test_URL_Manager():
                 elif key.lower() == "lookdirection":
                     del mutatable_dict[key]
                     mutatable_dict["lookdirection"] = test_input.parse_string_list(val)
+                elif key.lower() == "instrument":
+                    del mutatable_dict[key]
+                    mutatable_dict["instrument"] = test_input.parse_string_list(val)
                 # elif key.lower() == "processingdate":
                 #     del mutatable_dict[key]
                 #     mutatable_dict["processingdate"] = test_input.parse_date(val.replace("+", " "))
@@ -560,6 +564,10 @@ class test_URL_Manager():
         ### lookDirection:
         if "lookDirection" in json_dict:
             json_dict["lookdirection"] = json_dict.pop("lookDirection")
+        ### instrument:
+        for key in ["sensor", "Sensor", "instrument"]:
+            if key in json_dict:
+                json_dict["sensor"] = json_dict.pop(key)
         ### processingDate:
         # for key in ["Processing Date", "processingDate"]:
         #     if key in json_dict:

@@ -1,4 +1,3 @@
-import logging
 import dateparser
 from CMR.Translate import translate_params
 from CMR.Query import CMRQuery
@@ -7,7 +6,7 @@ import random
 
 precalc_datasets = ['AL', 'R1', 'E1', 'E2', 'J1']
 
-def get_stack(master, product_type=None, is_count=False):
+def get_stack(master, req_fields=None, product_type=None, is_count=False):
     warnings = None
 
     try:
@@ -18,11 +17,10 @@ def get_stack(master, product_type=None, is_count=False):
         else:
             raise e
 
-    logging.debug(stack_params)
     if is_count:
         return 1, None
 
-    stack = query_stack(stack_params)
+    stack = query_stack(stack_params, req_fields)
 
     if len(stack) <= 0:
         raise ValueError(f'No products found matching stack parameters')
@@ -81,9 +79,10 @@ def get_stack_params(master, product_type):
 
     return stack_params
 
-def query_stack(params):
+def query_stack(params, req_fields):
     params, output, max_results = translate_params(params)
     query = CMRQuery(
+        req_fields,
         params=dict(params)
     )
     return [product for product in query.get_results()]

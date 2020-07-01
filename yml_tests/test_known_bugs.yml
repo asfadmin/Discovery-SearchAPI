@@ -21,7 +21,7 @@ tests:
     expected file: error json
     expected code: 400
 
-# DS-2809 - open bug for this - some UAVSAR scenes span multiple years, so outside the seasons specified
+# DS-2809 / DS-3193 - open bug for this - some UAVSAR scenes span multiple years, so outside the seasons specified
 - season 1-175 UAVSAR Start End:
     season: 1,175
     platform: Ua
@@ -49,7 +49,7 @@ tests:
     expected file: count
     expected code: 200
 
-#DS-2766 open bug for absoluteOrbit - GRFN scenes search correct range, but file returns different value for absoluteOrbit
+#DS-2766 / DS-3194 open bug for absoluteOrbit - GRFN scenes search correct range, but file returns different value for absoluteOrbit
 #Note: This will fail on prod only, due to GRFN data differences in api-test
 - absoluteOrbit range:
     absoluteOrbit: 5000-6000

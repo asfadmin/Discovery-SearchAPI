@@ -1,4 +1,3 @@
-import logging
 import json
 
 from flask import Response, make_response
@@ -26,16 +25,17 @@ class APIStackQuery:
             if 'output' not in self.params:
                 self.params['output'] = 'metalink'
 
+            translators = output_translators()
+            translator, mimetype, suffix, req_fields = translators.get(self.params['output'], translators['metalink'])
 
             is_count = self.params['output'].lower() == 'count'
             stack, warnings = get_stack(
-                self.params['master'],
+                master=self.params['master'],
+                req_fields=req_fields,
                 product_type=self.params['processinglevel'])
             if is_count:
                 return make_response(f'{len(stack)}\n')
 
-            translators = output_translators()
-            translator, mimetype, suffix = translators.get(self.params['output'], translators['metalink'])
 
             filename = make_filename(suffix)
             d = api_headers.base(mimetype)
