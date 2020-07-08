@@ -99,7 +99,7 @@ def parse_granule(granule, req_fields):
 
     if 'canInsar' in req_fields:
         if result['platform'] in ['ALOS', 'RADARSAT-1', 'JERS-1', 'ERS-1', 'ERS-2']:
-            result['insarGrouping'] = get_val(field_paths('insarGrouping'))
+            result['insarGrouping'] = get_val(field_paths['insarGrouping'])
             remove_field('insarGrouping')
             if result['insarGrouping'] not in [None, 0, '0', 'NA', 'NULL']:
                 result['canInsar'] = True

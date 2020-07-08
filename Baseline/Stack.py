@@ -13,7 +13,9 @@ def get_stack(master, req_fields=None, product_type=None):
     except ValueError as e:
         raise e
 
-    req_fields.append('granuleName')
+    req_fields.extend([
+        'granuleName',
+        'startTime'])
     if get_platform(master) in precalc_datasets:
         req_fields.append('insarBaseline')
     elif get_platform(master) in ['S1']:
@@ -22,7 +24,6 @@ def get_stack(master, req_fields=None, product_type=None):
             'centerLat',
             'centerLon',
             'stateVectors',
-            'startTime',
             'stopTime'
         ])
 
