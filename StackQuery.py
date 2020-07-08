@@ -2,6 +2,7 @@ import json
 
 from flask import Response, make_response
 from datetime import datetime
+import logging
 
 import api_headers
 from CMR.Input import parse_string
@@ -17,7 +18,6 @@ class APIStackQuery:
         self.params = None # populated by self.validate()
 
     def get_response(self):
-        logging.debug(self.request.values)
         try:
             self.validate()
             if 'processinglevel' not in self.params:
