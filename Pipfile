@@ -11,7 +11,7 @@ flask-talisman = "*"
 flask-cors = "*"
 dateparser = "*"
 geomet = "*"
-utilsapi = {editable = true,git = "https://git@github.com/asfadmin/Discovery-Utils.git",ref = "prod"}
+wktutils = {editable = true,git = "https://git@github.com/asfadmin/Discovery-WKTUtils.git",ref = "prod"}
 lxml = "*"
 requests = "*"
 defusedxml = "*"
