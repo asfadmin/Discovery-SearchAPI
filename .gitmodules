@@ -2,7 +2,3 @@
 	path = Discovery-PytestAutomation
 	url = git@github.com:asfadmin/Discovery-PytestAutomation.git
 	branch = prod
-[submodule "Discovery-BulkDownload"]
-	path = Discovery-BulkDownload
-	url = git@github.com:asfadmin/Discovery-BulkDownload.git
-	branch = prod
