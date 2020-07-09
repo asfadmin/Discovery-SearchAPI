@@ -22,10 +22,6 @@ import endpoints
 
 project_root = os.path.dirname(os.path.abspath(__file__))
 bulk_download_repo = "Discovery-BulkDownload"
-# Submodule imports:
-sys.path.append(os.path.join(project_root, bulk_download_repo))
-BulkDownloadAPI = importlib.import_module("APIBulkDownload")
-sys.path.remove(os.path.join(project_root, bulk_download_repo))
 
 application = Flask(__name__)
 application.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024 # limit to 10 MB, primarily affects file uploads
@@ -40,11 +36,6 @@ config = {
     'help_url': 'http://bulk-download.asf.alaska.edu/help'
 }
 
-# Returns either the default filename or the param-specified one
-def get_filename():
-    if 'filename' in request.values:
-        return request.values['filename']
-    return BulkDownloadAPI.get_default_filename()
 
 def get_product_list():
     products = None
@@ -58,27 +49,6 @@ def get_product_list():
         products = []
     return products
 
-# Send the help docs
-@application.route('/help')
-def view_help():
-    return application.send_static_file('./help.html')
-
-# Send the generated script as content formatted for display in the browser
-@application.route('/view')
-def view_script():
-    return '<html><pre>' + BulkDownloadAPI.create_script(config=config, filename=get_filename(), products=get_product_list()) + '</pre></html>'
-
-# Send the generated script as an attachment so it downloads directly
-@application.route('/', methods = ['GET', 'POST'])
-def get_script():
-    filename = get_filename()
-    results = BulkDownloadAPI.create_script(config=config, filename=filename, products=get_product_list())
-    generator = (cell for row in results
-                    for cell in row)
-    return Response(generator,
-                       mimetype = 'text/plain',
-                       headers = {'Content-Disposition':
-                                  'attachment;filename=' + filename})
 
 ########## Search API endpoints ##########
 
