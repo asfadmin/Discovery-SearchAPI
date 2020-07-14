@@ -11,6 +11,9 @@ phases:
     runtime-versions:
       python: 3.7
     commands:
+      - echo ""
+      - cat ~/.gitconfig
+      - echo ""
       - mkdir -p ~/.ssh
       - echo "$build_ssh_key" > ~/.ssh/id_rsa
       - chmod 600 ~/.ssh/id_rsa
