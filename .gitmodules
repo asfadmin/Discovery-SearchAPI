@@ -1,4 +1,4 @@
 [submodule "Discovery-PytestAutomation"]
 	path = Discovery-PytestAutomation
-	url = git@github.com:asfadmin/Discovery-PytestAutomation.git
+	url = https://github.com/asfadmin/Discovery-PytestAutomation.git
 	branch = prod
