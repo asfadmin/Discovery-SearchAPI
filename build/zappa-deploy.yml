@@ -11,6 +11,8 @@ phases:
     runtime-versions:
       python: 3.7
     commands:
+      - locale-gen en_US.UTF-8
+      - export LANG=en_US.UTF-8 LANGUAGE=en_US.en LC_ALL=en_US.UTF-8
       - python3 -m venv ${VENV}
       - . ./${VENV}/bin/activate
       - pip3 install -r requirements.txt
