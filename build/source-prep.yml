@@ -11,17 +11,11 @@ phases:
     runtime-versions:
       python: 3.7
     commands:
-      - echo ""
-      - echo $(git config --list)
-      - echo ""
       - mkdir -p ~/.ssh
       - echo "$build_ssh_key" > ~/.ssh/id_rsa
       - chmod 600 ~/.ssh/id_rsa
       - ssh-keygen -F github.com || ssh-keyscan github.com >>~/.ssh/known_hosts
-      # - git config --global url."git@github.com:".insteadOf "https://github.com/"
-      - echo ""
-      - echo $(git config --list)
-      - echo ""
+      - git config --global url."git@github.com:".insteadOf "https://github.com/"
       - |
         if [ ! -d ".git" ]; then
           git init                                              # Initialize Git
@@ -29,6 +23,7 @@ phases:
           git fetch --depth=1                                   # Get all the things
           git checkout -f "$CODEBUILD_RESOLVED_SOURCE_VERSION"  # Checkout the specific commit we are building
         fi
+      - git config --global --unset url."git@github.com:".insteadOf
       - git submodule init
       - git submodule update --recursive --depth=1
       - echo "{\"version\":\"$CODEBUILD_RESOLVED_SOURCE_VERSION\"}" > version.json
