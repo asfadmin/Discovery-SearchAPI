@@ -151,6 +151,17 @@ tests:
     expected file: csv
     expected code: 200
 
+# Failes on AWS, but not locally. Happens around 10-11am AK time at 
+# least, (Maybe longer?). Maybe a timezone conversion bug in test manager?
+- start now end yesterday reversed:
+    start: now
+    end: yesterday
+    output: csv
+    maxResults: 10
+
+    expected file: csv
+    expected code: 200
+
 # tests:
 # - Known bug - Inject urls:
 #     account: FullAccess
