@@ -1,4 +1,0 @@
-[submodule "Discovery-PytestAutomation"]
-	path = Discovery-PytestAutomation
-	url = https://github.com/asfadmin/Discovery-PytestAutomation.git
-	branch = prod
