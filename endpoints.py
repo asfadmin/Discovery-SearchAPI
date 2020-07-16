@@ -3,7 +3,8 @@ import json
 import api_headers
 import logging
 
-from UtilsAPI import FilesToWKT, RepairWKT, MissionList
+from WKTUtils import FilesToWKT, RepairWKT
+import MissionList
 from CMR.Input import parse_date
 
 

@@ -2301,15 +2301,6 @@ tests:
     expected file: count
     expected code: 200
 
-- start now end yesterday reversed:
-    start: now
-    end: yesterday
-    output: csv
-    maxResults: 10
-
-    expected file: csv
-    expected code: 200
-
 - realworld 1:
     intersectsWith: point(-168.0380672+53.9279675)
     platform: Sentinel-1A,Sentinel-1B

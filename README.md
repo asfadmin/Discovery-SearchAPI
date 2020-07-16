@@ -48,8 +48,11 @@ To get started with a local instance for development:
 ```
 
 # Testing
-Testing is done using the [Discovery-PytestAutomation](https://github.com/asfadmin/Discovery-PytestAutomation) submodule
+Testing is done using the [Discovery-PytestAutomation](https://github.com/asfadmin/Discovery-PytestAutomation) repo.
+
+1) Git clone https://github.com/asfadmin/Discovery-PytestAutomation
+2) cd Discovery-PytestAutomation
+3) pytest . (See repo for filters/flags for running suite).
 
 # Production
 To deploy to prod, merge changes to the prod branch.
-
