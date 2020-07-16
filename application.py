@@ -19,22 +19,10 @@ from asf_env import get_config, load_config
 
 import endpoints
 
-
-project_root = os.path.dirname(os.path.abspath(__file__))
-bulk_download_repo = "Discovery-BulkDownload"
-
 application = Flask(__name__)
 application.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024 # limit to 10 MB, primarily affects file uploads
 CORS(application, send_wildcard=True)
 talisman = Talisman(application)
-
-########## Bulk Download API endpoints and support ##########
-config = {
-    'urs_url': 'https://urs.earthdata.nasa.gov/oauth/authorize',
-    'client_id': 'BO_n7nTIlMljdvU6kRRB3g',
-    'redir_url': 'https://auth.asf.alaska.edu/login',
-    'help_url': 'http://bulk-download.asf.alaska.edu/help'
-}
 
 
 def get_product_list():
