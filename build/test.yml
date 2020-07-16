@@ -14,6 +14,8 @@ phases:
       - python3 -m pip install -r requirements.txt --upgrade
   build:
     commands:
+      # Testing if aws creates a git folder:
+      - git status
       - git clone https://github.com/asfadmin/Discovery-PytestAutomation.git
       - cd Discovery-PytestAutomation
       - CMD="pytest ${PYTEST_OPTIONS} . --api ${API_URL} ${TEST_SUITE_OPTIONS}"
