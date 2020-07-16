@@ -14,6 +14,7 @@ phases:
       - python3 -m pip install -r requirements.txt --upgrade
   build:
     commands:
+      - git clone https://github.com/asfadmin/Discovery-WKTUtils.git
       - cd Discovery-PytestAutomation
       - CMD="pytest ${PYTEST_OPTIONS} . --api ${API_URL} ${TEST_SUITE_OPTIONS}"
       - echo -e "\nRunning command=> ${CMD}\n" # Get exact command into logs for debugging
