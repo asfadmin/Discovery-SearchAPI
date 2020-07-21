@@ -44,6 +44,7 @@ class JSONLite2StreamArray(JSONLiteStreamArray):
             's': p['sizeMB'],
             'ss': p['stackSize'], # Used for datasets with precalculated stacks
             'st': p['startTime'],
+            'stp': p['stopTime'],
             't': p['thumb'].replace(p['granuleName'], '{gn}') if p['thumb'] is not None else p['thumb'],
             'w': p['wkt'],
             'wu': p['wkt_unwrapped']

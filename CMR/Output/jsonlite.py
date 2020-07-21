@@ -29,6 +29,7 @@ def req_fields_jsonlite():
         'sensor',
         'sizeMB',
         'startTime',
+        'stopTime',
         'stringFootprint',
         'thumbnailUrl'
     ]
@@ -130,6 +131,7 @@ class JSONLiteStreamArray(JSONStreamArray):
             'sizeMB': p['sizeMB'],
             'stackSize': p['insarStackSize'], # Used for datasets with precalculated stacks
             'startTime': p['startTime'],
+            'stopTime': p['stopTime'],
             'thumb': p['thumbnailUrl'],
             'wkt': p['stringFootprint'],
             'wkt_unwrapped': unwrap_wkt(p['stringFootprint'])
