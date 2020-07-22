@@ -137,6 +137,14 @@ tests:
     expected file: csv
     expected code: 200
 
+- beamSwath OBS 100:
+    beamSwath: OBS
+    maxresults: 100
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
 - beamSwath Airsar list 100:
     beamSwath: 3FP,ATI,XTI
     platform: AIRSAR
@@ -481,7 +489,7 @@ tests:
     expected file: json
     expected code: 200
 
-- groupid ALOS:
+- groupid ALOS PALSAR:
     groupid: ALPSRP279071100
     output: json
 
@@ -493,6 +501,31 @@ tests:
     output: json
 
     expected file: json
+    expected code: 200
+
+- instrument alos palsar:
+    instrument: pAlsAr
+    maxResults: 20
+    output: json
+
+    expected file: json
+    expected code: 200
+
+- instrument alos avnir:
+    instrument: aVnIr-2
+    maxResults: 20
+    output: json
+
+    expected file: json
+    expected code: 200
+
+- instrument with platform alos avnir:
+    platform: ALOS
+    instrument: Avnir-2
+    maxResults: 15
+    output: csv
+
+    expected file: csv
     expected code: 200
 
 - intersectsWith point:
@@ -880,6 +913,24 @@ tests:
     processingLevel: L1.0
     polygon: -148.52,64.63,-150.41,64.64,-149.58,63.86,-148.52,64.63
     maxResults: 100
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- platform ALOS PALSAR:
+    platform: alos
+    instrument: palsar
+    maxResults: 25
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- platform ALOS AVNIR:
+    platform: alos
+    instrument: avnir-2
+    maxResults: 25
     output: csv
 
     expected file: csv
@@ -1289,6 +1340,22 @@ tests:
     platform: a3
     start: "2006-01-01T00:00:00Z"
     end: "2012-01-01T00:00:00Z"
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count alos palsar:
+    platform: a3
+    instrument: Palsar
+    output: count
+
+    expected file: count
+    expected code: 200
+
+- platform count alos avnir:
+    platform: a3
+    instrument: Avnir-2
     output: count
 
     expected file: count
@@ -2112,8 +2179,6 @@ tests:
     expected file: csv
     expected code: 200
 
-
-
 - season 1-175 SMAP 3year:
     season: 1,175
     platform: SP
@@ -2234,15 +2299,6 @@ tests:
     output: count
 
     expected file: count
-    expected code: 200
-
-- start now end yesterday reversed:
-    start: now
-    end: yesterday
-    output: csv
-    maxResults: 10
-
-    expected file: csv
     expected code: 200
 
 - realworld 1:

@@ -2,6 +2,40 @@ import logging
 import json
 from geomet import wkt
 
+def req_fields_jsonlite():
+    fields = [
+        'absoluteOrbit',
+        'beamMode',
+        'browse',
+        'canInsar',
+        'downloadUrl',
+        'faradayRotation',
+        'fileName',
+        'flightDirection',
+        'flightLine',
+        'frameNumber',
+        'granuleName',
+        'groupID',
+        'insarStackSize',
+        'missionName',
+        'offNadirAngle',
+        'platform',
+        'pointingAngle',
+        'polarization',
+        'processingLevel',
+        'processingTypeDisplay',
+        'product_file_id',
+        'relativeOrbit',
+        'sensor',
+        'sizeMB',
+        'startTime',
+        'stopTime',
+        'stringFootprint',
+        'thumbnailUrl'
+    ]
+    return fields
+
+
 from .json import JSONStreamArray
 
 def cmr_to_jsonlite(rgen, includeBaseline=False, addendum=None):
@@ -15,6 +49,7 @@ def cmr_to_jsonlite(rgen, includeBaseline=False, addendum=None):
     for p in json.JSONEncoder(indent=2, sort_keys=True).iterencode(jsondata):
         yield p
 
+
 def unwrap_wkt(wkt_str):
     try:
         wkt_obj = wkt.loads(wkt_str)
@@ -26,18 +61,6 @@ def unwrap_wkt(wkt_str):
         return wkt_str
     return wkt_str
 
-def canInsar(p):
-    if p['platform'] in ['ALOS', 'RADARSAT-1', 'JERS-1', 'ERS-1', 'ERS-2'] and \
-        p.get('insarGrouping') not in [None, 0, '0', 'NA']:
-        return True
-    elif None not in [
-        p['sv_pos_pre'], p['sv_pos_post'],
-        p['sv_vel_pre'], p['sv_vel_post'],
-        p['sv_t_pos_pre'], p['sv_t_pos_post'],
-        p['sv_t_vel_pre'], p['sv_t_vel_post']]:
-        return True
-    else:
-        return False
 
 class JSONLiteStreamArray(JSONStreamArray):
     def getItem(self, p):
@@ -82,9 +105,10 @@ class JSONLiteStreamArray(JSONStreamArray):
         except TypeError:
             pass
 
-        result = {            'beamMode': p['beamMode'],
+        result = {
+            'beamMode': p['beamMode'],
             'browse': p['browse'],
-            'canInSAR': canInsar(p),
+            'canInSAR': p['canInsar'],
             'dataset': p['platform'],
             'downloadUrl': p['downloadUrl'],
             'faradayRotation': p['faradayRotation'], # ALOS
@@ -107,6 +131,7 @@ class JSONLiteStreamArray(JSONStreamArray):
             'sizeMB': p['sizeMB'],
             'stackSize': p['insarStackSize'], # Used for datasets with precalculated stacks
             'startTime': p['startTime'],
+            'stopTime': p['stopTime'],
             'thumb': p['thumbnailUrl'],
             'wkt': p['stringFootprint'],
             'wkt_unwrapped': unwrap_wkt(p['stringFootprint'])

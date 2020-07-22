@@ -4,6 +4,16 @@ api: Test
 ## This file contains test cases with known bugs. Bug is listed above each group. These will fail if run, and will block the AWS pipeline
 
 tests:
+#DS-3175 open bug - pointingAngle keyword gives validation error
+#Add more TCs when resolved
+- pointing angle:
+    pointingAngle: 0.0
+    output: csv
+    maxResults: 1
+
+    expected file: csv
+    expected code: 200
+
 #DS-3121 open bug - multiple masters should not be allowed. Currently it retuns a 200 http code with results
 - multiple masters:
     master: ALPSRP064337140,ALPSRP279057140
@@ -11,7 +21,7 @@ tests:
     expected file: error json
     expected code: 400
 
-# DS-2809 - open bug for this - some UAVSAR scenes span multiple years, so outside the seasons specified
+# DS-2809 / DS-3193 - open bug for this - some UAVSAR scenes span multiple years, so outside the seasons specified
 - season 1-175 UAVSAR Start End:
     season: 1,175
     platform: Ua
@@ -39,7 +49,7 @@ tests:
     expected file: count
     expected code: 200
 
-#DS-2766 open bug for absoluteOrbit - GRFN scenes search correct range, but file returns different value for absoluteOrbit
+#DS-2766 / DS-3194 open bug for absoluteOrbit - GRFN scenes search correct range, but file returns different value for absoluteOrbit
 #Note: This will fail on prod only, due to GRFN data differences in api-test
 - absoluteOrbit range:
     absoluteOrbit: 5000-6000
@@ -137,6 +147,17 @@ tests:
     maxDoppler: -1
     maxResults: 10
     output: csv
+
+    expected file: csv
+    expected code: 200
+
+# Failes on AWS, but not locally. Happens around 10-11am AK time at 
+# least, (Maybe longer?). Maybe a timezone conversion bug in test manager?
+- start now end yesterday reversed:
+    start: now
+    end: yesterday
+    output: csv
+    maxResults: 10
 
     expected file: csv
     expected code: 200

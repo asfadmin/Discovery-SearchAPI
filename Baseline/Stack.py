@@ -5,15 +5,29 @@ from .Calc import calculate_perpendicular_baselines
 
 precalc_datasets = ['AL', 'R1', 'E1', 'E2', 'J1']
 
-def get_stack(master, product_type=None):
+def get_stack(master, req_fields=None, product_type=None):
     warnings = None
 
     try:
-        stack_params = get_stack_params(master, product_type)
+        stack_params = get_stack_params(master, product_type=product_type)
     except ValueError as e:
         raise e
 
-    stack = query_stack(stack_params)
+    req_fields.extend([
+        'granuleName',
+        'startTime'])
+    if get_platform(master) in precalc_datasets:
+        req_fields.append('insarBaseline')
+    elif get_platform(master) in ['S1']:
+        req_fields.extend([
+            'ascendingNodeTime',
+            'centerLat',
+            'centerLon',
+            'stateVectors',
+            'stopTime'
+        ])
+
+    stack = query_stack(stack_params, req_fields)
 
     if len(stack) <= 0:
         raise ValueError(f'No products found matching stack parameters')
@@ -29,12 +43,31 @@ def get_stack(master, product_type=None):
 
     return stack, warnings
 
-def get_stack_params(master, product_type):
+def get_stack_params(master, product_type=None):
     params = {'granule_list': master}
     if product_type is not None:
         params['processingLevel'] = product_type
     params, output, max_results = translate_params(params)
+    req_fields = [
+        'processingLevel'
+    ]
+    if get_platform(master) in precalc_datasets:
+        req_fields.extend([
+            'insarGrouping'
+        ])
+    elif get_platform(master) in ['S1']:
+        req_fields.extend([
+            'beamMode',
+            'centerLat',
+            'centerLon',
+            'flightDirection',
+            'lookDirection',
+            'platform',
+            'polarization',
+            'relativeOrbit'
+        ])
     query = CMRQuery(
+        req_fields,
         params=dict(params)
     )
     master_results = [product for product in query.get_results()]
@@ -70,10 +103,11 @@ def get_stack_params(master, product_type):
 
     return stack_params
 
-def query_stack(params):
+def query_stack(params, req_fields):
     params, output, max_results = translate_params(params)
     params = input_fixer(params)
     query = CMRQuery(
+        req_fields,
         params=dict(params)
     )
     return [product for product in query.get_results()]
@@ -119,5 +153,5 @@ def offset_perpendicular_baselines(master, stack):
         if product['granuleName'] == master:
             product['perpendicularBaseline'] = 0
         else:
-            product['perpendicularBaseline'] = float(product['insarBaseline']) - master_offset
+            product['perpendicularBaseline'] = round(float(product['insarBaseline']) - master_offset)
     return stack

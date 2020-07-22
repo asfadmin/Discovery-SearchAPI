@@ -1,8 +1,8 @@
-import logging
 import json
 
 from flask import Response, make_response
 from datetime import datetime
+import logging
 
 import api_headers
 from CMR.Input import parse_string
@@ -18,7 +18,6 @@ class APIStackQuery:
         self.params = None # populated by self.validate()
 
     def get_response(self):
-        logging.debug(self.request.values)
         try:
             self.validate()
             if 'processinglevel' not in self.params:
@@ -26,16 +25,17 @@ class APIStackQuery:
             if 'output' not in self.params:
                 self.params['output'] = 'metalink'
 
+            translators = output_translators()
+            translator, mimetype, suffix, req_fields = translators.get(self.params['output'], translators['metalink'])
 
             is_count = self.params['output'].lower() == 'count'
             stack, warnings = get_stack(
-                self.params['master'],
+                master=self.params['master'],
+                req_fields=req_fields,
                 product_type=self.params['processinglevel'])
             if is_count:
                 return make_response(f'{len(stack)}\n')
 
-            translators = output_translators()
-            translator, mimetype, suffix = translators.get(self.params['output'], translators['metalink'])
 
             filename = make_filename(suffix)
             d = api_headers.base(mimetype)

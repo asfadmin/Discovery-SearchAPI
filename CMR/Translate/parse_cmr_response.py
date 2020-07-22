@@ -1,9 +1,10 @@
 import logging
 from lxml import etree as ET
 import datetime
+from .fields import get_field_paths, attr_path
 
 
-def parse_cmr_response(r):
+def parse_cmr_response(r, req_fields):
     """
     Convert echo10 xml to results list used by output translators
     """
@@ -19,151 +20,133 @@ def parse_cmr_response(r):
     logging.debug(f'Found {num_results} results in this page')
 
     for granule in root.xpath('/results/result/Granule'):
-        yield parse_granule(granule)
+        yield parse_granule(granule, req_fields)
 
 
-def parse_granule(granule):
-    def get_val(path, default='NA'):
+def parse_granule(granule, req_fields):
+    req_fields = req_fields.copy() # gotta copy this list because we're gonna thrash it
+    def get_val(path):
         r = granule.xpath(path)
 
         if r is not None and len(r) > 0:
             return r[0].text
         else:
-            return default
-
-    def get_attr(path, default='NA'):
-        return get_val(attr(path), default=default)
-
-    shape, wkt_shape = wkt_from_gpolygon(
-        granule.xpath('./Spatial/HorizontalSpatialDomain/Geometry/GPolygon')
-    )
-
-    platform = get_attr(
-        'ASF_PLATFORM',
-        default=get_val("./Platforms/Platform/ShortName")
-    )
-
-    asf_frame_platforms = ['Sentinel-1A', 'Sentinel-1B', 'ALOS']
-    frame_number = get_attr('FRAME_NUMBER') \
-        if platform in asf_frame_platforms \
-        else get_attr('CENTER_ESA_FRAME')
-
-    result = {
-        'absoluteOrbit': get_val(
-            "./OrbitCalculatedSpatialDomains/OrbitCalculatedSpatialDomain/OrbitNumber",
-            default=None
-        ),
-        'ascendingNodeTime': get_attr('ASC_NODE_TIME'),
-        'baselinePerp': get_attr('INSAR_BASELINE'),
-        'beamMode': get_attr('BEAM_MODE_TYPE'),
-        'beamModeType': get_attr('BEAM_MODE_TYPE'),
-        'beamSwath': 'NA',  # .......complicated
-        'browse': get_browse_urls(granule, './AssociatedBrowseImageUrls'),
-        'bytes': get_attr("BYTES"),
-        'catSceneId': 'NA',  # always None in API
-        'centerLat':  get_attr('CENTER_LAT'),
-        'centerLon':  get_attr('CENTER_LON'),
-        'collectionName': get_attr('MISSION_NAME'),
-        'configurationName': get_attr('BEAM_MODE_DESC'),
-        'doppler': get_attr('DOPPLER'),
-        'downloadUrl': get_val("./OnlineAccessURLs/OnlineAccessURL/URL", default=None),
-        'farEndLat':  get_attr('FAR_END_LAT'),
-        'farEndLon':  get_attr('FAR_END_LON'),
-        'farStartLat':  get_attr('FAR_START_LAT'),
-        'farStartLon':  get_attr('FAR_START_LON'),
-        'faradayRotation':  get_attr('FARADAY_ROTATION'),
-        'fileName': get_val("./OnlineAccessURLs/OnlineAccessURL/URL", default=None).split('/')[-1],
-        'finalFrame':  get_attr('CENTER_ESA_FRAME'),
-        'firstFrame': get_attr('CENTER_ESA_FRAME'),
-        'flightDirection': get_attr('ASCENDING_DESCENDING'),
-        'flightLine': get_attr('FLIGHT_LINE'),
-        'formatName': 'NA',  # always None in API
-        'frameNumber': frame_number,
-        'frequency': 'NA',  # always None in API
-        'granuleName': get_val("./DataGranule/ProducerGranuleId", default=None),
-        'granuleType':  get_attr('GRANULE_TYPE'),
-        'groupID': get_attr('GROUP_ID'),
-        'incidenceAngle': 'NA',  # always None in API
-        'insarBaseline': get_attr('INSAR_BASELINE'),
-        'insarGrouping': get_attr('INSAR_STACK_ID'),
-        'insarStackSize': get_attr('INSAR_STACK_SIZE'),
-        'lookDirection': get_attr('LOOK_DIRECTION'),
-        'masterGranule': 'NA',  # almost always None in API
-        'md5sum': get_attr('MD5SUM'),
-        'missionName': get_attr('MISSION_NAME'),
-        'nearEndLat':  get_attr('NEAR_END_LAT'),
-        'nearEndLon':  get_attr('NEAR_END_LON'),
-        'nearStartLat':  get_attr('NEAR_START_LAT'),
-        'nearStartLon':  get_attr('NEAR_START_LON'),
-        'offNadirAngle': get_attr('OFF_NADIR_ANGLE'),
-        'percentCoherence': 'NA',  # not in CMR
-        'percentTroposphere': 'NA',  # not in CMR
-        'percentUnwrapped': 'NA',  # not in CMR
-        'platform': platform,
-        'pointingAngle': get_attr('POINTING_ANGLE', default=None),
-        'polarization':  get_attr('POLARIZATION'),
-        'processingDate':  get_val("./DataGranule/ProductionDateTime", default=None),
-        'processingDescription': get_attr('PROCESSING_DESCRIPTION'),
-        'processingLevel': get_attr('PROCESSING_TYPE'),
-        'processingType':  get_attr('PROCESSING_LEVEL'),
-        'processingTypeDisplay': get_attr('PROCESSING_TYPE_DISPLAY'),
-        'productName': get_val("./DataGranule/ProducerGranuleId", default=None),
-        'product_file_id': get_val("./GranuleUR", default=None),
-        'relativeOrbit': get_attr('PATH_NUMBER'),
-        'sarSceneId': 'NA',  # always None in API
-        'sceneDate': get_attr('ACQUISITION_DATE'),
-        'sceneDateString': 'NA',  # always None in API
-        'sceneId': get_val("./DataGranule/ProducerGranuleId", default=None),
-        'sensor': get_val('./Platforms/Platform/Instruments/Instrument/ShortName', default=None),
-        'shape': shape,
-        'sizeMB': get_val("./DataGranule/SizeMBDataGranule", default=None),
-        'slaveGranule': 'NA',  # almost always None in API
-        'startTime':  get_val("./Temporal/RangeDateTime/BeginningDateTime", default=None),
-        'status': 'NA',  # always None in API
-        'stopTime':  get_val("./Temporal/RangeDateTime/EndingDateTime", default=None),
-        'stringFootprint': wkt_shape,
-        'thumbnailUrl': get_attr('THUMBNAIL_URL'),
-        'track': get_attr('PATH_NUMBER'),
-        'varianceTroposphere': 'NA'  # not in CMR
-    }
-
-
-    def float_or_none(a):
-        try:
-            return float(a)
-        except ValueError:
             return None
 
-    def parse_sv(sv):
-        if sv is None:
-            return (None, None)
-        (x, y, z, t) = sv.split(',')
-        v = [float_or_none(x), float_or_none(y), float_or_none(z)]
-        if None not in v:
-            return (v, t if datetime.datetime.strptime(t, '%Y-%m-%dT%H:%M:%S.%f') is not None else None)
-        else:
-            return (None, None)
+    def remove_field(f):
+        try:
+            req_fields.remove(f)
+        except ValueError:
+            pass
 
-    result['sv_pos_pre'],  result['sv_t_pos_pre'] =  parse_sv(get_attr('SV_POSITION_PRE', default=None))
-    result['sv_pos_post'], result['sv_t_pos_post'] = parse_sv(get_attr('SV_POSITION_POST', default=None))
-    result['sv_vel_pre'],  result['sv_t_vel_pre'] =  parse_sv(get_attr('SV_VELOCITY_PRE', default=None))
-    result['sv_vel_post'], result['sv_t_vel_post'] = parse_sv(get_attr('SV_VELOCITY_POST', default=None))
+    field_paths = get_field_paths()
+    result = {}
+
+    # Handle a few special cases
+    if any(field in req_fields for field in ['shape', 'stringFootprint']):
+        shape, wkt_shape = wkt_from_gpolygon(
+            granule.xpath('./Spatial/HorizontalSpatialDomain/Geometry/GPolygon')
+        )
+        result['shape'] = shape
+        result['stringFootprint'] = wkt_shape
+        remove_field('shape')
+        remove_field('stringFootprint')
+
+    if any(field in req_fields for field in ['platform', 'frameNumber', 'canInsar']):
+        platform = get_val(attr_path('ASF_PLATFORM'))
+        if platform is None:
+            platform = get_val('./Platforms/Platform/ShortName')
+        result['platform'] = platform
+        remove_field('platform')
+
+    if 'frameNumber' in req_fields:
+        asf_frame_platforms = ['Sentinel-1A', 'Sentinel-1B', 'ALOS']
+        result['frameNumber'] = get_val(attr_path('FRAME_NUMBER')) \
+            if result['platform'] in asf_frame_platforms \
+            else get_val(attr_path('CENTER_ESA_FRAME'))
+        remove_field('frameNumber')
+
+    if 'browse' in req_fields:
+        result['browse'] = get_browse_urls(granule, './AssociatedBrowseImageUrls')
+        remove_field('browse')
+
+    if 'fileName' in req_fields:
+        result['fileName'] = get_val("./OnlineAccessURLs/OnlineAccessURL/URL").split('/')[-1]
+        remove_field('fileName')
+
+    if 'stateVectors' in req_fields or ('canInsar' in req_fields and result['platform'] not in ['ALOS', 'RADARSAT-1', 'JERS-1', 'ERS-1', 'ERS-2']):
+        def parse_sv(sv):
+            def float_or_none(a):
+                try:
+                    return float(a)
+                except ValueError:
+                    return None
+
+            if sv is None:
+                return (None, None)
+            (x, y, z, t) = sv.split(',')
+            v = [float_or_none(x), float_or_none(y), float_or_none(z)]
+            if None not in v:
+                return (v, t if datetime.datetime.strptime(t, '%Y-%m-%dT%H:%M:%S.%f') is not None else None)
+            else:
+                return (None, None)
+
+        result['sv_pos_pre'],  result['sv_t_pos_pre']  = parse_sv(get_val(attr_path('SV_POSITION_PRE')))
+        result['sv_pos_post'], result['sv_t_pos_post'] = parse_sv(get_val(attr_path('SV_POSITION_POST')))
+        result['sv_vel_pre'],  result['sv_t_vel_pre']  = parse_sv(get_val(attr_path('SV_VELOCITY_PRE')))
+        result['sv_vel_post'], result['sv_t_vel_post'] = parse_sv(get_val(attr_path('SV_VELOCITY_POST')))
+        remove_field('stateVectors')
+
+    if 'canInsar' in req_fields:
+        if result['platform'] in ['ALOS', 'RADARSAT-1', 'JERS-1', 'ERS-1', 'ERS-2']:
+            result['insarGrouping'] = get_val(field_paths['insarGrouping'])
+            remove_field('insarGrouping')
+            if result['insarGrouping'] not in [None, 0, '0', 'NA', 'NULL']:
+                result['canInsar'] = True
+        elif None not in [
+            result['sv_pos_pre'], result['sv_pos_post'],
+            result['sv_vel_pre'], result['sv_vel_post'],
+            result['sv_t_pos_pre'], result['sv_t_pos_post'],
+            result['sv_t_vel_pre'], result['sv_t_vel_post']]:
+            result['canInsar'] = True
+        else:
+            result['canInsar'] = False
+        remove_field('canInsar')
+
+    # These fields are always None or NA and should be fully deprecated/removed in the future
+    deprecated_fields = [
+        'beamSwath',
+        'catSceneId',
+        'formatName',
+        'frequency',
+        'incidenceAngle',
+        'masterGranule',
+        'percentCoherence',
+        'percentTroposphere',
+        'percentUnwrapped',
+        'sarSceneId',
+        'sceneDateString',
+        'slaveGranule',
+        'status',
+        'varianceTroposphere'
+    ]
+    for f in deprecated_fields:
+        if f in req_fields:
+            result[f] = None
+            try:
+                req_fields.remove(f)
+            except ValueError:
+                pass
+
+    # Parse any remaining needed fields from the CMR response
+    for field in req_fields:
+        result[field] = get_val(field_paths[field])
 
     for k in result:
-        if result[k] == 'NULL':
+        if result[k] in ['NULL', 'NA', 'None']:
             result[k] = None
 
     return result
-
-
-def attr(name):
-    """
-    Convenience method for handling echo10 additional attributes
-    """
-    return (
-        "./AdditionalAttributes/AdditionalAttribute"
-        f"[Name='{name}']/Values/Value"
-    )
 
 
 def wkt_from_gpolygon(gpoly):

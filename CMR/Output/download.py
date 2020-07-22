@@ -2,6 +2,12 @@ import logging
 import requests
 from asf_env import get_config
 
+def req_fields_download():
+    fields = [
+        'downloadUrl',
+    ]
+    return fields
+
 def cmr_to_download(rgen, includeBaseline=False, addendum=None):
     logging.debug('translating: bulk download script')
     plist = [p['downloadUrl'] for p in rgen()]

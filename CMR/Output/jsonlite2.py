@@ -1,6 +1,9 @@
 import logging
 import json
-from .jsonlite import JSONLiteStreamArray
+from .jsonlite import JSONLiteStreamArray, req_fields_jsonlite
+
+def req_fields_jsonlite2():
+    return req_fields_jsonlite()
 
 def cmr_to_jsonlite2(rgen, includeBaseline=False, addendum=None):
     logging.debug('translating: jsonlite')
@@ -41,6 +44,7 @@ class JSONLite2StreamArray(JSONLiteStreamArray):
             's': p['sizeMB'],
             'ss': p['stackSize'], # Used for datasets with precalculated stacks
             'st': p['startTime'],
+            'stp': p['stopTime'],
             't': p['thumb'].replace(p['granuleName'], '{gn}') if p['thumb'] is not None else p['thumb'],
             'w': p['wkt'],
             'wu': p['wkt_unwrapped']
