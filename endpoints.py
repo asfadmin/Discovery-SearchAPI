@@ -31,7 +31,7 @@ class FilesToWKT_Endpoint:
     def make_response(self):
         if self.files == None:
             return {'errors': [{'type': 'POST', 'report': "Could not find 'files' in post request."}]}
-        return FilesToWKT.FilesToWKT(self.files).getWKT()
+        return FilesToWKT.filesToWKT(self.files).getWKT()
 
 
 ########################################################
@@ -110,4 +110,3 @@ class MissionList_Endpoint:
             else:
                 data['platform[]'] = self.platform
         return MissionList.getMissions(data)
-
