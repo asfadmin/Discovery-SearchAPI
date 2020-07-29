@@ -103,8 +103,6 @@ def parse_granule(granule, req_fields):
             remove_field('insarGrouping')
             if result['insarGrouping'] not in [None, 0, '0', 'NA', 'NULL']:
                 result['canInsar'] = True
-            else:
-                result['canInsar'] = False
         elif None not in [
             result['sv_pos_pre'], result['sv_pos_post'],
             result['sv_vel_pre'], result['sv_vel_post'],
