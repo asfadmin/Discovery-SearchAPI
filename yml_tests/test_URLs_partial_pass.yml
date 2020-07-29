@@ -236,9 +236,9 @@ tests:
 - instrument notvalid:
     platform: ALOS
     instrument: notvalid
-    output: json
+    output: jsonlite
 
-    expected file: blank json
+    expected file: blank jsonlite
     expected code: 200
 
 - instrument with invalid dataset:

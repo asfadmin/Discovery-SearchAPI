@@ -519,6 +519,14 @@ tests:
     expected file: json
     expected code: 200
 
+- instrument alos avnir jsonlite:
+    instrument: aVnIr-2
+    maxResults: 20
+    output: jsonlite
+
+    expected file: jsonlite
+    expected code: 200
+
 - instrument with platform alos avnir:
     platform: ALOS
     instrument: Avnir-2
@@ -582,6 +590,88 @@ tests:
     output: csv
 
     expected file: csv
+    expected code: 200
+
+- jsonlite Avnir:
+    platform: Alos
+    instrument: Avnir-2
+    maxResults: 2
+    output: jsonlite
+
+    expected file: jsonlite
+    expected code: 200
+
+- jsonlite Palsar:
+    platform: Alos
+    instrument: Palsar
+    maxResults: 2
+    output: jsonlite
+
+    expected file: jsonlite
+    expected code: 200
+
+- jsonlite Sir-C:
+    platform: Sir-c
+    maxResults: 2
+    output: jsonlite
+
+    expected file: jsonlite
+    expected code: 200
+
+- jsonlite SMAP:
+    platform: SMAP
+    maxResults: 2
+    output: jsonlite
+
+    expected file: jsonlite
+    expected code: 200
+
+- jsonlite UAVSAR:
+    platform: UA
+    maxResults: 2
+    output: jsonlite
+
+    expected file: jsonlite
+    expected code: 200
+
+- jsonlite Radarsat:
+    platform: Radarsat-1
+    maxResults: 2
+    output: jsonlite
+
+    expected file: jsonlite
+    expected code: 200
+
+- jsonlite Ers:
+    platform: E1,E2
+    maxResults: 2
+    output: jsonlite
+
+    expected file: jsonlite
+    expected code: 200
+
+- jsonlite Jers:
+    platform: J1
+    maxResults: 2
+    output: jsonlite
+
+    expected file: jsonlite
+    expected code: 200
+
+- jsonlite Airsar:
+    platform: Airsar
+    maxResults: 2
+    output: jsonlite
+
+    expected file: jsonlite
+    expected code: 200
+
+- jsonlite Seasat:
+    platform: SS
+    maxResults: 2
+    output: jsonlite
+
+    expected file: jsonlite
     expected code: 200
 
 - linestring:
@@ -831,7 +921,7 @@ tests:
     expected file: count
     expected code: 200
 
-- output download:
+- output download Sentinel:
     platform: SB
     maxResults: 2000
     output: download
@@ -839,9 +929,27 @@ tests:
     expected file: download
     expected code: 200
 
-- output geojson:
+- output download Avnir:
+    platform: Alos
+    instrument: Avnir-2
+    maxResults: 2
+    output: download
+
+    expected file: download
+    expected code: 200
+
+- output geojson Sentinel:
     platform: SB
     maxResults: 2000
+    output: geojson
+
+    expected file: geojson
+    expected code: 200
+
+- output geojson Avnir:
+    platform: Alos
+    instrument: Avnir-2
+    maxResults: 2
     output: geojson
 
     expected file: geojson
@@ -863,7 +971,7 @@ tests:
     expected file: jsonlite
     expected code: 200
 
-- output kml:
+- output kml Sentinel:
     platform: SB
     maxResults: 2000
     output: kml
@@ -871,9 +979,27 @@ tests:
     expected file: kml
     expected code: 200
 
-- output metalink:
+- output kml Avnir:
+    platform: Alos
+    instrument: Avnir-2
+    maxResults: 2
+    output: kml
+
+    expected file: kml
+    expected code: 200
+
+- output metalink Sentinel:
     platform: SB
     maxResults: 2000
+    output: metalink
+
+    expected file: metalink
+    expected code: 200
+
+- output metalink Avnir:
+    platform: Alos
+    instrument: Avnir-2
+    maxResults: 2
     output: metalink
 
     expected file: metalink
@@ -2156,7 +2282,6 @@ tests:
     expected file: csv
     expected code: 200
 
-
 - season 1-175 SMAP July 2015-now:
     season: 1,175
     platform: SP
@@ -2194,6 +2319,17 @@ tests:
     season: 340,10
     platform: AS
     maxResults: 100
+    output: csv
+
+    expected file: csv
+    expected code: 200
+
+- season 1-175 UAVSAR Start End:
+    season: 1,175
+    platform: Ua
+    start: "2005-01-01T00:00:00Z"
+    end: "2014-01-01T01:00:00Z"
+    maxResults: 1000
     output: csv
 
     expected file: csv
