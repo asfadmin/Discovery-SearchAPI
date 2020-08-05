@@ -14,8 +14,6 @@ phases:
       - python3 -m pip install -r requirements.txt --upgrade
   build:
     commands:
-      - git init # PytestAutomation looks back until it finds another .git, and aws doesn't make one by default.
-      - git clone https://github.com/asfadmin/Discovery-PytestAutomation.git
       - cd Discovery-PytestAutomation
       - CMD="pytest ${PYTEST_OPTIONS} . --api ${API_URL} ${TEST_SUITE_OPTIONS}"
       - echo -e "\nRunning command=> ${CMD}\n" # Get exact command into logs for debugging

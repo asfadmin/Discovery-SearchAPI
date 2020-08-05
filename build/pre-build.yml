@@ -1,0 +1,18 @@
+version: 0.2
+
+env:
+  variables:
+    VENV: "search-api-venv"
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.7
+  build:
+    commands:
+      - echo "{\"version\":\"$CODEBUILD_RESOLVED_SOURCE_VERSION\"}" > version.json
+      - git init # PytestAutomation looks back until it finds another .git, and aws doesn't make one by default.
+      - git clone https://github.com/asfadmin/Discovery-PytestAutomation.git
+artifacts:
+  files:
+    - '**/*'
