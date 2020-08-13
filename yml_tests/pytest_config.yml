@@ -40,7 +40,7 @@ test_types:
     method: test_RepairWKTEndpoint
     variables:
       endpoint: "/services/utils/wkt"
-        
+
 ## Main SearchAPI tests:
 - Mission List Endpoint:
     required_keys: misson_list_size_min
