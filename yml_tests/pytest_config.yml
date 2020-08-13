@@ -29,6 +29,19 @@ api_urls:
 
 
 test_types:
+## WKTUtils sanity tests:
+- FilesToWKT Endpoint:
+    required_keys: file_wkt
+    method: test_FilesToWKTEndpoint
+    variables:
+      endpoint: "/services/utils/files_to_wkt"
+- RepairWKT Endpoint:
+    required_keys: repair_wkt
+    method: test_RepairWKTEndpoint
+    variables:
+      endpoint: "/services/utils/wkt"
+
+## Main SearchAPI tests:
 - Mission List Endpoint:
     required_keys: misson_list_size_min
     method: test_MissionListEndpoint
