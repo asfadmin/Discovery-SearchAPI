@@ -21,18 +21,6 @@ tests:
     expected file: error json
     expected code: 400
 
-# DS-2809 / DS-3193 - open bug for this - some UAVSAR scenes span multiple years, so outside the seasons specified
-- season 1-175 UAVSAR Start End:
-    season: 1,175
-    platform: Ua
-    start: "2005-01-01T00:00:00Z"
-    end: "2019-01-01T01:00:00Z"
-    maxResults: 1000
-    output: csv
-
-    expected file: csv
-    expected code: 200
-
 #DS-3133 opened - appears CMR indexing did not resolve - today returns 0 count... today's date returns a count
 - processingDate today:
     processingDate: today
@@ -142,16 +130,17 @@ tests:
     expected code: 200
 
 # DS-3093
+# seems to be working now (7/29/2020), bug still open - investigate further
 - min and max Doppler negative:
     minDoppler: -20000
     maxDoppler: -1
-    maxResults: 10
+    maxResults: 1000
     output: csv
 
     expected file: csv
     expected code: 200
 
-# Failes on AWS, but not locally. Happens around 10-11am AK time at 
+# Failes on AWS, but not locally. Happens around 10-11am AK time at
 # least, (Maybe longer?). Maybe a timezone conversion bug in test manager?
 - start now end yesterday reversed:
     start: now

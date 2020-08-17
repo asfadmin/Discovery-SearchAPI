@@ -1,0 +1,17 @@
+tests:
+- REPAIR Merge individual shapes together and reverse polygon order:
+    test wkt: GEOMETRYCOLLECTION(POLYGON((46 -19,30 26,-3 41,22 39,49 16,46 -19)), POLYGON((27 24,12 4,18 31,27 24)))
+    repaired wkt: POLYGON ((46.0000000000000000 -19.0000000000000000, 49.0000000000000000 16.0000000000000000, 22.0000000000000000 39.0000000000000000, -3.0000000000000000 41.0000000000000000, 15.2549019607843128 18.6470588235294130, 12.0000000000000000 4.0000000000000000, 19.2845744680851077 13.7127659574468090, 46.0000000000000000 -19.0000000000000000))
+    repair:
+        - 'Unconnected shapes: Convex-halled each INDIVIDUAL shape to merge them together.'
+        - 'Reversed polygon winding order'
+
+- FILE returns multiple errors, along with a parsed wkt:
+    file wkt:
+        - kmls_invalid/Blowup.kml
+        - kmls_invalid/BillionLaughs.kml
+        - geojsons_valid/Basic_FC_GC_1.geojson
+    parsed wkt: POLYGON ((59.9414062499999900 50.6529433672570900, 42.9876543210000000 -42.1234567890000000, -22.2222222222222000 222.2220000000000000, 59.9414062499999900 50.6529433672570900))
+    errors:
+        - "Could not parse kml: DTDForbidden(name='bomb', system_id=None, public_id=None) (Cannot load file: 'Blowup.kml')"
+        - "Could not parse kml: DTDForbidden(name='xmlbomb', system_id=None, public_id=None) (Cannot load file: 'BillionLaughs.kml')"
