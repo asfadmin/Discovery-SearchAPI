@@ -19,6 +19,8 @@ class CMRSubQuery:
         self.hits = 0
         self.results = []
 
+        self.scroll = get_config()['cmr_scroll']
+
         self.params = self.combine_params(self.params, self.extra_params)
 
         if self.should_use_asf_frame():
@@ -99,13 +101,15 @@ class CMRSubQuery:
         logging.debug('Processing page 1')
 
         session = self.asf_session()
-        response = self.get_page(session)
+        response = self.get_page(session, 1)
 
         if response is None:
             return
 
         self.hits = int(response.headers['CMR-hits'])
-        self.sid = response.headers['CMR-Scroll-Id']
+        self.sid = None
+        if self.scroll:
+            self.sid = response.headers['CMR-Scroll-Id']
 
         logging.debug(f'CMR reported {self.hits} hits for session {self.sid}')
         logging.debug('Parsing page 1')
@@ -118,13 +122,14 @@ class CMRSubQuery:
         num_pages = int(ceil(hits / page_size)) + 1
 
         logging.debug(f'Planning to fetch additional {num_pages} pages')
-        session.headers.update({'CMR-Scroll-Id': self.sid})
+        if self.scroll:
+            session.headers.update({'CMR-Scroll-Id': self.sid})
 
         # fetch multiple pages of results if needed, yield a product at a time
         for page_num in range(2, num_pages):
             logging.debug('Processing page {0}'.format(page_num))
 
-            page = self.get_page(session)
+            page = self.get_page(session, page_num)
 
             logging.debug('Parsing page {0}'.format(page_num))
 
@@ -140,8 +145,8 @@ class CMRSubQuery:
 
         return
 
-    def get_page(self, session):
-        logging.debug('Page fetch starting')
+    def get_page(self, session, page_num):
+        logging.debug('Page fetch starting' + (' (scrolled)' if self.scroll else ' (paged)'))
         max_retry = 3
 
         # Sometimes CMR is on the fritz, retry for a bit
@@ -149,7 +154,10 @@ class CMRSubQuery:
             q_start = perf_counter()
 
             api_url = self.cmr_api_url()
-            response = session.post(api_url, data=self.params)
+            if self.scroll == False:
+                response = session.post(api_url, data=self.params + [('page_num', page_num)])
+            else:
+                response = session.post(api_url, data=self.params)
 
             query_duration = perf_counter() - q_start
             logging.debug(f'CMR query time: {query_duration}')

@@ -2,21 +2,25 @@ import itertools
 import logging
 import time
 
+from asf_env import get_config
+
 from CMR.Translate import input_map
 from CMR.SubQuery import CMRSubQuery
 
 
 class CMRQuery:
     def __init__(self, req_fields, params=None, max_results=None):
+        cfg = get_config()
+
         self.max_results = max_results
         self.req_fields = req_fields
-        self.page_size = 250
+        self.page_size = cfg['cmr_page_size']
         self.params = params
 
         self.extra_params = [
             {'provider': 'ASF'},  # always limit the results to ASF as the provider
             {'page_size': self.max_results if self.is_small_max_results() else self.page_size},  # page size to request from CMR
-            {'scroll': 'true'},  # used for fetching multiple page_size
+            {'scroll': str(cfg['cmr_scroll']).lower()},  # used for fetching multiple page_size
             {'options[temporal][and]': 'true'}, # Makes handling date ranges easier
             {'sort_key[]': '-end_date'}, # Sort CMR results, but this is partially defeated by the subquery system
             {'sort_key[]': 'granule_ur'}, # Secondary sort key, the order these keys are specified in matters! This is to make multiple granules with the same date sort consistently
