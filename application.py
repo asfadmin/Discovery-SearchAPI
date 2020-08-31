@@ -77,6 +77,7 @@ def stack_search():
 ########## General endpoints ##########
 
 # Health check endpoint
+@application.route('/')
 @application.route('/health')
 @talisman(force_https=False)
 def health_check():
