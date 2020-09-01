@@ -17,4 +17,5 @@ phases:
   build:
     commands:
       - zappa --version
-      - zappa update ${MATURITY}
+      - python3 application.py
+      # - zappa update ${MATURITY}
