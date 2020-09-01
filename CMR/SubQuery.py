@@ -4,6 +4,7 @@ import re
 from time import sleep, perf_counter
 
 import requests
+from flask import request
 
 from asf_env import get_config
 from CMR.Translate import parse_cmr_response
@@ -110,6 +111,7 @@ class CMRSubQuery:
         self.sid = None
         if self.scroll:
             self.sid = response.headers['CMR-Scroll-Id']
+            request.cmr_scroll_sessions.append(self.sid)
 
         logging.debug(f'CMR reported {self.hits} hits for session {self.sid}')
         logging.debug('Parsing page 1')
