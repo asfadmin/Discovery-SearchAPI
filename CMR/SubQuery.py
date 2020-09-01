@@ -87,16 +87,16 @@ class CMRSubQuery:
         session = self.asf_session()
         url = self.cmr_api_url()
 
-        request = session.post(url, data=params)
+        cmr_request = session.post(url, data=params)
 
-        if 'CMR-hits' not in request.headers:
-            raise CMRError(request.text)
+        if 'CMR-hits' not in cmr_request.headers:
+            raise CMRError(cmr_request.text)
 
-        self.hits = int(request.headers['CMR-hits'])
+        self.hits = int(cmr_request.headers['CMR-hits'])
 
         logging.debug('CMR reported {0} hits'.format(self.hits))
 
-        return int(request.headers['CMR-hits'])
+        return int(cmr_request.headers['CMR-hits'])
 
     def get_results(self):
         logging.debug('Processing page 1')
