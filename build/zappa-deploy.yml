@@ -16,4 +16,4 @@ phases:
       - python3 -m pip install -r requirements.txt --upgrade
   build:
     commands:
-       - zappa update ${MATURITY}
+      - zappa update ${MATURITY}

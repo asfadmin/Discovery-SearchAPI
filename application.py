@@ -15,6 +15,7 @@ from Analytics import analytics_pageview
 from werkzeug.exceptions import RequestEntityTooLarge
 import time
 import importlib
+import multiprocessing
 from asf_env import get_config, load_config
 
 import endpoints
@@ -77,6 +78,7 @@ def stack_search():
 ########## General endpoints ##########
 
 # Health check endpoint
+@application.route('/')
 @application.route('/health')
 @talisman(force_https=False)
 def health_check():
@@ -112,6 +114,19 @@ def preflight():
     if get_config()['flexible_maturity']:
         if 'maturity' in request.values:
             request.temp_maturity = request.values['maturity']
+    request.cmr_scroll_sessions = []
+
+# Post-flight operations
+@application.teardown_request
+def postflight(e):
+    def close_cmr_scroll(sid):
+        logging.debug(f'Leaving CMR scroll session {sid} open!')
+        #requests.post(get_config()['cmr_base']+'some_session_close_endpoint', data={'sid': sid})
+
+    if len(request.cmr_scroll_sessions) > 0:
+        num_processes = min([8, len(request.cmr_scroll_sessions)])
+        p = multiprocessing.pool.ThreadPool(processes=num_processes)
+        p.map_async(close_cmr_scroll, request.cmr_scroll_sessions)
 
 # Run a dev server
 if __name__ == '__main__':
