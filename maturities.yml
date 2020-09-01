@@ -6,6 +6,8 @@ local:
     cmr_health: /search/health
     cmr_api: /search/granules.echo10
     cmr_collections: /search/collections
+    cmr_scroll: True
+    cmr_page_size: 250
     cmr_headers:
         Client-Id: local_searchapi_asf
     flexible_maturity: True
@@ -18,6 +20,8 @@ devel:
     cmr_health: /search/health
     cmr_api: /search/granules.echo10
     cmr_collections: /search/collections
+    cmr_scroll: False
+    cmr_page_size: 1000
     cmr_headers:
         Client-Id: devel_vertex_asf
     flexible_maturity: True
@@ -30,6 +34,8 @@ devel-beanstalk:
     cmr_health: /search/health
     cmr_api: /search/granules.echo10
     cmr_collections: /search/collections
+    cmr_scroll: True
+    cmr_page_size: 250
     cmr_headers:
         Client-Id: devel_searchapi_asf
     flexible_maturity: True
@@ -42,6 +48,8 @@ test:
     cmr_health: /search/health
     cmr_api: /search/granules.echo10
     cmr_collections: /search/collections
+    cmr_scroll: False
+    cmr_page_size: 1000
     cmr_headers:
         Client-Id: test_vertex_asf
     flexible_maturity: True
@@ -54,6 +62,8 @@ test-beanstalk:
     cmr_health: /search/health
     cmr_api: /search/granules.echo10
     cmr_collections: /search/collections
+    cmr_scroll: True
+    cmr_page_size: 250
     cmr_headers:
         Client-Id: test_searchapi_asf
     flexible_maturity: True
@@ -66,6 +76,8 @@ prod:
     cmr_health: /search/health
     cmr_api: /search/granules.echo10
     cmr_collections: /search/collections
+    cmr_scroll: False
+    cmr_page_size: 1000
     cmr_headers:
         Client-Id: searchapi_asf
     flexible_maturity: False
@@ -78,6 +90,8 @@ prod-private:
     cmr_health: /search/health
     cmr_api: /search/granules.echo10
     cmr_collections: /search/collections
+    cmr_scroll: True
+    cmr_page_size: 250
     cmr_headers:
         Client-Id: vertex_asf
     flexible_maturity: False
