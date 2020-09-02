@@ -171,6 +171,9 @@ class CMRSubQuery:
                 self.log_bad_cmr_response(
                     attempt, max_retry, response, session
                 )
+                if response.status_code == 404:
+                    logging.error('Halting without retries due to 404')
+                    break
 
                 # CMR a chance to sort itself out
                 sleep(0.5)
@@ -209,8 +212,8 @@ class CMRSubQuery:
 
     def log_bad_cmr_response(self, attempt, max_retry, response, session):
         logging.error(
-            f'Bad news bears! CMR said {response.status_code} '
-            f'on session {self.sid}'
+            f'Bad news bears! CMR said {response.status_code}' +
+            (f' on session {self.sid}' if self.scroll else '')
         )
         logging.error('Attempt {0} of {1}'.format(attempt + 1, max_retry))
         logging.error('Params sent to CMR:')
