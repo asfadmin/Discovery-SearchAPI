@@ -115,6 +115,8 @@ def preflight():
         if 'maturity' in request.values:
             request.temp_maturity = request.values['maturity']
     request.cmr_scroll_sessions = []
+    logging.debug('Using config:')
+    logging.debug(get_config())
 
 # Post-flight operations
 @application.teardown_request

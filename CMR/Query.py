@@ -75,6 +75,11 @@ class CMRQuery:
                 self.result_counter += 1
                 yield result
 
+                # it's a little silly but run this check again here so we don't accidentally fetch an extra page
+                if self.max_results_reached():
+                    logging.debug('Max results reached, terminating')
+                    return
+
             logging.debug('End of available results reached')
 
     def is_out_of_time(self):
