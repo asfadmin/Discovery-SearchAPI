@@ -31,12 +31,12 @@ api_urls:
 test_types:
 ## WKTUtils sanity tests:
 - FilesToWKT Endpoint:
-    required_keys: file_wkt
+    required_keys: "file wkt"
     method: test_FilesToWKTEndpoint
     variables:
       endpoint: "/services/utils/files_to_wkt"
 - RepairWKT Endpoint:
-    required_keys: repair_wkt
+    required_keys: "test wkt"
     method: test_RepairWKTEndpoint
     variables:
       endpoint: "/services/utils/wkt"
