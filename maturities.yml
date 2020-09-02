@@ -76,8 +76,8 @@ prod:
     cmr_health: /search/health
     cmr_api: /search/granules.echo10
     cmr_collections: /search/collections
-    cmr_scroll: False
-    cmr_page_size: 1000
+    cmr_scroll: True
+    cmr_page_size: 250
     cmr_headers:
         Client-Id: searchapi_asf
     flexible_maturity: False
@@ -90,8 +90,8 @@ prod-private:
     cmr_health: /search/health
     cmr_api: /search/granules.echo10
     cmr_collections: /search/collections
-    cmr_scroll: True
-    cmr_page_size: 250
+    cmr_scroll: False
+    cmr_page_size: 1000
     cmr_headers:
         Client-Id: vertex_asf
     flexible_maturity: False
