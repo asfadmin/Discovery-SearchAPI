@@ -184,7 +184,10 @@ class CMRSubQuery:
 
     def asf_session(self):
         session = requests.Session()
-        session.headers.update({'Client-Id': 'vertex_asf'})
+        headers = get_config()['cmr_headers']
+        session.headers.update(headers)
+        logging.debug('New requests.Session with headers:')
+        logging.debug(session.headers)
 
         return session
 
