@@ -11,16 +11,14 @@ def load_config():
         logging.warning('os.environ[\'MATURITY\'] not set! Defaulting to local config.]')
 
     maturity = os.environ['MATURITY'] if 'MATURITY' in os.environ.keys() else 'local'
-    maturities = all_config
 
-    # need to inject this into the temporary maturity for crossover to prod so it still accepts the 'maturity' param
-    flex_maturity = maturities[maturity]['flexible_maturity']
+    config = all_config[maturity]
 
-    if maturities[maturity]['flexible_maturity'] and hasattr(request, 'temp_maturity'):
-        maturity = request.temp_maturity
-
-    config = maturities[maturity]
-    config['flexible_maturity'] = flex_maturity
+    if config['flexible_maturity'] and 'maturity' in request.values:
+        temp_maturity = request.values['maturity']
+        request.temp_maturity = temp_maturity
+        for flex_key in ['bulk_download_api', 'cmr_base', 'cmr_health', 'cmr_api', 'cmr_collections']:
+            config[flex_key] = all_config[temp_maturity][flex_key]
 
     # dynamically switch to non-scrolled results if the max results <= page size
     if 'maxresults' in request.values:
@@ -31,8 +29,6 @@ def load_config():
             pass
 
     request.asf_config = config
-    logging.debug('====================')
-    logging.debug(request.asf_config)
 
 def get_config():
     return request.asf_config

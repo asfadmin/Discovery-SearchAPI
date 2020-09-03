@@ -111,9 +111,6 @@ def handle_oversize_request(error):
 def preflight():
     load_config()
     analytics_pageview()
-    if get_config()['flexible_maturity']:
-        if 'maturity' in request.values:
-            request.temp_maturity = request.values['maturity']
     request.cmr_scroll_sessions = []
     logging.debug('Using config:')
     logging.debug(get_config())
