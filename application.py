@@ -89,7 +89,7 @@ def health_check():
         logging.debug(e)
         api_version = {'version': 'unknown'}
     cmr_health = get_cmr_health()
-    api_health = {'ASFSearchAPI': {'ok?': True, 'version': api_version['version']}, 'CMRSearchAPI': cmr_health}
+    api_health = {'ASFSearchAPI': {'ok?': True, 'version': api_version['version'], 'config': request.asf_config}, 'CMRSearchAPI': cmr_health}
     response = make_response(json.dumps(api_health, sort_keys=True, indent=2))
     response.mimetype = 'application/json; charset=utf-8'
     return response
