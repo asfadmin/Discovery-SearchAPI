@@ -7,7 +7,7 @@ local:
     cmr_api: /search/granules.echo10
     cmr_collections: /search/collections
     cmr_scroll: True
-    cmr_page_size: 250
+    cmr_page_size: 2000
     cmr_headers:
         Client-Id: local_searchapi_asf
     flexible_maturity: True
