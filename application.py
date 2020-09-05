@@ -126,6 +126,8 @@ def postflight(e):
         num_processes = min([8, len(request.cmr_scroll_sessions)])
         p = multiprocessing.pool.ThreadPool(processes=num_processes)
         p.map_async(close_cmr_scroll, request.cmr_scroll_sessions)
+        p.close()
+        p.join()
 
 # Run a dev server
 if __name__ == '__main__':
