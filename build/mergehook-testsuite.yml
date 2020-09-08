@@ -7,3 +7,4 @@ phases:
   build:
     commands:
       - echo "${CODEBUILD_WEBHOOK_TRIGGER}" # == "pr/<id_number>". (ie: "pr/522")
+      - exit -1
