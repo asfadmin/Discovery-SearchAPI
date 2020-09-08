@@ -14,20 +14,11 @@ phases:
       - python3.7 -m pip install -r requirements.txt --upgrade
   build:
     commands:
-      # PRE-BUILD: Setup pytest, and the version file
+      # PRE-BUILD: Setup pytest, and the version file. Store what variables you'll need
       - echo "{\"version\":\"${CODEBUILD_RESOLVED_SOURCE_VERSION}\"}" > version.json
-      - git status
-      # - git init # PytestAutomation looks back until it finds another .git, and aws doesn't make one by default.
       - git clone https://github.com/asfadmin/Discovery-PytestAutomation.git
-      
-      - echo "CODEBUILD_WEBHOOK_HEAD_REF:${CODEBUILD_WEBHOOK_HEAD_REF}"
-      - echo "CODEBUILD_WEBHOOK_PREV_COMMIT:${CODEBUILD_WEBHOOK_PREV_COMMIT}"
-      - echo "CODEBUILD_WEBHOOK_EVENT:${CODEBUILD_WEBHOOK_EVENT}"
-      - echo "CODEBUILD_WEBHOOK_BASE_REF:${CODEBUILD_WEBHOOK_BASE_REF}"
-      - echo "CODEBUILD_SOURCE_VERSION:${CODEBUILD_SOURCE_VERSION}"
-      - echo "CODEBUILD_SOURCE_REPO_URL:${CODEBUILD_SOURCE_REPO_URL}"
-      - echo "CODEBUILD_RESOLVED_SOURCE_VERSION:${CODEBUILD_RESOLVED_SOURCE_VERSION}"
-
+      - export GIT_DIST_BRANCH=$(echo "${CODEBUILD_WEBHOOK_BASE_REF}" | awk -F/ '{print $NF}')
+      - echo ${GIT_DIST_BRANCH}
 
 
       # Setup staging to run test suite against:
