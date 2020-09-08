@@ -40,6 +40,8 @@ def analytics_events(events=None):
             p = multiprocessing.pool.ThreadPool(processes=num_processes)
 
             p.map_async(post_analytics_event, events_with_params)
+            p.close()
+            p.join()
 
     except requests.RequestException as e:
         logging.debug('Problem logging analytics: {0}'.format(e))
