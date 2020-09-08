@@ -1,11 +1,26 @@
 version: 0.2
 
+env:
+  variables:
+    VENV: "search-api-venv"
+
 phases:
   install:
     runtime-versions:
       python: 3.7
+    commands:
+      - python3.7 -m venv ${VENV}
+      - . ./${VENV}/bin/activate
+      - python3.7 -m pip install -r requirements.txt --upgrade
   build:
     commands:
-      - echo "${CODEBUILD_WEBHOOK_TRIGGER}" # == "pr/<id_number>". (ie: "pr/522")
-      - ls -halt
-      - pwd
+      # PRE-BUILD: Setup pytest, and the version file
+      - echo "{\"version\":\"${CODEBUILD_RESOLVED_SOURCE_VERSION}\"}" > version.json
+      - git status
+      # - git init # PytestAutomation looks back until it finds another .git, and aws doesn't make one by default.
+      - git clone https://github.com/asfadmin/Discovery-PytestAutomation.git
+      
+      - git rev-parse --abbrev-ref HEAD
+
+      # Setup staging to run test suite against:
+      
