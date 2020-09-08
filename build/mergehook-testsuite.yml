@@ -20,7 +20,15 @@ phases:
       # - git init # PytestAutomation looks back until it finds another .git, and aws doesn't make one by default.
       - git clone https://github.com/asfadmin/Discovery-PytestAutomation.git
       
-      - git rev-parse --abbrev-ref HEAD
+      - echo "CODEBUILD_WEBHOOK_HEAD_REF:${CODEBUILD_WEBHOOK_HEAD_REF}"
+      - echo "CODEBUILD_WEBHOOK_PREV_COMMIT:${CODEBUILD_WEBHOOK_PREV_COMMIT}"
+      - echo "CODEBUILD_WEBHOOK_EVENT:${CODEBUILD_WEBHOOK_EVENT}"
+      - echo "CODEBUILD_WEBHOOK_BASE_REF:${CODEBUILD_WEBHOOK_BASE_REF}"
+      - echo "CODEBUILD_SOURCE_VERSION:${CODEBUILD_SOURCE_VERSION}"
+      - echo "CODEBUILD_SOURCE_REPO_URL:${CODEBUILD_SOURCE_REPO_URL}"
+      - echo "CODEBUILD_RESOLVED_SOURCE_VERSION:${CODEBUILD_RESOLVED_SOURCE_VERSION}"
+
+
 
       # Setup staging to run test suite against:
       
