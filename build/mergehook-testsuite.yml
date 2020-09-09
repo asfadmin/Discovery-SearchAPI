@@ -24,9 +24,7 @@ phases:
       - zappa update "${GIT_DIST_BRANCH}_staging"
 
       # TEST: Run the test suite...
-      - cd Discovery-PytestAutomation
-      - CMD="python3.7 -m pytest ${PYTEST_OPTIONS} . --api ${API_URL} ${TEST_SUITE_OPTIONS}"
+      # - cd Discovery-PytestAutomation
+      - CMD="cd Discovery-PytestAutomation && python3.7 -m pytest ${PYTEST_OPTIONS} . --api ${API_URL} ${TEST_SUITE_OPTIONS}"
       - echo -e "\nRunning command=> ${CMD}\n" # Get exact command into logs for debugging
       - ${CMD}
-
-      
