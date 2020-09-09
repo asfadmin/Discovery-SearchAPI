@@ -11,7 +11,7 @@ phases:
     commands:
       - python3.7 -m venv ${VENV}
       - . ./${VENV}/bin/activate
-      - python3.7 -m pip install -r requirements.txt --upgrade
+      # - python3.7 -m pip install -r requirements.txt --upgrade
   build:
     commands:
       # PRE-BUILD: Setup pytest, and the version file. Store what variables you'll need
@@ -20,7 +20,7 @@ phases:
       - export GIT_DIST_BRANCH=$(echo "${CODEBUILD_WEBHOOK_BASE_REF}" | awk -F/ '{print $NF}')
       
       # If the branch is NOT one of these, break out:
-      - if ! [[ "${GIT_DIST_BRANCH}" =~ ^(devel|test|prod)$ ]]; then echo "HIT EXIT" && exit 0; fi
+      - if [[ "${GIT_DIST_BRANCH}" =~ ^(devel|test|prod)$ ]]; then echo "HIT EXIT" && exit 0; fi
       - echo "DID NOT HIT EXIT"
       # Setup staging to run test suite against:
       
