@@ -22,7 +22,5 @@ phases:
       - zappa update "devel_staging"
 
       # TEST: Run the test suite...
-      - PYTEST_CMD="pytest -s -n auto -rs . --dont-run-file known_bugs --dont-run-file run_on_prod_only --api https://api-dev-staging.asf.alaska.edu"
-      - FULL_CMD="cd Discovery-PytestAutomation && python3.7 -m ${PYTEST_CMD}"
-      - echo -e "\nRunning command=> ${FULL_CMD}\n" # Get exact command into logs for debugging
-      - ${FULL_CMD}
+      - cd Discovery-PytestAutomation
+      - pytest -s -n auto -rs . --dont-run-file known_bugs --dont-run-file run_on_prod_only --api https://api-dev-staging.asf.alaska.edu
