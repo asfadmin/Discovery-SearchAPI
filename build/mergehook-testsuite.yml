@@ -18,8 +18,9 @@ phases:
       - echo "{\"version\":\"${CODEBUILD_RESOLVED_SOURCE_VERSION}\"}" > version.json
       - git clone https://github.com/asfadmin/Discovery-PytestAutomation.git
       - export GIT_DIST_BRANCH=$(echo "${CODEBUILD_WEBHOOK_BASE_REF}" | awk -F/ '{print $NF}')
-      - echo ${GIT_DIST_BRANCH}
-
-
+      
+      # If the branch is NOT one of these, break out:
+      - if ! [[ "${GIT_DIST_BRANCH}" =~ ^(devel|test|prod)$ ]]; then echo "HIT EXIT" && exit 0; fi
+      - echo "DID NOT HIT EXIT"
       # Setup staging to run test suite against:
       
