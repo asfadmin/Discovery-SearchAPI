@@ -19,9 +19,14 @@ phases:
       - git clone https://github.com/asfadmin/Discovery-PytestAutomation.git
       - export GIT_DIST_BRANCH=$(echo "${CODEBUILD_WEBHOOK_BASE_REF}" | awk -F/ '{print $NF}')
 
-      # Setup staging to run test suite against:
+      # BUILD: Setup staging to run test suite against:
       # (I set this project to ONLY run on devel/test/prod branches in it's source settings).
-      - zappa update ${GIT_DIST_BRANCH}_staging
-  
-      
+      - zappa update "${GIT_DIST_BRANCH}_staging"
+
+      # TEST: Run the test suite...
+      - cd Discovery-PytestAutomation
+      - CMD="python3.7 -m pytest ${PYTEST_OPTIONS} . --api ${API_URL} ${TEST_SUITE_OPTIONS}"
+      - echo -e "\nRunning command=> ${CMD}\n" # Get exact command into logs for debugging
+      - ${CMD}
+
       
