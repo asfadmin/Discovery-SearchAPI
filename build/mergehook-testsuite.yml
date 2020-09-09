@@ -22,6 +22,6 @@ phases:
       # If the branch is NOT one of these, break out:
       - if [[ "${GIT_DIST_BRANCH}" =~ ^(devel|test|prod)$ ]]; then echo "HIT EXIT" && exit 0; fi
       - echo "DID NOT HIT EXIT"
-      - aws codebuild help # Seeing if aws is installed
+      - aws codebuild help  # Seeing if aws is installed
       # Setup staging to run test suite against:
       
