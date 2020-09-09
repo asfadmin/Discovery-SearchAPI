@@ -19,10 +19,10 @@ phases:
       - git clone https://github.com/asfadmin/Discovery-PytestAutomation.git
 
       # BUILD: Setup staging to run test suite against:
-      - zappa update "devel_staging"
+      - zappa update "test_staging"
 
       # TEST: Run the test suite...
-      - PYTEST_CMD="pytest -s -n auto -rs . --dont-run-file known_bugs --dont-run-file run_on_prod_only --api https://api-dev-staging.asf.alaska.edu"
+      - PYTEST_CMD="pytest -s -n auto -rs . --dont-run-file known_bugs --dont-run-file run_on_prod_only --api https://api-test-staging.asf.alaska.edu"
       - FULL_CMD="cd Discovery-PytestAutomation && python3.7 -m ${PYTEST_CMD}"
       - echo -e "\nRunning command=> ${FULL_CMD}\n" # Get exact command into logs for debugging
       - ${FULL_CMD}
