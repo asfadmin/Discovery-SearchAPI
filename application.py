@@ -122,9 +122,9 @@ def postflight(e):
     def close_cmr_scroll(req):
         try:
             logging.debug(f'Closing CMR scroll session {req["sid"]}')
-            r = requests.post(req['url'], data={'scroll_id': req['sid']})
-            if r.status_code != 200:
-                logging.warn(f'CMR returned HTTP {r.status_code} when closing scroll session {req["sid"]}')
+            #r = requests.post(req['url'], data={'scroll_id': req['sid']})
+            #if r.status_code != 200:
+            #    logging.warn(f'CMR returned HTTP {r.status_code} when closing scroll session {req["sid"]}')
         except Exception as e:
             logging.warning(f'Failed to close scroll session {req["sid"]}: {e}')
 
