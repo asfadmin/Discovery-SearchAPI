@@ -28,6 +28,9 @@ def load_config():
         except ValueError:
             pass
 
+    if 'granule_list' in request.values or 'product_list' in request.values:
+        config['cmr_scroll'] = False
+
     request.asf_config = config
 
 def get_config():
