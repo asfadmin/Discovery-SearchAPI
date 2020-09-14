@@ -32,8 +32,6 @@ def parse_date(v):
     d = dateparser.parse(v)
     if d is None:
         raise ValueError('Invalid date: {0}'.format(v))
-    if d > datetime.datetime.now() + datetime.timedelta(days=10):
-        raise ValueError('Date appears to be too far in the future: {0}'.format(v))
     return dateparser.parse(v).strftime('%Y-%m-%dT%H:%M:%SZ')
 
 # Parse and validate a date range: "1991-10-01T00:00:00Z,1991-10-02T00:00:00Z"
