@@ -135,7 +135,7 @@ def postflight(e):
         if len(request.cmr_scroll_sessions) > 0:
             num_processes = min([4, len(request.cmr_scroll_sessions)])
             p = multiprocessing.pool.ThreadPool(processes=num_processes)
-            reqs = [{'sid': sid, 'url': get_config()['cmr_base']+'/search/clear-scroll'} for sid in request.cmr_scroll_sessions]
+            reqs = [{'sid': sid, 'url': get_config()['cmr_base']+get_config()['cmr_clear_scroll']} for sid in request.cmr_scroll_sessions]
             p.map_async(close_cmr_scroll, reqs)
             p.close()
             p.join()
