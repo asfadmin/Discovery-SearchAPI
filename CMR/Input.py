@@ -1,4 +1,5 @@
 import dateparser
+import datetime
 import re
 from geomet import wkt
 from WKTUtils.Input import parse_wkt_util
@@ -32,7 +33,7 @@ def parse_date(v):
     if d is None:
         raise ValueError('Invalid date: {0}'.format(v))
     return dateparser.parse(v).strftime('%Y-%m-%dT%H:%M:%SZ')
-    
+
 # Parse and validate a date range: "1991-10-01T00:00:00Z,1991-10-02T00:00:00Z"
 def parse_date_range(v):
     dates = v.split(',')
