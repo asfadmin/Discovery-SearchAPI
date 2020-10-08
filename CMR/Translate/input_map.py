@@ -53,7 +53,7 @@ def input_map():
         'groupid':              ['attribute[]',             'string,GROUP_ID,{0}',              parse_string_list],
         'insarstackid':         ['attribute[]',             'int,INSAR_STACK_ID,{0}',           parse_string],
         'instrument':           ['instrument[]',            '{0}',                              parse_string],
-        'pointingAngle':        ['attribute[]',             'float,POINTING_ANGLE,{0}',         parse_float_list]
+        'pointingangle':        ['attribute[]',             'float,POINTING_ANGLE,{0}',         parse_float_list]
     }
 
     # So the search endpoint doesn't complain if we use this
