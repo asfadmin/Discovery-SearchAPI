@@ -78,8 +78,10 @@ class APIStackQuery:
                 val = self.request.values[k]
                 if key not in valid_params:
                     raise ValueError(f'Unrecognized parameter: {key}')
-                parse_string(val)
+                val = parse_string(val)
                 params[key] = val
+            if 'master' not in params:
+                raise ValueError(f"Could not find 'master' in post request.")
             self.params = params
         except ValueError as e:
             logging.debug(f'ValueError: {e}')
