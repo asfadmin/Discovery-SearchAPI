@@ -69,4 +69,5 @@ class test_date_parser():
                     assert False, self.error_msg.format("API did not return a date. Error Message: '{0}'.\n - API Returned: {1}.\n".format(str(e), content))
             else:
                 assert False, self.error_msg.format("API did not return a date. Returned (First 500 char):\n{0}\n".format(content[:500]))
-
+        if "expected code" in self.test_info:
+            assert self.test_info["expected code"] == status_code, self.error_msg.format("API returned different error code than expected. Code returned: {0}, Expected: {1}.".format(status_code, self.test_info["expected code"]))
