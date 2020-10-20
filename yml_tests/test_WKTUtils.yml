@@ -6,7 +6,7 @@ tests:
     repair:
         - 'Unconnected shapes: Convex-halled each INDIVIDUAL shape to merge them together.'
         - 'Reversed polygon winding order'
- 
+
 # FILE geojson:
 - FILE geojson smallest possible json:
     file wkt: geojsons_valid/SmallestJson_1.geojson
