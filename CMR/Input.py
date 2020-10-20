@@ -1,5 +1,4 @@
 import dateparser
-import datetime
 import re
 from geomet import wkt
 from WKTUtils.Input import parse_wkt_util

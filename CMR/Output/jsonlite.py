@@ -57,7 +57,7 @@ def unwrap_wkt(wkt_str):
         if(max(lons) - min(lons) > 180):
             wkt_obj['coordinates'] = [[a if a[0] > 0 else [a[0] + 360, a[1]] for a in wkt_obj['coordinates'][0]]]
         return wkt.dumps(wkt_obj, decimals=6)
-    except ValueError as e:
+    except ValueError:
         return wkt_str
     return wkt_str
 

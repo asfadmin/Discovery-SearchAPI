@@ -30,7 +30,7 @@ def get_stack(master, req_fields=None, product_type=None):
     stack = query_stack(stack_params, req_fields)
 
     if len(stack) <= 0:
-        raise ValueError(f'No products found matching stack parameters')
+        raise ValueError('No products found matching stack parameters')
 
     master, stack, warnings = check_master(master, stack)
 
@@ -47,7 +47,7 @@ def get_stack_params(master, product_type=None):
     params = {'granule_list': master}
     if product_type is not None:
         params['processingLevel'] = product_type
-    params, output, max_results = translate_params(params)
+    params,_,_ = translate_params(params)
     req_fields = [
         'processingLevel'
     ]
@@ -104,7 +104,7 @@ def get_stack_params(master, product_type=None):
     return stack_params
 
 def query_stack(params, req_fields):
-    params, output, max_results = translate_params(params)
+    params,_,_ = translate_params(params)
     params = input_fixer(params)
     query = CMRQuery(
         req_fields,

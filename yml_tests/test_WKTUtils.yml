@@ -6,7 +6,7 @@ tests:
     repair:
         - 'Unconnected shapes: Convex-halled each INDIVIDUAL shape to merge them together.'
         - 'Reversed polygon winding order'
-        
+ 
 # FILE geojson:
 - FILE geojson smallest possible json:
     file wkt: geojsons_valid/SmallestJson_1.geojson
@@ -32,5 +32,3 @@ tests:
     errors:
         - "Could not parse kml: DTDForbidden(name='bomb', system_id=None, public_id=None) (Cannot load file: 'Blowup.kml')"
         - "Could not parse kml: DTDForbidden(name='xmlbomb', system_id=None, public_id=None) (Cannot load file: 'BillionLaughs.kml')"
-
-

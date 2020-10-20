@@ -81,10 +81,10 @@ class APIStackQuery:
                 val = parse_string(val)
                 params[key] = val
             if 'master' not in params:
-                raise ValueError(f"Could not find 'master' in post request.")
+                raise ValueError("Could not find 'master' in post request.")
             # If you try passing in multiple masters:
             if "," in str(params['master']):
-                raise ValueError(f"Can only pass in one master granule.")
+                raise ValueError("Can only pass in one master granule.")
             self.params = params
         except ValueError as e:
             logging.debug(f'ValueError: {e}')
