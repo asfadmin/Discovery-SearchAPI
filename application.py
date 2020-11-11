@@ -13,8 +13,6 @@ import json
 from CMR.Health import get_cmr_health
 from Analytics import analytics_pageview
 from werkzeug.exceptions import RequestEntityTooLarge
-import time
-import importlib
 import multiprocessing
 import requests
 from asf_env import get_config, load_config
