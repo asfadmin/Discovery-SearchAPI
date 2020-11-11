@@ -1,5 +1,5 @@
 import logging
-from lxml import etree as ET
+from defusedxml.lxml import fromstring
 import datetime
 from .fields import get_field_paths, attr_path
 
@@ -11,8 +11,8 @@ def parse_cmr_response(r, req_fields):
     logging.debug('parsing CMR results')
 
     try:
-        root = ET.fromstring(r.text.encode('latin-1'))
-    except ET.ParseError as e:
+        root = fromstring(r.text.encode('latin-1'))
+    except Exception as e:
         logging.error(f'CMR parsing error: {e} when parsing: {r.text}')
         return
 

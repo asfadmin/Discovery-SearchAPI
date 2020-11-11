@@ -12,10 +12,11 @@ from CMR.Input import parse_date
 class FilesToWKT_Endpoint:
     def __init__(self, request):
         # Find out if the user passed us files:
+        self.files = []
         if 'files' in request.files and len(list(request.files.getlist('files'))) > 0:
-            self.files = request.files.getlist("files")
-        else:
-            self.files = None
+            for file in list(request.files.getlist('files')):
+                self.files.append(file)
+
 
     def get_response(self):
         d = api_headers.base(mimetype='application/json')
@@ -29,7 +30,7 @@ class FilesToWKT_Endpoint:
         return Response(json.dumps(resp_dict, sort_keys=True, indent=4), 200, headers=d)
 
     def make_response(self):
-        if self.files == None:
+        if self.files == []:
             return {'errors': [{'type': 'POST', 'report': "Could not find 'files' in post request."}]}
         return FilesToWKT.filesToWKT(self.files).getWKT()
 

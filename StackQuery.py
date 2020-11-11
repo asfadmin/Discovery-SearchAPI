@@ -78,8 +78,13 @@ class APIStackQuery:
                 val = self.request.values[k]
                 if key not in valid_params:
                     raise ValueError(f'Unrecognized parameter: {key}')
-                parse_string(val)
+                val = parse_string(val)
                 params[key] = val
+            if 'master' not in params:
+                raise ValueError("Could not find 'master' in post request.")
+            # If you try passing in multiple masters:
+            if "," in str(params['master']):
+                raise ValueError("Can only pass in one master granule.")
             self.params = params
         except ValueError as e:
             logging.debug(f'ValueError: {e}')
