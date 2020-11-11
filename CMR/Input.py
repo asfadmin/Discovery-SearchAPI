@@ -9,22 +9,22 @@ def parse_string(v):
         raise ValueError('Invalid string: Empty string: {0}'.format(v))
     try:
         return '{0}'.format(v)
-    except ValueError: # If this happens, the following line would fail as well...
-        raise ValueError('Invalid string: {0}'.format(v))
+    except ValueError as e: # If this happens, the following line would fail as well...
+        raise ValueError('Invalid string: {0}'.format(v)) from e
 
 # Parse and validate an int: "10"
 def parse_int(v):
     try:
         return int(v)
-    except ValueError:
-        raise ValueError('Invalid int: {0}'.format(v))
+    except ValueError as e:
+        raise ValueError('Invalid int: {0}'.format(v)) from e
 
 # Parse and validate a float: "1.2"
 def parse_float(v):
     try:
         return float(v)
-    except ValueError:
-        raise ValueError('Invalid number: {0}'.format(v))
+    except ValueError as e:
+        raise ValueError('Invalid number: {0}'.format(v)) from e
 
 # Parse and validate a date: "1991-10-01T00:00:00Z"
 def parse_date(v):
