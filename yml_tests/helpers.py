@@ -3,7 +3,9 @@ import json             # files stuff
 
 
 # Incase I need to change endpoint interaction, I can do it all here:
-def make_request(full_url, files=None, data={}):
+def make_request(full_url, files=None, data=None):
+    if data is None:
+        data = {}
     try:
         r = requests.post(full_url, files=files, data=data)
     except (requests.ConnectionError, requests.Timeout, requests.TooManyRedirects) as e:
