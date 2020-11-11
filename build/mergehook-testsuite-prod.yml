@@ -23,4 +23,4 @@ phases:
 
       # TEST: Run the test suite...
       - cd Discovery-PytestAutomation
-      - pytest -s -n auto -rs . --dont-run-file known_bugs --dont-run-file run_on_prod_only --api https://api-prod-private-staging.asf.alaska.edu
+      - pytest -s -n auto -rs . --dont-run-file known_bugs --api https://api-prod-private-staging.asf.alaska.edu
