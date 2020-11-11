@@ -116,7 +116,7 @@ def check_master(master, stack):
     warnings = None
     if master not in [product['granuleName'] for product in stack]:
         master = stack[0]['granuleName']
-        warnings = [{'NEW_MASTER': f'A new master had to be selected in order to calculate baseline values.'}]
+        warnings = [{'NEW_MASTER': 'A new master had to be selected in order to calculate baseline values.'}]
     return master, stack, warnings
 
 def get_platform(master):
