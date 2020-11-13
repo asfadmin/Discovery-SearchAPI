@@ -657,6 +657,14 @@ tests:
     expected file: error json
     expected code: 400
 
+- pointing angle:
+    pointingAngle: 0.0
+    output: csv
+    maxResults: 1
+
+    expected file: error json
+    expected code: 400
+
 - product_list specchar invalid:
     product_list: ~,#
     output: csv

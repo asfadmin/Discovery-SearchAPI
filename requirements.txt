@@ -11,7 +11,7 @@ cfn-flip==1.2.2
 chardet==3.0.4
 Click==7.0
 coverage==5.0.2
-cryptography==2.8
+cryptography==3.2
 dateparser==0.7.2
 DateTime==4.3
 defusedxml==0.6.0

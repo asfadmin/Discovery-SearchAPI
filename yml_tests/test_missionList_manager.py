@@ -27,7 +27,7 @@ class test_mission_list():
         try:
             json_content = json.loads(content)
         except json.JSONDecodeError as e:
-            assert False, "API did not return JSON. Test: {0} URL: {1}.\nReturned:\n{2}\n".format(self.test_info["title"], self.full_url, content)
+            assert False, "API did not return JSON. Test: {0} URL: {1}. Error: '{2}'\nReturned:\n{3}\n".format(self.test_info["title"], self.full_url, str(e), content)
         return json_content
 
     def runAssertTests(self, response_json):
