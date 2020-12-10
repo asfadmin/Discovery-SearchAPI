@@ -2,91 +2,128 @@
 
 Search API for talking with CMR.
 
-## Development
+- [SearchAPI](#searchapi)
+  - [First Time Setup](#first-time-setup)
+  - [Starting the SearchAPI](#starting-the-searchapi)
+  - [Developing](#developing)
+  - [Testing](#testing)
+    - [Setting up PytestAutomation](#setting-up-pytestautomation)
+    - [Running the Tests](#running-the-tests)
+  - [Production](#production)
 
-### Install and enviornment for running the first time
+## First Time Setup
 
-1. Clone a local copy of this repo:
+If cloning for the first time, follow these steps to get all the requirements installed.
 
-> ~$ git clone git@github.com:asfadmin/Discovery-SearchAPI.git
+- Works for: Ubuntu, MacBook, and Windows subsystem for linux (Ubuntu app)).
 
-> ~$ cd Discovery-SearchAPI
+1. Update your package list:
+
+   ```bash
+   sudo apt update
+   ```
+
+2. Install missing libraries from apt:
+
+   ```bash
+   sudo apt install python3-pip python3-testresources libgeos-dev
+   ```
+
+3. Clone a local copy of this repo:
+
+   ```bash
+   git clone git@github.com:asfadmin/Discovery-SearchAPI.git
+   ```
+
+   ```bash
+   cd Discovery-SearchAPI
+   ```
+
+4. Create a virtual environment:
+
+   ```bash
+   virtualenv --python=python3 ~/SearchAPI-env
+   ```
+
+5. Activate the virtual environment:
+
+   ```bash
+   source ~/SearchAPI-env/bin/activate
+   ```
+
+   - If it works, you should see "(SearchAPI-env)" appear at the beginnning of your prompt.
 
 
-2. Create a virtual environment:
+6. Use pip to install requirements:
 
-> ~$ virtualenv --python=python3 ~/SearchAPI-env
+   ```bash
+   pip install -r requirements.txt --update
+   ```
 
+   - At the time of this writing, in some situations you may encounter an SSL certificate error. If that happens, re-install pip using the following command and try step 4 again.
 
-3. Activate the virtual environmen, make sure the label appears:
+      ```bash
+      curl https://bootstrap.pypa.io/get-pip.py | python
+      ```
 
-> ~$ source ~/SearchAPI-env/bin/activate
+## Starting the SearchAPI
 
-> (SearchAPI-env) ~$
-
-
-4. Use pip to install requirements:
-
-> (SearchAPI-env) ~$ pip install -r requirements.txt
-
-- At the time of this writing, in some situations you may encounter an SSL certificate error. If that happens, re-install pip using the following command and try step 4 again:
-
-> curl https://bootstrap.pypa.io/get-pip.py | python
-
-### 
+Once installed, this is how you run the api.
 
 1. If not already started, activate the enviornment:
 
-```bash
-~$ source ~/SearchAPI-env/bin/activate
-```
+   ```bash
+   source ~/SearchAPI-env/bin/activate
+   ```
 
 2. Run the dev server
 
-```bash
-(ProxyAPI-env) ~$ python application.py
-```
+   ```bash
+   python application.py
+   ```
 
-3. After making changes, pylint your code
+## Developing
 
-```bash
-(ProxyAPI-env) ~$ pylint --rcfile=pylintrc <changed files>
-```
+1. After making changes, pylint your code
 
-4. If you install new modules with pip, update requirements.txt:
+   ```bash
+   pylint --rcfile=pylintrc <changed files>
+   ```
 
-```bash
-(ProxyAPI-env) ~$ pip freeze > requirements.txt
-```
+2. If you install new modules with pip, update requirements.txt:
 
-# Testing
+   ```bash
+   pip freeze > requirements.txt
+   ```
+
+## Testing
+
 Testing is done using the [Discovery-PytestAutomation](https://github.com/asfadmin/Discovery-PytestAutomation) repo.
 
-> git clone https://github.com/asfadmin/Discovery-PytestAutomation
+### Setting up PytestAutomation
 
-> cd Discovery-PytestAutomation
+   1. Clone the repository:
 
-> pytest {pytest flags here} . {PytestAutomation flags here}
+   ```bash
+   git clone https://github.com/asfadmin/Discovery-PytestAutomation
+   ```
 
-   - See [here](https://github.com/asfadmin/Discovery-PytestAutomation) for filters/flags for PytestAutomation.
-   - See [here]() for custom flags, unique to this project.
+### Running the Tests
 
-# Installing
+1. Make sure you're in the PytestAutomation repo.
 
-## Windows Subsystem for Linux:
+   ```bash
+   cd Discovery-PytestAutomation
+   ```
 
-1) Update your package list
+2. Run the suite.
 
-> sudo apt update
+   ```bash
+   pytest {pytest flags here} . {PytestAutomation flags here}
+   ```
 
-2) Install missing libraries from apt
-```
-sudo apt install python3-pip python3-testresources libgeos-dev
-```
+   - See [here](https://github.com/asfadmin/Discovery-PytestAutomation) for filters/flags for PytestAutomation. (How to run specific tests, etc.)
+   - See [here](https://github.com/asfadmin/Discovery-SearchAPI/tree/devel/yml_tests) for custom flags unique to this project, and how to write tests for the API.
 
-3) Install missing libraries from pip
-```
-pip3 install -r requirements.txt
-```
-# Production
+## Production
 To deploy to prod, merge changes to the prod branch.
