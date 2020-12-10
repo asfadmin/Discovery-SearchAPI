@@ -13,6 +13,8 @@ Search API for talking with CMR.
 
 ## First Time Setup
 
+[Back to Top](#searchapi)
+
 If cloning for the first time, follow these steps to get all the requirements installed.
 
 - Works for: Ubuntu, MacBook, and Windows subsystem for linux (Ubuntu app)).
@@ -53,7 +55,6 @@ If cloning for the first time, follow these steps to get all the requirements in
 
    - If it works, you should see "(SearchAPI-env)" appear at the beginnning of your prompt.
 
-
 6. Use pip to install requirements:
 
    ```bash
@@ -68,7 +69,9 @@ If cloning for the first time, follow these steps to get all the requirements in
 
 ## Starting the SearchAPI
 
-Once installed, this is how you run the api.
+[Back to Top](#searchapi)
+
+Once requirements are installed, run the api.
 
 1. If not already started, activate the enviornment:
 
@@ -84,6 +87,8 @@ Once installed, this is how you run the api.
 
 ## Developing
 
+[Back to Top](#searchapi)
+
 1. After making changes, pylint your code
 
    ```bash
@@ -97,6 +102,8 @@ Once installed, this is how you run the api.
    ```
 
 ## Testing
+
+[Back to Top](#searchapi)
 
 Testing is done using the [Discovery-PytestAutomation](https://github.com/asfadmin/Discovery-PytestAutomation) repo.
 
@@ -126,4 +133,7 @@ Testing is done using the [Discovery-PytestAutomation](https://github.com/asfadm
    - See [here](https://github.com/asfadmin/Discovery-SearchAPI/tree/devel/yml_tests) for custom flags unique to this project, and how to write tests for the API.
 
 ## Production
+
+[Back to Top](#searchapi)
+
 To deploy to prod, merge changes to the prod branch.
