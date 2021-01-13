@@ -40,7 +40,7 @@ kappa==0.6.0
 kml2geojson==4.0.2
 lambda-packages==0.20.0
 libpagure==0.22
-lxml==4.4.2
+lxml==4.6.2
 MarkupSafe==1.1.1
 more-itertools==8.0.2
 numpy==1.18.1
