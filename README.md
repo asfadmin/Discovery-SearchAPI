@@ -24,6 +24,14 @@ To get started with a local instance for development:
 4. Use pip to install requirements:
 ```
 (ProxyAPI-env) ~$ pip install -r requirements.txt
+```
+>   If you hit the error **"OSError: Could not find library geos_c or load any of its variants ['libgeos_c.so.1', 'libgeos_c.so']"**, then run:
+>
+>   ```
+>   sudo apt install libgeos-dev
+>   ```
+
+```
 (ProxyAPI-env) ~$ pip install git+ssh://git@github.com/asfadmin/Discovery-Utils.git@prod --upgrade
 ```
 
@@ -56,3 +64,4 @@ Testing is done using the [Discovery-PytestAutomation](https://github.com/asfadm
 
 # Production
 To deploy to prod, merge changes to the prod branch.
+
