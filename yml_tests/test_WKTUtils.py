@@ -157,7 +157,7 @@ class test_repairWKT():
             else:
                 assert False, "Unexpected WKT returned: {0}. Test: '{1}'".format(response_json, test_info["title"])
         if "repaired error msg" in test_info:
-            if "error" in response_json:
-                assert test_info["repaired error msg"] in response_json["error"]["report"], self.error_msg.format("Got different error message than expected. Error returned: {0}".format(response_json["error"]["report"]))
+            if "errors" in response_json:
+                assert test_info["repaired error msg"] in response_json["errors"]["report"], self.error_msg.format("Got different error message than expected. Error returned: {0}".format(response_json["errors"]["report"]))
             else:
                 assert False, self.error_msg.format("Unexpected WKT returned. Response: {0}.".format(response_json))
