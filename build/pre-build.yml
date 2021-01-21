@@ -13,7 +13,7 @@ phases:
       - echo "{\"version\":\"${CODEBUILD_RESOLVED_SOURCE_VERSION}\"}" > version.json
       - git init # PytestAutomation looks back until it finds another .git, and aws doesn't make one by default.
       - git clone https://github.com/asfadmin/Discovery-PytestAutomation.git
-      - yum install geos-devel
+      - yum install --y geos-devel
 artifacts:
   files:
     - '**/*'
