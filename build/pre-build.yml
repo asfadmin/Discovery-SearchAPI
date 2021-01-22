@@ -13,6 +13,8 @@ phases:
       - echo "{\"version\":\"${CODEBUILD_RESOLVED_SOURCE_VERSION}\"}" > version.json
       - git init # PytestAutomation looks back until it finds another .git, and aws doesn't make one by default.
       - git clone https://github.com/asfadmin/Discovery-PytestAutomation.git
+      # Needs to be present, before downloading requirements.txt for EBS instances:
+      - python3.7 -m pip install Cython==0.29.21
 
 artifacts:
   files:
