@@ -12,7 +12,8 @@ chardet==3.0.4
 Click==7.0
 coverage==5.0.2
 cryptography==3.2
-dateparser==0.7.2
+Cython==0.29.21
+dateparser==1.0.0
 DateTime==4.3
 defusedxml==0.6.0
 Deprecated==1.2.7
@@ -67,8 +68,8 @@ python-dateutil==2.6.1
 python-gitlab==1.15.0
 python-slugify==4.0.0
 pytz==2019.3
-PyYAML==5.3
-regex==2020.1.8
+PyYAML==5.3.1
+regex==2020.11.13
 requests==2.22.0
 s3transfer==0.2.1
 scandir==1.10.0
