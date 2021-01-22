@@ -1,7 +1,0 @@
-{
-    "name": "searchapi",
-    "version": "0.0.1",
-    "dependencies": {
-      "git": "latest"
-    }
-  }
