@@ -14,8 +14,9 @@ phases:
       - git init # PytestAutomation looks back until it finds another .git, and aws doesn't make one by default.
       - git clone https://github.com/asfadmin/Discovery-PytestAutomation.git
 packages:
-  git: []
-  geos-devel: []
+  yum:
+    git: []
+    geos-devel: []
 
 artifacts:
   files:
