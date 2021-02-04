@@ -1,67 +1,140 @@
-# ProxyAPI
-Proxy API for CMR. The proxy converts ASF API style queries to CMR queries and translates the results to back ASF API style results. For complex API queries that CMR can not directly support, multiple sub-queries are performed, and the results combined.
+# SearchAPI
 
-# Development
-To get started with a local instance for development:
+Search API for talking with CMR.
 
-1. Clone a local copy of this repo:
-```
-~$ git clone git@github.com:asfadmin/ProxyAPI.git
-~$ cd ProxyAPI
-```
+- [SearchAPI](#searchapi)
+  - [First Time Setup](#first-time-setup)
+  - [Starting the SearchAPI](#starting-the-searchapi)
+  - [Developing](#developing)
+  - [Testing](#testing)
+    - [Setting up PytestAutomation](#setting-up-pytestautomation)
+    - [Running the Tests](#running-the-tests)
+  - [Production](#production)
 
-2. Create a virtual environment:
-```
-~$ virtualenv --python=python3 ~/ProxyAPI-env
-```
+## First Time Setup
 
-3. Activate the virtual environment:
-```
-~$ source ~/ProxyAPI-env/bin/activate
-(ProxyAPI-env) ~$
-```
+[Back to Top](#searchapi)
 
-4. Use pip to install requirements:
-```
-(ProxyAPI-env) ~$ pip install -r requirements.txt
-```
->   If you hit the error **"OSError: Could not find library geos_c or load any of its variants ['libgeos_c.so.1', 'libgeos_c.so']"**, then run:
->
->   ```
->   sudo apt install libgeos-dev
->   ```
+If cloning for the first time, follow these steps to get all the requirements installed.
 
-```
-(ProxyAPI-env) ~$ pip install git+ssh://git@github.com/asfadmin/Discovery-Utils.git@prod --upgrade
-```
+- Works for: Ubuntu, MacBook, and Windows subsystem for linux (Ubuntu app)).
 
-  - At the time of this writing, in some situations you may encounter an SSL certificate error. If that happens, re-install pip using the following command and try step 4 again:
-  ```
-  curl https://bootstrap.pypa.io/get-pip.py | python
-  ```
+1. Update your package list:
 
-5. Run the dev server
-```
-(ProxyAPI-env) ~$ python application.py
-```
+   ```bash
+   sudo apt update
+   ```
 
-6. After making changes, pylint your code:
-```
-(ProxyAPI-env) ~$ pylint --rcfile=pylintrc <changed files>
-```
+2. Install missing libraries from apt:
 
-7. If you install new modules with pip, update requirements.txt:
-```
-(ProxyAPI-env) ~$ pip freeze > requirements.txt
-```
+   ```bash
+   sudo apt install python3-pip python3-testresources libgeos-dev
+   ```
 
-# Testing
+3. Clone a local copy of this repo:
+
+   ```bash
+   git clone git@github.com:asfadmin/Discovery-SearchAPI.git
+   ```
+
+   ```bash
+   cd Discovery-SearchAPI
+   ```
+
+4. Create a virtual environment:
+
+   ```bash
+   virtualenv --python=python3 ~/SearchAPI-env
+   ```
+
+5. Activate the virtual environment:
+
+   ```bash
+   source ~/SearchAPI-env/bin/activate
+   ```
+
+   - If it works, you should see "(SearchAPI-env)" appear at the beginnning of your prompt.
+
+6. Use pip to install requirements:
+
+   ```bash
+   pip install -r requirements.txt --update
+   ```
+
+   - At the time of this writing, in some situations you may encounter an SSL certificate error. If that happens, re-install pip using the following command and try step 4 again.
+
+      ```bash
+      curl https://bootstrap.pypa.io/get-pip.py | python
+      ```
+
+## Starting the SearchAPI
+
+[Back to Top](#searchapi)
+
+Once requirements are installed, run the api.
+
+1. If not already started, activate the enviornment:
+
+   ```bash
+   source ~/SearchAPI-env/bin/activate
+   ```
+
+2. Run the dev server
+
+   ```bash
+   python application.py
+   ```
+
+## Developing
+
+[Back to Top](#searchapi)
+
+1. After making changes, pylint your code
+
+   ```bash
+   pylint --rcfile=pylintrc <changed files>
+   ```
+
+2. If you install new modules with pip, update requirements.txt:
+
+   ```bash
+   pip freeze > requirements.txt
+   ```
+
+## Testing
+
+[Back to Top](#searchapi)
+
 Testing is done using the [Discovery-PytestAutomation](https://github.com/asfadmin/Discovery-PytestAutomation) repo.
 
-1) Git clone https://github.com/asfadmin/Discovery-PytestAutomation
-2) cd Discovery-PytestAutomation
-3) pytest . (See repo for filters/flags for running suite).
+### Setting up PytestAutomation
 
-# Production
+   1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/asfadmin/Discovery-PytestAutomation
+   ```
+
+### Running the Tests
+
+1. Make sure you're in the PytestAutomation repo.
+
+   ```bash
+   cd Discovery-PytestAutomation
+   ```
+
+2. Run the suite.
+
+   ```bash
+   pytest {pytest flags here} . {PytestAutomation flags here}
+   ```
+
+   - See [here](https://github.com/asfadmin/Discovery-PytestAutomation) for filters/flags for PytestAutomation. (How to run specific tests, etc.)
+   - See [here](https://github.com/asfadmin/Discovery-SearchAPI/tree/devel/yml_tests) for custom flags unique to this project, and how to write tests for the API.
+
+## Production
+
+[Back to Top](#searchapi)
+
 To deploy to prod, merge changes to the prod branch.
 
