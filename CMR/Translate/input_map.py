@@ -55,8 +55,4 @@ def input_map():
         'instrument':           ['instrument[]',            '{0}',                              parse_string]
     }
 
-    # So the search endpoint doesn't complain if we use this
-    if get_config()['flexible_maturity']:
-        parameter_map['maturity'] = [None, '{0}', parse_string]
-
     return parameter_map

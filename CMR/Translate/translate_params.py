@@ -20,8 +20,10 @@ def translate_params(p):
         if key == 'intersectswith': # Gotta catch this suuuuper early
             s = requests.Session()
             repair_params = dict({'wkt': val})
-            if hasattr(request, 'temp_maturity'):
+            try:
                 repair_params['maturity'] = request.temp_maturity
+            except NameError:
+                pass
             response = json.loads(s.post(get_config()['this_api'] + '/services/utils/wkt', data=repair_params).text)
             if 'errors' in response:
                 raise ValueError('Could not repair WKT: {0}'.format(val))
@@ -48,9 +50,5 @@ def translate_params(p):
                 'Invalid maxResults, must be > 0: {0}'.format(max_results)
             )
         del params['maxresults']
-
-    # This gets handled during pre-flight
-    if 'maturity' in params:
-        del params['maturity']
 
     return params, output, max_results

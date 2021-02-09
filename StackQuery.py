@@ -68,8 +68,6 @@ class APIStackQuery:
 
     def validate(self):
         valid_params = ['master', 'output', 'processinglevel']
-        if get_config()['flexible_maturity']:
-            valid_params.append('maturity')
 
         params = {}
         try:
