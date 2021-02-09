@@ -33,10 +33,10 @@ class APISearchQuery:
             return self.cmr_error(e)
 
     def post_analytics(self):
-        events = [{'ec': 'Param', 'ea': v} for v in self.request.values]
+        events = [{'ec': 'Param', 'ea': v} for v in self.request.local_values]
         events.append({
             'ec': 'Param List',
-            'ea': ', '.join(sorted([p.lower() for p in self.request.values]))
+            'ea': ', '.join(sorted([p.lower() for p in self.request.local_values]))
         })
 
         analytics_events(events=events)
@@ -52,9 +52,9 @@ class APISearchQuery:
         return True
 
     def check_has_search_params(self):
-        non_searchable_param = ['output', 'maxresults', 'pagesize', 'maturity']
+        non_searchable_param = ['output', 'maxresults', 'pagesize']
         searchables = [
-            v for v in self.request.values if v not in non_searchable_param
+            v for v in self.request.local_values if v not in non_searchable_param
         ]
 
         if len(searchables) <= 0:
@@ -65,7 +65,7 @@ class APISearchQuery:
 
     def check_and_set_cmr_params(self):
         self.cmr_params, self.output, self.max_results = \
-            translate_params(self.request.values)
+            translate_params(self.request.local_values)
 
         self.cmr_params = input_fixer(self.cmr_params)
 
@@ -101,7 +101,7 @@ class APISearchQuery:
 
     def validation_error(self, error):
         logging.debug('Malformed query, returning HTTP 400')
-        logging.debug(self.request.values)
+        logging.debug(self.request.local_values)
 
         d = api_headers.base(mimetype='application/json')
 
