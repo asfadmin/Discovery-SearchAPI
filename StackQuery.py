@@ -8,7 +8,6 @@ import api_headers
 from CMR.Input import parse_string
 from CMR.Output import output_translators
 from Baseline import get_stack, get_default_product_type
-from asf_env import get_config
 
 
 class APIStackQuery:

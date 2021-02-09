@@ -5,8 +5,6 @@ from CMR.Input import (
     parse_coord_string, parse_bbox_string, parse_point_string
 )
 
-from asf_env import get_config
-
 def input_map():
     """
     Supported input parameters and their associated CMR parameters

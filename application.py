@@ -137,7 +137,6 @@ def postflight(e):
         if request.asf_config['cloudwatch_metrics']:
             logging.debug('Logging query run time to cloudwatch metrics')
             cloudwatch = boto3.client('cloudwatch')
-            maturity = os.environ['MATURITY'] if 'MATURITY' in os.environ.keys() else 'local'
             response = cloudwatch.put_metric_data(
                 MetricData = [
                     {
