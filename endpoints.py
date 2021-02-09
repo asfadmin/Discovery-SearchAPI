@@ -38,8 +38,8 @@ class FilesToWKT_Endpoint:
 ########################################################
 class RepairWKT_Endpoint:
     def __init__(self, request):
-        if 'wkt' in request.values:
-            self.wkt = request.values["wkt"].upper()
+        if 'wkt' in request.local_values:
+            self.wkt = request.local_values["wkt"].upper()
         else:
             self.wkt = None
 
@@ -58,8 +58,8 @@ class RepairWKT_Endpoint:
 ########################################################
 class DateValidator_Endpoint:
     def __init__(self, request):
-        if 'date' in request.values:
-            self.date = request.values['date']
+        if 'date' in request.local_values:
+            self.date = request.local_values['date']
         else:
             self.date = None
 
@@ -82,8 +82,8 @@ class DateValidator_Endpoint:
 ########################################################
 class MissionList_Endpoint:
     def __init__(self, request):
-        if 'platform' in request.values:
-            self.platform = request.values['platform'].upper()
+        if 'platform' in request.local_values:
+            self.platform = request.local_values['platform'].upper()
         else:
             self.platform = None
 

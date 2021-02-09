@@ -30,7 +30,7 @@ talisman = Talisman(application)
 def get_product_list():
     products = None
     try:
-        products = request.values.getlist('products')
+        products = request.local_values.getlist('products')
         all_products = []
         for p in products:
             all_products += parse.unquote(p).split(',')

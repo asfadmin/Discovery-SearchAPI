@@ -71,9 +71,9 @@ class APIStackQuery:
 
         params = {}
         try:
-            for k in self.request.values:
+            for k in self.request.local_values:
                 key = k.lower()
-                val = self.request.values[k]
+                val = self.request.local_values[k]
                 if key not in valid_params:
                     raise ValueError(f'Unrecognized parameter: {key}')
                 val = parse_string(val)
@@ -90,7 +90,7 @@ class APIStackQuery:
 
     def validation_error(self, error):
         logging.debug('Malformed query, returning HTTP 400')
-        logging.debug(self.request.values)
+        logging.debug(self.request.local_values)
 
         d = api_headers.base(mimetype='application/json')
 
