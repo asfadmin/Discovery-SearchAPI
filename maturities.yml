@@ -60,7 +60,7 @@ test:
     cmr_headers:
         Client-Id: test_vertex_asf
     flexible_maturity: True
-    cloudwatch_metrics: False
+    cloudwatch_metrics: True
 
 test-beanstalk:
     bulk_download_api: https://bulk-download-test.asf.alaska.edu
@@ -76,7 +76,7 @@ test-beanstalk:
     cmr_headers:
         Client-Id: test_searchapi_asf
     flexible_maturity: True
-    cloudwatch_metrics: False
+    cloudwatch_metrics: True
 
 prod:
     bulk_download_api: https://bulk-download.asf.alaska.edu
