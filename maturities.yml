@@ -28,7 +28,7 @@ devel:
     cmr_headers:
         Client-Id: devel_vertex_asf
     flexible_maturity: True
-    cloudwatch_metrics: False
+    cloudwatch_metrics: True
 
 devel-beanstalk:
     bulk_download_api: https://bulk-download-dev.asf.alaska.edu
