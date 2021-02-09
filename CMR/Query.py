@@ -6,6 +6,7 @@ from asf_env import get_config
 
 from CMR.Translate import input_map
 from CMR.SubQuery import CMRSubQuery
+from flask import request
 
 
 class CMRQuery:
@@ -17,14 +18,20 @@ class CMRQuery:
         self.page_size = cfg['cmr_page_size']
         self.params = params
 
+        provider = request.local_values.get('cmr_provider', 'ASF')
+
         self.extra_params = [
-            {'provider': 'ASF'},  # always limit the results to ASF as the provider
+            {'provider': provider},  # always limit the results to a provider, default 'ASF'
             {'page_size': self.max_results if self.is_small_max_results() else self.page_size},  # page size to request from CMR
             {'options[temporal][and]': 'true'}, # Makes handling date ranges easier
             {'sort_key[]': '-end_date'}, # Sort CMR results, but this is partially defeated by the subquery system
             {'sort_key[]': 'granule_ur'}, # Secondary sort key, the order these keys are specified in matters! This is to make multiple granules with the same date sort consistently
             {'options[platform][ignore_case]': 'true'}
         ]
+
+        token = request.local_values.get('cmr_token')
+        if token:
+            self.extra_params.append({'token': token})
 
         if cfg['cmr_scroll']:
             self.extra_params.append({'scroll': 'true'}) # Just leave this off if false, for the sake of the CMR team looking at logs

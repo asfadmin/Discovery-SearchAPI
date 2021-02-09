@@ -24,6 +24,8 @@ class CMRSubQuery:
 
         self.params = self.combine_params(self.params, self.extra_params)
 
+        self.headers = {}
+
         if self.should_use_asf_frame():
             self.use_asf_frame()
 
@@ -87,7 +89,7 @@ class CMRSubQuery:
         session = self.asf_session()
         url = self.cmr_api_url()
 
-        cmr_request = session.post(url, data=params)
+        cmr_request = session.post(url, data=params, headers=self.headers)
 
         if 'CMR-hits' not in cmr_request.headers:
             raise CMRError(cmr_request.text)
@@ -157,9 +159,9 @@ class CMRSubQuery:
 
             api_url = self.cmr_api_url()
             if self.scroll == False:
-                response = session.post(api_url, data=self.params + [('page_num', page_num)])
+                response = session.post(api_url, data=self.params + [('page_num', page_num)], headers=self.headers)
             else:
-                response = session.post(api_url, data=self.params)
+                response = session.post(api_url, data=self.params, headers=self.headers)
 
             query_duration = perf_counter() - q_start
             logging.debug(f'CMR query time: {query_duration}')
