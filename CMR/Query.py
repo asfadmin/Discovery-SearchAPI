@@ -18,7 +18,9 @@ class CMRQuery:
         self.page_size = cfg['cmr_page_size']
         self.params = params
 
-        provider = request.local_values.get('cmr_provider', 'ASF')
+        try: provider = request.cmr_provider
+        except NameError: provider = 'ASF'
+        request.cmr_provider
 
         self.extra_params = [
             {'provider': provider},  # always limit the results to a provider, default 'ASF'
@@ -28,10 +30,6 @@ class CMRQuery:
             {'sort_key[]': 'granule_ur'}, # Secondary sort key, the order these keys are specified in matters! This is to make multiple granules with the same date sort consistently
             {'options[platform][ignore_case]': 'true'}
         ]
-
-        token = request.local_values.get('cmr_token')
-        if token:
-            self.extra_params.append({'token': token})
 
         if cfg['cmr_scroll']:
             self.extra_params.append({'scroll': 'true'}) # Just leave this off if false, for the sake of the CMR team looking at logs
