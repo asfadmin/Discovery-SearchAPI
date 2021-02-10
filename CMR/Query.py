@@ -20,7 +20,6 @@ class CMRQuery:
 
         try: provider = request.cmr_provider
         except NameError: provider = 'ASF'
-        request.cmr_provider
 
         self.extra_params = [
             {'provider': provider},  # always limit the results to a provider, default 'ASF'
