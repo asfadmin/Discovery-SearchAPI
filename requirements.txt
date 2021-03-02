@@ -11,7 +11,7 @@ cfn-flip==1.2.2
 chardet==3.0.4
 Click==7.0
 coverage==5.0.2
-cryptography==3.2
+cryptography==3.4.6
 dateparser==1.0.0
 DateTime==4.3
 defusedxml==0.6.0
@@ -86,7 +86,7 @@ tzlocal==2.0.0
 Unidecode==1.1.1
 urllib3==1.25.7
 wcwidth==0.1.8
-WKTUtils==0.0.3
+WKTUtils==0.0.5
 Werkzeug==0.16.0
 wrapt==1.11.2
 wsgi-request-logger==0.4.6
