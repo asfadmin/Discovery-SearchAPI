@@ -112,11 +112,34 @@ def query_stack(params, req_fields):
     )
     return [product for product in query.get_results()]
 
+def valid_state_vectors(product):
+    if product is None:
+        raise ValueError(f'Attempting to check state vectors on None, this is fatal')
+    if None in [product['sv_t_pos_pre'], product['sv_t_pos_post'], product['sv_pos_pre'], product['sv_pos_post']]:
+        return False
+    return True
+
+def find_new_master(stack):
+    for product in stack:
+        if valid_state_vectors(product):
+            return product['granuleName']
+    return None
+
 def check_master(master, stack):
     warnings = None
-    if master not in [product['granuleName'] for product in stack]:
+    if master not in [product['granuleName'] for product in stack]: # Somehow the reference we built the stack from is missing?! Just pick one
         master = stack[0]['granuleName']
-        warnings = [{'NEW_MASTER': 'A new master had to be selected in order to calculate baseline values.'}]
+        warnings = [{'NEW_MASTER': 'A new reference had to be selected in order to calculate baseline values.'}]
+
+    for product in stack:
+        if product['granuleName'] = master:
+            master_product = product
+    if not valid_state_vectors(master_product): # the reference might be missing state vectors, pick a valid reference, replace above warning if it also happened
+        master = find_new_master(stack)
+        if master is None:
+            raise ValueError(f'No valid state vectors on any scenes in stack, this is fatal')
+        warnings = [{'NEW_MASTER': 'A new reference had to be selected in order to calculate baseline values.'}]
+
     return master, stack, warnings
 
 def get_platform(master):
