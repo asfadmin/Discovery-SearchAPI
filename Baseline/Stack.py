@@ -132,7 +132,7 @@ def check_master(master, stack):
         warnings = [{'NEW_MASTER': 'A new reference had to be selected in order to calculate baseline values.'}]
 
     for product in stack:
-        if product['granuleName'] = master:
+        if product['granuleName'] == master:
             master_product = product
     if not valid_state_vectors(master_product): # the reference might be missing state vectors, pick a valid reference, replace above warning if it also happened
         master = find_new_master(stack)
