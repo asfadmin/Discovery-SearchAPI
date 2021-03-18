@@ -114,7 +114,7 @@ def query_stack(params, req_fields):
 
 def valid_state_vectors(product):
     if product is None:
-        raise ValueError(f'Attempting to check state vectors on None, this is fatal')
+        raise ValueError('Attempting to check state vectors on None, this is fatal')
     if None in [product['sv_t_pos_pre'], product['sv_t_pos_post'], product['sv_pos_pre'], product['sv_pos_post']]:
         return False
     return True
@@ -137,7 +137,7 @@ def check_master(master, stack):
     if not valid_state_vectors(master_product): # the reference might be missing state vectors, pick a valid reference, replace above warning if it also happened
         master = find_new_master(stack)
         if master is None:
-            raise ValueError(f'No valid state vectors on any scenes in stack, this is fatal')
+            raise ValueError('No valid state vectors on any scenes in stack, this is fatal')
         warnings = [{'NEW_MASTER': 'A new reference had to be selected in order to calculate baseline values.'}]
 
     return master, stack, warnings
