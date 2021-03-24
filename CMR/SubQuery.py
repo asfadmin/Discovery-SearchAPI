@@ -25,8 +25,10 @@ class CMRSubQuery:
         self.params = self.combine_params(self.params, self.extra_params)
 
         self.headers = {}
-        try: headers['Authorization: Bearer'] = request.cmr_token
-        except NameError: pass
+        
+        token = request.args.get("cmr_token")
+        if token != None:
+            self.headers['Authorization: Bearer'] = token
 
         if self.should_use_asf_frame():
             self.use_asf_frame()
