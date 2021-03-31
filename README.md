@@ -137,4 +137,3 @@ Testing is done using the [Discovery-PytestAutomation](https://github.com/asfadm
 [Back to Top](#searchapi)
 
 To deploy to prod, merge changes to the prod branch.
-

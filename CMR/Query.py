@@ -18,8 +18,9 @@ class CMRQuery:
         self.page_size = cfg['cmr_page_size']
         self.params = params
 
-        try: provider = request.cmr_provider
-        except NameError: provider = 'ASF'
+        provider = request.args.get("cmr_provider")
+        if provider == None:
+            provider = 'ASF'
 
         self.extra_params = [
             {'provider': provider},  # always limit the results to a provider, default 'ASF'
