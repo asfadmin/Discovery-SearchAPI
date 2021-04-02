@@ -22,7 +22,7 @@ def translate_params(p):
             repair_params = dict({'wkt': val})
             try:
                 repair_params['maturity'] = request.temp_maturity
-            except NameError:
+            except AttributeError:
                 pass
             response = json.loads(s.post(get_config()['this_api'] + '/services/utils/wkt', data=repair_params).text)
             if 'errors' in response:
