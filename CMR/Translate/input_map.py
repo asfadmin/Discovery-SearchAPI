@@ -5,8 +5,6 @@ from CMR.Input import (
     parse_coord_string, parse_bbox_string, parse_point_string
 )
 
-from asf_env import get_config
-
 def input_map():
     """
     Supported input parameters and their associated CMR parameters
@@ -54,9 +52,5 @@ def input_map():
         'insarstackid':         ['attribute[]',             'int,INSAR_STACK_ID,{0}',           parse_string],
         'instrument':           ['instrument[]',            '{0}',                              parse_string]
     }
-
-    # So the search endpoint doesn't complain if we use this
-    if get_config()['flexible_maturity']:
-        parameter_map['maturity'] = [None, '{0}', parse_string]
 
     return parameter_map

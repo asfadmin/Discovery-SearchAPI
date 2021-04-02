@@ -12,6 +12,7 @@ local:
     cmr_headers:
         Client-Id: local_searchapi_asf
     flexible_maturity: True
+    cloudwatch_metrics: False
 
 devel:
     bulk_download_api: https://bulk-download-dev.asf.alaska.edu
@@ -27,6 +28,7 @@ devel:
     cmr_headers:
         Client-Id: devel_vertex_asf
     flexible_maturity: True
+    cloudwatch_metrics: True
 
 devel-beanstalk:
     bulk_download_api: https://bulk-download-dev.asf.alaska.edu
@@ -42,6 +44,7 @@ devel-beanstalk:
     cmr_headers:
         Client-Id: devel_searchapi_asf
     flexible_maturity: True
+    cloudwatch_metrics: True
 
 test:
     bulk_download_api: https://bulk-download-test.asf.alaska.edu
@@ -57,6 +60,7 @@ test:
     cmr_headers:
         Client-Id: test_vertex_asf
     flexible_maturity: True
+    cloudwatch_metrics: True
 
 test-beanstalk:
     bulk_download_api: https://bulk-download-test.asf.alaska.edu
@@ -72,6 +76,7 @@ test-beanstalk:
     cmr_headers:
         Client-Id: test_searchapi_asf
     flexible_maturity: True
+    cloudwatch_metrics: True
 
 prod:
     bulk_download_api: https://bulk-download.asf.alaska.edu
@@ -87,6 +92,7 @@ prod:
     cmr_headers:
         Client-Id: searchapi_asf
     flexible_maturity: False
+    cloudwatch_metrics: False
 
 prod-private:
     bulk_download_api: https://bulk-download.asf.alaska.edu
@@ -102,3 +108,4 @@ prod-private:
     cmr_headers:
         Client-Id: vertex_asf
     flexible_maturity: False
+    cloudwatch_metrics: False

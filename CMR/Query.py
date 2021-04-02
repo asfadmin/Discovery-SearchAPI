@@ -6,6 +6,7 @@ from asf_env import get_config
 
 from CMR.Translate import input_map
 from CMR.SubQuery import CMRSubQuery
+from flask import request
 
 
 class CMRQuery:
@@ -17,8 +18,12 @@ class CMRQuery:
         self.page_size = cfg['cmr_page_size']
         self.params = params
 
+        provider = request.args.get("cmr_provider")
+        if provider == None:
+            provider = 'ASF'
+
         self.extra_params = [
-            {'provider': 'ASF'},  # always limit the results to ASF as the provider
+            {'provider': provider},  # always limit the results to a provider, default 'ASF'
             {'page_size': self.max_results if self.is_small_max_results() else self.page_size},  # page size to request from CMR
             {'options[temporal][and]': 'true'}, # Makes handling date ranges easier
             {'sort_key[]': '-end_date'}, # Sort CMR results, but this is partially defeated by the subquery system

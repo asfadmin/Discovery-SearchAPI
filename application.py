@@ -16,6 +16,8 @@ from werkzeug.exceptions import RequestEntityTooLarge
 import multiprocessing
 import requests
 from asf_env import get_config, load_config
+from time import perf_counter
+import boto3
 
 import endpoints
 
@@ -28,7 +30,7 @@ talisman = Talisman(application)
 def get_product_list():
     products = None
     try:
-        products = request.values.getlist('products')
+        products = request.local_values.getlist('products')
         all_products = []
         for p in products:
             all_products += parse.unquote(p).split(',')
@@ -113,6 +115,7 @@ def preflight():
     request.cmr_scroll_sessions = []
     logging.debug('Using config:')
     logging.debug(get_config())
+    request.query_start_time = perf_counter()
 
 # Post-flight operations
 @application.teardown_request
@@ -129,6 +132,28 @@ def postflight(e):
             logging.warning(f'Failed to close scroll session {req["sid"]}: {e}')
 
     try:
+        query_run_time = perf_counter() - request.query_start_time
+        logging.debug(f'Total query run time: {query_run_time}')
+        if request.asf_config['cloudwatch_metrics']:
+            logging.debug('Logging query run time to cloudwatch metrics')
+            cloudwatch = boto3.client('cloudwatch')
+            response = cloudwatch.put_metric_data(
+                MetricData = [
+                    {
+                        'MetricName': 'TotalQueryTime',
+                        'Dimensions': [
+                            {
+                                'Name': 'maturity',
+                                'Value': request.asf_base_maturity
+                            }
+                        ],
+                        'Unit': 'None',
+                        'Value': query_run_time
+                    }
+                ],
+                Namespace = 'SearchAPI'
+            )
+
         logging.debug(f'Closing {len(request.cmr_scroll_sessions)} scroll sessions')
         if len(request.cmr_scroll_sessions) > 0:
             num_processes = min([4, len(request.cmr_scroll_sessions)])
