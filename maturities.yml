@@ -108,4 +108,4 @@ prod-private:
     cmr_headers:
         Client-Id: vertex_asf
     flexible_maturity: False
-    cloudwatch_metrics: False
+    cloudwatch_metrics: True
