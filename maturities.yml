@@ -92,7 +92,7 @@ prod:
     cmr_headers:
         Client-Id: searchapi_asf
     flexible_maturity: False
-    cloudwatch_metrics: False
+    cloudwatch_metrics: True
 
 prod-private:
     bulk_download_api: https://bulk-download.asf.alaska.edu
@@ -108,4 +108,4 @@ prod-private:
     cmr_headers:
         Client-Id: vertex_asf
     flexible_maturity: False
-    cloudwatch_metrics: False
+    cloudwatch_metrics: True
