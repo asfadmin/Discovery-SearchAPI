@@ -140,7 +140,7 @@ def postflight(e):
             response = cloudwatch.put_metric_data(
                 MetricData = [
                     {
-                        'MetricName': 'TotalQueryTime',
+                        'MetricName': 'TotalQueryRunTime',
                         'Dimensions': [
                             {
                                 'Name': 'maturity',
