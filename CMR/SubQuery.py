@@ -28,7 +28,7 @@ class CMRSubQuery:
         
         token = request.args.get("cmr_token")
         if token != None:
-            self.headers['Authorization: Bearer'] = token
+            self.headers['Authorization'] = f'Bearer {token}'
 
         if self.should_use_asf_frame():
             self.use_asf_frame()
