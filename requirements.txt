@@ -36,7 +36,7 @@ itsdangerous==1.1.0
 Jinja2==2.11.3
 jmespath==0.10.0
 joblib==1.0.1
-kappa==0.7.0
+kappa==0.6.0
 kml2geojson==4.0.2
 lambda-packages==0.20.0
 libpagure==0.22
@@ -87,7 +87,7 @@ Unidecode==1.2.0
 urllib3==1.26.4
 wcwidth==0.2.5
 WKTUtils==0.0.5
-Werkzeug==1.0.1
+Werkzeug==0.16.1
 wrapt==1.12.1
 wsgi-request-logger==0.4.6
 xmljson==0.2.1
