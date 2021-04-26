@@ -30,7 +30,7 @@ geomet==0.3.0
 gitdb2==4.0.2
 GitPython==3.1.15
 hjson==3.0.2
-idna==3.1
+idna==2.10
 importlib-metadata==4.0.1
 itsdangerous==1.1.0
 Jinja2==2.11.3
