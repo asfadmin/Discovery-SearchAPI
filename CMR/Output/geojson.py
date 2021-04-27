@@ -76,7 +76,7 @@ class GeoJSONStreamArray(JSONStreamArray):
                 'insarStackId': p['insarGrouping'],
                 'md5sum': p['md5sum'],
                 'offNadirAngle': p['offNadirAngle'],
-                'orbit': p['absoluteOrbit'],
+                'orbit': p['absoluteOrbit'][0],
                 'pathNumber': p['relativeOrbit'],
                 'platform': p['platform'],
                 'pointingAngle': p['pointingAngle'],
