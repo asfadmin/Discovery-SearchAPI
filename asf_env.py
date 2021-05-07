@@ -13,6 +13,7 @@ def load_config():
     maturity = os.environ['MATURITY'] if 'MATURITY' in os.environ.keys() else 'local'
 
     config = all_config[maturity]
+    logging.warning("HEY: HIT UPDATED CODE!!! ")
     tmp_request = request.values.to_dict()
     print(tmp_request)
     logging.warning("HIT DEBUG LOGGING: " + str(tmp_request))
