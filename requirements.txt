@@ -91,6 +91,6 @@ Werkzeug==0.16.1
 wrapt==1.12.1
 wsgi-request-logger==0.4.6
 xmljson==0.2.1
-zappa==0.52.0
+zappa==0.51.0
 zipp==3.4.1
 zope.interface==5.4.0
