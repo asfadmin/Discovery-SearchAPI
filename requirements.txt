@@ -87,7 +87,7 @@ Unidecode==1.2.0
 urllib3==1.26.4
 wcwidth==0.2.5
 WKTUtils==0.2.0
-Werkzeug==1.0.1
+Werkzeug==0.16.1
 wrapt==1.12.1
 wsgi-request-logger==0.4.6
 xmljson==0.2.1
