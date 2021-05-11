@@ -87,7 +87,7 @@ tzlocal==2.1
 Unidecode==1.2.0
 urllib3==1.26.4
 wcwidth==0.2.5
-WKTUtils==0.0.5
+WKTUtils==0.2.0
 Werkzeug==0.16.0
 wrapt==1.12.1
 wsgi-request-logger==0.4.6
