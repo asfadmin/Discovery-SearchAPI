@@ -117,5 +117,6 @@ class JSONStreamArray(list):
             legacy_json_keys.extend(['temporalBaseline', 'perpendicularBaseline'])
 
         p['browse'] = p['browse'][0] if len(p['browse']) > 0 else None
+        p['absoluteOrbit'] = p['absoluteOrbit'][0] if len(p['absoluteOrbit']) > 0 else None
 
         return dict((k, p[k]) for k in legacy_json_keys if k in p)

@@ -24,7 +24,7 @@
             <li>Processing type: {{r.processingTypeDisplay}}</li>
             <li>Frame: {{r.frameNumber}}</li>
             <li>Path: {{r.relativeOrbit}}</li>
-            <li>Orbit: {{r.absoluteOrbit}}</li>
+            <li>Orbit: {{r.absoluteOrbit[0]}}</li>
             <li>Start time: {{r.startTime}}</li>
             <li>End time: {{r.stopTime}}</li>
             {% if r.faradayRotation is defined %}

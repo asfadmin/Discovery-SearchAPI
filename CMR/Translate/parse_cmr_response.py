@@ -33,6 +33,14 @@ def parse_granule(granule, req_fields):
         else:
             return None
 
+    def get_all_vals(path):
+        r = granule.xpath(path)
+
+        if r is not None and len(r) > 0:
+            return [v.text for v in r]
+        else:
+            return None
+
     def remove_field(f):
         try:
             req_fields.remove(f)
@@ -141,8 +149,14 @@ def parse_granule(granule, req_fields):
                 pass
 
     # Parse any remaining needed fields from the CMR response
+    multi_fields = [
+        'absoluteOrbit'
+    ]
     for field in req_fields:
-        result[field] = get_val(field_paths[field])
+        if field in multi_fields:
+            result[field] = get_all_vals(field_paths[field])
+        else:
+            result[field] = get_val(field_paths[field])
 
     for k in result:
         if result[k] in ['NULL', 'NA', 'None']:
