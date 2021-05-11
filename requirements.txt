@@ -69,14 +69,14 @@ python-gitlab==2.7.1
 python-slugify==4.0.1
 pytz==2021.1
 PyYAML==5.4.1
-
 regex==2021.4.4
 requests==2.25.1
 s3transfer==0.4.2
 scandir==1.10.0
 
-scikit-learn==0.22.1
-scipy==1.4.1
+scikit-learn==0.24.1
+scipy==1.6.3
+
 Shapely==1.7.1
 six==1.13.0
 
