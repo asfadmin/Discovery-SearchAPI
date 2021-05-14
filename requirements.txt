@@ -73,7 +73,7 @@ regex==2021.4.4
 requests==2.25.1
 s3transfer==0.4.2
 scandir==1.10.0
-scikit-learn==0.22.1 # WARNING: 0.24.1 breaks ShorelineMask26 test
+scikit-learn==0.24.2 # WARNING: 0.24.1 breaks ShorelineMask26 test
 scipy==1.6.3
 Shapely==1.7.1
 six==1.15.0
