@@ -61,7 +61,7 @@ class test_filesToWKT():
                 # Save it in the format the api is expecting:
                 files_that_exist.append(('files', open(file_path, 'rb')))
             else:
-                assert False, self.error_msg.format("File in 'file wkt' not found: {0}.")
+                assert False, self.error_msg.format("File in 'file wkt' not found: {0}.".format(file_path))
         # Override with the new files:
         test_info["file wkt"] = files_that_exist
         return test_info
