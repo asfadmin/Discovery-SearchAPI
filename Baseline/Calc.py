@@ -9,7 +9,7 @@ f = pow((1.0 - 1 / 298.257224), 2)
 # pre-calc and cache and call it all f anyhow
 
 
-def calculate_perpendicular_baselines(master, stack):
+def calculate_perpendicular_baselines(reference, stack):
     for product in stack:
         if None in [product['sv_t_pos_pre'], product['sv_t_pos_post'], product['sv_pos_pre'], product['sv_pos_post']]:
             product['noStateVectors'] = True
@@ -30,11 +30,11 @@ def calculate_perpendicular_baselines(master, stack):
         product['relative_sv_post_time'] = t_post - asc_node_time
 
     for product in stack:
-        if product['granuleName'] == master:
-            master = product
-            master['perpendicularBaseline'] = 0
+        if product['granuleName'] == reference:
+            reference = product
+            reference['perpendicularBaseline'] = 0
             # Cache these values
-            master['granulePosition'] = get_granule_position(master['centerLat'], master['centerLon'])
+            reference['granulePosition'] = get_granule_position(reference['centerLat'], reference['centerLon'])
             break
 
     for secondary in stack:
@@ -42,20 +42,20 @@ def calculate_perpendicular_baselines(master, stack):
             secondary['perpendicularBaseline'] = None
             continue
 
-        shared_rel_time = get_shared_sv_time(master, secondary)
+        shared_rel_time = get_shared_sv_time(reference, secondary)
 
-        master_shared_pos = get_pos_at_rel_time(master, shared_rel_time)
-        master_shared_vel = get_vel_at_rel_time(master, shared_rel_time)
+        reference_shared_pos = get_pos_at_rel_time(reference, shared_rel_time)
+        reference_shared_vel = get_vel_at_rel_time(reference, shared_rel_time)
         secondary_shared_pos = get_pos_at_rel_time(secondary, shared_rel_time)
         #secondary_shared_vel = get_vel_at_rel_time(secondary, shared_rel_time) # unused
 
         # need to get sat pos and sat vel at center time
-        master['alongBeamVector'] = get_along_beam_vector(master_shared_pos, master['granulePosition'])
-        master['upBeamVector'] = get_up_beam_vector(master_shared_vel, master['alongBeamVector'])
+        reference['alongBeamVector'] = get_along_beam_vector(reference_shared_pos, reference['granulePosition'])
+        reference['upBeamVector'] = get_up_beam_vector(reference_shared_vel, reference['alongBeamVector'])
 
         perpendicular_baseline = get_paired_granule_baseline(
-            master['granulePosition'],
-            master['upBeamVector'],
+            reference['granulePosition'],
+            reference['upBeamVector'],
             secondary_shared_pos)
         if abs(perpendicular_baseline) > 100000:
             perpendicular_baseline = None
@@ -87,21 +87,21 @@ def get_up_beam_vector(satellite_velocity, along_beam_vector):
     up_beam_vector = np.divide(up_beam_vector, np.linalg.norm(up_beam_vector)) # normalize
     return(up_beam_vector)
 
-# Calculate baseline between master and paired granule
-def get_paired_granule_baseline(master_granule_position, master_up_beam_vector, paired_satellite_position):
-    posd = np.subtract(paired_satellite_position, master_granule_position)
-    baseline = np.dot(master_up_beam_vector, posd)
+# Calculate baseline between reference and paired granule
+def get_paired_granule_baseline(reference_granule_position, reference_up_beam_vector, paired_satellite_position):
+    posd = np.subtract(paired_satellite_position, reference_granule_position)
+    baseline = np.dot(reference_up_beam_vector, posd)
     return(int(round(baseline)))
 
 # Find a relative orbit time covered by both granules' SVs
-def get_shared_sv_time(master, secondary):
-    start = max(master['relative_sv_pre_time'], secondary['relative_sv_pre_time'])
-    end = max(master['relative_sv_post_time'], secondary['relative_sv_post_time'])
+def get_shared_sv_time(reference, secondary):
+    start = max(reference['relative_sv_pre_time'], secondary['relative_sv_pre_time'])
+    end = max(reference['relative_sv_post_time'], secondary['relative_sv_post_time'])
 
-    # Favor the start/end SV time of the master so we can use that SV directly without interpolation
-    if start == master['relative_sv_pre_time']:
+    # Favor the start/end SV time of the reference so we can use that SV directly without interpolation
+    if start == reference['relative_sv_pre_time']:
         return start
-    if end == master['relative_sv_post_time']:
+    if end == reference['relative_sv_post_time']:
         return end
 
     return start
