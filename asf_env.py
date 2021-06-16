@@ -14,7 +14,6 @@ def load_config():
 
     config = all_config[maturity]
     request.local_values = request.values.to_dict()
-
     if config['flexible_maturity']:
         if 'maturity' in request.local_values:
             temp_maturity = request.local_values['maturity']
