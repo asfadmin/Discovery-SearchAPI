@@ -162,12 +162,6 @@ tests:
     expected file: error json
     expected code: 400
 
-- multiple references:
-    reference: ALPSRP064337140,ALPSRP279057140
-
-    expected file: error json
-    expected code: 400
-
 - Sentinel RAW without baseline:
     reference: S1B_EW_RAW__0SDH_20200408T180120_20200408T180228_021056_027F1A_8312
     # use_maturity: True
