@@ -5,7 +5,7 @@ api: Test
 
 tests:
 - Use maturity param on api-prod:
-    master: S1B_IW_SLC__1SDV_20190610T143518_20190610T143545_016635_01F4F7_6EA1
+    reference: S1B_IW_SLC__1SDV_20190610T143518_20190610T143545_016635_01F4F7_6EA1
     use_maturity: True
     output: csv
 
