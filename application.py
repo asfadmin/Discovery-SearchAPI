@@ -95,11 +95,6 @@ def health_check():
     response.mimetype = 'application/json; charset=utf-8'
     return response
 
-# Send the API swagger docs
-@application.route('/reference')
-def reference():
-    return application.send_static_file('./SearchAPIRef.yaml')
-
 ########## Helper functionality ##########
 
 @application.errorhandler(RequestEntityTooLarge)
