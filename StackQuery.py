@@ -19,8 +19,10 @@ class APIStackQuery:
     def get_response(self):
         try:
             self.validate()
+            if 'reference' not in self.params:
+                self.params['reference'] = self.params['master']
             if 'processinglevel' not in self.params:
-                self.params['processinglevel'] = get_default_product_type(self.params['master'])
+                self.params['processinglevel'] = get_default_product_type(self.params['reference'])
             if 'output' not in self.params:
                 self.params['output'] = 'metalink'
 
@@ -29,7 +31,7 @@ class APIStackQuery:
 
             is_count = self.params['output'].lower() == 'count'
             stack, warnings = get_stack(
-                master=self.params['master'],
+                reference=self.params['reference'],
                 req_fields=req_fields,
                 product_type=self.params['processinglevel'])
             if is_count:
@@ -66,7 +68,7 @@ class APIStackQuery:
         return Response(resp, headers=d)
 
     def validate(self):
-        valid_params = ['master', 'output', 'processinglevel']
+        valid_params = ['reference', 'master', 'output', 'processinglevel']
 
         params = {}
         try:
@@ -77,11 +79,8 @@ class APIStackQuery:
                     raise ValueError(f'Unrecognized parameter: {key}')
                 val = parse_string(val)
                 params[key] = val
-            if 'master' not in params:
-                raise ValueError("Could not find 'master' in post request.")
-            # If you try passing in multiple masters:
-            if "," in str(params['master']):
-                raise ValueError("Can only pass in one master granule.")
+            if 'reference' not in params and 'master' not in params:
+                raise ValueError("Could not find 'reference' or 'master' in request.")
             self.params = params
         except ValueError as e:
             logging.debug(f'ValueError: {e}')
