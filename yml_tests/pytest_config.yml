@@ -55,7 +55,7 @@ test_types:
       endpoint: "/services/utils/date"
 
 - Baseline SearchAPI Endpoint:
-    required_keys: master
+    required_keys: reference
     method: test_BaselineEndpoint
     variables:
       endpoint: "/services/search/baseline"

@@ -85,7 +85,7 @@ tqdm==4.60.0
 troposphere==2.7.1
 tzlocal==2.1
 Unidecode==1.2.0
-urllib3==1.26.4
+urllib3==1.26.5
 wcwidth==0.2.5
 WKTUtils==1.0.0
 Werkzeug==0.16.1
