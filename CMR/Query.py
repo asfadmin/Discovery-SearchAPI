@@ -109,7 +109,16 @@ def subquery_list_from(params):
 
     subquery_params, list_params = {}, {}
 
-    list_param_names = ['granule_list', 'product_list', 'platform'] # these parameters will dodge the subquery system
+    def chunk_list(source_list, n):
+        return [source_list[i * n:(i + 1) * n] for i in range((len(source_list) + n - 1) // n)]
+
+    chunk_lists = ['granule_list', 'product_list'] # these list parameters will be broken into chunks for subquerying
+    for chunk_type in chunk_lists:
+        if chunk_type in params:
+            params[chunk_type] = chunk_list(params[chunk_type], 500)
+
+    list_param_names = ['platform'] # these parameters will dodge the subquery system
+
     for k, v in params.items():
         if k in list_param_names:
             list_params[k] = v

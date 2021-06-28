@@ -45,7 +45,14 @@ class CMRSubQuery:
         for p in params + extra_params:
             fixed.extend(p.items())
 
-        return fixed
+        final = []
+        for p in fixed:
+            if p[0] in ['readable_granule_name[]', 'granule_ur[]']:
+                for g in p[1].split(','):
+                    final.append((p[0], g))
+            else:
+                final.append(p)
+        return final
 
     def should_use_asf_frame(self):
         asf_frame_platforms = ['SENTINEL-1A', 'SENTINEL-1B', 'ALOS']
