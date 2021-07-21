@@ -4,6 +4,7 @@ from .json import JSONStreamArray
 
 def req_fields_geojson():
     fields = [
+        'beamMode',
         'beamModeType',
         'browse',
         'bytes',
@@ -15,6 +16,7 @@ def req_fields_geojson():
         'groupID',
         'granuleType',
         'insarGrouping',
+        'instrument',
         'md5sum',
         'offNadirAngle',
         'absoluteOrbit',
@@ -65,6 +67,7 @@ class GeoJSONStreamArray(JSONStreamArray):
                 ]
             },
             'properties': {
+                'beamMode': p['beamMode'],
                 'beamModeType': p['beamModeType'],
                 'browse': p['browse'],
                 'bytes': p['bytes'],
@@ -76,6 +79,7 @@ class GeoJSONStreamArray(JSONStreamArray):
                 'groupID': p['groupID'],
                 'granuleType': p['granuleType'],
                 'insarStackId': p['insarGrouping'],
+                'instrument': p['instrument'],
                 'md5sum': p['md5sum'],
                 'offNadirAngle': p['offNadirAngle'],
                 'orbit': p['absoluteOrbit'][0],
