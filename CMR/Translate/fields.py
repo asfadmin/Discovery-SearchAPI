@@ -33,6 +33,7 @@ def get_field_paths():
         'insarBaseline':            attr_path('INSAR_BASELINE'),
         'insarGrouping':            attr_path('INSAR_STACK_ID'),
         'insarStackSize':           attr_path('INSAR_STACK_SIZE'),
+        'instrument':               './Platforms/Platform/Instruments/Instrument/ShortName',
         'lookDirection':            attr_path('LOOK_DIRECTION'),
         'md5sum':                   attr_path('MD5SUM'),
         'missionName':              attr_path('MISSION_NAME'),
