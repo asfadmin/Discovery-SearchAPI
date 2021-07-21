@@ -9,7 +9,7 @@ def get_field_paths():
         'absoluteOrbit':            "./OrbitCalculatedSpatialDomains/OrbitCalculatedSpatialDomain/OrbitNumber",
         'ascendingNodeTime':        attr_path('ASC_NODE_TIME'),
         'baselinePerp':             attr_path('INSAR_BASELINE'),
-        'beamMode':                 attr_path('BEAM_MODE_TYPE'),
+        'beamMode':                 attr_path('BEAM_MODE'),
         'beamModeType':             attr_path('BEAM_MODE_TYPE'),
         'bytes':                    attr_path("BYTES"),
         'centerLat':                attr_path('CENTER_LAT'),
