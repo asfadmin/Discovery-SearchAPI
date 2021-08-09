@@ -34,6 +34,7 @@ def req_fields_json():
         'incidenceAngle',
         'insarGrouping',
         'insarStackSize',
+        'instrument',
         'lookDirection',
         'masterGranule',
         'md5sum',
