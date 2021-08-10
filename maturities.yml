@@ -109,3 +109,16 @@ prod-private:
         Client-Id: vertex_asf
     flexible_maturity: False
     cloudwatch_metrics: False
+
+# These next few, are to let the test suite look up if it should use the maturity tag:
+devel-staging:
+    this_api: https://api-dev-staging.asf.alaska.edu
+    flexible_maturity: False
+
+test-staging:
+    this_api: https://api-test-staging.asf.alaska.edu
+    flexible_maturity: True
+
+prod-staging:
+    this_api: https://api-prod-private-staging.asf.alaska.edu/
+    flexible_maturity: False
