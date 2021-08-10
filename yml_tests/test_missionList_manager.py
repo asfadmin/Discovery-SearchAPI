@@ -2,19 +2,15 @@ import requests
 import json
 
 class test_mission_list():
-    def __init__(self, test_info, file_conf, cli_args, test_vars):
-        if cli_args["api"] != None:
-            test_api = cli_args["api"]
-        elif "api" in file_conf:
-            test_api = file_conf["api"]
-        else:
-            assert False, "Endpoint test ran, but '--api' not declared in CLI (test_files_to_wkt).\nCan also add 'default' api to use in yml_tests/pytest_config.yml.\n"
+    def __init__(self, **args):
+        self.test_info = args["test_info"]
+        test_api = args["config"].getoption("--api")["this_api"]
 
-        url_parts = [test_api, test_vars["endpoint"]]
+        # Craft the url, combining api's and entrypoint to test against:
+        url_parts = [ test_api, args["test_type_vars"]["endpoint"], ]
         self.full_url = '/'.join(s.strip('/') for s in url_parts) # If both/neither have '/' between them, this still joins them correctly
-        if "platform" in test_info:
-            self.full_url += "?platform=" + test_info["platform"]
-        self.test_info = test_info
+        if "platform" in self.test_info:
+            self.full_url += "?platform=" + self.test_info["platform"]
 
         response_json = self.makeRequest()
 
