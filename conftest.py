@@ -10,10 +10,10 @@ def api_type(user_input: str) -> str:
     api_info = None # Will be: ("api url: str", "is_flex_maturity: bool")
     for nickname, info in maturities.items():
         # If you gave it the nickname, or the url of a known api:
-        if user_input in [ nickname.lower(), maturities[nickname]["this_api"], ]:
+        if user_input in [ nickname.lower(), info["this_api"], ]:
             api_info = {
-                "this_api": maturities[nickname]["this_api"],
-                "flexible_maturity": maturities[nickname]["flexible_maturity"],
+                "this_api": info["this_api"],
+                "flexible_maturity": info["flexible_maturity"],
             }
             break
     # Make sure you hit an option in maturities.yml
