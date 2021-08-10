@@ -113,7 +113,7 @@ prod-private:
 # These next few, are to let the test suite look up if it should use the maturity tag:
 devel-staging:
     this_api: https://api-dev-staging.asf.alaska.edu
-    flexible_maturity: False
+    flexible_maturity: True
 
 test-staging:
     this_api: https://api-test-staging.asf.alaska.edu
