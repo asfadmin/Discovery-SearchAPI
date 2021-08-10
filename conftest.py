@@ -26,7 +26,6 @@ def api_type(user_input: str) -> str:
         raise argparse.ArgumentTypeError("ERROR: Could not connect to url '{0}'. Message: '{1}'.".format(user_input, str(e)))
 
     # It connected!! You're good:
-    print(api_info)
     return api_info
 
 def pytest_addoption(parser):
