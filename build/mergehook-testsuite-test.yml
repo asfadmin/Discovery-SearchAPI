@@ -17,11 +17,9 @@ phases:
     commands:
       # PRE-BUILD: Setup pytest, and the version file. Store what variables you'll need
       - echo "{\"version\":\"${CODEBUILD_RESOLVED_SOURCE_VERSION}\"}" > version.json
-      - git clone https://github.com/asfadmin/Discovery-PytestAutomation.git
 
       # BUILD: Setup staging to run test suite against:
       - zappa update "test_staging"
 
       # TEST: Run the test suite...
-      - cd Discovery-PytestAutomation
       - python3.7 -m pytest -s -n auto -rs . --dont-run-file known_bugs --dont-run-file run_on_prod_only --api https://api-test-staging.asf.alaska.edu
