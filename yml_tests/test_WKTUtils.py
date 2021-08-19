@@ -4,14 +4,14 @@ import shapely.wkt, geomet.wkt      # For comparing wkt's
 from helpers import make_request, request_to_json
 
 class test_filesToWKT():
-    def __init__(self, test_info, file_conf, cli_args, test_vars):
-        # I replace '{0}' with itself, so that you can format that in later, and everything else is populated already:
-        self.error_msg = "Reason: {0}\n - File: '{1}'\n - Test: '{2}'".format('{0}', file_conf["yml name"], test_info["title"])
+    def __init__(self, **args):
+        self.error_msg = "Reason: {0}"
 
-        assert "api" in cli_args, self.error_msg.format("Endpoint test ran, but '--api' not declared in CLI. Can also add 'default' api to use in yml_tests/pytest_config.yml.\n")
-        
+        test_info = args["test_info"]
+        test_api = args["config"].getoption("--api")["this_api"]
+
         # Join the url 'start' to the endpoint, even if they both/neither have '/' between them:
-        url_parts = [ cli_args["api"], test_vars["endpoint"] ]
+        url_parts = [ test_api, args["test_type_vars"]["endpoint"] ]
         full_url = '/'.join(s.strip('/') for s in url_parts)
         test_info = self.applyDefaultValues(test_info)
         # Make a request, and turn it into json. Helpers should handle if something goes wrong:
@@ -86,13 +86,14 @@ class test_filesToWKT():
 
 
 class test_repairWKT():
-    def __init__(self, test_info, file_conf, cli_args, test_vars):
-        self.error_msg = "Reason: {0}\n - File: '{1}'\n - Test: '{2}'".format('{0}', file_conf["yml name"], test_info["title"])
+    def __init__(self, **args):
+        self.error_msg = "Reason: {0}"
 
-        assert "api" in cli_args, self.error_msg.format("Endpoint test ran, but '--api' not declared in CLI. Can also add 'default' api to use in yml_tests/pytest_config.yml.\n")
+        test_info = args["test_info"]
+        test_api = args["config"].getoption("--api")["this_api"]
 
         # Join the url 'start' to the endpoint, even if they both/neither have '/' between them:
-        url_parts = [ cli_args["api"], test_vars["endpoint"] ]
+        url_parts = [ test_api, args["test_type_vars"]["endpoint"] ]
         full_url = '/'.join(s.strip('/') for s in url_parts)
         test_info = self.applyDefaultValues(test_info)
         # Make a request, and turn it into json. Helpers should handle if something goes wrong:

@@ -7,24 +7,23 @@ from test_WKTUtils import test_filesToWKT, test_repairWKT
 ##########################
 ## SearchAPI Main tests ##
 ##########################
-def test_URLManagerSearch(test_info, file_conf, cli_args, test_vars):
-    test_URL_Manager(test_info, file_conf, cli_args, test_vars)
+def test_URLManagerSearch(**args):
+    test_URL_Manager(**args)
 
-def test_MissionListEndpoint(test_info, file_conf, cli_args, test_vars):
-    test_mission_list(test_info, file_conf, cli_args, test_vars)
+def test_MissionListEndpoint(**args):
+    test_mission_list(**args)
 
-def test_DateParserEndpoint(test_info, file_conf, cli_args, test_vars):
-    test_date_parser(test_info, file_conf, cli_args, test_vars)
+def test_DateParserEndpoint(**args):
+    test_date_parser(**args)
 
-def test_BaselineEndpoint(test_info, file_conf, cli_args, test_vars):
-    test_baseline(test_info, file_conf, cli_args, test_vars)
+def test_BaselineEndpoint(**args):
+    test_baseline(**args)
 
 ###########################
 ## WKTUtils Single tests ##
 ###########################
-def test_FilesToWKTEndpoint(test_info, file_conf, cli_args, test_vars):
-    test_filesToWKT(test_info, file_conf, cli_args, test_vars)
+def test_FilesToWKTEndpoint(**args):
+    test_filesToWKT(**args)
 
-def test_RepairWKTEndpoint(test_info, file_conf, cli_args, test_vars):
-    test_repairWKT(test_info, file_conf, cli_args, test_vars)
-
+def test_RepairWKTEndpoint(**args):
+    test_repairWKT(**args)

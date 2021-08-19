@@ -3,16 +3,13 @@ import json
 from datetime import datetime
 
 class test_date_parser():
-    def __init__(self, test_info, file_conf, cli_args, test_vars):
-        self.error_msg = "Reason: {0}\n - File: '{1}'\n - Test: '{2}'".format('{0}', file_conf["yml name"], test_info["title"])
-        if cli_args["api"] != None:
-            test_api = cli_args["api"]
-        elif "api" in file_conf:
-            test_api = file_conf["api"]
-        else:
-            assert False, self.error_msg.format("Endpoint test ran, but '--api' not declared in CLI. You can also add 'default' api to use in yml_tests/pytest_config.yml, or add 'api: *url*' to each test.")
+    def __init__(self, **args):
+        self.error_msg = "Reason: {0}"
+        test_info = args["test_info"]
+        test_api = args["config"].getoption("--api")["this_api"]
 
-        url_parts = [test_api, test_vars["endpoint"]]
+
+        url_parts = [test_api, args["test_type_vars"]["endpoint"]]
         self.full_url = '/'.join(s.strip('/') for s in url_parts) # If both/neither have '/' between them, this still joins them correctly
         if "date" in test_info:
             self.full_url += "?date=" + test_info["date"]
