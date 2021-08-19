@@ -4,11 +4,17 @@ import requests
 
 def api_type(user_input: str) -> str:
     user_input = str(user_input).lower()
+    # If it's a url with a trailing '/', remove it:
+    if user_input.endswith('/'):
+        user_input = user_input[:-1]
     # Grab list of maturities, for available API's:
     with open("maturities.yml", "r") as ymlfile:
         maturities = yaml.safe_load( ymlfile.read() )
     api_info = None # Will be: ("api url: str", "is_flex_maturity: bool")
     for nickname, info in maturities.items():
+        # If the url in maturities ends with '/', remove it. (Lets it match user input always):
+        if info["this_api"].endswith('/'):
+            info["this_api"] = info["this_api"][:-1]
         # If you gave it the nickname, or the url of a known api:
         if user_input in [ nickname.lower(), info["this_api"], ]:
             api_info = {
