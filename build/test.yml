@@ -15,7 +15,6 @@ phases:
       - python3 -m pip install -r requirements.txt
   build:
     commands:
-      - cd Discovery-PytestAutomation
-      - CMD="python3 -m pytest ${PYTEST_OPTIONS} . --api ${API_URL} ${TEST_SUITE_OPTIONS}"
+      - CMD="python3 -m pytest ${PYTEST_OPTIONS} ${TEST_SUITE_OPTIONS} . --api ${API_URL}"
       - echo -e "\nRunning command=> ${CMD}\n" # Get exact command into logs for debugging
       - ${CMD}

@@ -13,18 +13,14 @@ sys.path.remove(project_root)
 
 
 class test_baseline():
-    def __init__(self, test_info, file_conf, cli_args, test_vars):
+    def __init__(self, **args):
 
-        # I replace '{0}' with itself, so that you can format that in later, and everything else is populated already:
-        self.error_msg = "Reason: {0}\n - File: '{1}'\n - Test: '{2}'".format('{0}', file_conf["yml name"], test_info["title"])
-        if cli_args["api"] != None:
-            test_api = cli_args["api"]
-        elif "api" in file_conf:
-            test_api = file_conf["api"]
-        else:
-            assert False, self.error_msg.format("Endpoint test ran, but '--api' not declared in CLI. You can also add 'default' api to use in yml_tests/pytest_config.yml, or add 'api: *url*' to each test.")
+        test_info = args["test_info"]
+        api_info = args["config"].getoption("--api")
+        test_api = api_info["this_api"]
 
-        url_parts = [test_api, test_vars["endpoint"]+"?"]
+
+        url_parts = [test_api, args["test_type_vars"]["endpoint"]+"?"]
         full_url = '/'.join(s.strip('/') for s in url_parts) # If both/neither have '/' between them, this still joins them correctly
 
         # If you're overriding if you want to show the maturity:
@@ -32,14 +28,15 @@ class test_baseline():
             use_cmr_maturity = test_info["use_maturity"]
         # Defalut use it, if you're not running against a prod api:
         else:
-            use_cmr_maturity = cli_args["api"] not in cli_args["api prod list"]
+            use_cmr_maturity = api_info["flexible_maturity"]
 
         # Get the url string and (bool)if assert was used:
         keywords, assert_used = self.getKeywords(test_info)
         if use_cmr_maturity:
-            keywords.append("maturity=" + test_vars["maturity"])
+            keywords.append("maturity=" + args["test_type_vars"]["maturity"])
         self.query = full_url + "&".join(keywords)
-        self.error_msg += "\n - URL: '{0}'".format(self.query)
+        # I replace '{0}' with itself, so that you can format that in later, and everything else is populated already:
+        self.error_msg = "Reason: {0}\n - URL: '{1}'".format("{0}",self.query)
 
         # Figure out if you should print stuff:
         if "print" not in test_info:
