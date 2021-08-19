@@ -120,5 +120,5 @@ test-staging:
     flexible_maturity: True
 
 prod-staging:
-    this_api: https://api-prod-private-staging.asf.alaska.edu/
+    this_api: https://api-prod-private-staging.asf.alaska.edu
     flexible_maturity: False
