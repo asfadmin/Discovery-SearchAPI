@@ -134,6 +134,7 @@ tests:
     expected code: 400
 
 - blank reference:
+    reference: ""
     output: count
 
     expected file: error json
