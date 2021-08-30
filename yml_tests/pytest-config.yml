@@ -1,0 +1,40 @@
+
+
+test_types:
+## WKTUtils sanity tests:
+- FilesToWKT WKTUtils Endpoint:
+    required_keys: "file wkt"
+    method: test_FilesToWKTEndpoint
+    variables:
+      endpoint: "/services/utils/files_to_wkt"
+- RepairWKT WKTUtils Endpoint:
+    required_keys: "test wkt"
+    method: test_RepairWKTEndpoint
+    variables:
+      endpoint: "/services/utils/wkt"
+
+## Main SearchAPI tests:
+- Mission List SearchAPI Endpoint:
+    required_keys: misson_list_size_min
+    method: test_MissionListEndpoint
+    variables:
+      endpoint: "/services/utils/mission_list"
+
+- Date Parser SearchAPI Endpoint:
+    required_keys: date
+    method: test_DateParserEndpoint
+    variables:
+      endpoint: "/services/utils/date"
+
+- Baseline SearchAPI Endpoint:
+    required_keys: reference
+    method: test_BaselineEndpoint
+    variables:
+      endpoint: "/services/search/baseline"
+      maturity: prod
+
+- Get Data from SearchAPI:
+    method: test_URLManagerSearch
+    variables:
+      endpoint: "/services/search/param"
+      maturity: prod
