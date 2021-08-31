@@ -81,7 +81,8 @@ class APIStackQuery:
                 raise ValueError("Could not find 'reference' in request.")
             self.params = params
         except ValueError as e:
-            logging.debug('ValueError: {0}'.format(str(e)))
+            logging.debug(f'ValueError: {e}')
+            # logging.debug('ValueError: {0}'.format(str(e)))
             raise e
 
     def validation_error(self, error):
