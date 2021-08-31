@@ -107,7 +107,7 @@ class CMRSubQuery:
 
         self.hits = int(cmr_request.headers['CMR-hits'])
 
-        logging.debug('CMR reported {0} hits'.format(self.hits))
+        logging.debug(f'CMR reported {self.hits} hits')
 
         return int(cmr_request.headers['CMR-hits'])
 
@@ -142,11 +142,11 @@ class CMRSubQuery:
 
         # fetch multiple pages of results if needed, yield a product at a time
         for page_num in range(2, num_pages):
-            logging.debug('Processing page {0}'.format(page_num))
+            logging.debug(f'Processing page {page_num}')
 
             page = self.get_page(session, page_num)
 
-            logging.debug('Parsing page {0}'.format(page_num))
+            logging.debug(f'Parsing page {page_num}')
 
             for parsed_page in parse_cmr_response(page, self.req_fields):
                 yield parsed_page
@@ -154,9 +154,7 @@ class CMRSubQuery:
             logging.debug(f'Parsing page {page_num} complete')
             logging.debug(f'Processing page {page_num} complete')
 
-        logging.debug('Done fetching results: got {0}/{1}'.format(
-            len(self.results), self.hits
-        ))
+        logging.debug(f'Done fetching results: got {len(self.results)}/{self.hits}')
 
         return
 
@@ -228,9 +226,9 @@ class CMRSubQuery:
             f'Bad news bears! CMR said {response.status_code}' +
             (f' on session {self.sid}' if self.scroll else '')
         )
-        logging.error('Attempt {0} of {1}'.format(attempt + 1, max_retry))
+        logging.error(f'Attempt {attempt + 1} of {max_retry}')
         logging.error('Params sent to CMR:')
         logging.error(self.params)
         logging.error('Headers sent to CMR:')
         logging.error(session.headers)
-        logging.error('Error body: {0}'.format(response.text))
+        logging.error(f'Error body: {response.text}')

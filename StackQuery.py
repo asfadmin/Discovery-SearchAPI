@@ -103,7 +103,4 @@ class APIStackQuery:
         return make_response(f'A CMR error has occured: {e}')
 
 def make_filename(suffix):
-    return 'asf-datapool-results-{0}.{1}'.format(
-        datetime.now().strftime('%Y-%m-%d_%H-%M-%S'),
-        suffix
-    )
+    return f'asf-datapool-results-{datetime.now().strftime("%Y-%m-%d_%H-%M-%S")}.{suffix}'

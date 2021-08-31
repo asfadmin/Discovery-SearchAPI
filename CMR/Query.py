@@ -62,7 +62,7 @@ class CMRQuery:
 
     def get_results(self):
         for query_num, subquery in enumerate(self.sub_queries):
-            logging.debug('Running subquery {0}'.format(query_num+1))
+            logging.debug(f'Running subquery {query_num+1}')
 
             # taking a page at a time from each subquery,
             # yield one result at a time until we max out

@@ -75,7 +75,7 @@ class DateValidator_Endpoint:
             date = parse_date(self.date)
             logging.debug(date)
         except ValueError as e:
-            return {'errors': [{'type': 'VALUE', 'report': 'Could not parse date: {0}'.format(str(e))}]}
+            return {'errors': [{'type': 'VALUE', 'report': f'Could not parse date: {e}'}]}
         return {'date': {'original': self.date, 'parsed': date}}
 
 

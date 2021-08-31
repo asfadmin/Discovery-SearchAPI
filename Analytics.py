@@ -44,7 +44,7 @@ def analytics_events(events=None):
             p.join()
 
     except requests.RequestException as e:
-        logging.debug('Problem logging analytics: {0}'.format(e))
+        logging.debug(f'Problem logging analytics: {e}')
 
     end = time.time()
     logging.debug(f'ANALYTICS TOOK {end - start}')
@@ -76,12 +76,12 @@ def analytics_pageview():
         logging.debug('Skipping analytics: analytics_id not set')
         return
 
-    logging.debug('Posting analytics pageview to {0}'.format(get_config()['analytics_id']))
+    logging.debug(f'Posting analytics pageview to {get_config()["analytics_id"]}'
     url = get_analytics_url()
     params = {
         "v":    "1",
         "tid":  get_config()['analytics_id'],
-        "cid":  '{0}'.format(request.access_route[-1])
+        "cid":  f'{request.access_route[-1]}'
         }
     try:
         s = requests.Session()
@@ -100,4 +100,4 @@ def analytics_pageview():
         p['ua'] = request.headers.get('User-Agent')
         s.post(url, data=p)
     except requests.RequestException as e:
-        logging.debug('Problem logging analytics: {0}'.format(e))
+        logging.debug(f'Problem logging analytics: {e}')
