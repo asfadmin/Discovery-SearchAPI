@@ -82,7 +82,6 @@ class APIStackQuery:
             self.params = params
         except ValueError as e:
             logging.debug(f'ValueError: {e}')
-            # logging.debug('ValueError: {0}'.format(str(e)))
             raise e
 
     def validation_error(self, error):
