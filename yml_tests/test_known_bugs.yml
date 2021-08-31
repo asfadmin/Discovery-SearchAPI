@@ -1,6 +1,4 @@
 
-api: Test
-
 ## This file contains test cases with known bugs. Bug is listed above each group. These will fail if run, and will block the AWS pipeline
 
 tests:

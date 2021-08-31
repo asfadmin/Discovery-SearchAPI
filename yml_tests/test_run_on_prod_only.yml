@@ -1,4 +1,3 @@
-api: Test
 
 #This file contains test cases that are known failures on api-test. These will fail if run, and will block the AWS pipeline.
 #Run this file on api-prod & api-prod-private ONLY
