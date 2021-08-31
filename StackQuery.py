@@ -19,8 +19,6 @@ class APIStackQuery:
     def get_response(self):
         try:
             self.validate()
-            if 'reference' not in self.params:
-                self.params['reference'] = self.params['master']
             if 'processinglevel' not in self.params:
                 self.params['processinglevel'] = get_default_product_type(self.params['reference'])
             if 'output' not in self.params:
@@ -68,7 +66,7 @@ class APIStackQuery:
         return Response(resp, headers=d)
 
     def validate(self):
-        valid_params = ['reference', 'master', 'output', 'processinglevel']
+        valid_params = ['reference', 'output', 'processinglevel']
 
         params = {}
         try:
@@ -79,11 +77,11 @@ class APIStackQuery:
                     raise ValueError(f'Unrecognized parameter: {key}')
                 val = parse_string(val)
                 params[key] = val
-            if 'reference' not in params and 'master' not in params:
-                raise ValueError("Could not find 'reference' or 'master' in request.")
+            if 'reference' not in params:
+                raise ValueError("Could not find 'reference' in request.")
             self.params = params
         except ValueError as e:
-            logging.debug(f'ValueError: {e}')
+            logging.debug('ValueError: {0}'.format(str(e)))
             raise e
 
     def validation_error(self, error):
