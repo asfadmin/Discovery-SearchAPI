@@ -61,7 +61,7 @@ pyOpenSSL==20.0.1
 pyparsing==2.4.7
 pyshp==2.1.3
 pytest==6.2.3
-pytest-automation==0.1.0
+pytest-automation==1.0.0
 pytest-cov==2.11.1
 pytest-forked==1.3.0
 pytest-xdist==2.2.1
