@@ -1,6 +1,4 @@
 
-api: Test
-
 tests:
 - beamMode test blank:
     beamMode: TEST

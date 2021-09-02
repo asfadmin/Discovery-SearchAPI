@@ -1,6 +1,4 @@
 
-api: Test
-
 
 tests:
 - invalid query:
