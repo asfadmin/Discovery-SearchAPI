@@ -76,7 +76,7 @@ def analytics_pageview():
         logging.debug('Skipping analytics: analytics_id not set')
         return
 
-    logging.debug(f'Posting analytics pageview to {get_config()["analytics_id"]}'
+    logging.debug(f'Posting analytics pageview to {get_config()["analytics_id"]}')
     url = get_analytics_url()
     params = {
         "v":    "1",
