@@ -84,7 +84,7 @@ def stack_search():
 @talisman(force_https=False)
 def health_check():
     try:
-        with open('version.json') as version_file:
+        with open('version.json', encoding="utf-8") as version_file:
             api_version = json.load(version_file)
     except Exception as e:
         logging.debug(e)
