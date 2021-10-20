@@ -243,6 +243,7 @@ tests:
     platform: S1
     instrument: SA
     output: json
+    maxResults: 100
 
     expected file: blank json
     expected code: 200
@@ -251,6 +252,7 @@ tests:
     platform: S1
     relativeOrbit: 85-90
     output: TEST
+    maxResults: 100
 
     expected file: metalink
     expected code: 200
