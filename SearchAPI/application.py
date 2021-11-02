@@ -1,4 +1,6 @@
 from flask import Flask, make_response
+# from flask_lambda import FlaskLambda
+import awsgi
 from flask import request
 from flask import Response
 from flask_talisman import Talisman
@@ -21,6 +23,7 @@ import boto3
 
 import endpoints
 
+# application = FlaskLambda(__name__)
 application = Flask(__name__)
 application.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024 # limit to 10 MB, primarily affects file uploads
 CORS(application, send_wildcard=True)
@@ -160,8 +163,11 @@ def postflight(e):
     except Exception as e:
         logging.critical(f'Failure during request teardown: {e}')
 
-# Run a dev server
-if __name__ == '__main__':
+def handler(event, context):
+    return awsgi.response(application, event, context)
+
+# So you can call this from the Dockerfile as well:
+def main():
     if 'MATURITY' not in os.environ:
         os.environ['MATURITY'] = 'local'
     sys.dont_write_bytecode = True  # prevent clutter
@@ -169,3 +175,7 @@ if __name__ == '__main__':
     FORMAT = "[%(filename)18s:%(lineno)-4s - %(funcName)18s() ] %(message)s"
     logging.basicConfig(level=logging.DEBUG, format=FORMAT) # enable debugging output
     application.run(threaded=True)  # run threaded to prevent a broken pipe error
+
+# Run a dev server
+if __name__ == '__main__':
+    main()
