@@ -28,7 +28,4 @@ ENV PYTHONPATH "${PYTHONPATH}:${LAMBDA_TASK_ROOT}/SearchAPI"
 
 ## Run everything from the SearchAPI directoy:
 WORKDIR "${LAMBDA_TASK_ROOT}/SearchAPI"
-RUN python3 -m pip install aws-wsgi
-# RUN chmod +x entrypoint.sh
-# ENTRYPOINT [ "./entrypoint.sh" ]
 CMD [ "application.handler" ]
