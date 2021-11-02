@@ -1,5 +1,4 @@
 from flask import Flask, make_response
-# from flask_lambda import FlaskLambda
 import awsgi
 from flask import request
 from flask import Response
@@ -23,7 +22,6 @@ import boto3
 
 import endpoints
 
-# application = FlaskLambda(__name__)
 application = Flask(__name__)
 application.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024 # limit to 10 MB, primarily affects file uploads
 CORS(application, send_wildcard=True)
