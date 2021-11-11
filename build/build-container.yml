@@ -22,7 +22,10 @@ phases:
       - echo Build started on `date`
       - echo Building the Docker image...
       - docker build -t ${image}:latest .
-      - docker tag ${image}:latest ${PUBLIC_REPOSITORY_URI}:latest ${PUBLIC_REPOSITORY_URI}:${CODEBUILD_RESOLVED_SOURCE_VERSION} ${PRIVATE_REPOSITORY_URI}:latest ${PRIVATE_REPOSITORY_URI}:${CODEBUILD_RESOLVED_SOURCE_VERSION}
+      - docker tag ${image}:latest ${PUBLIC_REPOSITORY_URI}:latest
+      - docker tag ${image}:latest ${PUBLIC_REPOSITORY_URI}:${CODEBUILD_RESOLVED_SOURCE_VERSION}
+      - docker tag ${image}:latest ${PRIVATE_REPOSITORY_URI}:latest
+      - docker tag ${image}:latest ${PRIVATE_REPOSITORY_URI}:${CODEBUILD_RESOLVED_SOURCE_VERSION}
   post_build:
     commands:
       - echo Build completed on `date`
