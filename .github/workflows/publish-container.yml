@@ -25,7 +25,7 @@ jobs:
 
       - name: Configure AWS credentials (Test)
         uses: aws-actions/configure-aws-credentials@v1
-        if: '!contains(github.ref, "prod")'
+        if: "!contains(github.ref, 'prod')"
         with:
           aws-access-key-id: ${{ secrets.TEST_AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.TEST_AWS_SECRET_ACCESS_KEY }}
