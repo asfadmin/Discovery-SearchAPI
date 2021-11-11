@@ -6,7 +6,8 @@ phases:
   pre_build:
     commands:
       - aws --version
-      - if [ -z ${image} ]; then echo "ERROR - must declare 'image' in variables! Quitting"; exit -1; fi
+      - if [ -z ${image} ]; then echo "ERROR - must declare 'image' in variables! (What image to push to *inside* of registry). Quitting"; exit -1; fi
+      - if [ -z ${lambda_name} ]; then echo "ERROR - must declare 'lambda_name' in variables! (Name of lambda function to update). Quitting"; exit -1; fi
 
       - echo Logging in to Amazon ECR...
       # Must maintain *both* public/private, until lambda supports running off public images:
@@ -19,18 +20,21 @@ phases:
       - echo "{\"version\":\"${CODEBUILD_RESOLVED_SOURCE_VERSION}\"}" > SearchAPI/version.json
   build:
     commands:
-      - echo Build started on `date`
       - echo Building the Docker image...
       - docker build -t ${image}:latest .
+
       - docker tag ${image}:latest ${PUBLIC_REPOSITORY_URI}:latest
       - docker tag ${image}:latest ${PUBLIC_REPOSITORY_URI}:${CODEBUILD_RESOLVED_SOURCE_VERSION}
       - docker tag ${image}:latest ${PRIVATE_REPOSITORY_URI}:latest
       - docker tag ${image}:latest ${PRIVATE_REPOSITORY_URI}:${CODEBUILD_RESOLVED_SOURCE_VERSION}
-  post_build:
-    commands:
-      - echo Build completed on `date`
+
       - echo Pushing the Docker images...
       - docker push ${PUBLIC_REPOSITORY_URI}:latest
       - docker push ${PUBLIC_REPOSITORY_URI}:${CODEBUILD_RESOLVED_SOURCE_VERSION}
       - docker push ${PRIVATE_REPOSITORY_URI}:latest
       - docker push ${PRIVATE_REPOSITORY_URI}:${CODEBUILD_RESOLVED_SOURCE_VERSION}
+  post_build:
+    commands:
+      - aws lambda update-function-code --region ${AWS_REGION} --function-name ${lambda_name} --image-uri ${PRIVATE_REPOSITORY_URI}:${CODEBUILD_RESOLVED_SOURCE_VERSION}
+      - aws lambda wait function-updated --region ${AWS_REGION} --function-name ${lambda_name}
+
