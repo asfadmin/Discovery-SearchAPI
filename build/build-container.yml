@@ -4,7 +4,7 @@ version: 0.2
 
 env:
   secrets-manager:
-    docker_password: docker_password:docker_password
+    docker_password: dockerhub:dockerhub_password
 
 phases:
   pre_build:
