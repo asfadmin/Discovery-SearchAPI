@@ -13,45 +13,46 @@ on:
 
 jobs:
   Publish:
-  runs-on: ubuntu-latest
+    runs-on: ubuntu-latest
 
-  steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-    
-    - name: Save Version
-      run: |
-        echo "{\"version\": \"$GITHUB_SHA\"}" > SearchAPI/version.json
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      
+      - name: Save Version
+        run: |
+          echo "{\"version\": \"$GITHUB_SHA\"}" > SearchAPI/version.json
 
-    - name: Configure AWS credentials (Test)
-      uses: aws-actions/configure-aws-credentials@v1
-      if: '!contains(github.ref, "prod")'
-      with:
-        aws-access-key-id: ${{ secrets.TEST_AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.TEST_AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-1
+      - name: Configure AWS credentials (Test)
+        uses: aws-actions/configure-aws-credentials@v1
+        if: '!contains(github.ref, "prod")'
+        with:
+          aws-access-key-id: ${{ secrets.TEST_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.TEST_AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
 
-    - name: Configure AWS credentials (Prod)
-      uses: aws-actions/configure-aws-credentials@v1
-      if: contains(github.ref, "prod")
-      with:
-        aws-access-key-id: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-1
+      ## TODO: Add this user:
+      - name: Configure AWS credentials (Prod)
+        uses: aws-actions/configure-aws-credentials@v1
+        if: contains(github.ref, "prod")
+        with:
+          aws-access-key-id: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
 
-    - name: Login to Amazon ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
 
-    - name: Build, tag, and push the image to Amazon ECR
-      id: build-image
-      env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        ECR_REPOSITORY: u8i1y1d8/searchapi-devel
-        IMAGE_TAG: latest
-      run: |
-        # Build a docker container and push it to ECR
-        IMAGE="$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
-        docker build -t $IMAGE .
-        echo "Pushing image to ECR... ($IMAGE)"
-        docker push $IMAGE
+      - name: Build, tag, and push the image to Amazon ECR
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: u8i1y1d8/searchapi-devel
+          IMAGE_TAG: latest
+        run: |
+          # Build a docker container and push it to ECR
+          IMAGE="$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+          docker build -t $IMAGE .
+          echo "Pushing image to ECR... ($IMAGE)"
+          docker push $IMAGE
