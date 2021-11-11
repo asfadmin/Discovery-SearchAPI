@@ -34,7 +34,7 @@ jobs:
       ## TODO: Add this user:
       - name: Configure AWS credentials (Prod)
         uses: aws-actions/configure-aws-credentials@v1
-        if: contains(github.ref, "prod")
+        if: contains(github.ref, 'prod')
         with:
           aws-access-key-id: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
