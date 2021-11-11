@@ -5,21 +5,29 @@ version: 0.2
 phases:
   pre_build:
     commands:
-      - echo Logging in to Amazon ECR...
       - aws --version
-      - if [ -z $image ]; then echo "ERROR - must declare 'image' in variables! Quitting"; exit -1; fi
-      - aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws
-      - REPOSITORY_URI=public.ecr.aws/u8i1y1d8/$image
+      - if [ -z ${image} ]; then echo "ERROR - must declare 'image' in variables! Quitting"; exit -1; fi
+
+      - echo Logging in to Amazon ECR...
+      # Must maintain *both* public/private, until lambda supports running off public images:
+      - aws ecr-public get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin public.ecr.aws
+      - aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${CODEBUILD_WEBHOOK_ACTOR_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
+
+      - PUBLIC_REPOSITORY_URI=public.ecr.aws/u8i1y1d8/${image}
+      - PRIVATE_REPOSITORY_URI=${CODEBUILD_WEBHOOK_ACTOR_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${image}
+
       - echo "{\"version\":\"${CODEBUILD_RESOLVED_SOURCE_VERSION}\"}" > SearchAPI/version.json
   build:
     commands:
       - echo Build started on `date`
       - echo Building the Docker image...
-      - docker build -t $REPOSITORY_URI:latest .
-      - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$CODEBUILD_RESOLVED_SOURCE_VERSION
+      - docker build -t ${image}:latest .
+      - docker tag ${image}:latest ${PUBLIC_REPOSITORY_URI}:latest ${PUBLIC_REPOSITORY_URI}:${CODEBUILD_RESOLVED_SOURCE_VERSION} ${PRIVATE_REPOSITORY_URI}:latest ${PRIVATE_REPOSITORY_URI}:${CODEBUILD_RESOLVED_SOURCE_VERSION}
   post_build:
     commands:
       - echo Build completed on `date`
       - echo Pushing the Docker images...
-      - docker push $REPOSITORY_URI:latest
-      - docker push $REPOSITORY_URI:$CODEBUILD_RESOLVED_SOURCE_VERSION
+      - docker push ${PUBLIC_REPOSITORY_URI}:latest
+      - docker push ${PUBLIC_REPOSITORY_URI}:${CODEBUILD_RESOLVED_SOURCE_VERSION}
+      - docker push ${PRIVATE_REPOSITORY_URI}:latest
+      - docker push ${PRIVATE_REPOSITORY_URI}:${CODEBUILD_RESOLVED_SOURCE_VERSION}
