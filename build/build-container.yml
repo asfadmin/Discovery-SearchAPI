@@ -10,6 +10,8 @@ phases:
       - if [ -z ${lambda_name} ]; then echo "ERROR - must declare 'lambda_name' in variables! (Name of lambda function to update). Quitting"; exit -1; fi
 
       - echo Logging in to Amazon ECR...
+      # First do dockerhub, to not hit limit on pulling the base docker image:
+      - docker login -u ${docker_username} -p ${docker_password}
       # Must maintain *both* public/private, until lambda supports running off public images:
       - aws ecr-public get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin public.ecr.aws
       - aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin $(aws sts get-caller-identity --query Account --output text).dkr.ecr.${AWS_REGION}.amazonaws.com
