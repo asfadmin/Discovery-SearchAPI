@@ -1,4 +1,4 @@
-# Copied from: https://aws.amazon.com/blogs/devops/build-a-continuous-delivery-pipeline-for-your-container-images-with-amazon-ecr-as-source/
+# Modified from: https://aws.amazon.com/blogs/devops/build-a-continuous-delivery-pipeline-for-your-container-images-with-amazon-ecr-as-source/
 
 version: 0.2
 
@@ -10,6 +10,7 @@ phases:
       - if [ -z $image ]; then echo "ERROR - must declare 'image' in variables! Quitting"; exit -1; fi
       - aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws
       - REPOSITORY_URI=public.ecr.aws/u8i1y1d8/$image
+      - echo "{\"version\":\"${CODEBUILD_RESOLVED_SOURCE_VERSION}\"}" > SearchAPI/version.json
   build:
     commands:
       - echo Build started on `date`
