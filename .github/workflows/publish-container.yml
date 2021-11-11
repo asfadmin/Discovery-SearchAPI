@@ -18,6 +18,10 @@ jobs:
   steps:
     - name: Checkout code
       uses: actions/checkout@v2
+    
+    - name: Save Version
+      run: |
+        echo "{\"version\": \"$GITHUB_SHA\"}" > SearchAPI/version.json
 
     - name: Configure AWS credentials (Test)
       uses: aws-actions/configure-aws-credentials@v1
