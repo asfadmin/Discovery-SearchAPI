@@ -137,3 +137,38 @@ Testing is done using the [Discovery-PytestAutomation](https://github.com/asfadm
 [Back to Top](#searchapi)
 
 To deploy to prod, merge changes to the prod branch.
+
+
+## Lambda Testing
+
+Build image:
+`<image_tag>`: Format of "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${CustomRegistry}"
+
+```bash
+docker build -t <image_tag> .
+```
+
+Run image:
+
+```bash
+docker run -p 8080:8080 <image_tag>
+```
+
+In a new console, curl against it:
+
+```bash
+# The "/2015-03-31/functions/function/invocations", is an endpoint from the base image of the Dockerfile
+# "httpMethod", "path", and "queryStringParameters" are all required to not get a KeyError when running
+curl -XPOST "http://localhost:8080/2015-03-31/functions/function/invocations" -d '{ "httpMethod": "GET", "path": "/health", "queryStringParameters": "" }'
+```
+
+To push it, first login (with a valid `~/.aws/credentials` file), then push:
+
+```bash
+## IF private repo:
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
+## IF public repo:
+aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws
+
+docker push <image_tag>
+```
