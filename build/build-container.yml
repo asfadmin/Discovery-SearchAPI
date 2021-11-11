@@ -2,6 +2,10 @@
 
 version: 0.2
 
+env:
+  secrets-manager:
+    docker_password: ${docker_password}
+
 phases:
   pre_build:
     commands:
@@ -11,6 +15,7 @@ phases:
 
       - echo Logging in to Amazon ECR...
       # First do dockerhub, to not hit limit on pulling the base docker image:
+      # (Added to codebuild itself, you don't need to populate these)
       - docker login -u ${docker_username} -p ${docker_password}
       # Must maintain *both* public/private, until lambda supports running off public images:
       - aws ecr-public get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin public.ecr.aws
