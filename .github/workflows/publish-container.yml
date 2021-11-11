@@ -39,7 +39,7 @@ jobs:
           aws-access-key-id: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
-      
+
       - name: Save AWS ECR password
         id: ecr-pass
         run: echo "::set-output name=password::$(aws ecr-public get-login-password --region us-east-1)"
@@ -49,8 +49,8 @@ jobs:
         with:
           registry: public.ecr.aws
           username: AWS
-          password: ${{ steps.ecr-pass.outputs.password }}
-          # password: $(aws ecr-public get-login-password --region us-east-1)
+          # password: ${{ steps.ecr-pass.outputs.password }}
+          password: $(aws ecr-public get-login-password --region us-east-1)
         env:
           AWS_REGION: us-east-1
 
