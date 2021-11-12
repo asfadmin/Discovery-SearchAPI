@@ -1,0 +1,10 @@
+name: Wait for AWS hook
+
+on: push
+
+jobs:
+  wait:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Waiting
+        run: sleep 15
