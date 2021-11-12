@@ -4,8 +4,8 @@ version: 0.2
 
 env:
   secrets-manager:
-    docker_password: dockerhub:dockerhub_password
     docker_username: dockerhub:dockerhub_username
+    docker_password: dockerhub:dockerhub_password
 
 phases:
   pre_build:
@@ -13,8 +13,6 @@ phases:
       - aws --version
       - if [ -z "${image}" ]; then echo "ERROR - must declare 'image' in variables! (What image to push to *inside* of registry). Quitting"; exit -1; fi
       - if [ -z "${lambda_name}" ]; then echo "ERROR - must declare 'lambda_name' in variables! (Name of lambda function to update). Quitting"; exit -1; fi
-
-      - if [ -z "${docker_username}" ]; then echo "Testing if empty"; exit -1; fi
 
       - echo Logging in to Amazon ECR...
       # First do dockerhub, to not hit limit on pulling the base docker image:
@@ -48,3 +46,4 @@ phases:
       - aws lambda update-function-code --region ${AWS_REGION} --function-name ${lambda_name} --image-uri ${PRIVATE_REPOSITORY_URI}:${CODEBUILD_RESOLVED_SOURCE_VERSION}
       - aws lambda wait function-updated --region ${AWS_REGION} --function-name ${lambda_name}
 
+      # TODO: Run testsuite here
