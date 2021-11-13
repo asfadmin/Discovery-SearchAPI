@@ -1,0 +1,49 @@
+# Modified from: https://aws.amazon.com/blogs/devops/build-a-continuous-delivery-pipeline-for-your-container-images-with-amazon-ecr-as-source/
+
+version: 0.2
+
+env:
+  secrets-manager:
+    docker_username: dockerhub:dockerhub_username
+    docker_password: dockerhub:dockerhub_password
+
+phases:
+  pre_build:
+    commands:
+      - aws --version
+      - if [ -z "${image}" ]; then echo "ERROR - must declare 'image' in variables! (What image to push to *inside* of registry). Quitting"; exit -1; fi
+      - if [ -z "${lambda_name}" ]; then echo "ERROR - must declare 'lambda_name' in variables! (Name of lambda function to update). Quitting"; exit -1; fi
+
+      - echo Logging in to Amazon ECR...
+      # First do dockerhub, to not hit limit on pulling the base docker image:
+      # (Added to codebuild itself, you don't need to populate these)
+      - docker login -u "${docker_username}" -p "${docker_password}"
+      # Must maintain *both* public/private, until lambda supports running off public images:
+      - aws ecr-public get-login-password --region "${AWS_REGION}" | docker login --username AWS --password-stdin public.ecr.aws
+      - aws ecr get-login-password --region "${AWS_REGION}" | docker login --username AWS --password-stdin $(aws sts get-caller-identity --query Account --output text).dkr.ecr.${AWS_REGION}.amazonaws.com
+
+      - PUBLIC_REPOSITORY_URI="public.ecr.aws/u8i1y1d8/${image}"
+      - PRIVATE_REPOSITORY_URI="$(aws sts get-caller-identity --query Account --output text).dkr.ecr.${AWS_REGION}.amazonaws.com/${image}"
+
+      - echo "{\"version\":\"${CODEBUILD_RESOLVED_SOURCE_VERSION}\"}" > SearchAPI/version.json
+  build:
+    commands:
+      - echo Building the Docker image...
+      - docker build -t ${image}:latest .
+
+      - docker tag ${image}:latest ${PUBLIC_REPOSITORY_URI}:latest
+      - docker tag ${image}:latest ${PUBLIC_REPOSITORY_URI}:${CODEBUILD_RESOLVED_SOURCE_VERSION}
+      - docker tag ${image}:latest ${PRIVATE_REPOSITORY_URI}:latest
+      - docker tag ${image}:latest ${PRIVATE_REPOSITORY_URI}:${CODEBUILD_RESOLVED_SOURCE_VERSION}
+
+      - echo Pushing the Docker images...
+      - docker push ${PUBLIC_REPOSITORY_URI}:latest
+      - docker push ${PUBLIC_REPOSITORY_URI}:${CODEBUILD_RESOLVED_SOURCE_VERSION}
+      - docker push ${PRIVATE_REPOSITORY_URI}:latest
+      - docker push ${PRIVATE_REPOSITORY_URI}:${CODEBUILD_RESOLVED_SOURCE_VERSION}
+  post_build:
+    commands:
+      - aws lambda update-function-code --region ${AWS_REGION} --function-name ${lambda_name} --image-uri ${PRIVATE_REPOSITORY_URI}:${CODEBUILD_RESOLVED_SOURCE_VERSION}
+      - aws lambda wait function-updated --region ${AWS_REGION} --function-name ${lambda_name}
+
+      # TODO: Run testsuite here

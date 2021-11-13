@@ -12,5 +12,5 @@ def get_cmr_health():
         logging.debug(e)
         d = {'host': cfg['cmr_base'], 'error': {
             'display': 'ASF is experiencing errors loading data.  Please try again later.',
-            'raw': '{0}'.format(e)}}
+            'raw': f'{e}'}}
     return d

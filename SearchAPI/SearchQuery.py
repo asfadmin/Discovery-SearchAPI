@@ -133,7 +133,4 @@ def is_max_results_with_json_output(maxResults, output):
 
 
 def make_filename(suffix):
-    return 'asf-datapool-results-{0}.{1}'.format(
-        datetime.now().strftime('%Y-%m-%d_%H-%M-%S'),
-        suffix
-    )
+    return f'asf-datapool-results-{datetime.now().strftime("%Y-%m-%d_%H-%M-%S")}.{suffix}'

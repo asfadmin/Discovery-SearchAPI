@@ -1,4 +1,5 @@
 from flask import Flask, make_response
+import awsgi
 from flask import request
 from flask import Response
 from flask_talisman import Talisman
@@ -35,7 +36,7 @@ def get_product_list():
         for p in products:
             all_products += parse.unquote(p).split(',')
         products = list(filter(lambda p: p is not None, map(lambda p: ('"' + str(p) + '"') if p else None, all_products)))
-    except:
+    except Exception:
         products = []
     return products
 
@@ -84,7 +85,7 @@ def stack_search():
 @talisman(force_https=False)
 def health_check():
     try:
-        with open('version.json') as version_file:
+        with open('version.json', 'r', encoding="utf-8") as version_file:
             api_version = json.load(version_file)
     except Exception as e:
         logging.debug(e)
@@ -160,8 +161,11 @@ def postflight(e):
     except Exception as e:
         logging.critical(f'Failure during request teardown: {e}')
 
-# Run a dev server
-if __name__ == '__main__':
+def handler(event, context):
+    return awsgi.response(application, event, context)
+
+# So you can call this from the Dockerfile as well:
+def main():
     if 'MATURITY' not in os.environ:
         os.environ['MATURITY'] = 'local'
     sys.dont_write_bytecode = True  # prevent clutter
@@ -169,3 +173,7 @@ if __name__ == '__main__':
     FORMAT = "[%(filename)18s:%(lineno)-4s - %(funcName)18s() ] %(message)s"
     logging.basicConfig(level=logging.DEBUG, format=FORMAT) # enable debugging output
     application.run(threaded=True)  # run threaded to prevent a broken pipe error
+
+# Run a dev server
+if __name__ == '__main__':
+    main()

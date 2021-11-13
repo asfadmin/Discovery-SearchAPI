@@ -19,11 +19,11 @@ def input_fixer(params):
         k = k.lower()
         if k == 'lookdirection':  # Vaguely wildcard-like behavior
             if v[0].upper() not in ['L', 'R']:
-                raise ValueError('Invalid look direction: {0}'.format(v))
+                raise ValueError(f'Invalid look direction: {v}')
             fixed_params[k] = v[0].upper()
         elif k == 'flightdirection':  # Vaguely wildcard-like behavior
             if v[0].upper() not in ['A', 'D']:
-                raise ValueError('Invalid flight direction: {0}'.format(v))
+                raise ValueError(f'Invalid flight direction: {v}')
             fixed_params[k] = {
                 'A': 'ASCENDING',
                 'D': 'DESCENDING'
@@ -198,7 +198,7 @@ def fix_polygon(v):
                 raise ValueError(f'Invalid coordinates, could not repair: {v}')
         else:
             raise ValueError(
-                'Invalid coordinates, could not repair: {0}'.format(v)
+                f'Invalid coordinates, could not repair: {v}'
             )
 
     return ','.join(v)

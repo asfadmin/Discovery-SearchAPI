@@ -23,13 +23,13 @@ def api_type(user_input: str) -> str:
             }
             break
     # Make sure you hit an option in maturities.yml
-    assert api_info is not None, "Error: api '{0}' not found in maturities.yml file. Can pass in full url, or key of maturity.".format(user_input)
+    assert api_info is not None, f"Error: api '{user_input}' not found in maturities.yml file. Can pass in full url, or key of maturity."
 
     # Assume it's a url now, and try to connect:
     try:
         requests.get(api_info["this_api"]).raise_for_status()
     except (requests.ConnectionError, requests.exceptions.HTTPError) as e:
-        raise argparse.ArgumentTypeError("ERROR: Could not connect to url '{0}'. Message: '{1}'.".format(user_input, str(e)))
+        raise argparse.ArgumentTypeError(f"ERROR: Could not connect to url '{user_input}'. Message: '{e}'.")
 
     # It connected!! You're good:
     return api_info

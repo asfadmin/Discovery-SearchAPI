@@ -26,7 +26,7 @@ def translate_params(p):
                 pass
             response = json.loads(s.post(get_config()['this_api'] + '/services/utils/wkt', data=repair_params).text)
             if 'errors' in response:
-                raise ValueError('Could not repair WKT: {0}'.format(val))
+                raise ValueError(f'Could not repair WKT: {val}')
             val = response['wkt']['wrapped']
         try:
             params[key] = input_map()[key][2](val)
@@ -47,7 +47,7 @@ def translate_params(p):
         max_results = params['maxresults']
         if max_results < 1:
             raise ValueError(
-                'Invalid maxResults, must be > 0: {0}'.format(max_results)
+                f'Invalid maxResults, must be > 0: {max_results}'
             )
         del params['maxresults']
 
