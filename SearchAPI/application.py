@@ -36,7 +36,7 @@ def get_product_list():
         for p in products:
             all_products += parse.unquote(p).split(',')
         products = list(filter(lambda p: p is not None, map(lambda p: ('"' + str(p) + '"') if p else None, all_products)))
-    except:
+    except Exception:
         products = []
     return products
 
