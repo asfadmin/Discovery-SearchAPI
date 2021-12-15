@@ -10,12 +10,7 @@ from datetime import datetime
 from tzlocal import get_localzone
 from pytz import timezone
 
-import sys, os              # Path manipulation
-this_folder = os.path.dirname(__file__)
-project_root = os.path.abspath(os.path.join(this_folder, ".."))
-sys.path.append(project_root)
-import CMR.Input as test_input
-sys.path.remove(project_root)
+from SearchAPI.CMR import Input as test_input
 
 
 class test_URL_Manager():
