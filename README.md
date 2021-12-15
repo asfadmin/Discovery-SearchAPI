@@ -142,7 +142,7 @@ To deploy to prod, merge changes to the prod branch.
 ## Lambda Testing
 
 Build image:
-`<image_tag>`: Format of "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${CustomRegistry}"
+`<image_tag>`: Format of `${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${CustomRegistry}`
 
 ```bash
 docker build -t <image_tag> .
@@ -172,3 +172,13 @@ aws ecr-public get-login-password --region us-east-1 | docker login --username A
 
 docker push <image_tag>
 ```
+
+## SAM Notes
+
+To spin up a local instance, to test against (Both API Gateway and Lambda included):
+
+```bash
+sam build && sam local start-api --port 5000
+```
+
+Then you can run the test suite, against http://127.0.0.1:5000
