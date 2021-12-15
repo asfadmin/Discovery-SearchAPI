@@ -3,9 +3,14 @@ import logging
 import yaml
 from flask import request
 
+def load_config_file():
+    file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),  "maturities.yml")
+    with open(file_path, "r") as yml_file:
+        config = yaml.safe_load(yml_file)
+    return config
+
 def load_config():
-    with open("maturities.yml", "r") as yml_file:
-        all_config = yaml.safe_load(yml_file)
+    all_config = load_config_file()
 
     if 'MATURITY' not in os.environ.keys():
         logging.warning('os.environ[\'MATURITY\'] not set! Defaulting to local config.]')

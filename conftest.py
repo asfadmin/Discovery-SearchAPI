@@ -2,14 +2,15 @@ import argparse
 import yaml
 import requests
 
+from SearchAPI.asf_env import load_config_file
+
 def api_type(user_input: str) -> str:
     user_input = str(user_input).lower()
     # If it's a url with a trailing '/', remove it:
     if user_input.endswith('/'):
         user_input = user_input[:-1]
     # Grab list of maturities, for available API's:
-    with open("maturities.yml", "r") as ymlfile:
-        maturities = yaml.safe_load( ymlfile.read() )
+    maturities = load_config_file()
     api_info = None # Will be: ("api url: str", "is_flex_maturity: bool")
     for nickname, info in maturities.items():
         # If the url in maturities ends with '/', remove it. (Lets it match user input always):
