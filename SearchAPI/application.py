@@ -45,34 +45,41 @@ def get_product_list():
 
 # Validate and/or repair a WKT to ensure it meets CMR's requirements
 @application.route('/services/utils/wkt', methods = ['GET', 'POST'])
+@talisman(force_https=False)
 def validate_wkt():
     return endpoints.RepairWKT_Endpoint(request).get_response()
 
 # Validate a date to ensure it meets our requirements
 @application.route('/services/utils/date', methods = ['GET', 'POST'])
+@talisman(force_https=False)
 def validate_date():
     return endpoints.DateValidator_Endpoint(request).get_response()
 
 # Convert a set of shapefiles or a geojson file to WKT
 @application.route('/services/utils/files_to_wkt', methods = ['POST'])
+@talisman(force_https=False)
 def filesToWKT():
     return endpoints.FilesToWKT_Endpoint(request).get_response()
 
 # Collect a list of missions from CMR for a given platform
 @application.route('/services/utils/mission_list', methods = ['GET', 'POST'])
+@talisman(force_https=False)
 def missionList():
     return endpoints.MissionList_Endpoint(request).get_response()
 
 # Fetch and convert the results from CMR
 @application.route('/services/search/param', methods = ['GET', 'POST'])
+@talisman(force_https=False)
 def proxy_search():
     return APISearchQuery(request, should_stream=True).get_response()
 
 @application.route('/services/load/param', methods = ['GET', 'POST'])
+@talisman(force_https=False)
 def proxy_search_without_stream():
     return APISearchQuery(request, should_stream=False).get_response()
 
 @application.route('/services/search/baseline', methods = ['GET', 'POST'])
+@talisman(force_https=False)
 def stack_search():
     return APIStackQuery(request).get_response()
 
@@ -161,11 +168,13 @@ def postflight(e):
     except Exception as e:
         logging.critical(f'Failure during request teardown: {e}')
 
-def handler(event, context):
+# Lambda hook, to run in AWS:
+def run_flask_lambda(event, context):
     return awsgi.response(application, event, context)
 
 # So you can call this from the Dockerfile as well:
-def main():
+## NOTE: This'll be called by the container too. We can't JUST have it be debug by default
+def run_flask():
     if 'MATURITY' not in os.environ:
         os.environ['MATURITY'] = 'local'
     sys.dont_write_bytecode = True  # prevent clutter
@@ -176,4 +185,4 @@ def main():
 
 # Run a dev server
 if __name__ == '__main__':
-    main()
+    run_flask()

@@ -1,0 +1,55 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  python3.9
+
+  Sample SAM Template for sam-app-testing
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Description: SAM deployment for the SearchAPI
+    Timeout: 200
+    MemorySize: 1524
+
+Resources:
+  SearchAPIFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      PackageType: Image
+      # The vanilla container can run a generic flask app this way:
+      ImageConfig:
+        Command: ["application.run_flask_lambda"]
+      Architectures:
+        - x86_64
+      Events:
+        # "proxy+" can't accept reqeuests to root. (They need to "pass along" something).
+        # This way, we let all requests pass: 
+        SearchAPI-root:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /
+            Method: ANY
+        SearchAPI-proxy:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /{proxy+}
+            Method: ANY
+    Metadata:
+      Dockerfile: Dockerfile
+      DockerContext: "./"
+      DockerTag: python3.9-v1
+
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  SearchAPIApi:
+    Description: "API Gateway endpoint URL for Prod stage for SearchAPI function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com"
+  SearchAPIFunction:
+    Description: "SearchAPI Lambda Function ARN"
+    Value: !GetAtt SearchAPIFunction.Arn
+  SearchAPIFunctionIamRole:
+    Description: "Implicit IAM Role created for SearchAPI function"
+    Value: !GetAtt SearchAPIFunctionRole.Arn
