@@ -1,6 +1,7 @@
 import argparse
 import yaml
 import requests
+import warnings
 
 from SearchAPI.asf_env import load_config_file
 
@@ -23,8 +24,13 @@ def api_type(user_input: str) -> str:
                 "flexible_maturity": info["flexible_maturity"],
             }
             break
-    # Make sure you hit an option in maturities.yml
-    assert api_info is not None, f"Error: api '{user_input}' not found in maturities.yml file. Can pass in full url, or key of maturity."
+    # If you don't hit an option in maturities.yml, assume what was passed IS the url:
+    if api_info is None:
+        warnings.warn(f"API url not found in 'maturities.yml'. Using it directly. ({user_input}).")
+        api_info = {
+            "this_api": str(user_input),
+            "flexible_maturity": False,
+        }
 
     # Assume it's a url now, and try to connect:
     try:
