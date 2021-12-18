@@ -182,3 +182,16 @@ sam build && sam local start-api --port 5000
 ```
 
 Then you can run the test suite, against http://127.0.0.1:5000
+
+To deploy to the cloud:
+
+```bash
+#(example, customize your params)
+sam deploy --region us-east-1 --stack-name SearchAPI-devel-staging --image-repository ${ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/searchapi-devel-staging --tags KeyName1=latest KeyName2=GITHUB_HASH_HERE_TODO --capabilities CAPABILITY_IAM
+```
+
+To delete a deployment:
+
+```bash
+sam delete --region us-east-1 --stack-name SearchAPI-devel-staging
+```
