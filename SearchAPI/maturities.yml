@@ -1,3 +1,19 @@
+# If the --api param doesn't match anything in this list, assume it IS a url, and load these params here:
+default:
+    bulk_download_api: https://bulk-download.asf.alaska.edu
+    analytics_id: None
+    cmr_base: https://cmr.uat.earthdata.nasa.gov
+    cmr_health: /search/health
+    cmr_api: /search/granules.echo10
+    cmr_collections: /search/collections
+    cmr_clear_scroll: /search/clear-scroll
+    cmr_scroll: True
+    cmr_page_size: 250
+    cmr_headers:
+        Client-Id: local_searchapi_asf
+    flexible_maturity: True
+    cloudwatch_metrics: False
+
 local:
     bulk_download_api: https://bulk-download.asf.alaska.edu
     analytics_id: None
@@ -110,15 +126,15 @@ prod-private:
     flexible_maturity: False
     cloudwatch_metrics: False
 
-# These next few, are to let the test suite look up if it should use the maturity tag:
-devel-staging:
-    this_api: https://api-dev-staging.asf.alaska.edu
-    flexible_maturity: True
+# # These next few, are to let the test suite look up if it should use the maturity tag:
+# devel-staging:
+#     this_api: https://api-dev-staging.asf.alaska.edu
+#     flexible_maturity: True
 
-test-staging:
-    this_api: https://api-test-staging.asf.alaska.edu
-    flexible_maturity: True
+# test-staging:
+#     this_api: https://api-test-staging.asf.alaska.edu
+#     flexible_maturity: True
 
-prod-staging:
-    this_api: https://api-prod-private-staging.asf.alaska.edu
-    flexible_maturity: False
+# prod-staging:
+#     this_api: https://api-prod-private-staging.asf.alaska.edu
+#     flexible_maturity: False
