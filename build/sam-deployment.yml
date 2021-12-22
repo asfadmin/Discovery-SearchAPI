@@ -1,0 +1,15 @@
+version: 0.2
+
+env:
+  variables:
+    VENV: "search-api-venv"
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.7
+
+  build:
+    commands:
+      - sam build
+      - sam deploy --region ${AWS_REGION} --stack-name SearchAPI-devel-staging --image-repository ${CODEBUILD_WEBHOOK_ACTOR_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/searchapi-devel-staging --tags KeyName1=latest KeyName2=GITHUB_HASH_HERE_TODO --capabilities CAPABILITY_IAM --no-fail-on-empty-changeset
