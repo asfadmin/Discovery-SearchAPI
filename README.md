@@ -187,7 +187,7 @@ To deploy to the cloud:
 
 ```bash
 #(example, customize your params)
-sam deploy --region us-east-1 --stack-name SearchAPI-devel-staging --image-repository ${ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/searchapi-devel-staging --tags KeyName1=latest KeyName2=GITHUB_HASH_HERE_TODO --capabilities CAPABILITY_IAM --no-fail-on-empty-changeset
+sam deploy --region us-east-1 --stack-name SearchAPI-devel-staging --image-repository $(aws sts get-caller-identity --query Account --output text).dkr.ecr.${AWS_REGION}.amazonaws.com/searchapi-devel-staging --tags KeyName1=latest KeyName2=GITHUB_HASH_HERE_TODO --capabilities CAPABILITY_IAM --no-fail-on-empty-changeset
 ```
 
 To delete a deployment:
