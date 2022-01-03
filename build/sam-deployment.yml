@@ -8,5 +8,6 @@ phases:
 
   build:
     commands:
+      - dnf upgrade -y
       - sam build
       - sam deploy --region ${AWS_REGION} --stack-name SearchAPI-devel-staging --image-repository $(aws sts get-caller-identity --query Account --output text).dkr.ecr.${AWS_REGION}.amazonaws.com/searchapi-devel-staging --tags KeyName1=latest KeyName2=GITHUB_HASH_HERE_TODO --capabilities CAPABILITY_IAM --no-fail-on-empty-changeset
