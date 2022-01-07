@@ -30,7 +30,7 @@ phases:
       - echo "{\"version\":\"${CODEBUILD_RESOLVED_SOURCE_VERSION}\"}" > SearchAPI/version.json
 
       # Setup SAM function name:
-      - SAM_FUNC_NAME="SearchAPI-${image}"
+      - SamFuncName="SearchAPI-${image}"
 
 
   build:
@@ -42,6 +42,6 @@ phases:
       - docker tag "searchapifunction:sam_image" "${PRIVATE_REPOSITORY_URI}:latest" && docker push "${PRIVATE_REPOSITORY_URI}:latest"
       - docker tag "searchapifunction:sam_image" "${PUBLIC_REPOSITORY_URI}:latest" && docker push "${PUBLIC_REPOSITORY_URI}:latest"
 
-      # The lambda function name also consequently makes a good stack-name. If you change the "SAM_FUNC_NAME" key, also change in template.yaml
-      - sam deploy --region ${AWS_REGION} --stack-name ${SAM_FUNC_NAME} --image-repository ${PRIVATE_REPOSITORY_URI} --tags KeyName1=SAM_SearchAPI --capabilities CAPABILITY_IAM --no-fail-on-empty-changeset
-      - aws lambda wait function-updated --region ${AWS_REGION} --function-name ${SAM_FUNC_NAME}
+      # The lambda function name also consequently makes a good stack-name. If you change the "SamFuncName" key, also change in template.yaml
+      - sam deploy --region ${AWS_REGION} --stack-name ${SamFuncName} --image-repository ${PRIVATE_REPOSITORY_URI} --tags KeyName1=SAM_SearchAPI --capabilities CAPABILITY_IAM --no-fail-on-empty-changeset
+      - aws lambda wait function-updated --region ${AWS_REGION} --function-name ${SamFuncName}
