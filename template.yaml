@@ -12,24 +12,17 @@ Globals:
     Timeout: 200
     MemorySize: 1524
 
+Parameters:
+  LAMBDA_FUNC_NAME:
+    Description: Required. What to name the function in AWS.
+    Type: String
+
 Resources:
-
-  # BasicAWSApiGateway:
-  #   Type: AWS::Serverless::Api
-  #   Properties:
-  #     Name: SAM deployment for Lambda Container
-  #     Description: Created through template.yaml, edit there to make changes
-  #     StageName: Stage
-
-  # BasicAWSApiGateway:
-  #   Type: AWS::ApiGateway::RestApi
-  #   Properties:
-  #     Name: SAM deployment for Lambda Container
-  #     FailOnWarnings: true
 
   SearchAPIFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
+      FunctionName: !Ref LAMBDA_FUNC_NAME
       PackageType: Image
       # The vanilla container can run a generic flask app this way:
       ImageConfig:
@@ -56,6 +49,19 @@ Resources:
       DockerContext: "./"
       # If you change this, also change in build/sam-deployment.yml, so codebuild can find the image:
       DockerTag: sam_image
+
+  # BasicAWSApiGateway:
+  #   Type: AWS::Serverless::Api
+  #   Properties:
+  #     Name: SAM deployment for Lambda Container
+  #     Description: Created through template.yaml, edit there to make changes
+  #     StageName: Stage
+
+  # BasicAWSApiGateway:
+  #   Type: AWS::ApiGateway::RestApi
+  #   Properties:
+  #     Name: SAM deployment for Lambda Container
+  #     FailOnWarnings: true
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
