@@ -19,6 +19,9 @@ RUN python3 -m pip install --no-cache-dir -r requirements.txt --target "${LAMBDA
 ADD SearchAPI "${LAMBDA_TASK_ROOT}/SearchAPI"
 ENV PYTHONPATH "${PYTHONPATH}:${LAMBDA_TASK_ROOT}/SearchAPI"
 
+## Cleanup to save space:
+RUN rm -rf /var/cache/yum
+
 ## Run everything from the SearchAPI directoy:
 WORKDIR "${LAMBDA_TASK_ROOT}/SearchAPI"
 CMD [ "application.application" ]
