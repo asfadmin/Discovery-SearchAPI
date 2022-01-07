@@ -54,7 +54,8 @@ Resources:
     Metadata:
       Dockerfile: Dockerfile
       DockerContext: "./"
-      DockerTag: latest
+      # If you change this, also change in build/sam-deployment.yml, so codebuild can find the image:
+      DockerTag: sam_image
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
