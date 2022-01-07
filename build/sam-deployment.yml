@@ -8,8 +8,11 @@ phases:
 
   build:
     commands:
+      - IMAGE_REPO="$(aws sts get-caller-identity --query Account --output text).dkr.ecr.${AWS_REGION}.amazonaws.com/searchapi-devel-staging"
       - yum upgrade -y
+      # Inject the github hash to version file, so you can check if deployed on the health endpoint.
       - echo "{\"version\":\"${CODEBUILD_RESOLVED_SOURCE_VERSION}\"}" > SearchAPI/version.json
       - sam build
-      - docker image ls
-      - sam deploy --region ${AWS_REGION} --stack-name SearchAPI-devel-staging --image-repository $(aws sts get-caller-identity --query Account --output text).dkr.ecr.${AWS_REGION}.amazonaws.com/searchapi-devel-staging --tags KeyName1=latest KeyName2=GITHUB_HASH_HERE_TODO --capabilities CAPABILITY_IAM --no-fail-on-empty-changeset
+      # Make sure "latest" tag gets updated too. `sam deploy` only pushes a image with a weird hash, so each one is unique.
+      - docker tag searchapifunction "${IMAGE_REPO}:latest" && docker push "${IMAGE_REPO}:latest"
+      - sam deploy --region ${AWS_REGION} --stack-name SearchAPI-devel-staging --image-repository ${IMAGE_REPO} --tags KeyName1=latest KeyName2=GITHUB_HASH_HERE_TODO --capabilities CAPABILITY_IAM --no-fail-on-empty-changeset
