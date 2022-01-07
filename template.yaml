@@ -13,7 +13,8 @@ Globals:
     MemorySize: 1524
 
 Parameters:
-  LAMBDA_FUNC_NAME:
+  # If you change the name, change in build/sam-deployment.yml too
+  SAM_FUNC_NAME:
     Description: Required. What to name the function in AWS.
     Type: String
 
@@ -22,7 +23,7 @@ Resources:
   SearchAPIFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
-      FunctionName: !Ref LAMBDA_FUNC_NAME
+      FunctionName: !Ref SAM_FUNC_NAME
       PackageType: Image
       # The vanilla container can run a generic flask app this way:
       ImageConfig:
