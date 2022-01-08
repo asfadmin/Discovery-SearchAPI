@@ -30,7 +30,7 @@ phases:
       - echo "{\"version\":\"${CODEBUILD_RESOLVED_SOURCE_VERSION}\"}" > SearchAPI/version.json
 
       # Setup SAM function name:
-      - SAM_Deployment_Name="SearchAPI-${image}"
+      - SAM_Deployment_Name="SAM-${image}"
 
 
   build:
