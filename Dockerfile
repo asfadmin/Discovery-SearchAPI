@@ -6,14 +6,14 @@ RUN yum update -y && \
     yum install -y g++ gcc-c++ && \
     yum -y clean all
 
-### TODO: Poke at dropping to non-root here <---------------------------------------------------------------------- !!!!!!!!!!!!!!!!!!!!!!!!
+RUN python3 -m venv /opt/venv
 
-RUN python3 -m pip install --no-cache-dir --upgrade pip
-RUN python3 -m pip install --no-cache-dir wheel Cython
+RUN . /opt/venv/bin/activate && python3 -m pip install --no-cache-dir --upgrade pip
+RUN . /opt/venv/bin/activate && python3 -m pip install --no-cache-dir wheel Cython
     # wheel Cython => building (mainly scikit-learn)
 
 COPY requirements.txt .
-RUN python3 -m pip install --no-cache-dir -r requirements.txt --target "${LAMBDA_TASK_ROOT}"
+RUN . /opt/venv/bin/activate && python3 -m pip install --no-cache-dir -r requirements.txt --target "${LAMBDA_TASK_ROOT}"
 
 ## Copy required files:
 ADD SearchAPI "${LAMBDA_TASK_ROOT}/SearchAPI"
