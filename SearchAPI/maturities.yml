@@ -46,6 +46,22 @@ devel:
     flexible_maturity: True
     cloudwatch_metrics: True
 
+devel-staging:
+    bulk_download_api: https://bulk-download-dev.asf.alaska.edu
+    analytics_id: UA-118881300-4
+    this_api: https://api-devel-staging.asf.alaska.edu
+    cmr_base: https://cmr.uat.earthdata.nasa.gov
+    cmr_health: /search/health
+    cmr_api: /search/granules.echo10
+    cmr_collections: /search/collections
+    cmr_clear_scroll: /search/clear-scroll
+    cmr_scroll: False
+    cmr_page_size: 1000
+    cmr_headers:
+        Client-Id: devel_vertex_asf
+    flexible_maturity: True
+    cloudwatch_metrics: True
+
 devel-beanstalk:
     bulk_download_api: https://bulk-download-dev.asf.alaska.edu
     analytics_id: UA-118881300-4
