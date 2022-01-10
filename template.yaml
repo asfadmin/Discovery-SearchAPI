@@ -19,6 +19,7 @@ Parameters:
     Type: String
   Maturity:
     Description: Required. Check 'SearchAPI/maturities.yml' for available options.
+    Type: String
 
 Resources:
 
