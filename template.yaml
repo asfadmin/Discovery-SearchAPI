@@ -33,6 +33,9 @@ Resources:
         Command: ["application.run_flask_lambda"]
       Architectures:
         - x86_64
+      Enviornment:
+        Variables:
+          MATURITY: !Ref Maturity
       Events:
         # "proxy+" can't accept reqeuests to root. (They need to "pass along" something).
         # This way, we let all requests pass: 
