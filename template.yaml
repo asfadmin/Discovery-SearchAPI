@@ -33,7 +33,7 @@ Resources:
         Command: ["application.run_flask_lambda"]
       Architectures:
         - x86_64
-      Enviornment:
+      Environment:
         Variables:
           MATURITY: !Ref Maturity
       Events:
