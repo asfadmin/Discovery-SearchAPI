@@ -27,7 +27,7 @@ Resources:
       PackageType: Image
       # The vanilla container can run a generic flask app this way:
       ImageConfig:
-        Entrypoint: ["/bin/bash", "-c", "source /opt/venv/bin/activate && /lambda-entrypoint.sh"]
+        Entrypoint: ["/lambda-entrypoint.sh"]
         Command: ["application.run_flask_lambda"]
       Architectures:
         - x86_64

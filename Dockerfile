@@ -24,4 +24,7 @@ RUN rm -rf /var/cache/yum
 
 ## Run everything from the SearchAPI directoy:
 WORKDIR "${LAMBDA_TASK_ROOT}/SearchAPI"
-CMD [ "application.application" ]
+
+## Nuke default entrypoint. The "exec" in CMD is for correct signal handling.
+# ENTRYPOINT []
+CMD [ "source", "/opt/venv/bin/activate", "&&", "exec", "python3", "-m", "application" ]
