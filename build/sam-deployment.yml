@@ -14,7 +14,8 @@ phases:
 
   pre_build:
     commands:
-      - if [ -z "${image}" ]; then echo "ERROR - must declare 'image' where you're using codebuild! (What repo inside ECR to push to). Quitting"; exit -1; fi
+      - if [ -z "${Image}" ]; then echo "ERROR - must declare 'Image' where using codebuild! (What repo inside ECR to push to.). Quitting"; exit -1; fi
+      - if [ -z "${Maturity}" ]; then echo "ERROR - must declare 'Maturity' when using codebuild! (Check 'SearchAPI/maturities.yml' for available options.). Quitting"; exit -1; fi
 
       # First do dockerhub, to not hit limit on pulling the base docker image:
       # (Added to codebuild itself, you don't need to populate these)
@@ -23,14 +24,14 @@ phases:
       - aws ecr-public get-login-password --region "${AWS_REGION}" | docker login --username AWS --password-stdin public.ecr.aws
       - aws ecr get-login-password --region "${AWS_REGION}" | docker login --username AWS --password-stdin $(aws sts get-caller-identity --query Account --output text).dkr.ecr.${AWS_REGION}.amazonaws.com
 
-      - PUBLIC_REPOSITORY_URI="public.ecr.aws/u8i1y1d8/${image}"
-      - PRIVATE_REPOSITORY_URI="$(aws sts get-caller-identity --query Account --output text).dkr.ecr.${AWS_REGION}.amazonaws.com/${image}"
+      - PUBLIC_REPOSITORY_URI="public.ecr.aws/u8i1y1d8/${Image}"
+      - PRIVATE_REPOSITORY_URI="$(aws sts get-caller-identity --query Account --output text).dkr.ecr.${AWS_REGION}.amazonaws.com/${Image}"
 
       # Inject the github hash to version file, so you can check if deployed on the health endpoint.
       - echo "{\"version\":\"${CODEBUILD_RESOLVED_SOURCE_VERSION}\"}" > SearchAPI/version.json
 
       # Setup SAM function name:
-      - SAM_Deployment_Name="SAM-${image}"
+      - SAM_Deployment_Name="SAM-${Image}"
 
 
   build:
@@ -43,5 +44,17 @@ phases:
       - docker tag "searchapifunction:sam_image" "${PUBLIC_REPOSITORY_URI}:latest" && docker push "${PUBLIC_REPOSITORY_URI}:latest"
 
       # The lambda function name also consequently makes a good stack-name. If you change the "SamFuncName" key, also change in template.yaml
-      - sam deploy --region ${AWS_REGION} --image-repository ${PRIVATE_REPOSITORY_URI} --parameter-overrides SamFuncName=${SAM_Deployment_Name} --stack-name ${SAM_Deployment_Name} --tags KeyName1=SAM_SearchAPI --capabilities CAPABILITY_IAM --no-fail-on-empty-changeset
+      - sam deploy --region ${AWS_REGION} \
+                   --image-repository ${PRIVATE_REPOSITORY_URI} \
+                   --parameter-overrides SamFuncName=${SAM_Deployment_Name} \
+                   --parameter-overrides Maturity=${maturity} \
+                   --stack-name ${SAM_Deployment_Name} \
+                   --tags KeyName1=SAM_SearchAPI \
+                   --capabilities CAPABILITY_IAM \
+                   --no-fail-on-empty-changeset
+      
+      # Wait for lambda to be updated. Send a request, to spin up the initial container:
       - aws lambda wait function-updated --region ${AWS_REGION} --function-name ${SAM_Deployment_Name}
+      ## TODO: Send the health point request here
+
+      ## TODO: Run test suite here

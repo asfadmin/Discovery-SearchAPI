@@ -17,6 +17,8 @@ Parameters:
   SamFuncName:
     Description: Required. What to name the function in AWS.
     Type: String
+  Maturity:
+    Description: Required. Check 'SearchAPI/maturities.yml' for available options.
 
 Resources:
 
