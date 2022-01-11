@@ -16,7 +16,7 @@ phases:
     commands:
       - if [ -z "${Image}" ]; then echo "ERROR - must declare 'Image' where using codebuild! (What repo inside ECR to push to.). Quitting"; exit -1; fi
       - if [ -z "${Maturity}" ]; then echo "ERROR - must declare 'Maturity' when using codebuild! (Check 'SearchAPI/maturities.yml' for available options.). Quitting"; exit -1; fi
-      - if [ -z "${TestSuiteURL}" ]; then echo "ERROR - must declare 'TestSuiteURL' when using codebuild! Quitting"; exit -1; fi
+      # - if [ -z "${TestSuiteURL}" ]; then echo "ERROR - must declare 'TestSuiteURL' when using codebuild! Quitting"; exit -1; fi
       ## Need to put paths at the end of the url. If it has a trailing '/', remove it so you don't end up with "https://api//endpoint".
       # - if [[ "${TestSuiteURL}" == */ ]]; then TestSuiteURL=${TestSuiteURL::-1}; fi
 
