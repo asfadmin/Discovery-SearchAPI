@@ -4,23 +4,23 @@ from flask import request
 from flask import Response
 from flask_talisman import Talisman
 from flask_cors import CORS
-from SearchQuery import APISearchQuery
-from StackQuery import APIStackQuery
+from SearchAPI.SearchQuery import APISearchQuery
+from SearchAPI.StackQuery import APIStackQuery
 from urllib import parse
 import sys
 import logging
 import os
 import json
-from CMR.Health import get_cmr_health
-from Analytics import analytics_pageview
+from SearchAPI.CMR.Health import get_cmr_health
+from SearchAPI.Analytics import analytics_pageview
 from werkzeug.exceptions import RequestEntityTooLarge
 import multiprocessing
 import requests
-from asf_env import get_config, load_config
+from SearchAPI.asf_env import get_config, load_config
 from time import perf_counter
 import boto3
 
-import endpoints
+import SearchAPI.endpoints
 
 application = Flask(__name__)
 application.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024 # limit to 10 MB, primarily affects file uploads

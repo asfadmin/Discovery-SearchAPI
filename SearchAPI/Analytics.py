@@ -5,7 +5,7 @@ import time
 import requests
 from flask import request
 from urllib.parse import urlparse
-from asf_env import get_config
+from SearchAPI.asf_env import get_config
 
 
 def analytics_events(events=None):

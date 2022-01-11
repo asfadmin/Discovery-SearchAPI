@@ -6,9 +6,9 @@ from time import sleep, perf_counter
 import requests
 from flask import request
 
-from asf_env import get_config
-from CMR.Translate import parse_cmr_response
-from CMR.Exceptions import CMRError
+from SearchAPI.asf_env import get_config
+from SearchAPI.CMR.Translate import parse_cmr_response
+from SearchAPI.CMR.Exceptions import CMRError
 
 
 class CMRSubQuery:

@@ -2,10 +2,10 @@ import itertools
 import logging
 import time
 
-from asf_env import get_config
+from SearchAPI.asf_env import get_config
 
-from CMR.Translate import input_map
-from CMR.SubQuery import CMRSubQuery
+from SearchAPI.CMR.Translate import input_map
+from SearchAPI.CMR.SubQuery import CMRSubQuery
 from flask import request
 
 

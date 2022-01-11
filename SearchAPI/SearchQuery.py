@@ -4,12 +4,12 @@ import json
 
 from flask import Response, make_response, stream_with_context
 
-import api_headers
-from CMR.Query import CMRQuery
-from CMR.Translate import translate_params, input_fixer
-from CMR.Output import output_translators
-from CMR.Exceptions import CMRError
-from Analytics import analytics_events
+import SearchAPI.api_headers
+from SearchAPI.CMR.Query import CMRQuery
+from SearchAPI.CMR.Translate import translate_params, input_fixer
+from SearchAPI.CMR.Output import output_translators
+from SearchAPI.CMR.Exceptions import CMRError
+from SearchAPI.Analytics import analytics_events
 
 
 class APISearchQuery:
