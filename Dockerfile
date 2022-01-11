@@ -24,6 +24,7 @@ COPY SearchAPI SearchAPI
 ## Cleanup to save space:
 RUN rm -rf /var/cache/yum
 
+EXPOSE 5000
 ## Nuke "default" entrypoint (Since it's for running in lambda). It gets set BACK to default, in template.yaml
 ENTRYPOINT []
 ## The "exec" is for correct signal handling.
