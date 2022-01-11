@@ -12,19 +12,19 @@ RUN . /opt/venv/bin/activate && python3 -m pip install --no-cache-dir --upgrade 
 RUN . /opt/venv/bin/activate && python3 -m pip install --no-cache-dir wheel Cython
     # wheel Cython => building (mainly scikit-learn)
 
+## Run everything from the Lambda directoy:
+WORKDIR "${LAMBDA_TASK_ROOT}"
+
 COPY requirements.txt .
 RUN . /opt/venv/bin/activate && python3 -m pip install --no-cache-dir -r requirements.txt --target "${LAMBDA_TASK_ROOT}"
 
 ## Copy required files:
-ADD SearchAPI "${LAMBDA_TASK_ROOT}/SearchAPI"
-ENV PYTHONPATH "${PYTHONPATH}:${LAMBDA_TASK_ROOT}/SearchAPI"
+COPY SearchAPI SearchAPI
 
 ## Cleanup to save space:
 RUN rm -rf /var/cache/yum
 
-## Run everything from the SearchAPI directoy:
-WORKDIR "${LAMBDA_TASK_ROOT}/SearchAPI"
-
-## Nuke default entrypoint. The "exec" in CMD is for correct signal handling.
+## Nuke "default" entrypoint (Since it's for running in lambda). It gets set BACK to default, in template.yaml
 ENTRYPOINT []
-CMD [ "source", "/opt/venv/bin/activate", "&&", "exec", "python3", "-m", "application" ]
+## The "exec" is for correct signal handling.
+CMD ["/bin/bash", "-c", ". /opt/venv/bin/activate && exec python -m SearchAPI.application"]
