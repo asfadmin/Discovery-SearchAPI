@@ -32,7 +32,7 @@ phases:
 
       ## Pull both the base, and the image before this one, to use cached layers where possible.
       - docker pull public.ecr.aws/lambda/python:3.9
-      - docker pull ${PRIVATE_REPOSITORY_URI}:latest || true
+      - docker pull "${PRIVATE_REPOSITORY_URI}:latest" && docker tag "${PRIVATE_REPOSITORY_URI}:latest" "searchapifunction:sam_image" || true
 
       ## Inject the github hash to version file, so you can check if deployed on the health endpoint.
       - echo "{\"version\":\"${CODEBUILD_RESOLVED_SOURCE_VERSION}\"}" > SearchAPI/version.json
