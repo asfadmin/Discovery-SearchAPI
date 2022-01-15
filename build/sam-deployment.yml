@@ -42,7 +42,6 @@ phases:
       ## Setup SAM function name:
       - SAM_Deployment_Name="SAM-${Image}"
 
-
   build:
     commands:
       # - yum upgrade -y
