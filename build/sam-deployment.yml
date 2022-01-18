@@ -59,7 +59,6 @@ phases:
                    --tags KeyName1=SAM_SearchAPI
                    --capabilities CAPABILITY_IAM
                    --no-fail-on-empty-changeset
-                  #  --parameter-overrides ParameterKey=SamFuncName,ParameterValue=${SAM_Deployment_Name} ParameterKey=Maturity,ParameterValue=${Maturity}
 
       ## Wait for lambda to be updated. Then send a request, to spin up the initial container:
       ##   (The first request ALWAYS takes super long, but all after it return as normal)
@@ -68,3 +67,7 @@ phases:
 
       ## Finally, run the test suite:
       # - pytest -n auto --df known_bugs --df prod_only . --api ${TEST_SUITE_URL}
+
+artifacts:
+  files:
+    - '**/*'
