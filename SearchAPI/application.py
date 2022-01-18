@@ -20,7 +20,7 @@ from SearchAPI.asf_env import get_config, load_config
 from time import perf_counter
 import boto3
 
-import SearchAPI.endpoints
+import SearchAPI.endpoints as endpoints
 
 application = Flask(__name__)
 application.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024 # limit to 10 MB, primarily affects file uploads

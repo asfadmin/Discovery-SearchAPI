@@ -1,10 +1,10 @@
 from flask import Response
 import json
-import SearchAPI.api_headers
+import SearchAPI.api_headers as api_headers
 import logging
 
 from WKTUtils import FilesToWKT, RepairWKT
-import SearchAPI.MissionList
+import SearchAPI.MissionList as MissionList
 from SearchAPI.CMR.Input import parse_date
 
 

@@ -39,7 +39,7 @@ Resources:
           MATURITY: !Ref Maturity
       Events:
         # "proxy+" can't accept reqeuests to root. (They need to "pass along" something).
-        # This way, we let all requests pass: 
+        # This way, we let all requests pass:
         RootRequest:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:

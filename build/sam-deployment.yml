@@ -60,7 +60,7 @@ phases:
                    --tags KeyName1=SAM_SearchAPI
                    --capabilities CAPABILITY_IAM
                    --no-fail-on-empty-changeset
-      
+
       ## Wait for lambda to be updated. Then send a request, to spin up the initial container:
       ##   (The first request ALWAYS takes super long, but all after it return as normal)
       - aws lambda wait function-updated --region ${AWS_REGION} --function-name ${SAM_Deployment_Name}
