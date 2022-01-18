@@ -7,4 +7,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Waiting
-        run: sleep 15
+        run: sleep 30
