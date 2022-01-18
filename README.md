@@ -142,7 +142,7 @@ To deploy to prod, merge changes to the prod branch.
 ## Lambda Testing
 
 Build image:
-`<image_tag>`: Format of "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${CustomRegistry}"
+`<image_tag>`: Format of `${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${CustomRegistry}`
 
 ```bash
 docker build -t <image_tag> .
@@ -171,4 +171,27 @@ aws ecr get-login-password --region us-east-1 | docker login --username AWS --pa
 aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws
 
 docker push <image_tag>
+```
+
+## SAM Notes
+
+To spin up a local instance, to test against (Both API Gateway and Lambda included):
+
+```bash
+sam build && sam local start-api --port 5000
+```
+
+Then you can run the test suite, against http://127.0.0.1:5000
+
+To deploy to the cloud:
+
+```bash
+#(example, customize your params)
+sam deploy --region us-east-1 --stack-name SearchAPI-devel-staging --image-repository $(aws sts get-caller-identity --query Account --output text).dkr.ecr.${AWS_REGION}.amazonaws.com/searchapi-devel-staging --tags KeyName1=latest KeyName2=GITHUB_HASH_HERE_TODO --capabilities CAPABILITY_IAM --no-fail-on-empty-changeset
+```
+
+To delete a deployment:
+
+```bash
+sam delete --region us-east-1 --stack-name SearchAPI-devel-staging
 ```

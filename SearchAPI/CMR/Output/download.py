@@ -1,6 +1,6 @@
 import logging
 import requests
-from asf_env import get_config
+from SearchAPI.asf_env import get_config
 
 def req_fields_download():
     fields = [

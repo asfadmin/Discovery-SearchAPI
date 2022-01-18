@@ -1,4 +1,4 @@
-from asf_env import get_config
+from SearchAPI.asf_env import get_config
 from defusedxml.lxml import fromstring
 
 import logging

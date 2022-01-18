@@ -1,0 +1,70 @@
+version: 0.2
+
+# Base permissions for SAM: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-permissions.html
+
+env:
+  secrets-manager:
+    docker_username: dockerhub:dockerhub_username
+    docker_password: dockerhub:dockerhub_password
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.7
+
+  pre_build:
+    commands:
+      - if [ -z "${Image}" ]; then echo "ERROR - must declare 'Image' where using codebuild! (What repo inside ECR to push to.). Quitting"; exit -1; fi
+      - if [ -z "${Maturity}" ]; then echo "ERROR - must declare 'Maturity' when using codebuild! (Check 'SearchAPI/maturities.yml' for available options.). Quitting"; exit -1; fi
+      # - if [ -z "${TestSuiteURL}" ]; then echo "ERROR - must declare 'TestSuiteURL' when using codebuild! Quitting"; exit -1; fi
+      ## Need to put paths at the end of the url. If it has a trailing '/', remove it so you don't end up with "https://api//endpoint".
+      # - if [[ "${TestSuiteURL}" == */ ]]; then TestSuiteURL=${TestSuiteURL::-1}; fi
+
+      ## First do dockerhub, to not hit limit on pulling the base docker image:
+      ## (Added to codebuild itself, you don't need to populate these)
+      - docker login -u "${docker_username}" -p "${docker_password}"
+      ## Must maintain *both* public/private, until lambda supports running off public images:
+      - aws ecr-public get-login-password --region "${AWS_REGION}" | docker login --username AWS --password-stdin public.ecr.aws
+      - aws ecr get-login-password --region "${AWS_REGION}" | docker login --username AWS --password-stdin $(aws sts get-caller-identity --query Account --output text).dkr.ecr.${AWS_REGION}.amazonaws.com
+
+      - PUBLIC_REPOSITORY_URI="public.ecr.aws/u8i1y1d8/${Image}"
+      - PRIVATE_REPOSITORY_URI="$(aws sts get-caller-identity --query Account --output text).dkr.ecr.${AWS_REGION}.amazonaws.com/${Image}"
+
+      ## Pull both the base, and the image before this one, to use cached layers where possible.
+      ## Can't get this working yet. Need to wipe ALL local images, and test if this works like I think it should.
+      ## NOTE: Tested you do need to pull the base image FIRST, so sam can check if THAT needs updating.
+      # - docker pull public.ecr.aws/lambda/python:3.9
+      # - docker pull "${PRIVATE_REPOSITORY_URI}:latest" && docker tag "${PRIVATE_REPOSITORY_URI}:latest" "searchapifunction:sam_image" || true
+
+      ## Inject the github hash to version file, so you can check if deployed on the health endpoint.
+      - echo "{\"version\":\"${CODEBUILD_RESOLVED_SOURCE_VERSION}\"}" > SearchAPI/version.json
+
+      ## Setup SAM function name:
+      - SAM_Deployment_Name="SAM-${Image}"
+
+  build:
+    commands:
+      # - yum upgrade -y
+      - sam build
+
+      ## Make sure "latest" tag gets updated too. `sam deploy` only pushes a image with a weird hash, so each one is unique.
+      - docker tag "searchapifunction:sam_image" "${PRIVATE_REPOSITORY_URI}:latest" && docker push "${PRIVATE_REPOSITORY_URI}:latest"
+      - docker tag "searchapifunction:sam_image" "${PUBLIC_REPOSITORY_URI}:latest" && docker push "${PUBLIC_REPOSITORY_URI}:latest"
+
+      ## The lambda function name also consequently makes a good stack-name. If you change the "SamFuncName" key, also change in template.yaml
+      - sam deploy --region ${AWS_REGION}
+                   --image-repository ${PRIVATE_REPOSITORY_URI}
+                   --parameter-overrides SamFuncName=${SAM_Deployment_Name}
+                   --parameter-overrides Maturity=${Maturity}
+                   --stack-name ${SAM_Deployment_Name}
+                   --tags KeyName1=SAM_SearchAPI
+                   --capabilities CAPABILITY_IAM
+                   --no-fail-on-empty-changeset
+
+      ## Wait for lambda to be updated. Then send a request, to spin up the initial container:
+      ##   (The first request ALWAYS takes super long, but all after it return as normal)
+      - aws lambda wait function-updated --region ${AWS_REGION} --function-name ${SAM_Deployment_Name}
+      # - curl --max-time 300 ${TEST_SUITE_URL}/health
+
+      ## Finally, run the test suite:
+      # - pytest -n auto --df known_bugs --df prod_only . --api ${TEST_SUITE_URL}

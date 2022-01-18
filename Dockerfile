@@ -1,31 +1,31 @@
 # From aws's repository:
-FROM amazon/aws-lambda-python:3
+FROM public.ecr.aws/lambda/python:3.9
 
 ## Install/update outside libraries:
 RUN yum update -y && \
     yum install -y g++ gcc-c++ && \
     yum -y clean all
 
+RUN python3 -m venv /opt/venv
 
-# Add Lambda Runtime Interface Emulator and use a script in the ENTRYPOINT for simpler local runs
-# ADD https://github.com/aws/aws-lambda-runtime-interface-emulator/releases/latest/download/aws-lambda-rie /usr/bin/aws-lambda-rie
-# RUN chmod +x /usr/bin/aws-lambda-rie
-
-### TODO: Poke at dropping to non-root here <---------------------------------------------------------------------- !!!!!!!!!!!!!!!!!!!!!!!!
-
-RUN python3 -m pip install --no-cache-dir --upgrade pip
-RUN python3 -m pip install --no-cache-dir wheel Cython
+RUN . /opt/venv/bin/activate && python3 -m pip install --no-cache-dir --upgrade pip
+RUN . /opt/venv/bin/activate && python3 -m pip install --no-cache-dir wheel Cython
     # wheel Cython => building (mainly scikit-learn)
-    # awslambdaric => lambda runtime API: https://docs.aws.amazon.com/lambda/latest/dg/runtimes-images.html#runtimes-api-client
-        # Maybe not needed? Since I'm building from amazon/aws-lambda-python container
+
+## Run everything from the Lambda directoy:
+WORKDIR "${LAMBDA_TASK_ROOT}"
 
 COPY requirements.txt .
-RUN python3 -m pip install --no-cache-dir -r requirements.txt --target "${LAMBDA_TASK_ROOT}"
+RUN . /opt/venv/bin/activate && python3 -m pip install --no-cache-dir -r requirements.txt --target "${LAMBDA_TASK_ROOT}"
 
 ## Copy required files:
-ADD SearchAPI "${LAMBDA_TASK_ROOT}/SearchAPI"
-ENV PYTHONPATH "${PYTHONPATH}:${LAMBDA_TASK_ROOT}/SearchAPI"
+COPY SearchAPI SearchAPI
 
-## Run everything from the SearchAPI directoy:
-WORKDIR "${LAMBDA_TASK_ROOT}/SearchAPI"
-CMD [ "application.handler" ]
+## Cleanup to save space:
+RUN rm -rf /var/cache/yum
+
+EXPOSE 5000
+## Nuke "default" entrypoint (Since it's for running in lambda). It gets set BACK to default, in template.yaml
+ENTRYPOINT []
+## The "exec" is for correct signal handling.
+CMD ["/bin/bash", "-c", ". /opt/venv/bin/activate && exec python -m SearchAPI.application"]

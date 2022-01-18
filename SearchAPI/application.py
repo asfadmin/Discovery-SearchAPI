@@ -4,23 +4,23 @@ from flask import request
 from flask import Response
 from flask_talisman import Talisman
 from flask_cors import CORS
-from SearchQuery import APISearchQuery
-from StackQuery import APIStackQuery
+from SearchAPI.SearchQuery import APISearchQuery
+from SearchAPI.StackQuery import APIStackQuery
 from urllib import parse
 import sys
 import logging
 import os
 import json
-from CMR.Health import get_cmr_health
-from Analytics import analytics_pageview
+from SearchAPI.CMR.Health import get_cmr_health
+from SearchAPI.Analytics import analytics_pageview
 from werkzeug.exceptions import RequestEntityTooLarge
 import multiprocessing
 import requests
-from asf_env import get_config, load_config
+from SearchAPI.asf_env import get_config, load_config
 from time import perf_counter
 import boto3
 
-import endpoints
+import SearchAPI.endpoints as endpoints
 
 application = Flask(__name__)
 application.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024 # limit to 10 MB, primarily affects file uploads
@@ -45,34 +45,41 @@ def get_product_list():
 
 # Validate and/or repair a WKT to ensure it meets CMR's requirements
 @application.route('/services/utils/wkt', methods = ['GET', 'POST'])
+@talisman(force_https=False)
 def validate_wkt():
     return endpoints.RepairWKT_Endpoint(request).get_response()
 
 # Validate a date to ensure it meets our requirements
 @application.route('/services/utils/date', methods = ['GET', 'POST'])
+@talisman(force_https=False)
 def validate_date():
     return endpoints.DateValidator_Endpoint(request).get_response()
 
 # Convert a set of shapefiles or a geojson file to WKT
 @application.route('/services/utils/files_to_wkt', methods = ['POST'])
+@talisman(force_https=False)
 def filesToWKT():
     return endpoints.FilesToWKT_Endpoint(request).get_response()
 
 # Collect a list of missions from CMR for a given platform
 @application.route('/services/utils/mission_list', methods = ['GET', 'POST'])
+@talisman(force_https=False)
 def missionList():
     return endpoints.MissionList_Endpoint(request).get_response()
 
 # Fetch and convert the results from CMR
 @application.route('/services/search/param', methods = ['GET', 'POST'])
+@talisman(force_https=False)
 def proxy_search():
     return APISearchQuery(request, should_stream=True).get_response()
 
 @application.route('/services/load/param', methods = ['GET', 'POST'])
+@talisman(force_https=False)
 def proxy_search_without_stream():
     return APISearchQuery(request, should_stream=False).get_response()
 
 @application.route('/services/search/baseline', methods = ['GET', 'POST'])
+@talisman(force_https=False)
 def stack_search():
     return APIStackQuery(request).get_response()
 
@@ -85,7 +92,8 @@ def stack_search():
 @talisman(force_https=False)
 def health_check():
     try:
-        with open('version.json', 'r', encoding="utf-8") as version_file:
+        version_path = os.path.join("SearchAPI", "version.json")
+        with open(version_path, 'r', encoding="utf-8") as version_file:
             api_version = json.load(version_file)
     except Exception as e:
         logging.debug(e)
@@ -161,11 +169,13 @@ def postflight(e):
     except Exception as e:
         logging.critical(f'Failure during request teardown: {e}')
 
-def handler(event, context):
+# Lambda hook, to run in AWS:
+def run_flask_lambda(event, context):
     return awsgi.response(application, event, context)
 
 # So you can call this from the Dockerfile as well:
-def main():
+## NOTE: This'll be called by the container too. We can't JUST have it be debug by default
+def run_flask():
     if 'MATURITY' not in os.environ:
         os.environ['MATURITY'] = 'local'
     sys.dont_write_bytecode = True  # prevent clutter
@@ -176,4 +186,4 @@ def main():
 
 # Run a dev server
 if __name__ == '__main__':
-    main()
+    run_flask()
