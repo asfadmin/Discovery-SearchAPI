@@ -5,7 +5,7 @@ from flask import request
 
 def load_config_file():
     file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),  "maturities.yml")
-    with open(file_path, "r") as yml_file:
+    with open(file_path, "r", encoding='utf-8') as yml_file:
         config = yaml.safe_load(yml_file)
     return config
 

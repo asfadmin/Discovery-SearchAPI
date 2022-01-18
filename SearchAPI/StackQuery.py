@@ -4,7 +4,7 @@ from flask import Response, make_response
 from datetime import datetime
 import logging
 
-import SearchAPI.api_headers
+import SearchAPI.api_headers as api_headers
 from SearchAPI.CMR.Input import parse_string
 from SearchAPI.CMR.Output import output_translators
 from SearchAPI.Baseline import get_stack, get_default_product_type
