@@ -54,11 +54,12 @@ phases:
       ## The lambda function name also consequently makes a good stack-name. If you change the "SamFuncName" key, also change in template.yaml
       - sam deploy --region ${AWS_REGION}
                    --image-repository ${PRIVATE_REPOSITORY_URI}
-                   --parameter-overrides SamFuncName=${SAM_Deployment_Name},Maturity=${Maturity}
+                   --parameter-overrides SamFuncName=${SAM_Deployment_Name} Maturity=${Maturity}
                    --stack-name ${SAM_Deployment_Name}
                    --tags KeyName1=SAM_SearchAPI
                    --capabilities CAPABILITY_IAM
                    --no-fail-on-empty-changeset
+                  #  --parameter-overrides ParameterKey=SamFuncName,ParameterValue=${SAM_Deployment_Name} ParameterKey=Maturity,ParameterValue=${Maturity}
 
       ## Wait for lambda to be updated. Then send a request, to spin up the initial container:
       ##   (The first request ALWAYS takes super long, but all after it return as normal)
