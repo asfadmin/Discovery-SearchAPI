@@ -15,11 +15,14 @@ RUN . /opt/venv/bin/activate && python3 -m pip install --no-cache-dir wheel Cyth
 ## Run everything from the Lambda directoy:
 WORKDIR "${LAMBDA_TASK_ROOT}"
 
-COPY requirements.txt .
-RUN . /opt/venv/bin/activate && python3 -m pip install --no-cache-dir -r requirements.txt --target "${LAMBDA_TASK_ROOT}"
-
 ## Copy required files:
 COPY SearchAPI SearchAPI
+COPY requirements.txt .
+COPY setup.py .
+COPY README.md .
+
+## Install both requirements.txt, AND the SearchAPI package in this dir:
+RUN . /opt/venv/bin/activate && python3 -m pip install --no-cache-dir -r requirements.txt --target "${LAMBDA_TASK_ROOT}" .
 
 ## Cleanup to save space:
 RUN rm -rf /var/cache/yum
