@@ -42,7 +42,7 @@ def cmr_to_csv(rgen, includeBaseline=False, addendum=None):
     logging.debug('translating: csv')
 
     templateEnv = Environment(
-        loader=PackageLoader('CMR', 'templates'),
+        loader=PackageLoader('SearchAPI.CMR', 'templates'),
         autoescape=True
     )
 
