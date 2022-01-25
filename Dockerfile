@@ -27,7 +27,7 @@ RUN . /opt/venv/bin/activate && python3 -m pip install --no-cache-dir -r require
 ## Cleanup to save space:
 RUN rm -rf /var/cache/yum
 
-EXPOSE 5000
+EXPOSE 8080
 ## Nuke "default" entrypoint (Since it's for running in lambda). It gets set BACK to default, in template.yaml
 ENTRYPOINT []
 ## The "exec" is for correct signal handling.

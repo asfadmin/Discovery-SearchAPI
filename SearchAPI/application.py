@@ -182,7 +182,7 @@ def run_flask():
     application.debug = True        # enable debugging mode
     FORMAT = "[%(filename)18s:%(lineno)-4s - %(funcName)18s() ] %(message)s"
     logging.basicConfig(level=logging.DEBUG, format=FORMAT) # enable debugging output
-    application.run(threaded=True)  # run threaded to prevent a broken pipe error
+    application.run(threaded=True, port=8080)  # run threaded to prevent a broken pipe error
 
 # Run a dev server
 if __name__ == '__main__':
