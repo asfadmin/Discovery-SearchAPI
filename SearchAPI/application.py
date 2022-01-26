@@ -178,11 +178,17 @@ def run_flask_lambda(event, context):
 def run_flask():
     if 'MATURITY' not in os.environ:
         os.environ['MATURITY'] = 'local'
+    # Don't open to public by default, in case you're running locally:
+    if 'OPEN_APP_TO_PUBLIC' in os.environ and os.environ['OPEN_APP_TO_PUBLIC'].lower() == "true":
+        host = "0.0.0.0"
+    else:
+        host = "127.0.0.1"
+
     sys.dont_write_bytecode = True  # prevent clutter
     application.debug = True        # enable debugging mode
     FORMAT = "[%(filename)18s:%(lineno)-4s - %(funcName)18s() ] %(message)s"
     logging.basicConfig(level=logging.DEBUG, format=FORMAT) # enable debugging output
-    application.run(threaded=True, host="0.0.0.0", port=80)  # run threaded to prevent a broken pipe error
+    application.run(threaded=True, host=host, port=80)  # run threaded to prevent a broken pipe error
 
 # Run a dev server
 if __name__ == '__main__':
