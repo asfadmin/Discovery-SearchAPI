@@ -14,11 +14,16 @@ phases:
 
   pre_build:
     commands:
-      - if [ -z "${Image}" ]; then echo "ERROR - must declare 'Image' where using codebuild! (What repo inside ECR to push to.). Quitting"; exit -1; fi
-      - if [ -z "${Maturity}" ]; then echo "ERROR - must declare 'Maturity' when using codebuild! (Check 'SearchAPI/maturities.yml' for available options.). Quitting"; exit -1; fi
-      # - if [ -z "${TestSuiteURL}" ]; then echo "ERROR - must declare 'TestSuiteURL' when using codebuild! Quitting"; exit -1; fi
-      ## Need to put paths at the end of the url. If it has a trailing '/', remove it so you don't end up with "https://api//endpoint".
-      # - if [[ "${TestSuiteURL}" == */ ]]; then TestSuiteURL=${TestSuiteURL::-1}; fi
+      ## Errors:
+      - if [[ -z "${Image}" ]]; then echo "ERROR - must declare 'Image' where using codebuild! (What repo inside ECR to push to.). Quitting"; exit -1; fi
+      - if [[ -z "${Maturity}" ]]; then echo "ERROR - must declare 'Maturity' when using codebuild! (Check 'SearchAPI/maturities.yml' for available options.). Quitting"; exit -1; fi
+
+      ## Warnings:
+      - if [[ -z "${TestSuiteURL}" ]]; then echo "WARNING - 'TestSuiteURL' isn't declared. Will skip running test suite."; fi
+      ## Need to put paths at the end of the url. If it has a trailing '/', remove it so you don't end up with "https://api_url//endpoint".
+      - if [[ "${TestSuiteURL}" == */ ]]; then TestSuiteURL=${TestSuiteURL::-1}; fi
+      # You can also declare "EXTRA_PYTEST_ARGS", for extra args like '--df prod_only' on selected environments
+
 
       ## First do dockerhub, to not hit limit on pulling the base docker image:
       ## (Added to codebuild itself, you don't need to populate these)
@@ -63,11 +68,12 @@ phases:
       ## Wait for lambda to be updated. Then send a request, to spin up the initial container:
       ##   (The first request ALWAYS takes super long, but all after it return as normal)
       - aws lambda wait function-updated --region ${AWS_REGION} --function-name ${SAM_Deployment_Name}
-      # - curl --max-time 300 ${TEST_SUITE_URL}/health
+      - if [[ -n ${TestSuiteURL} ]]; then  curl --max-time 300 ${TestSuiteURL}/health; fi
 
       ## Finally, run the test suite:
-      # - pytest -n auto --df known_bugs --df prod_only . --api ${TEST_SUITE_URL}
-
+      - if [[ -n ${TestSuiteURL} ]]; then pytest -r -n auto --df known_bugs ${EXTRA_PYTEST_ARGS} . --api ${TestSuiteURL}; fi
+        # -r = show warnings
+        # -n = how many threads (auto = all on system)
 artifacts:
   files:
     - '**/*'
