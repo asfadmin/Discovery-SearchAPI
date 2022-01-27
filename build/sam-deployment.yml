@@ -68,10 +68,10 @@ phases:
       ## Wait for lambda to be updated. Then send a request, to spin up the initial container:
       ##   (The first request ALWAYS takes super long, but all after it return as normal)
       - aws lambda wait function-updated --region ${AWS_REGION} --function-name ${SAM_Deployment_Name}
-      - [[ -n "TestSuiteURL" ]] && curl --max-time 300 ${TestSuiteURL}/health
+      - if [ -n ${TestSuiteURL} ]; then  curl --max-time 300 ${TestSuiteURL}/health; fi
 
       ## Finally, run the test suite:
-      - [[ -n "TestSuiteURL" ]] && pytest -r -n auto --df known_bugs ${EXTRA_PYTEST_ARGS} . --api ${TestSuiteURL}
+      - if [ -n ${TestSuiteURL} ]; then pytest -r -n auto --df known_bugs ${EXTRA_PYTEST_ARGS} . --api ${TestSuiteURL}; fi
         # -r = show warnings
         # -n = how many threads (auto = all on system)
 artifacts:
