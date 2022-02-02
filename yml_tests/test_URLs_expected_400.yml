@@ -717,7 +717,6 @@ tests:
     processingLevel: SLC,GRD_HD
     platform: SENTINEL-1A%2CSENTINEL-1B
     product_list: S1A_IW_SLC__1SDV_20220202T093807_20220202T093837_041732_04F745_3C87-SLC
-    output: count
 
     expected file: error json
     expected code: 400
