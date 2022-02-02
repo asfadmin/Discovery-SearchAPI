@@ -2509,7 +2509,7 @@ tests:
     frame: 580%2C581%2C582%2C583%2C585
     processingLevel: L0%2CL1.0%2CSLC
     platform: SENTINEL-1A%2CSENTINEL-1B
-    maxResults: 10000
+    maxResults: 15000
     relativeOrbit: 1-1000
 
     expected file: count
