@@ -195,6 +195,31 @@ tests:
     expected file: error json
     expected code: 400
 
+- granule_list with platform invalid:
+    granule_list: S1B_S6_GRDH_1SDV_20190911T214309_20190911T214338_017995_021E10_5CCB
+    platform: S1
+    output: csv
+
+    expected file: error json
+    expected code: 400
+
+- granule_list with date invalid:
+    granule_list: S1B_S6_GRDH_1SDV_20190911T214309_20190911T214338_017995_021E10_5CCB
+    start: "2019-01-01T00:00:00Z"
+    output: csv
+
+    expected file: error json
+    expected code: 400
+
+- granule_list with other keywords invalid:
+    intersectsWith: polygon((-91.1083+41.7191,-83.9568+41.4233,-83.9916+43.9781,-91.7194+42.8556,-91.1083+41.7191))
+    platform: Sentinel-1A,Sentinel-1B
+    granule_list: S1A_IW_GRDH_1SDV_20220201T000545_20220201T000612_041712_04F694_C8B2
+    output: json
+
+    expected file: error json
+    expected code: 400
+
 - instrument empty string invalid:
     instrument: ""
     output: csv
@@ -666,6 +691,33 @@ tests:
 - product_list specchar invalid:
     product_list: ~,#
     output: csv
+
+    expected file: error json
+    expected code: 400
+
+- product_list with platform invalid:
+    product_list: S1B_IW_GRDH_1SDV_20190410T153301_20190410T153328_015746_01D8D2_0E9B-GRD_HD,S1B_S6_GRDH_1SDV_20190911T214309_20190911T214338_017995_021E10_5CCB-GRD_HD,S1B_IW_SLC__1SDV_20180517T005744_20180517T005757_010954_0140DF_9891-SLC,S1B_WV_OCN__2SSV_20180513T055028_20180513T062610_010898_013F0C_059A-METADATA_OCN
+    platform: SB
+    output: json
+
+    expected file: error json
+    expected code: 400
+
+- product_list with processingLevel invalid:
+    product_list: S1B_IW_GRDH_1SDV_20190410T153301_20190410T153328_015746_01D8D2_0E9B-GRD_HD,S1B_S6_GRDH_1SDV_20190911T214309_20190911T214338_017995_021E10_5CCB-GRD_HD,S1B_IW_SLC__1SDV_20180517T005744_20180517T005757_010954_0140DF_9891-SLC,S1B_WV_OCN__2SSV_20180513T055028_20180513T062610_010898_013F0C_059A-METADATA_OCN
+    processingLevel: GRD_HS,GRD_HD
+    output: json
+
+    expected file: error json
+    expected code: 400
+
+- product_list with other keywords invalid:
+    output: count
+    frame: 580%2C581%2C582%2C583%2C585
+    processingLevel: SLC,GRD_HD
+    platform: SENTINEL-1A%2CSENTINEL-1B
+    product_list: S1A_IW_SLC__1SDV_20220202T093807_20220202T093837_041732_04F745_3C87-SLC
+    output: count
 
     expected file: error json
     expected code: 400
