@@ -178,7 +178,7 @@ docker push <image_tag>
 To spin up a local instance, to test against (Both API Gateway and Lambda included):
 
 ```bash
-sam build && sam local start-api --port 80 --parameter-overrides Maturity=local
+sam build && sam local start-api --port 8080 --parameter-overrides Maturity=local
 ```
 
 Then you can run the test suite, against http://127.0.0.1:80
