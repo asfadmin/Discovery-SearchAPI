@@ -220,6 +220,14 @@ tests:
     expected file: error json
     expected code: 400
 
+- granule_list with product_list invalid:
+    granule_list: S1B_S6_GRDH_1SDV_20190911T214309_20190911T214338_017995_021E10_5CCB
+    product_list: S1B_IW_GRDH_1SDV_20190410T153301_20190410T153328_015746_01D8D2_0E9B-GRD_HD
+    output: csv
+
+    expected file: error json
+    expected code: 400
+
 - instrument empty string invalid:
     instrument: ""
     output: csv
