@@ -178,11 +178,13 @@ def run_flask_lambda(event, context):
 def run_flask():
     if 'MATURITY' not in os.environ:
         os.environ['MATURITY'] = 'local'
-    # Don't open to public by default, in case you're running locally:
-    if 'OPEN_APP_TO_PUBLIC' in os.environ and os.environ['OPEN_APP_TO_PUBLIC'].lower() == "true":
-        host = "0.0.0.0"
-    else:
-        host = "127.0.0.1"
+    
+    ## Launch app through gunicorn, with docker. This block miiiight not be necessary anymore:
+    # # Don't open to public by default, in case you're running locally:
+    # if 'OPEN_APP_TO_PUBLIC' in os.environ and os.environ['OPEN_APP_TO_PUBLIC'].lower() == "true":
+    #     host = "0.0.0.0"
+    # else:
+    #     host = "127.0.0.1"
 
     # enable debugging mode sometimes
     if "prod" not in os.environ["MATURITY"]:
