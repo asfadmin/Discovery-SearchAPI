@@ -38,7 +38,7 @@ phases:
       ## Pull both the base, and the image before this one, to use cached layers where possible.
       ## Can't get this working yet. Need to wipe ALL local images, and test if this works like I think it should.
       ## NOTE: Tested you do need to pull the base image FIRST, so sam can check if THAT needs updating.
-      # - docker pull public.ecr.aws/lambda/python:3.9
+      - docker pull public.ecr.aws/lambda/python:3.9
       # - docker pull "${PRIVATE_REPOSITORY_URI}:latest" && docker tag "${PRIVATE_REPOSITORY_URI}:latest" "searchapifunction:sam_image" || true
 
       ## Inject the github hash to version file, so you can check if deployed on the health endpoint.
@@ -78,3 +78,6 @@ phases:
 artifacts:
   files:
     - '**/*'
+cache:
+  paths:
+    -'.aws-sam/**/*'
