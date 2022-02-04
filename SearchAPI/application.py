@@ -25,7 +25,7 @@ import SearchAPI.endpoints as endpoints
 application = Flask(__name__)
 application.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024 # limit to 10 MB, primarily affects file uploads
 CORS(application, send_wildcard=True)
-# talisman = Talisman(application)
+talisman = Talisman(application)
 
 
 def get_product_list():
@@ -45,41 +45,41 @@ def get_product_list():
 
 # Validate and/or repair a WKT to ensure it meets CMR's requirements
 @application.route('/services/utils/wkt', methods = ['GET', 'POST'])
-# @talisman(force_https=False)
+@talisman(force_https=False)
 def validate_wkt():
     return endpoints.RepairWKT_Endpoint(request).get_response()
 
 # Validate a date to ensure it meets our requirements
 @application.route('/services/utils/date', methods = ['GET', 'POST'])
-# @talisman(force_https=False)
+@talisman(force_https=False)
 def validate_date():
     return endpoints.DateValidator_Endpoint(request).get_response()
 
 # Convert a set of shapefiles or a geojson file to WKT
 @application.route('/services/utils/files_to_wkt', methods = ['POST'])
-# @talisman(force_https=False)
+@talisman(force_https=False)
 def filesToWKT():
     return endpoints.FilesToWKT_Endpoint(request).get_response()
 
 # Collect a list of missions from CMR for a given platform
 @application.route('/services/utils/mission_list', methods = ['GET', 'POST'])
-# @talisman(force_https=False)
+@talisman(force_https=False)
 def missionList():
     return endpoints.MissionList_Endpoint(request).get_response()
 
 # Fetch and convert the results from CMR
 @application.route('/services/search/param', methods = ['GET', 'POST'])
-# @talisman(force_https=False)
+@talisman(force_https=False)
 def proxy_search():
     return APISearchQuery(request, should_stream=True).get_response()
 
 @application.route('/services/load/param', methods = ['GET', 'POST'])
-# @talisman(force_https=False)
+@talisman(force_https=False)
 def proxy_search_without_stream():
     return APISearchQuery(request, should_stream=False).get_response()
 
 @application.route('/services/search/baseline', methods = ['GET', 'POST'])
-# @talisman(force_https=False)
+@talisman(force_https=False)
 def stack_search():
     return APIStackQuery(request).get_response()
 
@@ -89,7 +89,7 @@ def stack_search():
 # Health check endpoint
 @application.route('/')
 @application.route('/health')
-# @talisman(force_https=False)
+@talisman(force_https=False)
 def health_check():
     try:
         version_path = os.path.join("SearchAPI", "version.json")
