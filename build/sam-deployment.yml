@@ -64,6 +64,7 @@ phases:
                    --tags KeyName1=SAM_SearchAPI
                    --capabilities CAPABILITY_IAM
                    --no-fail-on-empty-changeset
+      # Need to use cloudwatch timers to keep container warm: https://acloudguru.com/blog/engineering/how-to-keep-your-lambda-functions-warm
 
       ## Wait for lambda to be updated. Then send a request, to spin up the initial container:
       ##   (The first request ALWAYS takes super long, but all after it return as normal)

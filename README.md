@@ -178,10 +178,10 @@ docker push <image_tag>
 To spin up a local instance, to test against (Both API Gateway and Lambda included):
 
 ```bash
-sam build && sam local start-api --port 5000
+sam build && sam local start-api --port 8080 --parameter-overrides Maturity=local
 ```
 
-Then you can run the test suite, against http://127.0.0.1:5000
+Then you can run the test suite, against http://127.0.0.1:80
 
 To deploy to the cloud:
 
@@ -194,4 +194,11 @@ To delete a deployment:
 
 ```bash
 sam delete --region us-east-1 --stack-name SearchAPI-devel-staging
+```
+
+## Running Container Directly
+
+```bash
+docker build -t <container_name> .
+docker run --network="host" <container_name>
 ```
