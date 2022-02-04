@@ -34,8 +34,6 @@ RUN rm -rf /var/cache/yum
 ENV OPEN_TO_IP="127.0.0.1"
 EXPOSE 80
 # ## Nuke "default" entrypoint (Since it's for running in lambda). It gets set BACK to default, in template.yaml
-# ENTRYPOINT ["/bin/bash"]
+ENTRYPOINT ["/bin/bash"]
 # ## The "exec" is for correct signal handling.
-# CMD ["-c", ". /opt/venv/bin/activate && exec python3 -m gunicorn --bind ${OPEN_TO_IP}:80 --workers 2 --threads $(grep -c ^processor /proc/cpuinfo) SearchAPI.application:application"]
-ENTRYPOINT []
-CMD ["/bin/bash", "-c", ". /opt/venv/bin/activate && exec python -m SearchAPI.application"]
+CMD ["-c", ". /opt/venv/bin/activate && exec python3 -m gunicorn --bind ${OPEN_TO_IP}:80 --workers 2 --threads $(grep -c ^processor /proc/cpuinfo) SearchAPI.application:application"]
