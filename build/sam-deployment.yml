@@ -53,7 +53,7 @@ phases:
   build:
     commands:
       # - yum upgrade -y
-      - sam build
+      - sam build --base-dir ${CODEBUILD_SRC_DIR}
 
       ## Make sure "latest" tag gets updated too. `sam deploy` only pushes a image with a weird hash, so each one is unique.
       - docker tag "searchapifunction:sam_image" "${PRIVATE_REPOSITORY_URI}:latest" && docker push "${PRIVATE_REPOSITORY_URI}:latest"
