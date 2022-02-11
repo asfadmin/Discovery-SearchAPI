@@ -1,5 +1,5 @@
 from flask import Flask, make_response
-import awsgi
+import serverless_wsgi
 from flask import request
 from flask import Response
 from flask_talisman import Talisman
@@ -171,20 +171,19 @@ def postflight(e):
 
 # Lambda hook, to run in AWS:
 def run_flask_lambda(event, context):
-    return awsgi.response(application, event, context)
+    return serverless_wsgi.handle_request(application, event, context)
 
 # So you can call this from the Dockerfile as well:
 ## NOTE: This'll be called by the container too. We can't JUST have it be debug by default
 def run_flask():
+    # Make sure maturity is set, and you're not debugging on prod:
     if 'MATURITY' not in os.environ:
         os.environ['MATURITY'] = 'local'
-    
+    if "prod" not in os.environ["MATURITY"].lower():
+        application.debug = True
+
     if 'OPEN_TO_IP' not in os.environ:
         os.environ['OPEN_TO_IP'] = '127.0.0.1'
-
-    # enable debugging mode sometimes
-    if "prod" not in os.environ["MATURITY"]:
-        application.debug = True
 
     sys.dont_write_bytecode = True  # prevent clutter
     FORMAT = "[%(filename)18s:%(lineno)-4s - %(funcName)18s() ] %(message)s"

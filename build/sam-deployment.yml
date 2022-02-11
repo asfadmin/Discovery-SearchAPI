@@ -14,6 +14,9 @@ phases:
 
   pre_build:
     commands:
+      ## Seeing if cache even exists:
+      - ls -halt /var/lib/docker
+
       ## Errors:
       - if [[ -z "${Image}" ]]; then echo "ERROR - must declare 'Image' where using codebuild! (What repo inside ECR to push to.). Quitting"; exit -1; fi
       - if [[ -z "${Maturity}" ]]; then echo "ERROR - must declare 'Maturity' when using codebuild! (Check 'SearchAPI/maturities.yml' for available options.). Quitting"; exit -1; fi
@@ -36,7 +39,7 @@ phases:
       - PRIVATE_REPOSITORY_URI="$(aws sts get-caller-identity --query Account --output text).dkr.ecr.${AWS_REGION}.amazonaws.com/${Image}"
 
       ## Pull both the base, and the image before this one, to use cached layers where possible.
-      ## Can't get this working yet. Need to wipe ALL local images, and test if this works like I think it should.
+      ## Can't get this working yet. AWS only supports caching docker layers "locally". There's workarounds for vanilla docker containers, but nothing sam-related.
       ## NOTE: Tested you do need to pull the base image FIRST, so sam can check if THAT needs updating.
       # - docker pull public.ecr.aws/lambda/python:3.9
       # - docker pull "${PRIVATE_REPOSITORY_URI}:latest" && docker tag "${PRIVATE_REPOSITORY_URI}:latest" "searchapifunction:sam_image" || true
@@ -49,7 +52,7 @@ phases:
 
   build:
     commands:
-      # - yum upgrade -y
+      - yum upgrade -y --skip-broken
       - sam build
 
       ## Make sure "latest" tag gets updated too. `sam deploy` only pushes a image with a weird hash, so each one is unique.
@@ -75,6 +78,11 @@ phases:
       - if [[ -n ${TestSuiteURL} ]]; then pytest -r -n auto --df known_bugs ${EXTRA_PYTEST_ARGS} . --api ${TestSuiteURL}; fi
         # -r = show warnings
         # -n = how many threads (auto = all on system)
+
 artifacts:
   files:
     - '**/*'
+
+# cache:
+#   paths:
+#     - '.aws-sam/**/*'

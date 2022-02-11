@@ -62,6 +62,15 @@ class APISearchQuery:
                 'No searchable parameters specified, queries must include'
                 ' parameters besides output= and maxresults='
             )
+        if 'granule_list' in searchables and len(searchables) > 1:
+            raise ValueError(
+                'granule_list may not be used in conjunction with other search parameters'
+            )
+
+        if 'product_list' in searchables and len(searchables) > 1:
+            raise ValueError(
+                'product_list may not be used in conjunction with other search parameters'
+            )
 
     def check_and_set_cmr_params(self):
         self.cmr_params, self.output, self.max_results = \

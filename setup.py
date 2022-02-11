@@ -11,5 +11,6 @@ setuptools.setup(
     long_description=readme,
     url="https://github.com/asfadmin/Discovery-SearchAPI.git",
     packages=setuptools.find_packages(),
-    package_dir={"SearchAPI": "SearchAPI"},   
+    package_dir={"SearchAPI": "SearchAPI"},
+    package_data={"SearchAPI": ["*.yml", "*.yaml"]},
 )

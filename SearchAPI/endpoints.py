@@ -19,7 +19,6 @@ class FilesToWKT_Endpoint:
 
 
     def get_response(self):
-        d = api_headers.base(mimetype='application/json')
         resp_dict = self.make_response()
         ###### For backwards compatibility #################################
         if "parsed wkt" in resp_dict:                                      #
@@ -27,7 +26,7 @@ class FilesToWKT_Endpoint:
             for key, val in repaired_json.items():                         #
                 resp_dict[key] = val                                       #
         ####################################################################
-        return Response(json.dumps(resp_dict, sort_keys=True, indent=4), 200, headers=d)
+        return Response(json.dumps(resp_dict, sort_keys=True, indent=4), 200, mimetype='application/json')
 
     def make_response(self):
         if self.files == []:
@@ -44,9 +43,8 @@ class RepairWKT_Endpoint:
             self.wkt = None
 
     def get_response(self):
-        d = api_headers.base(mimetype='application/json')
         resp_dict = self.make_response()
-        return Response(json.dumps(resp_dict, sort_keys=True, indent=4), 200, headers=d)
+        return Response(json.dumps(resp_dict, sort_keys=True, indent=4), 200, mimetype='application/json')
 
     def make_response(self):
         if self.wkt == None:
@@ -64,9 +62,8 @@ class DateValidator_Endpoint:
             self.date = None
 
     def get_response(self):
-        d = api_headers.base(mimetype='application/json')
         resp_dict = self.make_response()
-        return Response(json.dumps(resp_dict, sort_keys=True, indent=4), 200, headers=d)
+        return Response(json.dumps(resp_dict, sort_keys=True, indent=4), 200, mimetype='application/json')
 
     def make_response(self):
         if self.date == None:
@@ -88,9 +85,8 @@ class MissionList_Endpoint:
             self.platform = None
 
     def get_response(self):
-        d = api_headers.base(mimetype='application/json')
         resp_dict = self.make_response()
-        return Response(json.dumps(resp_dict, sort_keys=True, indent=4), 200, headers=d)
+        return Response(json.dumps(resp_dict, sort_keys=True, indent=4), 200, mimetype='application/json')
 
     def make_response(self):
         # Setup data for request.
