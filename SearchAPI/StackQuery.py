@@ -52,7 +52,7 @@ class APIStackQuery:
                     includeBaseline=True,
                     addendum={'warnings': warnings} if warnings is not None else None))
 
-            return Response(resp, headers=d)
+            return Response(resp, headers=d, mimetype=mimetype)
 
         except ValueError as e:
             return self.validation_error(e)
@@ -60,10 +60,11 @@ class APIStackQuery:
         resp = json.dumps(stack)
 
         filename = make_filename('json')
-        d = api_headers.base('application/json; charset=utf-8')
+        mimetype='application/json; charset=utf-8'
+        d = api_headers.base(mimetype)
         d.add('Content-Disposition', 'attachment', filename=filename)
 
-        return Response(resp, headers=d)
+        return Response(resp, headers=d, mimetype=mimetype)
 
     def validate(self):
         valid_params = ['reference', 'output', 'processinglevel']
@@ -88,7 +89,8 @@ class APIStackQuery:
         logging.debug('Malformed query, returning HTTP 400')
         logging.debug(self.request.local_values)
 
-        d = api_headers.base(mimetype='application/json')
+        mimetype='application/json'
+        d = api_headers.base(mimetype=mimetype)
 
         resp = json.dumps({
             'error': {
@@ -97,7 +99,7 @@ class APIStackQuery:
             }
         }, sort_keys=True, indent=4)
 
-        return Response(resp, 400, headers=d)
+        return Response(resp, 400, headers=d, mimetype=mimetype)
 
     def cmr_error(self, e):
         return make_response(f'A CMR error has occured: {e}')
