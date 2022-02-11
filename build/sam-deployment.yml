@@ -79,10 +79,6 @@ phases:
         # -r = show warnings
         # -n = how many threads (auto = all on system)
 
-      - echo "PATH:" && pwd
-      - file .aws-sam
-      - ls -halt .aws-sam
-
 artifacts:
   files:
     - '**/*'
