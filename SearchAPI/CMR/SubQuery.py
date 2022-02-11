@@ -16,7 +16,7 @@ class CMRSubQuery:
         self.params = params
         self.extra_params = extra_params
         self.req_fields = req_fields
-        self.sid = None
+        self.cmr_search_after = None
         self.hits = 0
         self.results = []
 
@@ -115,18 +115,19 @@ class CMRSubQuery:
         logging.debug('Processing page 1')
 
         session = self.asf_session()
-        response = self.get_page(session, 1)
+        response = self.get_page(session)
 
         if response is None:
             return
 
         self.hits = int(response.headers['CMR-hits'])
-        self.sid = None
-        if self.scroll:
-            self.sid = response.headers['CMR-Scroll-Id']
-            request.cmr_scroll_sessions.append(self.sid)
+        self.cmr_search_after = None
 
-        logging.debug(f'CMR reported {self.hits} hits for session {self.sid}')
+        if self.scroll:            
+            self.cmr_search_after = response.headers['CMR-Search-After']
+            request.cmr_search_after.append(self.cmr_search_after)
+
+        # logging.debug(f'CMR reported {self.hits} hits for session {self.cmr_search_after}')
         logging.debug('Parsing page 1')
 
         for p in parse_cmr_response(response, self.req_fields):
@@ -138,14 +139,19 @@ class CMRSubQuery:
 
         logging.debug(f'Planning to fetch additional {num_pages} pages')
         if self.scroll:
-            session.headers.update({'CMR-Scroll-Id': self.sid})
+            session.headers.update({'CMR-Search-After': self.cmr_search_after})
 
         # fetch multiple pages of results if needed, yield a product at a time
         for page_num in range(2, num_pages):
             logging.debug(f'Processing page {page_num}')
 
-            page = self.get_page(session, page_num)
+            page = self.get_page(session)
 
+            if self.scroll and 'CMR-Search-After' in response.headers:
+                self.cmr_search_after = response.headers['CMR-Search-After']
+                request.cmr_search_after.append(self.cmr_search_after)
+                session.headers.update({'CMR-Search-After': self.cmr_search_after})
+                
             logging.debug(f'Parsing page {page_num}')
 
             for parsed_page in parse_cmr_response(page, self.req_fields):
@@ -158,7 +164,7 @@ class CMRSubQuery:
 
         return
 
-    def get_page(self, session, page_num):
+    def get_page(self, session):
         logging.debug('Page fetch starting' + (' (scrolled)' if self.scroll else ' (paged)'))
         max_retry = 3
 
@@ -167,10 +173,7 @@ class CMRSubQuery:
             q_start = perf_counter()
 
             api_url = self.cmr_api_url()
-            if self.scroll == False:
-                response = session.post(api_url, data=self.params + [('page_num', page_num)], headers=self.headers)
-            else:
-                response = session.post(api_url, data=self.params, headers=self.headers)
+            response = session.post(api_url, data=self.params, headers=self.headers)
 
             query_duration = perf_counter() - q_start
             logging.debug(f'CMR query time: {query_duration}')
@@ -189,7 +192,7 @@ class CMRSubQuery:
                 # CMR a chance to sort itself out
                 sleep(0.5)
                 continue
-
+            
             logging.debug('Page fetch complete')
             return response
 
@@ -223,8 +226,8 @@ class CMRSubQuery:
 
     def log_bad_cmr_response(self, attempt, max_retry, response, session):
         logging.error(
-            f'Bad news bears! CMR said {response.status_code}' +
-            (f' on session {self.sid}' if self.scroll else '')
+            f'Bad news bears! CMR said {response.status_code}' 
+            # + (f' on session {self.cmr_search_after}' if self.scroll else '')
         )
         logging.error(f'Attempt {attempt + 1} of {max_retry}')
         logging.error('Params sent to CMR:')
