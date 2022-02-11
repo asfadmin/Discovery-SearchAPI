@@ -42,29 +42,27 @@ Resources:
         RootRequest:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
-            # RestApiId: !Ref BasicAWSApiGateway
+            RestApiId: !Ref BasicAWSApiGateway
             Path: /
             Method: ANY
-            ContentHandling: CONVERT_TO_TEXT
         ProxyRequest:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
-            # RestApiId: !Ref BasicAWSApiGateway
+            RestApiId: !Ref BasicAWSApiGateway
             Path: /{proxy+}
             Method: ANY
-            ContentHandling: CONVERT_TO_TEXT
     Metadata:
       Dockerfile: Dockerfile
       DockerContext: "./"
       # If you change this, also change in build/sam-deployment.yml, so codebuild can find the image:
       DockerTag: sam_image
 
-  # BasicAWSApiGateway:
-  #   Type: AWS::Serverless::Api
-  #   Properties:
-  #     Name: SAM deployment for Lambda Container
-  #     Description: Created through template.yaml, edit there to make changes
-  #     StageName: Stage
+  BasicAWSApiGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: SAM Deployment for Lambda Container
+      Description: Created through template.yaml, edit there to make changes
+      StageName: Prod
 
   # BasicAWSApiGateway:
   #   Type: AWS::ApiGateway::RestApi
