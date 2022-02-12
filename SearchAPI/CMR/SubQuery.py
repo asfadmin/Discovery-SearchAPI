@@ -123,7 +123,7 @@ class CMRSubQuery:
         self.hits = int(response.headers['CMR-hits'])
         self.cmr_search_after = None
 
-        if self.scroll:            
+        if self.scroll and 'CMR-Search-After' in response.headers:            
             self.cmr_search_after = response.headers['CMR-Search-After']
             request.cmr_search_after.append(self.cmr_search_after)
 
