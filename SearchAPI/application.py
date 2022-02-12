@@ -12,6 +12,7 @@ import logging
 import os
 import json
 from SearchAPI.CMR.Health import get_cmr_health
+from SearchAPI.CMR.Output import output_translators
 from SearchAPI.Analytics import analytics_pageview
 from werkzeug.exceptions import RequestEntityTooLarge
 import multiprocessing
@@ -26,6 +27,13 @@ application = Flask(__name__)
 application.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024 # limit to 10 MB, primarily affects file uploads
 CORS(application, send_wildcard=True)
 talisman = Talisman(application)
+
+# So this isn't repeated with each call to the lambda hook:
+file_outputs = output_translators()
+for _, file in file_outputs.items():
+    mimetype = file[1]
+    mimetype = mimetype.split(';')[0] if ";" in mimetype else mimetype
+    serverless_wsgi.TEXT_MIME_TYPES.append(mimetype)
 
 
 def get_product_list():
