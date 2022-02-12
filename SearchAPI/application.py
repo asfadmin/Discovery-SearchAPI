@@ -116,7 +116,6 @@ def handle_oversize_request(error):
 def preflight():
     load_config()
     analytics_pageview()
-    request.cmr_search_after = []
     logging.debug('Using config:')
     logging.debug(get_config())
     request.query_start_time = perf_counter()

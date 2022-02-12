@@ -125,7 +125,6 @@ class CMRSubQuery:
 
         if self.scroll and 'CMR-Search-After' in response.headers:            
             self.cmr_search_after = response.headers['CMR-Search-After']
-            request.cmr_search_after.append(self.cmr_search_after)
 
         # logging.debug(f'CMR reported {self.hits} hits for session {self.cmr_search_after}')
         logging.debug('Parsing page 1')
@@ -149,7 +148,6 @@ class CMRSubQuery:
 
             if self.scroll and 'CMR-Search-After' in response.headers:
                 self.cmr_search_after = response.headers['CMR-Search-After']
-                request.cmr_search_after.append(self.cmr_search_after)
                 session.headers.update({'CMR-Search-After': self.cmr_search_after})
                 
             logging.debug(f'Parsing page {page_num}')
