@@ -63,6 +63,12 @@ Resources:
       Name: SAM Deployment for Lambda Container
       Description: Created through template.yaml, edit there to make changes
       StageName: Prod
+      DefinitionBody:
+        paths:
+          "/{proxy+}":
+            x-amazon-apigateway-any-method:
+              x-amazon-apigateway-integration:
+                contentHandling: CONVERT_TO_TEXT
 
   # BasicAWSApiGateway:
   #   Type: AWS::ApiGateway::RestApi
