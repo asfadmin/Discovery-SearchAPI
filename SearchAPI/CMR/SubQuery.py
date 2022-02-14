@@ -117,7 +117,6 @@ class CMRSubQuery:
 
         self.hits = int(response.headers['CMR-hits'])
 
-        # logging.debug(f'CMR reported {self.hits} hits for session {self.cmr_search_after}')
         logging.debug('Parsing page 1')
 
         for p in parse_cmr_response(response, self.req_fields):
