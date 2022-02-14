@@ -14,8 +14,6 @@ import json
 from SearchAPI.CMR.Health import get_cmr_health
 from SearchAPI.Analytics import analytics_pageview
 from werkzeug.exceptions import RequestEntityTooLarge
-import multiprocessing
-import requests
 from SearchAPI.asf_env import get_config, load_config
 from time import perf_counter
 import boto3
