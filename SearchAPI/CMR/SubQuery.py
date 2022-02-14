@@ -16,7 +16,6 @@ class CMRSubQuery:
         self.params = params
         self.extra_params = extra_params
         self.req_fields = req_fields
-        self.cmr_search_after = None
         self.hits = 0
         self.results = []
 
@@ -117,10 +116,6 @@ class CMRSubQuery:
             return
 
         self.hits = int(response.headers['CMR-hits'])
-        self.cmr_search_after = None
-
-        if 'CMR-Search-After' in response.headers:            
-            self.cmr_search_after = response.headers['CMR-Search-After']
 
         # logging.debug(f'CMR reported {self.hits} hits for session {self.cmr_search_after}')
         logging.debug('Parsing page 1')
@@ -133,7 +128,6 @@ class CMRSubQuery:
         num_pages = int(ceil(hits / page_size)) + 1
 
         logging.debug(f'Planning to fetch additional {num_pages} pages')
-        session.headers.update({'CMR-Search-After': self.cmr_search_after})
 
         # fetch multiple pages of results if needed, yield a product at a time
         for page_num in range(2, num_pages):
@@ -141,12 +135,6 @@ class CMRSubQuery:
 
             page = self.get_page(session)
 
-            session.headers.update({'CMR-Search-After': None})
-
-            if 'CMR-Search-After' in response.headers:
-                self.cmr_search_after = response.headers['CMR-Search-After']
-                session.headers.update({'CMR-Search-After': self.cmr_search_after})
-                
             logging.debug(f'Parsing page {page_num}')
 
             for parsed_page in parse_cmr_response(page, self.req_fields):
@@ -169,6 +157,9 @@ class CMRSubQuery:
             api_url = self.cmr_api_url()
             response = session.post(api_url, data=self.params, headers=self.headers)
 
+            if 'CMR-Search-After' in response.headers:            
+                session.headers.update({'CMR-Search-After': response.headers['CMR-Search-After']})
+        
             query_duration = perf_counter() - q_start
             logging.debug(f'CMR query time: {query_duration}')
 
