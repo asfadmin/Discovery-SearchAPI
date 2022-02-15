@@ -31,9 +31,6 @@ class CMRQuery:
             {'options[platform][ignore_case]': 'true'}
         ]
 
-        if cfg['cmr_scroll']:
-            self.extra_params.append({'scroll': 'true'}) # Just leave this off if false, for the sake of the CMR team looking at logs
-
         self.result_counter = 0
 
         time_in_seconds = 14.5 * 60
