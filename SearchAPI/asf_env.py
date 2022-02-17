@@ -33,17 +33,6 @@ def load_config():
                 request.cmr_provider = request.local_values['cmr_provider']
                 del request.local_values['cmr_provider']
 
-    # dynamically switch to non-scrolled results if the max results <= page size
-    if 'maxresults' in request.local_values:
-        try:
-            if int(request.local_values['maxresults']) <= config['cmr_page_size']:
-                config['cmr_scroll'] = False
-        except ValueError:
-            pass
-
-    if 'granule_list' in request.local_values or 'product_list' in request.local_values:
-        config['cmr_scroll'] = False
-
     request.asf_config = config
     request.asf_base_maturity = maturity
 

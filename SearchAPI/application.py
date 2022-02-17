@@ -12,10 +12,9 @@ import logging
 import os
 import json
 from SearchAPI.CMR.Health import get_cmr_health
+from SearchAPI.CMR.Output import output_translators
 from SearchAPI.Analytics import analytics_pageview
 from werkzeug.exceptions import RequestEntityTooLarge
-import multiprocessing
-import requests
 from SearchAPI.asf_env import get_config, load_config
 from time import perf_counter
 import boto3
@@ -26,6 +25,13 @@ application = Flask(__name__)
 application.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024 # limit to 10 MB, primarily affects file uploads
 CORS(application, send_wildcard=True)
 talisman = Talisman(application)
+
+# So this isn't repeated with each call to the lambda hook:
+file_outputs = output_translators()
+for _, file in file_outputs.items():
+    mimetype = file[1]
+    mimetype = mimetype.split(';')[0] if ";" in mimetype else mimetype
+    serverless_wsgi.TEXT_MIME_TYPES.append(mimetype)
 
 
 def get_product_list():
@@ -116,7 +122,6 @@ def handle_oversize_request(error):
 def preflight():
     load_config()
     analytics_pageview()
-    request.cmr_scroll_sessions = []
     logging.debug('Using config:')
     logging.debug(get_config())
     request.query_start_time = perf_counter()
@@ -124,17 +129,6 @@ def preflight():
 # Post-flight operations
 @application.teardown_request
 def postflight(e):
-    def close_cmr_scroll(req):
-        try:
-            logging.debug(f'Closing CMR scroll session {req["sid"]}')
-            r = requests.post(req['url'], json={'scroll_id': req['sid']})
-            if r.ok:
-                logging.debug(f'Closed session {req["sid"]}')
-            else:
-                logging.warning(f'CMR returned HTTP {r.status_code} when closing scroll session {req["sid"]}')
-        except Exception as e:
-            logging.warning(f'Failed to close scroll session {req["sid"]}: {e}')
-
     try:
         query_run_time = perf_counter() - request.query_start_time
         logging.debug(f'Total query run time: {query_run_time}')
@@ -157,15 +151,6 @@ def postflight(e):
                 ],
                 Namespace = 'SearchAPI'
             )
-
-        logging.debug(f'Closing {len(request.cmr_scroll_sessions)} scroll sessions')
-        if len(request.cmr_scroll_sessions) > 0:
-            num_processes = min([4, len(request.cmr_scroll_sessions)])
-            p = multiprocessing.pool.ThreadPool(processes=num_processes)
-            reqs = [{'sid': sid, 'url': get_config()['cmr_base']+get_config()['cmr_clear_scroll']} for sid in request.cmr_scroll_sessions]
-            p.map_async(close_cmr_scroll, reqs)
-            p.close()
-            p.join()
     except Exception as e:
         logging.critical(f'Failure during request teardown: {e}')
 

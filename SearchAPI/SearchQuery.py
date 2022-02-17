@@ -106,13 +106,14 @@ class APISearchQuery:
         else:
             resp = ''.join(translator(query.get_results))
 
-        return Response(resp, headers=d)
+        return Response(resp, headers=d, mimetype=mimetype)
 
     def validation_error(self, error):
         logging.debug('Malformed query, returning HTTP 400')
         logging.debug(self.request.local_values)
 
-        d = api_headers.base(mimetype='application/json')
+        mimetype='application/json'
+        d = api_headers.base(mimetype=mimetype)
 
         resp = json.dumps({
             'error': {
@@ -121,7 +122,7 @@ class APISearchQuery:
             }
         }, sort_keys=True, indent=4)
 
-        return Response(resp, 400, headers=d)
+        return Response(resp, 400, headers=d, mimetype=mimetype)
 
     def cmr_error(self, e):
         return make_response(f'A CMR error has occured: {e}')
