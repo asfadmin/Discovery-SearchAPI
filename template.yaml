@@ -10,6 +10,7 @@ Globals:
     Description: SAM deployment for the SearchAPI
     Timeout: 200
     MemorySize: 3072
+  # Allow ALL binary media types (shp files) to pass to the API:
   Api:
     BinaryMediaTypes: ['*~1*']
 
