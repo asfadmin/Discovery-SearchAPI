@@ -10,6 +10,8 @@ Globals:
     Description: SAM deployment for the SearchAPI
     Timeout: 200
     MemorySize: 3072
+  Api:
+    BinaryMediaTypes: ['*~1*']
 
 Parameters:
   # If you change the name, change in build/sam-deployment.yml too
