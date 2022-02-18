@@ -33,8 +33,11 @@ class test_date_parser():
 
 
         if content_type == "json":
-            content = json.loads(content)
-            if "errors" in content:
+            try:
+                content = json.loads(content)
+            except json.decoder.JSONDecodeError:
+                assert False, self.error_msg.format("API did not return a json, but content_type said it did.\nReturned content (First 500 char): \n{0}\n".format(content[:500]))
+            if "errors" in content: 
                 content_type = "error json"
         return r.status_code, content_type, content
 
