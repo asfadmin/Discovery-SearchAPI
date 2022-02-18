@@ -45,13 +45,11 @@ Resources:
         RootRequest:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
-            # RestApiId: !Ref BasicAWSApiGateway
             Path: /
             Method: ANY
         ProxyRequest:
           Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
           Properties:
-            # RestApiId: !Ref BasicAWSApiGateway
             Path: /{proxy+}
             Method: ANY
     Metadata:
@@ -59,19 +57,6 @@ Resources:
       DockerContext: "./"
       # If you change this, also change in build/sam-deployment.yml, so codebuild can find the image:
       DockerTag: sam_image
-
-  # BasicAWSApiGateway:
-  #   Type: AWS::Serverless::Api
-  #   Properties:
-  #     Name: SAM deployment for Lambda Container
-  #     Description: Created through template.yaml, edit there to make changes
-  #     StageName: Stage
-
-  # BasicAWSApiGateway:
-  #   Type: AWS::ApiGateway::RestApi
-  #   Properties:
-  #     Name: SAM deployment for Lambda Container
-  #     FailOnWarnings: true
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
