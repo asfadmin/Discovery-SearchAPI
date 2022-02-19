@@ -1,7 +1,6 @@
 name: Wait for AWS hook
 
 on:
-  push:
   pull_request:
     types:
       - opened
@@ -10,6 +9,7 @@ on:
       - unlabeled
       - edited
       - synchronize
+
 jobs:
   wait:
     runs-on: ubuntu-latest
