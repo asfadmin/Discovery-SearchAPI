@@ -76,7 +76,7 @@ phases:
 
       ## Finally, run the test suite:
       - if [[ -n ${TestSuiteURL} ]]; then python3 -m pip install pytest pytest-automation pytest-xdist; fi
-      - if [[ -n ${TestSuiteURL} ]]; then pytest -r -n auto --df known_bugs ${EXTRA_PYTEST_ARGS} . --api ${TestSuiteURL}; fi
+      - if [[ -n ${TestSuiteURL} ]]; then python3 -m pytest -r -n auto --df known_bugs ${EXTRA_PYTEST_ARGS} . --api ${TestSuiteURL}; fi
         # -r = show warnings
         # -n = how many threads (auto = all on system)
 
