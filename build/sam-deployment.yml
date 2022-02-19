@@ -75,7 +75,7 @@ phases:
       - if [[ -n ${TestSuiteURL} ]]; then  curl --max-time 300 ${TestSuiteURL}/health; fi
 
       ## Finally, run the test suite:
-      PYTEST_COMMAND="pytest -n auto --df known_bugs ${EXTRA_PYTEST_ARGS} . --api ${TestSuiteURL}"
+      - PYTEST_COMMAND="pytest -n auto --df known_bugs ${EXTRA_PYTEST_ARGS} . --api ${TestSuiteURL}"
       - if [[ -n ${TestSuiteURL} ]]; then python3 -m pip install pytest pytest-automation pytest-xdist; fi
         # First echo the full command, so it (including what the variables *are*) exist in output:
       - if [[ -n ${TestSuiteURL} ]]; then echo $PYTEST_COMMAND && python3 -m $PYTEST_COMMAND; fi
