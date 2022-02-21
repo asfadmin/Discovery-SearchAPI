@@ -12,20 +12,23 @@ RUN python3 -m pip install --no-cache-dir --upgrade pip
 RUN python3 -m pip install --no-cache-dir wheel Cython
     # wheel Cython => building (mainly scikit-learn)
 
-## Run everything from the Lambda directoy:
-WORKDIR "${LAMBDA_TASK_ROOT}"
+## Eerything needs to be in the Lambda directoy:
+RUN mkdir "${LAMBDA_TASK_ROOT}/Discovery-SearchAPI"
+WORKDIR "${LAMBDA_TASK_ROOT}/Discovery-SearchAPI"
 
 ## copy/install requirements.txt first, to avoid re-running after every single edit to SearchAPI:
 COPY requirements.txt .
-RUN python3 -m pip install --no-cache-dir -r requirements.txt --target "${LAMBDA_TASK_ROOT}"
+RUN mkdir "${LAMBDA_TASK_ROOT}/python-packages"
+ENV PYTHONPATH "${PYTHONPATH}:${LAMBDA_TASK_ROOT}/python-packages"
+RUN python3 -m pip install --no-cache-dir -r requirements.txt --target "${LAMBDA_TASK_ROOT}/python-packages"
 
-## Copy required files:
+## Copy required files (Already inside Discovery-SearchAPI dir):
 COPY SearchAPI SearchAPI
 COPY setup.py .
 COPY README.md .
 
 ## Install the SearchAPI package in this dir:
-RUN python3 -m pip install --no-cache-dir --target "${LAMBDA_TASK_ROOT}" .
+RUN python3 -m pip install --no-cache-dir --target "${LAMBDA_TASK_ROOT}/python-packages" .
 
 ## Cleanup to save space:
 RUN rm -rf /var/cache/yum

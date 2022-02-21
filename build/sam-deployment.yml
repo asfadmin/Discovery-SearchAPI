@@ -81,8 +81,8 @@ phases:
         # Run in the container, so we don't have to re-install all the requirements
         # (In codebuild, workdir is /var/task. It changes dynamically inside lambda!!)
       - if [[ -n ${TestSuiteURL} ]]; then docker run --net=host 
-            --mount type=bind,source=$(pwd)/conftest.py,target=/var/task/conftest.py 
-            --mount type=bind,source=$(pwd)/yml_tests,target=/var/task/yml_tests
+            --mount type=bind,source=$(pwd)/conftest.py,target=/var/task/Discovery-SearchAPI/conftest.py 
+            --mount type=bind,source=$(pwd)/yml_tests,target=/var/task/Discovery-SearchAPI/yml_tests
             searchapifunction:sam_image
             "python3 -m ${PYTEST_COMMAND}"; fi
 
