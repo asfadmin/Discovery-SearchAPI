@@ -202,3 +202,8 @@ sam delete --region us-east-1 --stack-name SearchAPI-devel-staging
 docker build -t <container_name> .
 docker run --network="host" <container_name>
 ```
+
+## Tools
+
+- For checking API headers: <https://observatory.mozilla.org/>
+- For updating AWS Codebuild ID whitelist: <https://api.github.com/users/ASF-Discovery>

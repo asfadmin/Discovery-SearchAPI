@@ -1,6 +1,14 @@
 name: Wait for AWS hook
 
-on: push
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - labeled
+      - unlabeled
+      - edited
+      - synchronize
 
 jobs:
   wait:
