@@ -1,209 +1,107 @@
 # SearchAPI
 
-Search API for talking with CMR.
+Docs on how to interface against our API instances [here](https://docs.asf.alaska.edu/api/basics/).
 
-- [SearchAPI](#searchapi)
-  - [First Time Setup](#first-time-setup)
-  - [Starting the SearchAPI](#starting-the-searchapi)
-  - [Developing](#developing)
-  - [Testing](#testing)
-    - [Setting up PytestAutomation](#setting-up-pytestautomation)
-    - [Running the Tests](#running-the-tests)
-  - [Production](#production)
+This is the backend, powering [ASF Search](https://search.asf.alaska.edu/#/).
 
-## First Time Setup
+## Public ECR images
 
-[Back to Top](#searchapi)
+- Prod (Recommended): `Comming Soon!`
+- Test: `public.ecr.aws/asf-discovery/searchapi-test`
+- Devel: `public.ecr.aws/asf-discovery/searchapi-devel`
 
-If cloning for the first time, follow these steps to get all the requirements installed.
+If it complains you're not logged in, (assuming you have `~/.aws/credentials` setup), try running:
 
-- Works for: Ubuntu, MacBook, and Windows subsystem for linux (Ubuntu app)).
-
-1. Update your package list:
-
-   ```bash
-   sudo apt update
-   ```
-
-2. Install missing libraries from apt:
-
-   ```bash
-   sudo apt install python3-pip python3-testresources libgeos-dev
-   ```
-
-3. Clone a local copy of this repo:
-
-   ```bash
-   git clone git@github.com:asfadmin/Discovery-SearchAPI.git
-   ```
-
-   ```bash
-   cd Discovery-SearchAPI
-   ```
-
-4. Create a virtual environment:
-
-   ```bash
-   virtualenv --python=python3 ~/SearchAPI-env
-   ```
-
-5. Activate the virtual environment:
-
-   ```bash
-   source ~/SearchAPI-env/bin/activate
-   ```
-
-   - If it works, you should see "(SearchAPI-env)" appear at the beginnning of your prompt.
-
-6. Use pip to install requirements:
-
-   ```bash
-   pip install -r requirements.txt --update
-   ```
-
-   - At the time of this writing, in some situations you may encounter an SSL certificate error. If that happens, re-install pip using the following command and try step 4 again.
-
-      ```bash
-      curl https://bootstrap.pypa.io/get-pip.py | python
-      ```
-
-## Starting the SearchAPI
-
-[Back to Top](#searchapi)
-
-Once requirements are installed, run the api.
-
-1. If not already started, activate the enviornment:
-
-   ```bash
-   source ~/SearchAPI-env/bin/activate
-   ```
-
-2. Run the dev server
-
-   ```bash
-   python application.py
-   ```
+```bash
+aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws
+```
 
 ## Developing
 
-[Back to Top](#searchapi)
+### Python management with virtualenv
 
-1. After making changes, pylint your code
-
-   ```bash
-   pylint --rcfile=pylintrc <changed files>
-   ```
-
-2. If you install new modules with pip, update requirements.txt:
+1) Install virtualenv, and update:
 
    ```bash
-   pip freeze > requirements.txt
+   python3 -m pip install --upgrade pip
+   python3 -m pip install virtualenv
    ```
 
-## Testing
-
-[Back to Top](#searchapi)
-
-Testing is done using the [Discovery-PytestAutomation](https://github.com/asfadmin/Discovery-PytestAutomation) repo.
-
-### Setting up PytestAutomation
-
-   1. Clone the repository:
+2) Create and activate it:
 
    ```bash
-   git clone https://github.com/asfadmin/Discovery-PytestAutomation
+   virtualenv --python=python3 ~/SearchAPI-env
+   source ~/SearchAPI/bin/activate
+   # Now you should see something like "(SearchAPI-env)"
    ```
 
-### Running the Tests
-
-1. Make sure you're in the PytestAutomation repo.
+3) Install all the packages:
 
    ```bash
-   cd Discovery-PytestAutomation
+   python3 -m pip install -r requirements.txt
    ```
 
-2. Run the suite.
+## Building API with Docker
+
+This is more straight forward than the SAM method, and behaves more like Elastic Beanstalk. Use the SAM method if you need more of a "lambda" API.
+
+### Building and Running the Container (Docker)
+
+1) To build it locally, run:
 
    ```bash
-   pytest {pytest flags here} . {PytestAutomation flags here}
+   docker build -t searchapi .
    ```
 
-   - See [here](https://github.com/asfadmin/Discovery-PytestAutomation) for filters/flags for PytestAutomation. (How to run specific tests, etc.)
-   - See [here](https://github.com/asfadmin/Discovery-SearchAPI/tree/devel/yml_tests) for custom flags unique to this project, and how to write tests for the API.
+2) Then to start it:
 
-## Production
+   ```bash
+   docker run --net=host --rm searchapi
+   ```
 
-[Back to Top](#searchapi)
+   You'll see output like `Listening at: http://127.0.0.1:80`. Point the test suite there by using `--api <url>` to test the container locally.
 
-To deploy to prod, merge changes to the prod branch.
+## Building API with SAM
 
+This isn't AS straight forward as docker, but is very close. SAM behaves the same as if you're hitting against AWS lambda. Use the docker method if you need a Elastic Beanstalk environment.
 
-## Lambda Testing
+### Building and Running the Container (SAM)
 
-Build image:
-`<image_tag>`: Format of `${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${CustomRegistry}`
+1) To build it locally, run:
 
-```bash
-docker build -t <image_tag> .
-```
+   ```bash
+   sam build
+   ```
 
-Run image:
+2) Then to start it:
 
-```bash
-docker run -p 8080:8080 <image_tag>
-```
+   ```bash
+   sam local start-api --port 8080 --parameter-overrides Maturity=local
+   ```
 
-In a new console, curl against it:
+   You'll see output like `Listening at: http://127.0.0.1:8080`. (NOT PORT 80! Need root to listen there). Point the test suite there by using `--api <url>` to test the container locally.
 
-```bash
-# The "/2015-03-31/functions/function/invocations", is an endpoint from the base image of the Dockerfile
-# "httpMethod", "path", and "queryStringParameters" are all required to not get a KeyError when running
-curl -XPOST "http://localhost:8080/2015-03-31/functions/function/invocations" -d '{ "httpMethod": "GET", "path": "/health", "queryStringParameters": "" }'
-```
+## Run the Test Suite
 
-To push it, first login (with a valid `~/.aws/credentials` file), then push:
+Testing is done using the [Discovery-PytestAutomation](https://github.com/asfadmin/Discovery-PytestAutomation) plugin.
 
-```bash
-## IF private repo:
-aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
-## IF public repo:
-aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws
-
-docker push <image_tag>
-```
-
-## SAM Notes
-
-To spin up a local instance, to test against (Both API Gateway and Lambda included):
+Once you have your environment installed, and want to test against one of the deployments above, run the following command:
 
 ```bash
-sam build && sam local start-api --port 8080 --parameter-overrides Maturity=local
+pytest -n auto --df bugs --df prod_only . --api http://127.0.0.1:80
 ```
 
-Then you can run the test suite, against http://127.0.0.1:80
+- `-n auto`: Use however many threads your computer has. (can also run `-n 3` to set 3 threads).
+  - If you want the clean output of how many tests per file are running, leave this flag out.
+- `--df <some file>`: Short for `--dont-run-file`. If the file has this string in it's name, skip it.
+  - More filters in the [pytest-automation docs](https://github.com/asfadmin/Discovery-PytestAutomation).
+- `.`: Run from this directory (The path).
+- `--api <url>`: The url to hit against. Also supports keys in SearchAPY/maturities.yml (like `test`, and `test-beanstalk`). This flag must always be after the path. (i.e. `.` above).
 
-To deploy to the cloud:
+## Useful Tools and Links
 
-```bash
-#(example, customize your params)
-sam deploy --region us-east-1 --stack-name SearchAPI-devel-staging --image-repository $(aws sts get-caller-identity --query Account --output text).dkr.ecr.${AWS_REGION}.amazonaws.com/searchapi-devel-staging --tags KeyName1=latest KeyName2=GITHUB_HASH_HERE_TODO --capabilities CAPABILITY_IAM --no-fail-on-empty-changeset
-```
+- For checking headers for security, use <https://observatory.mozilla.org/>
+  - This works with ALL websites, not just the API.
 
-To delete a deployment:
-
-```bash
-sam delete --region us-east-1 --stack-name SearchAPI-devel-staging
-```
-
-## Running Container Directly
-
-```bash
-docker build -t <container_name> .
-docker run --network="host" <container_name>
-```
-
-## Tools
-
-- For checking API headers: <https://observatory.mozilla.org/>
-- For updating AWS Codebuild ID whitelist: <https://api.github.com/users/ASF-Discovery>
+- For updating the whitelist on who can trigger codebuild builds, grab their ID from <https://api.github.com/users/SOME_USERNAME>.
+  - You'll need the ID for whenever someone joins/leaves the team.
