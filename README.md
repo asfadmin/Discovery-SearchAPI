@@ -59,7 +59,7 @@ This is more straight forward than the SAM method, and behaves more like Elastic
    docker run --net=host --rm searchapi
    ```
 
-   You'll see output like `Listening at: http://127.0.0.1:80`. Point the test suite there by using `--api <url>` to test the container locally.
+   You'll see output like `Listening at: http://127.0.0.1:8080`. Point the test suite there by using `--api <url>` to test the container locally.
 
 ## Building API with SAM
 
@@ -79,7 +79,7 @@ This isn't AS straight forward as docker, but is very close. SAM behaves the sam
    sam local start-api --port 8080 --parameter-overrides Maturity=local
    ```
 
-   You'll see output like `Listening at: http://127.0.0.1:8080`. (NOT PORT 80! Need root to listen there). Point the test suite there by using `--api <url>` to test the container locally.
+   You'll see output like `Listening at: http://127.0.0.1:8080`. Point the test suite there by using `--api <url>` to test the container locally.
 
 ## Run the Test Suite
 
@@ -88,7 +88,7 @@ Testing is done using the [Discovery-PytestAutomation](https://github.com/asfadm
 Once you have your environment installed, and want to test against one of the deployments above, run the following command:
 
 ```bash
-pytest -n auto --df bugs --df prod_only . --api http://127.0.0.1:80
+pytest -n auto --df bugs --df prod_only . --api http://127.0.0.1:8080
 ```
 
 - `-n auto`: Use however many threads your computer has. (can also run `-n 3` to set 3 threads).
@@ -96,7 +96,7 @@ pytest -n auto --df bugs --df prod_only . --api http://127.0.0.1:80
 - `--df <some file>`: Short for `--dont-run-file`. If the file has this string in it's name, skip it.
   - More filters in the [pytest-automation docs](https://github.com/asfadmin/Discovery-PytestAutomation).
 - `.`: Run from this directory (The path).
-- `--api <url>`: The url to hit against. Also supports keys in SearchAPY/maturities.yml (like `test`, and `test-beanstalk`). This flag must always be after the path. (i.e. `.` above).
+- `--api <url>`: The url to hit against. Also supports keys in SearchAPY/maturities.yml (like `local`, `test`, and `test-beanstalk`). This flag must always be after the path. (i.e. `.` above).
 
 ## Useful Tools and Links
 

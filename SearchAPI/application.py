@@ -173,7 +173,7 @@ def run_flask():
     sys.dont_write_bytecode = True  # prevent clutter
     FORMAT = "[%(filename)18s:%(lineno)-4s - %(funcName)18s() ] %(message)s"
     logging.basicConfig(level=logging.DEBUG, format=FORMAT) # enable debugging output
-    application.run(threaded=True, host=os.environ['OPEN_TO_IP'], port=80)  # run threaded to prevent a broken pipe error
+    application.run(threaded=True, host=os.environ['OPEN_TO_IP'], port=8080)  # run threaded to prevent a broken pipe error
 
 # Run a dev server
 if __name__ == '__main__':

@@ -15,7 +15,7 @@ default:
 local:
     bulk_download_api: https://bulk-download.asf.alaska.edu
     analytics_id: None
-    this_api: http://127.0.0.1
+    this_api: http://127.0.0.1:8080
     cmr_base: https://cmr.uat.earthdata.nasa.gov
     cmr_health: /search/health
     cmr_api: /search/granules.echo10
