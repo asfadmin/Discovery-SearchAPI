@@ -32,7 +32,7 @@ aws ecr-public get-login-password --region us-east-1 | docker login --username A
    ```bash
    virtualenv --python=python3 ~/SearchAPI-env
    source ~/SearchAPI/bin/activate
-   # Now you should see something like "(SearchAPI-env)"
+   # Now you should see something like "(SearchAPI-env)".
    ```
 
 3) Install all the packages:
