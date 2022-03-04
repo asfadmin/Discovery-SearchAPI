@@ -20,6 +20,7 @@ phases:
       ## Errors:
       - if [[ -z "${Image}" ]]; then echo "ERROR - must declare 'Image' where using codebuild! (What repo inside ECR to push to.). Quitting"; exit -1; fi
       - if [[ -z "${Maturity}" ]]; then echo "ERROR - must declare 'Maturity' when using codebuild! (Check 'SearchAPI/maturities.yml' for available options.). Quitting"; exit -1; fi
+      - if [[ -z "${RegistryAlias}" ]]; then echo "ERROR - must declare 'RegistryAlias' when running. It's a random string on the 'Public ECR Registry' page."; exit-1; fi
 
       ## Warnings:
       - if [[ -z "${TestSuiteURL}" ]]; then echo "WARNING - 'TestSuiteURL' isn't declared. Will skip running test suite."; fi
@@ -35,7 +36,7 @@ phases:
       - aws ecr-public get-login-password --region "${AWS_REGION}" | docker login --username AWS --password-stdin public.ecr.aws
       - aws ecr get-login-password --region "${AWS_REGION}" | docker login --username AWS --password-stdin $(aws sts get-caller-identity --query Account --output text).dkr.ecr.${AWS_REGION}.amazonaws.com
 
-      - PUBLIC_REPOSITORY_URI="public.ecr.aws/u8i1y1d8/${Image}"
+      - PUBLIC_REPOSITORY_URI="public.ecr.aws/${RegistryAlias}/${Image}"
       - PRIVATE_REPOSITORY_URI="$(aws sts get-caller-identity --query Account --output text).dkr.ecr.${AWS_REGION}.amazonaws.com/${Image}"
 
       ## Pull both the base, and the image before this one, to use cached layers where possible.
