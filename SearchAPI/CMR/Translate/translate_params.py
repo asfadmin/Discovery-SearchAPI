@@ -31,7 +31,7 @@ def translate_params(p):
         try:
             params[key] = input_map()[key][2](val)
         except ValueError as exc:
-            raise ValueError(f'{key}: {exc}')
+            raise ValueError(f'{key}: {exc}') from e
 
     # be nice to make this not a special case
     output = 'metalink'
