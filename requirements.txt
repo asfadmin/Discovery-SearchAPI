@@ -104,7 +104,7 @@ tzdata==2021.4
 tzlocal==2.0.0                     # tzlocal.get_localzone() changed it's return type after this (No 'localize' attr)
 urllib3==1.26.7
 Werkzeug==2.0.2
-WKTUtils==1.1.1
+WKTUtils==1.1.4
 wrapt==1.13.2
 zipp==3.6.0
 zope.interface==4.7.2
