@@ -105,3 +105,4 @@ pytest -n auto --df bugs --df prod_only . --api http://127.0.0.1:8080
 
 - For updating the whitelist on who can trigger codebuild builds, grab their ID from <https://api.github.com/users/SOME_USERNAME>.
   - You'll need the ID for whenever someone joins/leaves the team.
+  - Each account has two codebuild projects that'll need updated.
