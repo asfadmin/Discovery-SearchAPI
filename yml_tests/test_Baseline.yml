@@ -127,6 +127,7 @@ tests:
     expected code: 200
 
 - baseline don't allow master keyword:
+    reference: ""
     master: S1B_IW_SLC__1SDV_20190610T143518_20190610T143545_016635_01F4F7_6EA1
     output: csv
 

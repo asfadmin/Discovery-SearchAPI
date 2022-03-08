@@ -4,13 +4,7 @@ import re                   # Opening/Reading the file stuff
 from io import StringIO     # Opening/Reading the file stuff
 from copy import deepcopy   # For making duplicate dicts
 
-import sys, os              # Path manipulation
-this_folder = os.path.dirname(__file__)
-project_root = os.path.abspath(os.path.join(this_folder, ".."))
-sys.path.append(project_root)
-import CMR.Input as test_input
-sys.path.remove(project_root)
-
+from SearchAPI.CMR import Input as test_input
 
 class test_baseline():
     def __init__(self, **args):

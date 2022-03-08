@@ -1,0 +1,96 @@
+version: 0.2
+
+# Base permissions for SAM: https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-permissions.html
+
+env:
+  secrets-manager:
+    docker_username: dockerhub:dockerhub_username
+    docker_password: dockerhub:dockerhub_password
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.7
+
+  pre_build:
+    commands:
+      ## Seeing if cache even exists:
+      - ls -halt /var/lib/docker
+
+      ## Errors:
+      - if [[ -z "${Image}" ]]; then echo "ERROR - must declare 'Image' where using codebuild! (What repo inside ECR to push to.). Quitting"; exit -1; fi
+      - if [[ -z "${Maturity}" ]]; then echo "ERROR - must declare 'Maturity' when using codebuild! (Check 'SearchAPI/maturities.yml' for available options.). Quitting"; exit -1; fi
+      - if [[ -z "${RegistryAlias}" ]]; then echo "ERROR - must declare 'RegistryAlias' when running. It's a random string on the 'Public ECR Registry' page."; exit-1; fi
+
+      ## Warnings:
+      - if [[ -z "${TestSuiteURL}" ]]; then echo "WARNING - 'TestSuiteURL' isn't declared. Will skip running test suite."; fi
+      ## Need to put paths at the end of the url. If it has a trailing '/', remove it so you don't end up with "https://api_url//endpoint".
+      - if [[ "${TestSuiteURL}" == */ ]]; then TestSuiteURL=${TestSuiteURL::-1}; fi
+      # You can also declare "EXTRA_PYTEST_ARGS", for extra args like '--df prod_only' on selected environments
+
+
+      ## First do dockerhub, to not hit limit on pulling the base docker image:
+      ## (Added to codebuild itself, you don't need to populate these)
+      - docker login -u "${docker_username}" -p "${docker_password}"
+      ## Must maintain *both* public/private, until lambda supports running off public images:
+      - aws ecr-public get-login-password --region "${AWS_REGION}" | docker login --username AWS --password-stdin public.ecr.aws
+      - aws ecr get-login-password --region "${AWS_REGION}" | docker login --username AWS --password-stdin $(aws sts get-caller-identity --query Account --output text).dkr.ecr.${AWS_REGION}.amazonaws.com
+
+      - PUBLIC_REPOSITORY_URI="public.ecr.aws/${RegistryAlias}/${Image}"
+      - PRIVATE_REPOSITORY_URI="$(aws sts get-caller-identity --query Account --output text).dkr.ecr.${AWS_REGION}.amazonaws.com/${Image}"
+
+      ## Pull both the base, and the image before this one, to use cached layers where possible.
+      ## Can't get this working yet. AWS only supports caching docker layers "locally". There's workarounds for vanilla docker containers, but nothing sam-related.
+      ## NOTE: Tested you do need to pull the base image FIRST, so sam can check if THAT needs updating.
+      # - docker pull public.ecr.aws/lambda/python:3.9
+      # - docker pull "${PRIVATE_REPOSITORY_URI}:latest" && docker tag "${PRIVATE_REPOSITORY_URI}:latest" "searchapifunction:sam_image" || true
+
+      ## Inject the github hash to version file, so you can check if deployed on the health endpoint.
+      - echo "{\"version\":\"${CODEBUILD_RESOLVED_SOURCE_VERSION}\"}" > SearchAPI/version.json
+
+      ## Setup SAM function name:
+      - SAM_Deployment_Name="SAM-${Image}"
+
+  build:
+    commands:
+      # - yum upgrade -y --skip-broken
+      - sam build
+
+      ## Make sure "latest" tag gets updated too. `sam deploy` only pushes a image with a weird hash, so each one is unique.
+      - docker tag "searchapifunction:sam_image" "${PRIVATE_REPOSITORY_URI}:latest" && docker push "${PRIVATE_REPOSITORY_URI}:latest"
+      - docker tag "searchapifunction:sam_image" "${PUBLIC_REPOSITORY_URI}:latest" && docker push "${PUBLIC_REPOSITORY_URI}:latest"
+
+      ## The lambda function name also consequently makes a good stack-name. If you change the "SamFuncName" key, also change in template.yaml
+      - sam deploy --region ${AWS_REGION}
+                   --image-repository ${PRIVATE_REPOSITORY_URI}
+                   --parameter-overrides SamFuncName=${SAM_Deployment_Name} Maturity=${Maturity}
+                   --stack-name ${SAM_Deployment_Name}
+                   --tags KeyName1=SAM_SearchAPI
+                   --capabilities CAPABILITY_IAM
+                   --no-fail-on-empty-changeset
+      # Need to use cloudwatch timers to keep container warm: https://acloudguru.com/blog/engineering/how-to-keep-your-lambda-functions-warm
+
+      ## Wait for lambda to be updated. Then send a request, to spin up the initial container:
+      ##   (The first request ALWAYS takes super long, but all after it return as normal)
+      - aws lambda wait function-updated --region ${AWS_REGION} --function-name ${SAM_Deployment_Name}
+      - if [[ -n ${TestSuiteURL} ]]; then  curl --max-time 300 ${TestSuiteURL}/health; fi
+
+      ## Finally, run the test suite:
+      - if [[ -n ${TestSuiteURL} ]]; then PYTEST_COMMAND="pytest -n auto --df known_bugs ${EXTRA_PYTEST_ARGS} . --api ${TestSuiteURL}"; fi
+        # First echo the full command, so it (including what the variables *are*) exist in output:
+      - if [[ -n ${TestSuiteURL} ]]; then echo "${PYTEST_COMMAND}"; fi
+        # Run in the container, so we don't have to re-install all the requirements
+        # (In codebuild, workdir is /var/task. It changes dynamically inside lambda!!)
+      - if [[ -n ${TestSuiteURL} ]]; then docker run --net=host
+            --mount type=bind,source=$(pwd)/conftest.py,target=/var/task/Discovery-SearchAPI/conftest.py
+            --mount type=bind,source=$(pwd)/yml_tests,target=/var/task/Discovery-SearchAPI/yml_tests
+            searchapifunction:sam_image
+            "python3 -m ${PYTEST_COMMAND}"; fi
+
+artifacts:
+  files:
+    - '**/*'
+
+# cache:
+#   paths:
+#     - '.aws-sam/**/*'

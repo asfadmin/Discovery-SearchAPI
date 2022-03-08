@@ -1,0 +1,73 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+
+  SearchAPI Stack - Deployed from SAM template.yaml
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Description: SAM deployment for the SearchAPI
+    Timeout: 200
+    MemorySize: 3072
+  # Allow ALL binary media types (shp files) to pass to the API:
+  Api:
+    BinaryMediaTypes: ['*~1*']
+
+Parameters:
+  # If you change the name, change in build/sam-deployment.yml too
+  SamFuncName:
+    Description: Required. What to name the function in AWS.
+    Type: String
+  Maturity:
+    Description: Required. Check 'SearchAPI/maturities.yml' for available options.
+    Type: String
+
+Resources:
+
+  SearchAPIFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      FunctionName: !Ref SamFuncName
+      PackageType: Image
+      # The vanilla container can run a generic flask app this way:
+      ImageConfig:
+        EntryPoint: ["/lambda-entrypoint.sh"]
+        Command: ["SearchAPI.application.run_flask_lambda"]
+      Architectures:
+        - x86_64
+      Environment:
+        Variables:
+          MATURITY: !Ref Maturity
+      Events:
+        # "proxy+" can't accept reqeuests to root. (They need to "pass along" something).
+        # This way, we let all requests pass:
+        RootRequest:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /
+            Method: ANY
+        ProxyRequest:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /{proxy+}
+            Method: ANY
+    Metadata:
+      Dockerfile: Dockerfile
+      DockerContext: "./"
+      # If you change this, also change in build/sam-deployment.yml, so codebuild can find the image:
+      DockerTag: sam_image
+
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  # SearchAPIApi:
+  #   Description: "API Gateway endpoint URL for Prod stage for SearchAPI function"
+  #   Value: !Sub "https://${BasicAWSApiGateway}.execute-api.${AWS::Region}.amazonaws.com/Stage/"
+  SearchAPIFunction:
+    Description: "SearchAPI Lambda Function ARN"
+    Value: !GetAtt SearchAPIFunction.Arn
+  SearchAPIFunctionIamRole:
+    Description: "Implicit IAM Role created for SearchAPI function"
+    Value: !GetAtt SearchAPIFunctionRole.Arn
