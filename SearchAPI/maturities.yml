@@ -84,7 +84,7 @@ test-beanstalk:
 
 test-staging:
     bulk_download_api: https://bulk-download-test.asf.alaska.edu
-    analytics_id: UA-118881300-3
+    analytics_id: None
     this_api: https://api-test-staging.asf.alaska.edu
     cmr_base: https://cmr.uat.earthdata.nasa.gov
     cmr_health: /search/health
@@ -126,7 +126,7 @@ prod-private:
 
 prod-staging:
     bulk_download_api: https://bulk-download-test.asf.alaska.edu
-    analytics_id: UA-118881300-3
+    analytics_id: None
     this_api: https://api-prod-private-staging.asf.alaska.edu
     cmr_base: https://cmr.uat.earthdata.nasa.gov
     cmr_health: /search/health
