@@ -36,7 +36,7 @@ devel:
     cmr_collections: /search/collections
     cmr_page_size: 1000
     cmr_headers:
-        Client-Id: devel_searchapi_asf
+        Client-Id: devel_vertex_asf
     flexible_maturity: True
     cloudwatch_metrics: True
 
@@ -50,7 +50,7 @@ devel-beanstalk:
     cmr_collections: /search/collections
     cmr_page_size: 250
     cmr_headers:
-        Client-Id: devel_beanstalk_searchapi_asf
+        Client-Id: devel_searchapi_asf
     flexible_maturity: True
     cloudwatch_metrics: True
 
@@ -64,7 +64,7 @@ test:
     cmr_collections: /search/collections
     cmr_page_size: 1000
     cmr_headers:
-        Client-Id: test_searchapi_asf
+        Client-Id: test_vertex_asf
     flexible_maturity: True
     cloudwatch_metrics: True
 
@@ -78,7 +78,7 @@ test-beanstalk:
     cmr_collections: /search/collections
     cmr_page_size: 250
     cmr_headers:
-        Client-Id: test_beanstalk_searchapi_asf
+        Client-Id: test_searchapi_asf
     flexible_maturity: True
     cloudwatch_metrics: True
 
@@ -92,7 +92,7 @@ test-staging:
     cmr_collections: /search/collections
     cmr_page_size: 250
     cmr_headers:
-        Client-Id: test_staging_searchapi_asf
+        Client-Id: test_staging_vertex_asf
     flexible_maturity: True
     cloudwatch_metrics: True
 
@@ -106,13 +106,13 @@ prod:
     cmr_collections: /search/collections
     cmr_page_size: 250
     cmr_headers:
-        Client-Id: prod_searchapi_asf
+        Client-Id: searchapi_asf
     flexible_maturity: False
     cloudwatch_metrics: False
 
 prod-private:
     bulk_download_api: https://bulk-download.asf.alaska.edu
-    analytics_id: UA-118881300-2
+    analytics_id: UA-118881300-5
     this_api: https://api-prod-private.asf.alaska.edu
     cmr_base: https://cmr.earthdata.nasa.gov
     cmr_health: /search/health
@@ -120,13 +120,13 @@ prod-private:
     cmr_collections: /search/collections
     cmr_page_size: 1000
     cmr_headers:
-        Client-Id: prod_private_searchapi_asf
+        Client-Id: vertex_asf
     flexible_maturity: False
     cloudwatch_metrics: False
 
 prod-staging:
     bulk_download_api: https://bulk-download-test.asf.alaska.edu
-    analytics_id: UA-118881300-2
+    analytics_id: UA-118881300-3
     this_api: https://api-prod-private-staging.asf.alaska.edu
     cmr_base: https://cmr.uat.earthdata.nasa.gov
     cmr_health: /search/health
@@ -134,6 +134,6 @@ prod-staging:
     cmr_collections: /search/collections
     cmr_page_size: 1000
     cmr_headers:
-        Client-Id: prod_staging_searchapi_asf
+        Client-Id: prod_staging_vertex_asf
     flexible_maturity: False
     cloudwatch_metrics: False
