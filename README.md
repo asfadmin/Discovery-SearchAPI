@@ -6,7 +6,7 @@ This is the backend, powering [ASF Search](https://search.asf.alaska.edu/#/).
 
 ## Public ECR images
 
-- Prod (Recommended): `Coming Soon!`
+- Prod (Recommended): `public.ecr.aws/o4c4z2t6/searchapi-prod`
 - Test: `public.ecr.aws/asf-discovery/searchapi-test`
 - Devel: `public.ecr.aws/asf-discovery/searchapi-devel`
 
