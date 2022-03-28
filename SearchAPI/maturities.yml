@@ -9,7 +9,7 @@ default:
     cmr_page_size: 250
     cmr_headers:
         Client-Id: unknown_searchapi_asf
-    flexible_maturity: True
+    flexible_maturity: False
     cloudwatch_metrics: False
 
 local:
