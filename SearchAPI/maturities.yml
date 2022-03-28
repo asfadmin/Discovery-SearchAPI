@@ -41,18 +41,30 @@ devel:
     cloudwatch_metrics: True
 
 devel-beanstalk:
-    bulk_download_api: https://bulk-download-dev.asf.alaska.edu
-    analytics_id: UA-118881300-4
-    this_api: https://api-devel-beanstalk.asf.alaska.edu
-    cmr_base: https://cmr.uat.earthdata.nasa.gov
+    bulk_download_api: https://bulk-download.asf.alaska.edu
+    analytics_id: UA-118881300-2
+    this_api: https://api.daac.asf.alaska.edu
+    cmr_base: https://cmr.earthdata.nasa.gov
     cmr_health: /search/health
     cmr_api: /search/granules.echo10
     cmr_collections: /search/collections
     cmr_page_size: 250
     cmr_headers:
         Client-Id: searchapi_asf
-    flexible_maturity: True
-    cloudwatch_metrics: True
+    flexible_maturity: False
+    cloudwatch_metrics: False
+    # bulk_download_api: https://bulk-download-dev.asf.alaska.edu
+    # analytics_id: UA-118881300-4
+    # this_api: https://api-devel-beanstalk.asf.alaska.edu
+    # cmr_base: https://cmr.uat.earthdata.nasa.gov
+    # cmr_health: /search/health
+    # cmr_api: /search/granules.echo10
+    # cmr_collections: /search/collections
+    # cmr_page_size: 250
+    # cmr_headers:
+    #     Client-Id: devel_searchapi_asf
+    # flexible_maturity: True
+    # cloudwatch_metrics: True
 
 test:
     bulk_download_api: https://bulk-download-test.asf.alaska.edu
