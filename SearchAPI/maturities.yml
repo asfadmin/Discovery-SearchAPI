@@ -53,7 +53,7 @@ devel-beanstalk:
     #     Client-Id: searchapi_asf
     # flexible_maturity: False
     # cloudwatch_metrics: False
-    bulk_download_api: https://bulk-download-dev.asf.alaska.edu
+    bulk_download_api: https://bulk-download.asf.alaska.edu
     analytics_id: UA-118881300-4
     this_api: https://api-devel-beanstalk.asf.alaska.edu
     cmr_base: https://cmr.uat.earthdata.nasa.gov
