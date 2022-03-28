@@ -9,7 +9,7 @@ default:
     cmr_page_size: 250
     cmr_headers:
         Client-Id: unknown_searchapi_asf
-    flexible_maturity: True
+    flexible_maturity: False
     cloudwatch_metrics: False
 
 local:
@@ -34,11 +34,11 @@ devel:
     cmr_health: /search/health
     cmr_api: /search/granules.echo10
     cmr_collections: /search/collections
-    cmr_page_size: 1000
+    cmr_page_size: 250
     cmr_headers:
         Client-Id: devel_vertex_asf
     flexible_maturity: True
-    cloudwatch_metrics: True
+    cloudwatch_metrics: False
 
 devel-beanstalk:
     bulk_download_api: https://bulk-download-dev.asf.alaska.edu
