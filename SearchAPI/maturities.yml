@@ -50,7 +50,7 @@ devel-beanstalk:
     cmr_collections: /search/collections
     cmr_page_size: 250
     cmr_headers:
-        Client-Id: devel_searchapi_asf
+        Client-Id: searchapi_asf
     flexible_maturity: True
     cloudwatch_metrics: True
 
