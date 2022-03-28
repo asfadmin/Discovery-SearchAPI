@@ -166,7 +166,8 @@ def run_flask():
     if 'MATURITY' not in os.environ:
         os.environ['MATURITY'] = 'local'
     if "prod" not in os.environ["MATURITY"].lower():
-        application.debug = True
+        pass
+        # application.debug = True
 
     if 'OPEN_TO_IP' not in os.environ:
         os.environ['OPEN_TO_IP'] = '127.0.0.1'
