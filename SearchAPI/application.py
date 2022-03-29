@@ -22,6 +22,7 @@ import boto3
 import SearchAPI.endpoints as endpoints
 
 application = Flask(__name__)
+# ALSO update upload size in .ebextentions/04_enable_streaming.config:
 application.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024 # limit to 10 MB, primarily affects file uploads
 CORS(application, send_wildcard=True)
 talisman = Talisman(application)
