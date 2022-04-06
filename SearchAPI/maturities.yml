@@ -94,7 +94,7 @@ test-staging:
     cmr_headers:
         Client-Id: test_staging_vertex_asf
     flexible_maturity: True
-    cloudwatch_metrics: True
+    cloudwatch_metrics: False
 
 prod:
     bulk_download_api: https://bulk-download.asf.alaska.edu
@@ -108,7 +108,7 @@ prod:
     cmr_headers:
         Client-Id: searchapi_asf
     flexible_maturity: False
-    cloudwatch_metrics: False
+    cloudwatch_metrics: True
 
 prod-private:
     bulk_download_api: https://bulk-download.asf.alaska.edu
@@ -122,7 +122,7 @@ prod-private:
     cmr_headers:
         Client-Id: vertex_asf
     flexible_maturity: False
-    cloudwatch_metrics: False
+    cloudwatch_metrics: True
 
 prod-staging:
     bulk_download_api: https://bulk-download-test.asf.alaska.edu
