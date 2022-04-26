@@ -128,7 +128,7 @@ def parse_granule(granule, req_fields):
             insarBaseline = get_val(field_paths['insarBaseline'])
             if insarBaseline is not None:
                 insarBaseline = float(insarBaseline)
-            result['baseline'] = {'perpendicularBaseline': insarBaseline} 
+            result['baseline'] = {'insarBaseline': insarBaseline} 
             remove_field('insarGrouping')
             if result['insarGrouping'] not in [None, 0, '0', 'NA', 'NULL']:
                 result['canInsar'] = True
