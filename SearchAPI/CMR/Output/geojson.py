@@ -31,7 +31,8 @@ def req_fields_geojson():
         'shape',
         'startTime',
         'stopTime',
-        'downloadUrl'
+        'downloadUrl',
+        'stateVectors'
     ]
     return fields
 
@@ -93,11 +94,30 @@ class GeoJSONStreamArray(JSONStreamArray):
                 'sensor': p['sensor'],
                 'startTime': p['startTime'],
                 'stopTime': p['stopTime'],
-                'url': p['downloadUrl']
+                'url': p['downloadUrl'],
+                'baseline': {
+                    'stateVectors': {
+                        'positions': {
+                            'prePosition': p['sv_pos_pre'],
+                            'postPosition': p['sv_pos_post'],
+                            'prePositionTime': p['sv_t_pos_pre'],
+                            'postPositionTime': p['sv_t_pos_post']
+                        },
+                        'velocities': {
+                            'preVelocity': p['sv_vel_pre'],
+                            'postVelocity': p['sv_vel_post'],
+                            'preVelocityTime': p['sv_t_vel_pre'],
+                            'postVelocityTime': p['sv_t_vel_post']
+                        }
+                    }
+                    
+                },
+                # 'temporalBaseline': p.pop('temporalBaseline'),
+                # 'perpendicularBaseline': p.pop('perpendicularBaseline')
             }
         }
-        if self.includeBaseline:
-            result['properties']['temporalBaseline'] = p['temporalBaseline']
-            result['properties']['perpendicularBaseline'] = p['perpendicularBaseline']
+        # if self.includeBaseline:
+        # result['properties']['temporalBaseline'] = p.pop('temporalBaseline')
+        # result['properties']['perpendicularBaseline'] = p.pop('perpendicularBaseline')
 
         return result
