@@ -32,7 +32,6 @@ def req_fields_geojson():
         'startTime',
         'stopTime',
         'downloadUrl',
-        'stateVectors',
         'canInsar',
     ]
     return fields

@@ -171,7 +171,8 @@ def parse_granule(granule, req_fields):
 
     # Parse any remaining needed fields from the CMR response
     multi_fields = [
-        'absoluteOrbit'
+        'absoluteOrbit',
+        'baseline'
     ]
     for field in req_fields:
         if field in multi_fields:
