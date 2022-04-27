@@ -33,6 +33,7 @@ def req_fields_geojson():
         'stopTime',
         'downloadUrl',
         'canInsar',
+        'ascendingNodeTime'
     ]
     return fields
 

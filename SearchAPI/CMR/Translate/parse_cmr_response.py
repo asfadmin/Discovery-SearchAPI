@@ -116,7 +116,8 @@ def parse_granule(granule, req_fields):
                     'postVelocity': result['sv_vel_post'],
                     'preVelocityTime': result['sv_t_vel_pre'],
                     'postVelocityTime': result['sv_t_vel_post']
-                }
+                },
+                'ascendingNodeTime': get_val(attr_path('ASC_NODE_TIME'))
             }
         }
         remove_field('stateVectors')
