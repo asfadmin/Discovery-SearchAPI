@@ -131,6 +131,13 @@ tests:
     expected file: error json
     expected code: 400
 
+- bbox incomplete asf_search invalid:
+    bbox: -150.2,65.0,-150.1,65.5,0
+    output: asf_search
+
+    expected file: error json
+    expected code: 400
+
 - beamMode empty string invalid:
     beamMode: ""
     output: csv
@@ -571,6 +578,30 @@ tests:
     platform: SENTINEL-1
     maxResults: +_
     output: geojson
+
+    expected file: error json
+    expected code: 400
+
+- maxResults 0 asf_search invalid:
+    platform: SENTINEL-1
+    maxResults: 0
+    output: asf_search
+
+    expected file: error json
+    expected code: 400
+
+- maxResults a asf_search invalid:
+    platform: SENTINEL-1
+    maxResults: a
+    output: asf_search
+
+    expected file: error json
+    expected code: 400
+
+- maxResults specchar asf_search invalid:
+    platform: SENTINEL-1
+    maxResults: +_
+    output: asf_search
 
     expected file: error json
     expected code: 400

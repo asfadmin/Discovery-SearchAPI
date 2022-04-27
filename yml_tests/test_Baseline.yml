@@ -119,6 +119,14 @@ tests:
     expected file: json
     expected code: 200
 
+- baseline asf_search:
+    reference: S1B_IW_SLC__1SDV_20180112T141823_20180112T141850_009139_0105AA_E6F5
+    output: asf_search
+    # use_maturity: True
+
+    expected file: geojson
+    expected code: 200
+
 - no output specified:
     reference: J1_08743_STD_F275
     # use_maturity: True
