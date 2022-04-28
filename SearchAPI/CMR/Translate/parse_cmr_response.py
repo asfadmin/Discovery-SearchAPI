@@ -117,8 +117,9 @@ def parse_granule(granule, req_fields):
                     'preVelocityTime': result['sv_t_vel_pre'],
                     'postVelocityTime': result['sv_t_vel_post']
                 },
-                'ascendingNodeTime': get_val(attr_path('ASC_NODE_TIME'))
-            }
+            },
+            'ascendingNodeTime': get_val(attr_path('ASC_NODE_TIME')),
+            'insarBaseline': None
         }
         remove_field('stateVectors')
 
@@ -129,7 +130,11 @@ def parse_granule(granule, req_fields):
             insarBaseline = get_val(field_paths['insarBaseline'])
             if insarBaseline is not None:
                 insarBaseline = float(insarBaseline)
-            result['baseline'] = {'insarBaseline': insarBaseline} 
+            result['baseline'] = {
+                'insarBaseline': insarBaseline,
+                'stateVectors': None, 
+                'ascendingNodeTime': None
+                } 
             remove_field('insarGrouping')
             if result['insarGrouping'] not in [None, 0, '0', 'NA', 'NULL']:
                 result['canInsar'] = True
