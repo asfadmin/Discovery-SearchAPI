@@ -448,6 +448,10 @@ tests:
     granule_list: S1B_S6_GRDH_1SDV_20190911T214309_20190911T214338_017995_021E10_5CCB
     output: geojson
 
+- granule_list single asf_search:
+    granule_list: S1B_S6_GRDH_1SDV_20190911T214309_20190911T214338_017995_021E10_5CCB
+    output: asf_search
+
     expected file: geojson
     expected code: 200
 
@@ -873,6 +877,22 @@ tests:
     expected file: jsonlite
     expected code: 200
 
+- maxResults 1 asf_search:
+    platform: SENTINEL-1
+    maxResults: 1
+    output: asf_search
+
+    expected file: geojson
+    expected code: 200
+
+- maxResults 2 asf_search:
+    platform: SENTINEL-1
+    maxResults: 2
+    output: asf_search
+
+    expected file: geojson
+    expected code: 200
+
 - offNadirAngle single:
     offNadirAngle: 21.5
     maxResults: 10
@@ -958,6 +978,23 @@ tests:
     instrument: Avnir-2
     maxResults: 2
     output: geojson
+
+    expected file: geojson
+    expected code: 200
+
+- output asf_search Sentinel:
+    platform: SB
+    maxResults: 2000
+    output: asf_search
+
+    expected file: geojson
+    expected code: 200
+
+- output asf_search Avnir:
+    platform: Alos
+    instrument: Avnir-2
+    maxResults: 2
+    output: asf_search
 
     expected file: geojson
     expected code: 200

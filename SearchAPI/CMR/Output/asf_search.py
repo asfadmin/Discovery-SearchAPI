@@ -2,7 +2,7 @@ import logging
 import json
 from .json import JSONStreamArray
 
-def req_fields_geojson():
+def req_fields_asf_search():
     fields = [
         'beamModeType',
         'browse',
@@ -32,19 +32,20 @@ def req_fields_geojson():
         'startTime',
         'stopTime',
         'downloadUrl',
+        'canInsar',
     ]
     return fields
 
-def cmr_to_geojson(rgen, includeBaseline=False, addendum=None):
-    logging.debug('translating: geojson')
+def cmr_to_asf_search(rgen, includeBaseline=False, addendum=None):
+    logging.debug('translating: asf_search')
 
-    streamer = GeoJSONStreamArray(rgen, includeBaseline)
+    streamer = ASFSearchStreamArray(rgen, includeBaseline)
 
     for p in json.JSONEncoder(indent=2, sort_keys=True).iterencode({'type': 'FeatureCollection','features':streamer}):
         yield p
 
 
-class GeoJSONStreamArray(JSONStreamArray):
+class ASFSearchStreamArray(JSONStreamArray):
 
     def getItem(self, p):
         for i in p.keys():
@@ -94,10 +95,10 @@ class GeoJSONStreamArray(JSONStreamArray):
                 'startTime': p['startTime'],
                 'stopTime': p['stopTime'],
                 'url': p['downloadUrl'],
+                'baseline': p.pop('baseline', None),
+                'temporalBaseline': p.pop('temporalBaseline', None),
+                'perpendicularBaseline': p.pop('perpendicularBaseline', None)
             }
         }
-        if self.includeBaseline:
-            result['properties']['temporalBaseline'] = p['temporalBaseline']
-            result['properties']['perpendicularBaseline'] = p['perpendicularBaseline']
 
         return result
