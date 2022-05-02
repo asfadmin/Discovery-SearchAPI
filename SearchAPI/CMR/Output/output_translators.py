@@ -1,4 +1,4 @@
-from SearchAPI.CMR.Output.asf_search import cmr_to_asf_search, req_fields_asf_search
+from .asf_search import cmr_to_asf_search, req_fields_asf_search
 from .count import count, req_fields_count
 from .csv import cmr_to_csv, req_fields_csv
 from .download import cmr_to_download, req_fields_download
