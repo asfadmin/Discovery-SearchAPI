@@ -96,10 +96,9 @@ class ASFSearchStreamArray(JSONStreamArray):
                 'stopTime': p['stopTime'],
                 'url': p['downloadUrl'],
                 'baseline': p.pop('baseline', None),
+                'temporalBaseline': p.pop('temporalBaseline', None),
+                'perpendicularBaseline': p.pop('perpendicularBaseline', None)
             }
         }
-        if self.includeBaseline:
-            result['properties']['temporalBaseline'] = p['temporalBaseline']
-            result['properties']['perpendicularBaseline'] = p['perpendicularBaseline']
 
         return result
