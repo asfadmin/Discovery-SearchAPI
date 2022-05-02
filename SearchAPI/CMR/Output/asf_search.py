@@ -36,7 +36,7 @@ def req_fields_asf_search():
     ]
     return fields
 
-def cmr_to_asf_search(rgen, includeBaseline=False):
+def cmr_to_asf_search(rgen, includeBaseline=False, addendum=None):
     logging.debug('translating: asf_search')
 
     streamer = ASFSearchStreamArray(rgen, includeBaseline)
