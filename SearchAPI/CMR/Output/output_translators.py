@@ -1,3 +1,4 @@
+from .asf_search import cmr_to_asf_search, req_fields_asf_search
 from .count import count, req_fields_count
 from .csv import cmr_to_csv, req_fields_csv
 from .download import cmr_to_download, req_fields_download
@@ -18,5 +19,6 @@ def output_translators():
         'jsonlite':     [cmr_to_jsonlite, 'application/json; charset=utf-8', 'json', req_fields_jsonlite()],
         'jsonlite2':    [cmr_to_jsonlite2, 'application/json; charset=utf-8', 'json', req_fields_jsonlite2()],
         'kml':          [cmr_to_kml, 'application/vnd.google-earth.kml+xml; charset=utf-8', 'kmz', req_fields_kml()],
-        'metalink':     [cmr_to_metalink, 'application/metalink+xml; charset=utf-8', 'metalink', req_fields_metalink()]
+        'metalink':     [cmr_to_metalink, 'application/metalink+xml; charset=utf-8', 'metalink', req_fields_metalink()],
+        'asf_search':   [cmr_to_asf_search, 'application/geojson; charset=utf-8', 'geojson', req_fields_asf_search()]
     }
