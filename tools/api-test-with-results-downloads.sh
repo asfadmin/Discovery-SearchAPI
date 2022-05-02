@@ -141,10 +141,12 @@ wget -d -O API-TEST-maxResults-1-valid.CSV "https://api-test.asf.alaska.edu/serv
 wget -d -O API-TEST-maxResults-1-valid.json "https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=1&output=json"
 wget -d -O API-TEST-maxResults-1-valid.jsonlite "https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=1&output=jsonlite"
 wget -d -O API-TEST-maxResults-1-valid.geojson "https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=1&output=geojson"
+wget -d -O API-TEST-maxResults-1-valid.asf_search "https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=1&output=asf_search"
 wget -d -O API-TEST-maxResults-2-valid.CSV "https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=2&output=csv"
 wget -d -O API-TEST-maxResults-2-valid.json "https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=2&output=json"
 wget -d -O API-TEST-maxResults-1-valid.jsonlite "https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=2&output=jsonlite"
 wget -d -O API-TEST-maxResults-2-valid.geojson "https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=2&output=geojson"
+wget -d -O API-TEST-maxResults-2-valid.asf_search "https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=2&output=asf_search"
 
 # minBaselinPerp Keyword
 wget -d -O API-TEST-minBaselinePerp-150-10-valid.CSV "https://api-test.asf.alaska.edu/services/search/param?minbaselineperp=150&platform=R1&maxresults=10&output=csv"
@@ -174,6 +176,7 @@ wget -d -O API-TEST-platform-SB-valid.CSV "https://api-test.asf.alaska.edu/servi
 wget -d -O API-TEST-platform-SB-count-valid.CSV "https://api-test.asf.alaska.edu/services/search/param?platform=SB&maxresults=2000&output=count"
 wget -d -O API-TEST-platform-SB-download-valid.py "https://api-test.asf.alaska.edu/services/search/param?platform=SB&maxresults=2000&output=download"
 wget -d -O API-TEST-platform-SB-geojson-valid.geojson "https://api-test.asf.alaska.edu/services/search/param?platform=SB&maxresults=2000&output=geojson"
+wget -d -O API-TEST-platform-SB-asf_search-valid.asf_search "https://api-test.asf.alaska.edu/services/search/param?platform=SB&maxresults=2000&output=asf_search"
 wget -d -O API-TEST-platform-SB-json-valid.json "https://api-test.asf.alaska.edu/services/search/param?platform=SB&maxresults=2000&output=json"
 wget -d -O API-TEST-platform-SB-jsonlite-valid.jsonlite "https://api-test.asf.alaska.edu/services/search/param?platform=SB&maxresults=2000&output=jsonlite"
 wget -d -O API-TEST-platform-SB-kml-valid.kml "https://api-test.asf.alaska.edu/services/search/param?platform=SB&maxresults=2000&output=kml"
@@ -394,6 +397,7 @@ wget -d -O API-TEST-bbox-incomplete-invalid.csv "https://api-test.asf.alaska.edu
 wget -d -O API-TEST-bbox-incomplete-json-invalid.json "https://api-test.asf.alaska.edu/services/search/param?bbox=-150.2,65.0,-150.1,65.5,0&output=JSON"
 wget -d -O API-TEST-bbox-incomplete-jsonlite-invalid.jsonlite "https://api-test.asf.alaska.edu/services/search/param?bbox=-150.2,65.0,-150.1,65.5,0&output=JSONLITE"
 wget -d -O API-TEST-bbox-incomplete-geojson-invalid.geojson "https://api-test.asf.alaska.edu/services/search/param?bbox=-150.2,65.0,-150.1,65.5,0&output=GEO.JSON"
+wget -d -O API-TEST-bbox-incomplete-asf_search-invalid.asf_search "https://api-test.asf.alaska.edu/services/search/param?bbox=-150.2,65.0,-150.1,65.5,0&output=ASF_SEARCH"
 wget -d -O API-TEST-bbox-incomplete-download-invalid.py "https://api-test.asf.alaska.edu/services/search/param?bbox=-150.2,65.0,-150.1&output=download"
 
 # beamMode Keyword Invalid
@@ -488,14 +492,17 @@ wget -d -O API-TEST-maxResults-0-invalid.CSV "https://api-test.asf.alaska.edu/se
 wget -d -O API-TEST-maxResults-0-invalid.json "https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=0&output=json"
 wget -d -O API-TEST-maxResults-0-invalid.jsonlite "https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=0&output=jsonlite"
 wget -d -O API-TEST-maxResults-0-invalid.geojson "https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=0&output=geojson"
+wget -d -O API-TEST-maxResults-0-invalid.asf_search "https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=0&output=asf_search"
 wget -d -O API-TEST-maxResults-a-invalid.CSV "https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=a&output=csv"
 wget -d -O API-TEST-maxResults-a-invalid.json "https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=a&output=json"
 wget -d -O API-TEST-maxResults-a-invalid.jsonlite "https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=a&output=jsonlite"
 wget -d -O API-TEST-maxResults-a-invalid.geojson "https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=a&output=geojson"
+wget -d -O API-TEST-maxResults-a-invalid.asf_search "https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=a&output=asf_search"
 wget -d -O API-TEST-maxResults-%-invalid.CSV "https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=%&output=csv"
 wget -d -O API-TEST-maxResults-%-invalid.json "https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=%&output=json"
 wget -d -O API-TEST-maxResults-%-invalid.jsonlite "https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=%&output=jsonlite"
 wget -d -O API-TEST-maxResults-%-invalid.geojson "https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=%&output=geojson"
+wget -d -O API-TEST-maxResults-%-invalid.asf_search "https://api-test.asf.alaska.edu/services/search/param?platform=SENTINEL-1&maxresults=%&output=asf_search"
 
 # minBaselinPerp Keyword Invalid
 wget -d -O API-TEST-minBaselineperp-TEST-invalid.csv "https://api-test.asf.alaska.edu/services/search/param?minbaselineperp=TEST&platform=R1&maxresults=10&output=csv"

@@ -103,11 +103,35 @@ def parse_granule(granule, req_fields):
         result['sv_pos_post'], result['sv_t_pos_post'] = parse_sv(get_val(attr_path('SV_POSITION_POST')))
         result['sv_vel_pre'],  result['sv_t_vel_pre']  = parse_sv(get_val(attr_path('SV_VELOCITY_PRE')))
         result['sv_vel_post'], result['sv_t_vel_post'] = parse_sv(get_val(attr_path('SV_VELOCITY_POST')))
+        result['baseline'] = {
+            'stateVectors': {
+                'positions': {
+                    'prePosition': result['sv_pos_pre'],
+                    'postPosition': result['sv_pos_post'],
+                    'prePositionTime': result['sv_t_pos_pre'],
+                    'postPositionTime': result['sv_t_pos_post']
+                },
+                'velocities': {
+                    'preVelocity': result['sv_vel_pre'],
+                    'postVelocity': result['sv_vel_post'],
+                    'preVelocityTime': result['sv_t_vel_pre'],
+                    'postVelocityTime': result['sv_t_vel_post']
+                },
+            },
+            'ascendingNodeTime': get_val(attr_path('ASC_NODE_TIME')),
+        }
         remove_field('stateVectors')
 
     if 'canInsar' in req_fields:
         if result['platform'] in ['ALOS', 'RADARSAT-1', 'JERS-1', 'ERS-1', 'ERS-2']:
             result['insarGrouping'] = get_val(field_paths['insarGrouping'])
+            
+            insarBaseline = get_val(field_paths['insarBaseline'])
+            if insarBaseline is not None:
+                insarBaseline = float(insarBaseline)
+            result['baseline'] = {
+                'insarBaseline': insarBaseline
+                } 
             remove_field('insarGrouping')
             if result['insarGrouping'] not in [None, 0, '0', 'NA', 'NULL']:
                 result['canInsar'] = True
@@ -150,7 +174,8 @@ def parse_granule(granule, req_fields):
 
     # Parse any remaining needed fields from the CMR response
     multi_fields = [
-        'absoluteOrbit'
+        'absoluteOrbit',
+        'baseline'
     ]
     for field in req_fields:
         if field in multi_fields:
