@@ -95,10 +95,10 @@ class ASFSearchStreamArray(JSONStreamArray):
                 'startTime': p['startTime'],
                 'stopTime': p['stopTime'],
                 'url': p['downloadUrl'],
-                'baseline': p.pop('baseline', None),
                 'temporalBaseline': p.pop('temporalBaseline', None),
                 'perpendicularBaseline': p.pop('perpendicularBaseline', None)
-            }
+            },
+            'baseline': p.pop('baseline', None),
         }
 
         return result
