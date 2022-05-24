@@ -622,9 +622,11 @@ class test_URL_Manager():
                 # Sentinel-1A
                 elif platform in ["SENTINEL-1A", "SA"]:
                     json_dict["Platform"][i] = "Sentinel-1A"
+                    json_dict["Platform"].append("Sentinel-1 Interferogram (BETA)")
                 # Sentinel-1B
                 elif platform in ["SENTINEL-1B", "SB"]:
                     json_dict["Platform"][i] = "Sentinel-1B"
+                    json_dict["Platform"].append("Sentinel-1 Interferogram (BETA)")
                 # Sir-C
                 elif platform in ["SIR-C"]:
                     del json_dict["Platform"][i]
