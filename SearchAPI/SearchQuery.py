@@ -52,7 +52,7 @@ class APISearchQuery:
         return True
 
     def check_has_search_params(self):
-        non_searchable_param = ['output', 'maxresults', 'pagesize']
+        non_searchable_param = ['output', 'maxresults', 'pagesize', 'maturity']
         searchables = [
             v for v in self.request.local_values if v not in non_searchable_param
         ]

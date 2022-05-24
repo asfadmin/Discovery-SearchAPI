@@ -99,9 +99,9 @@ def parse_granule(granule, req_fields):
             else:
                 return (None, None)
 
-        result['sv_pos_pre'],  result['sv_t_pos_pre']  = parse_sv(get_val(attr_path('SV_POSITION_PRE')))
+        result['sv_pos_pre'], result['sv_t_pos_pre'] = parse_sv(get_val(attr_path('SV_POSITION_PRE')))
         result['sv_pos_post'], result['sv_t_pos_post'] = parse_sv(get_val(attr_path('SV_POSITION_POST')))
-        result['sv_vel_pre'],  result['sv_t_vel_pre']  = parse_sv(get_val(attr_path('SV_VELOCITY_PRE')))
+        result['sv_vel_pre'], result['sv_t_vel_pre'] = parse_sv(get_val(attr_path('SV_VELOCITY_PRE')))
         result['sv_vel_post'], result['sv_t_vel_post'] = parse_sv(get_val(attr_path('SV_VELOCITY_POST')))
         result['baseline'] = {
             'stateVectors': {
