@@ -170,7 +170,7 @@ def calculate_temporal_baselines(reference, stack):
             product['temporalBaseline'] = 0
         else:
             start = dateparser.parse(product['startTime'])
-            product['temporalBaseline'] = (start - reference_start).days
+            product['temporalBaseline'] = (start.date() - reference_start.date()).days
     return stack
 
 def offset_perpendicular_baselines(reference, stack):
