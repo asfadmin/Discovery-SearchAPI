@@ -26,14 +26,17 @@ def req_fields_jsonlite():
         'processingTypeDisplay',
         'product_file_id',
         'relativeOrbit',
-        'relativeBurstID',
-        'burstIndex',
         'sensor',
         'sizeMB',
         'startTime',
         'stopTime',
         'stringFootprint',
-        'thumbnailUrl'
+        'thumbnailUrl',
+        'relativeBurstID',
+        'burstIndex',
+        'burstAnx',
+        'burstAnxDelta',
+        'IW2MidRange',
     ]
     return fields
 
@@ -146,5 +149,7 @@ class JSONLiteStreamArray(JSONStreamArray):
         if p.get('relativeBurstID') is not None:
             result['relativeBurstID'] =  p['relativeBurstID']
             result['burstIndex'] = p['burstIndex']
-
+            result['burstAnx'] = p['burstAnx'] 
+            result['burstAnxDelta'] = p['burstAnxDelta'] 
+            result['IW2MidRange'] = p['IW2MidRange'] 
         return result
