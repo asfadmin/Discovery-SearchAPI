@@ -59,5 +59,12 @@ def get_field_paths():
         'stopTime':                 "./Temporal/RangeDateTime/EndingDateTime",
         'thumbnailUrl':             attr_path('THUMBNAIL_URL'),
         'track':                    attr_path('PATH_NUMBER'),
+        
+        # BURST FIELDS
+        'relativeBurstID':          attr_path('RELATIVE_BURST_ID'),
+        'burstIndex':               attr_path('BURST_INDEX'),
+        'burstAnx':                 attr_path('BURST_ANX'),
+        'burstAnxDelta':            attr_path('BURST_ANX_DELTA'),
+        'IW2MidRange':              attr_path('IW2_MID_RANGE')
     }
     return paths

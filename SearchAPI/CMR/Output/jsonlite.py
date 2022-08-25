@@ -26,6 +26,8 @@ def req_fields_jsonlite():
         'processingTypeDisplay',
         'product_file_id',
         'relativeOrbit',
+        'relativeBurstID',
+        'burstIndex',
         'sensor',
         'sizeMB',
         'startTime',
@@ -140,5 +142,9 @@ class JSONLiteStreamArray(JSONStreamArray):
         if self.includeBaseline:
             result['temporalBaseline'] = p['temporalBaseline']
             result['perpendicularBaseline'] = p['perpendicularBaseline']
+        
+        if p.get('relativeBurstID') is not None:
+            result['relativeBurstID'] =  p['relativeBurstID']
+            result['burstIndex'] = p['burstIndex']
 
         return result
