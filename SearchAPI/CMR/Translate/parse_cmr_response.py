@@ -147,6 +147,44 @@ def parse_granule(granule, req_fields):
             result['canInsar'] = False
         remove_field('canInsar')
 
+    if get_val(field_paths['relativeBurstID']):
+        burst = {}
+        burst['relativeBurstID'] = get_val(field_paths['relativeBurstID'])
+        burst['burstIndex'] = get_val(field_paths['burstIndex'])
+        burst['burstAnx'] = get_val(field_paths['burstAnx'])
+        burst['burstAnxDelta'] = get_val(field_paths['burstAnxDelta'])
+        burst['IW2MidRange'] = get_val(field_paths['IW2MidRange'])
+        burst['swatch'] = get_val(field_paths['swatch'])
+        burst['annotationPath'] = get_val(field_paths['annotationPath'])
+        burst['azimuthFrameRate'] = get_val(field_paths['azimuthFrameRate'])
+        burst['azimuthSteerRate'] = get_val(field_paths['azimuthSteerRate'])
+        burst['azimuthTimeInterval'] = get_val(field_paths['azimuthTimeInterval'])
+        burst['byteLength'] = get_val(field_paths['byteLength'])
+        burst['byteOffset'] = get_val(field_paths['byteOffset'])
+        burst['firstValidLine'] = get_val(field_paths['firstValidLine'])
+        burst['firstValidSample'] = get_val(field_paths['firstValidSample'])
+        burst['lastValidLine'] = get_val(field_paths['lastValidLine'])
+        burst['lastValidSample'] = get_val(field_paths['lastValidSample'])
+        burst['lines'] = get_val(field_paths['lines'])
+        burst['measurementPath'] = get_val(field_paths['measurementPath'])
+        burst['operaID'] = get_val(field_paths['operaID'])
+        burst['prfRAWData'] = get_val(field_paths['prfRAWData'])
+        burst['radarCenterFrequency'] = get_val(field_paths['radarCenterFrequency'])
+        burst['rangeBandwidth'] = get_val(field_paths['rangeBandwidth'])
+        burst['rangeChirpRate'] = get_val(field_paths['rangeChirpRate'])
+        burst['rangePixelSpacing'] = get_val(field_paths['rangePixelSpacing'])
+        burst['rangeSamplingRate'] = get_val(field_paths['rangeSamplingRate'])
+        burst['rangeWindowCoefficient'] = get_val(field_paths['rangeWindowCoefficient'])
+        burst['rangeWindowType'] = get_val(field_paths['rangeWindowType'])
+        burst['rank'] = get_val(field_paths['rank'])
+        burst['samples'] = get_val(field_paths['samples'])
+        burst['slantRangeTime'] = get_val(field_paths['slantRangeTime'])
+        burst['SLCStartAnx'] = get_val(field_paths['SLCStartAnx'])
+        burst['startingRange'] = get_val(field_paths['startingRange'])
+        burst['swathIndex'] = get_val(field_paths['swathIndex'])
+        burst['wavelength'] = get_val(field_paths['wavelength'])
+        result['burst'] = burst
+        
     # These fields are always None or NA and should be fully deprecated/removed in the future
     deprecated_fields = [
         'beamSwath',

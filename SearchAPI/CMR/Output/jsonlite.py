@@ -37,6 +37,35 @@ def req_fields_jsonlite():
         'burstAnx',
         'burstAnxDelta',
         'IW2MidRange',
+        'swatch',
+        'annotationPath',
+        'azimuthFrameRate',
+        'azimuthSteerRate',
+        'azimuthTimeInterval',
+        'byteLength',
+        'byteOffset',
+        'firstValidLine',
+        'firstValidSample',
+        'lastValidLine',
+        'lastValidSample',
+        'lines',
+        'measurementPath',
+        'operaID',
+        'prfRAWData',
+        'radarCenterFrequency',
+        'rangeBandwidth',
+        'rangeChirpRate',
+        'rangePixelSpacing',
+        'rangeSamplingRate',
+        'rangeWindowCoefficient',
+        'rangeWindowType',
+        'rank',
+        'samples',
+        'slantRangeTime',
+        'SLCStartAnx',
+        'startingRange',
+        'swathIndex',
+        'wavelength'
     ]
     return fields
 
@@ -146,10 +175,7 @@ class JSONLiteStreamArray(JSONStreamArray):
             result['temporalBaseline'] = p['temporalBaseline']
             result['perpendicularBaseline'] = p['perpendicularBaseline']
         
-        if p.get('relativeBurstID') is not None:
-            result['relativeBurstID'] =  p['relativeBurstID']
-            result['burstIndex'] = p['burstIndex']
-            result['burstAnx'] = p['burstAnx'] 
-            result['burstAnxDelta'] = p['burstAnxDelta'] 
-            result['IW2MidRange'] = p['IW2MidRange'] 
+        if p.get('burst') is not None: # is a burst product
+            result['burst'] = p['burst']
+
         return result

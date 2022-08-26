@@ -61,10 +61,41 @@ def get_field_paths():
         'track':                    attr_path('PATH_NUMBER'),
         
         # BURST FIELDS
+        # 'absoluteBurstID':          attr_path('ABSOLUTE_BURST_ID'),
         'relativeBurstID':          attr_path('RELATIVE_BURST_ID'),
         'burstIndex':               attr_path('BURST_INDEX'),
         'burstAnx':                 attr_path('BURST_ANX'),
         'burstAnxDelta':            attr_path('BURST_ANX_DELTA'),
-        'IW2MidRange':              attr_path('IW2_MID_RANGE')
+        'IW2MidRange':              attr_path('IW2_MID_RANGE'),
+        'swatch':                    attr_path('SWATH'),
+        'annotationPath':          attr_path('ANNOTATION_PATH'),
+        'azimuthFrameRate':       attr_path('AZIMUTH_FRAME_RATE'),
+        'azimuthSteerRate':       attr_path('AZIMUTH_STEER_RATE'),
+        'azimuthTimeInterval':    attr_path('AZIMUTH_TIME_INTERVAL'),
+        'byteLength':              attr_path('BYTE_LENGTH'),
+        'byteOffset':              attr_path('BYTE_OFFSET'),
+        'firstValidLine':         attr_path('FIRST_VALID_LINE'),
+        'firstValidSample':       attr_path('FIRST_VALID_SAMPLE'),
+        'lastValidLine':          attr_path('LAST_VALID_LINE'),
+        'lastValidSample':        attr_path('LAST_VALID_SAMPLE'),
+        'lines':                    attr_path('LINES'),
+        'measurementPath':         attr_path('MEASUREMENT_PATH'),
+        'operaID':                 attr_path('OPERA_ID'),
+        'prfRAWData':             attr_path('PRF_RAW_DATA'),
+        'radarCenterFrequency':   attr_path('RADAR_CENTER_FREQUENCY'),
+        'rangeBandwidth':          attr_path('RANGE_BANDWIDTH'),
+        'rangeChirpRate':         attr_path('RANGE_CHIRP_RATE'),
+        'rangePixelSpacing':      attr_path('RANGE_PIXEL_SPACING'),
+        'rangeSamplingRate':      attr_path('RANGE_SAMPLING_RATE'),
+        'rangeWindowCoefficient': attr_path('RANGE_WINDOW_COEFFICIENT'),
+        'rangeWindowType':        attr_path('RANGE_WINDOW_TYPE'),
+        'rank':                     attr_path('RANK'),
+        'samples':                  attr_path('SAMPLES'),
+        'slantRangeTime':         attr_path('SLANT_RANGE_TIME'),
+        'SLCStartAnx':            attr_path('SLC_START_ANX'),
+        'startingRange':           attr_path('STARTING_RANGE'),
+        'swathIndex':              attr_path('SWATH_INDEX'),
+        'wavelength':               attr_path('WAVELENGTH')
+        
     }
     return paths
