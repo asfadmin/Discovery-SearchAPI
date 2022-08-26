@@ -67,7 +67,7 @@ def get_field_paths():
         'burstAnx':                 attr_path('BURST_ANX'),
         'burstAnxDelta':            attr_path('BURST_ANX_DELTA'),
         'IW2MidRange':              attr_path('IW2_MID_RANGE'),
-        'swatch':                    attr_path('SWATH'),
+        'swath':                    attr_path('SWATH'),
         'annotationPath':          attr_path('ANNOTATION_PATH'),
         'azimuthFrameRate':       attr_path('AZIMUTH_FRAME_RATE'),
         'azimuthSteerRate':       attr_path('AZIMUTH_STEER_RATE'),

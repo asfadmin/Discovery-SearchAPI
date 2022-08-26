@@ -154,7 +154,7 @@ def parse_granule(granule, req_fields):
         burst['burstAnx'] = get_val(field_paths['burstAnx'])
         burst['burstAnxDelta'] = get_val(field_paths['burstAnxDelta'])
         burst['IW2MidRange'] = get_val(field_paths['IW2MidRange'])
-        burst['swatch'] = get_val(field_paths['swatch'])
+        burst['swath'] = get_val(field_paths['swath'])
         burst['annotationPath'] = get_val(field_paths['annotationPath'])
         burst['azimuthFrameRate'] = get_val(field_paths['azimuthFrameRate'])
         burst['azimuthSteerRate'] = get_val(field_paths['azimuthSteerRate'])

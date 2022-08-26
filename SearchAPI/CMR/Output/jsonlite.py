@@ -37,7 +37,7 @@ def req_fields_jsonlite():
         'burstAnx',
         'burstAnxDelta',
         'IW2MidRange',
-        'swatch',
+        'swath',
         'annotationPath',
         'azimuthFrameRate',
         'azimuthSteerRate',
