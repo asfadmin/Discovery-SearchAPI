@@ -3,7 +3,7 @@ argcomplete==1.12.3
 asn1crypto==1.4.0
 atomicwrites==1.4.0
 attrs==21.2.0
-backports.zoneinfo==0.2.1
+backports.zoneinfo==0.2.1;python_version<"3.9" # https://stackoverflow.com/questions/71712258/error-could-not-build-wheels-for-backports-zoneinfo-which-is-required-to-insta
 boto3==1.19.0
 botocore==1.22.0
 Brotli==1.0.9
