@@ -1,0 +1,27 @@
+version: 0.2
+
+env:
+  secrets-manager:
+    docker_username: dockerhub:dockerhub_username
+    docker_password: dockerhub:dockerhub_password
+
+
+phases:
+  pre_build:
+    commands:
+      # To not hit the pull limit on base image:
+      - echo Logging into DockerHub...
+      - docker login -u "${docker_username}" -p "${docker_password}"
+
+      - echo Logging into PUBLIC Amazon ECR...
+      - aws ecr-public get-login-password --region "${AWS_REGION}" | docker login --username AWS --password-stdin public.ecr.aws
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo Building the Docker image...
+      - docker build -t ${DOCKER_IMAGE_URI}:${GITHUB_BRANCH} .
+  post_build:
+    commands:
+      - echo Started push on `date`
+      - echo Pushing the Docker image...
+      - docker push ${DOCKER_IMAGE_URI}:${GITHUB_BRANCH}
