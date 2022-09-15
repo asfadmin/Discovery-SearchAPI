@@ -11,6 +11,7 @@ update-main-stack-template:
 	aws cloudformation deploy \
 		--stack-name ${STACK_NAME} \
 		--template-file cloudformation/cf-stack.yml \
-		--capabilities CAPABILITY_IAM
+		--capabilities CAPABILITY_IAM \
+		--parameter-overrides GitHubBranch=cs.cloudformation-overhall
 
 all: update-macro-template update-main-stack-template
