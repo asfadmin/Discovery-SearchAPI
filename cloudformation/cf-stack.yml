@@ -5,14 +5,16 @@ Description: "One SearchAPI Deployment per GitHub Branch."
 Parameters:
   LambdaDockerRegistry:
     Type: String
-    Description: "Docker container containing the API."
+    Description: "ECR and Image containing the API. (No Tag)"
     Default: "public.ecr.aws/o4c4z2t6/searchapi"
   
   GitHubBranch:
     Type: String
     Description: "Branch to run from. This also becomes the tag for the container in ECR."
     Default: "prod"
-    AllowedPattern: "[A-Za-z0-9-]+"
+    # You need to escape the slash, so it can escape the period... weird.
+    # (Match the actual period, and not regex's "any character")
+    AllowedPattern: "[A-Za-z0-9-\\.]+"
   
   # # Not sure if this is the best place for this yet. Might need to be in the GH action:
   # CreateUatApi:
@@ -86,13 +88,30 @@ Resources:
         - PolicyName: AllowCodeBuildLogsTwo
           PolicyDocument:
             Statement:
-              # Allow CodeBuild to Create Logs
+              # Allow CodeBuild to Create Logs:
               - Effect: Allow
                 Action:
                   - logs:CreateLogGroup
                   - logs:CreateLogStream
                   - logs:PutLogEvents
                 Resource: !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/BuildPushDocker-*:log-stream:*"
+              # Allow CodeBuild to Read the Artifact:
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:GetObjectVersion
+                Resource: !Sub ${S3ArtifactBucket.Arn}/*
+              # Allow CodeBuild to get the DockerHub user/pass:
+              - Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:dockerhub-*
+              # Allow Codebuild to interact with Public ECR:
+              - Effect: Allow
+                Action:
+                  - ecr-public:GetAuthorizationToken
+                  - sts:GetServiceBearerToken
+                Resource: "*"
 
 
   GitHubConnection:
