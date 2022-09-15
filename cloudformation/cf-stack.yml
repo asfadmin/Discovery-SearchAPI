@@ -54,15 +54,22 @@ Resources:
         - PolicyName: AllowGitHubConnection
           PolicyDocument:
             Statement:
+              # Allow the first pipeline stage to connect to github:
               - Effect: Allow
                 Action:
                   - codestar-connections:UseConnection
                 Resource: !GetAtt GitHubConnection.ConnectionArn
+              # Allow the whole pipeline to store artifacts here:
               - Effect: Allow
                 Action:
                   - s3:PutObject
                 Resource: !Sub arn:aws:s3:::${S3ArtifactBucket}/*
-
+              # Allow the pipeline to start CodeBuild:
+              - Effect: Allow
+                Action:
+                  - codebuild:BatchGetBuilds
+                  - codebuild:StartBuild
+                Resource: !GetAtt BuildPushDocker.Arn
 
   CodeBuildRole:
     Type: AWS::IAM::Role
@@ -79,12 +86,13 @@ Resources:
         - PolicyName: AllowCodeBuildLogsTwo
           PolicyDocument:
             Statement:
+              # Allow CodeBuild to Create Logs
               - Effect: Allow
                 Action:
                   - logs:CreateLogGroup
                   - logs:CreateLogStream
                   - logs:PutLogEvents
-                Resource: !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/${AWS::StackName}-*"
+                Resource: !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/BuildPushDocker-*:log-stream:*"
 
 
   GitHubConnection:
@@ -100,6 +108,8 @@ Resources:
             Operation: MaxLength
             Length: 32
 
+  # IF you change this name, also update it's policy that writes logs.
+  # Hard-coded the name there to avoid a circular dependency.
   BuildPushDocker:
     Type: AWS::CodeBuild::Project
     Properties:
