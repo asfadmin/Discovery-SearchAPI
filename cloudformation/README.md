@@ -13,7 +13,7 @@ cfn-lint cloudformation/cf-stack.yml
 
 ```bash
 export AWS_DEFAULT_PROFILE="YOUR_PROFILE_HERE"
-aws cloudformation deploy --template-file cloudformation/cf-stack.yml --capabilities CAPABILITY_IAM --stack-name SearchAPI-test --parameter-overrides LambdaDockerImage="public.ecr.aws/asf-discovery/searchapi:test" GitHubBranch=test
+aws cloudformation deploy --template-file cloudformation/cf-stack.yml --capabilities CAPABILITY_IAM --stack-name SearchAPI-test --parameter-overrides LambdaDockerImage="public.ecr.aws/asf-discovery" GitHubBranch=test
 ```
 
 - If that stack already exists, the lambda image of the stack won't grab the latest docker image. Force it to do so:
