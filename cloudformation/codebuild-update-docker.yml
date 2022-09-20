@@ -19,9 +19,9 @@ phases:
     commands:
       - echo Build started on `date`
       - echo Building the Docker image...
-      - docker build -t ${DOCKER_IMAGE_URI}:${GITHUB_BRANCH} .
+      - docker build -t ${DOCKER_IMAGE_URI}:latest .
   post_build:
     commands:
       - echo Started push on `date`
       - echo Pushing the Docker image...
-      - docker push ${DOCKER_IMAGE_URI}:${GITHUB_BRANCH}
+      - docker push ${DOCKER_IMAGE_URI}:latest
