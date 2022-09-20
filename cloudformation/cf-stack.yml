@@ -3,17 +3,17 @@ AWSTemplateFormatVersion: 2010-09-09
 Description: "One SearchAPI Deployment per GitHub Branch."
 
 Parameters:
+
   LambdaDockerRegistry:
     Type: String
-    Description: "ECR and Image containing the API. (No Tag)"
-    Default: "public.ecr.aws/o4c4z2t6/searchapi"
+    Description: "For the whole account. Image Uri will be `LambdaDockerRegistry`/searchapi-`GitHubBranch`"
+    Default: "public.ecr.aws/o4c4z2t6"
   
   GitHubBranch:
     Type: String
     Description: "Branch to run from. This also becomes the tag for the container in ECR."
-    Default: "prod"
-    # You need to escape the slash, so it can escape the period... weird.
-    # (Match the actual period, and not regex's "any character")
+    # You need to escape the slash, so *it* can escape the period... weird.
+    # (To match the actual period, and not regex's "any character")
     AllowedPattern: "[A-Za-z0-9-\\.]+"
   
   # # Not sure if this is the best place for this yet. Might need to be in the GH action:
@@ -106,12 +106,23 @@ Resources:
                 Action:
                   - secretsmanager:GetSecretValue
                 Resource: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:dockerhub-*
-              # Allow Codebuild to interact with Public ECR:
+              # Allow Codebuild to interact with public ECR (requires ANY resource, keep this VERY minimal):
               - Effect: Allow
                 Action:
                   - ecr-public:GetAuthorizationToken
                   - sts:GetServiceBearerToken
                 Resource: "*"
+              # Allow codebuild to push to our *personal* ECR:
+              - Effect: Allow
+                Action:
+                  - ecr-public:InitiateLayerUpload
+                Resource: !GetAtt PublicECR.Arn
+
+  PublicECR:
+    Type: AWS::ECR::PublicRepository
+    Properties:
+      RepositoryName: !Sub searchapi-${GitHubBranch}
+
 
 
   GitHubConnection:
@@ -123,7 +134,7 @@ Resources:
         Fn::Transform:
           Name: String
           Parameters:
-            InputString: !Sub "${AWS::StackName}-github-connect"
+            InputString: !Sub "${AWS::StackName}-gh-connect"
             Operation: MaxLength
             Length: 32
 
@@ -142,12 +153,12 @@ Resources:
         EnvironmentVariables:
           - Type: PLAINTEXT
             Name: DOCKER_IMAGE_URI
-            Value: !Ref LambdaDockerRegistry
+            Value: !Sub ${LambdaDockerRegistry}/searchapi-${GitHubBranch}
           - Type: PLAINTEXT
             Name: GITHUB_BRANCH
             Value: !Ref GitHubBranch
         Image: aws/codebuild/amazonlinux2-x86_64-standard:4.0
-        PrivilegedMode: true # We need docker sadly
+        PrivilegedMode: true # We need docker as root sadly
       LogsConfig:
         CloudWatchLogs:
           Status: ENABLED
@@ -156,6 +167,7 @@ Resources:
         Type: CODEPIPELINE
         BuildSpec: cloudformation/codebuild-update-docker.yml
       TimeoutInMinutes: 20 # Default is 60
+      ConcurrentBuildLimit: 1
 
 
 
@@ -197,4 +209,7 @@ Resources:
               Configuration:
                 ProjectName: !Ref BuildPushDocker
 
-# Outputs:
+Outputs:
+  EcrImageUri:
+    Value: !Sub ${LambdaDockerRegistry}/searchapi-${GitHubBranch}
+    Description: "The full uri to pull the container from."
