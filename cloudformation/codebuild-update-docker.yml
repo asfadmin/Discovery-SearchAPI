@@ -14,14 +14,14 @@ phases:
       - docker login -u "${docker_username}" -p "${docker_password}"
 
       - echo Logging into PUBLIC Amazon ECR...
-      - aws ecr-public get-login-password --region "${AWS_REGION}" | docker login --username AWS --password-stdin public.ecr.aws
+      - aws ecr get-login-password --region "${AWS_REGION}" | docker login --username AWS --password-stdin "${DOCKER_IMAGE_URI}"
   build:
     commands:
       - echo Build started on `date`
       - echo Building the Docker image...
-      - docker build -t ${DOCKER_IMAGE_URI}:latest .
+      - docker build -t "${DOCKER_IMAGE_URI}:latest" .
   post_build:
     commands:
       - echo Started push on `date`
       - echo Pushing the Docker image...
-      - docker push ${DOCKER_IMAGE_URI}:latest
+      - docker push "${DOCKER_IMAGE_URI}:latest"
