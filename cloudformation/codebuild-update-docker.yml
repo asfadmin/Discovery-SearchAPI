@@ -9,6 +9,10 @@ env:
 phases:
   pre_build:
     commands:
+      # Make sure required environment variables are declared:
+      - if [[ -z "${DOCKER_IMAGE_URI}" ]]; then echo "ERROR - must declare 'DOCKER_IMAGE_URI' where using codebuild! Quitting"; exit -1; fi
+
+
       # To not hit the pull limit on base image:
       - echo Logging into DockerHub...
       - docker login -u "${docker_username}" -p "${docker_password}"
