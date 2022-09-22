@@ -1,13 +1,17 @@
+# TODO IN ORDER:
+# Figure out how to add a staging codebuild, that runs on PR's
+# Add layer caching to ECR
+
 AWSTemplateFormatVersion: 2010-09-09
 
 Description: "One SearchAPI Deployment per GitHub Branch."
 
 Parameters:
 
-  LambdaDockerRegistry:
-    Type: String
-    Description: "For the whole account. Image Uri will be `LambdaDockerRegistry`/searchapi-`GitHubBranch`"
-    Default: "public.ecr.aws/o4c4z2t6"
+  # LambdaDockerRegistry:
+  #   Type: String
+  #   Description: "For the whole account. In the form of: public.ecr.aws/o4c4z2t6"
+  #   Default: "public.ecr.aws/o4c4z2t6"
   
   GitHubBranch:
     Type: String
@@ -33,7 +37,7 @@ Resources:
         Fn::Transform:
           Name: String
           Parameters:
-            InputString: !Sub "${AWS::StackName}-artifact-storage"
+            InputString: !Sub "searchapi-${GitHubBranch}-artifact-storage"
             Operation: Lower
       LifecycleConfiguration:
         Rules:
@@ -106,20 +110,29 @@ Resources:
                 Action:
                   - secretsmanager:GetSecretValue
                 Resource: !Sub arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:dockerhub-*
-              # Allow Codebuild to interact with public ECR (requires ANY resource, keep this VERY minimal):
+              # Allow Codebuild to interact with any ECR (requires ANY resource, keep Action's VERY minimal):
               - Effect: Allow
                 Action:
-                  - ecr-public:GetAuthorizationToken
+                  - ecr:GetAuthorizationToken
                   - sts:GetServiceBearerToken
                 Resource: "*"
               # Allow codebuild to push to our *personal* ECR:
               - Effect: Allow
                 Action:
-                  - ecr-public:InitiateLayerUpload
-                Resource: !GetAtt PublicECR.Arn
+                  - ecr:BatchGetImage
+                  - ecr:BatchCheckLayerAvailability
+                  - ecr:CompleteLayerUpload
+                  - ecr:DescribeImages
+                  - ecr:DescribeRepositories
+                  - ecr:GetDownloadUrlForLayer
+                  - ecr:InitiateLayerUpload
+                  - ecr:ListImages
+                  - ecr:PutImage
+                  - ecr:UploadLayerPart
+                Resource: !GetAtt MainECR.Arn
 
-  PublicECR:
-    Type: AWS::ECR::PublicRepository
+  MainECR:
+    Type: AWS::ECR::Repository
     Properties:
       RepositoryName: !Sub searchapi-${GitHubBranch}
 
@@ -134,7 +147,7 @@ Resources:
         Fn::Transform:
           Name: String
           Parameters:
-            InputString: !Sub "${AWS::StackName}-gh-connect"
+            InputString: !Sub "SearchAPI-${GitHubBranch}-gh-connect"
             Operation: MaxLength
             Length: 32
 
@@ -150,13 +163,10 @@ Resources:
         # https://docs.aws.amazon.com/codebuild/latest/userguide/build-env-ref-compute-types.html
         ComputeType: BUILD_GENERAL1_SMALL
         Type: LINUX_CONTAINER
-        EnvironmentVariables:
-          - Type: PLAINTEXT
-            Name: DOCKER_IMAGE_URI
-            Value: !Sub ${LambdaDockerRegistry}/searchapi-${GitHubBranch}
-          - Type: PLAINTEXT
-            Name: GITHUB_BRANCH
-            Value: !Ref GitHubBranch
+        # EnvironmentVariables:
+        #   - Type: PLAINTEXT
+        #     Name: GITHUB_BRANCH
+        #     Value: !Ref GitHubBranch
         Image: aws/codebuild/amazonlinux2-x86_64-standard:4.0
         PrivilegedMode: true # We need docker as root sadly
       LogsConfig:
@@ -174,7 +184,7 @@ Resources:
   CodePipeline:
     Type: AWS::CodePipeline::Pipeline
     Properties:
-      Name: !Ref AWS::StackName
+      Name: !Sub SearchAPI-${GitHubBranch}
       ArtifactStore:
         Type: S3
         Location: !Ref S3ArtifactBucket
@@ -208,8 +218,18 @@ Resources:
                 Provider: CodeBuild
               Configuration:
                 ProjectName: !Ref BuildPushDocker
+                PrimarySource: SourceCode
+                EnvironmentVariables: !Sub '[
+                                              {"name":"DOCKER_IMAGE_URI","value":"${MainECR.RepositoryUri}","type":"PLAINTEXT"}
+                                            ]'
 
 Outputs:
-  EcrImageUri:
-    Value: !Sub ${LambdaDockerRegistry}/searchapi-${GitHubBranch}
-    Description: "The full uri to pull the container from."
+  # EcrImageUri:
+  #   Value: !Sub ${LambdaDockerRegistry}/searchapi-${GitHubBranch}
+  #   Description: "The full uri to pull the container from."
+  # Registry:
+  #   Value: !Ref LambdaDockerRegistry
+  Image:
+    Value: !Ref GitHubBranch
+  EcrArn:
+    Value: !GetAtt MainECR.Arn
