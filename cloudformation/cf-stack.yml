@@ -134,9 +134,7 @@ Resources:
   MainECR:
     Type: AWS::ECR::Repository
     Properties:
-      RepositoryName: !Sub searchapi-${GitHubBranch}
-
-
+      RepositoryName: !Sub SearchAPI-${GitHubBranch}
 
   GitHubConnection:
     Type: AWS::CodeStarConnections::Connection
@@ -222,6 +220,57 @@ Resources:
                 EnvironmentVariables: !Sub '[
                                               {"name":"DOCKER_IMAGE_URI","value":"${MainECR.RepositoryUri}","type":"PLAINTEXT"}
                                             ]'
+
+  # ##########################
+  # # Staging on GitHub PR's #
+  # ##########################
+
+
+  
+  # # IF you change this name, also update it's policy that writes logs.
+  # # Hard-coded the name there to avoid a circular dependency.
+  # StagingTestPR:
+  #   Type: AWS::CodeBuild::Project
+  #   Properties:
+  #     Environment:
+  #       # Different ComputeTypes:
+  #       # https://docs.aws.amazon.com/codebuild/latest/userguide/build-env-ref-compute-types.html
+  #       ComputeType: BUILD_GENERAL1_SMALL
+  #       Type: LINUX_CONTAINER
+  #       # EnvironmentVariables:
+  #       #   - Type: PLAINTEXT
+  #       #     Name: GITHUB_BRANCH
+  #       #     Value: !Ref GitHubBranch
+  #       Image: aws/codebuild/amazonlinux2-x86_64-standard:4.0
+  #       PrivilegedMode: true # We need docker as root sadly
+  #     LogsConfig:
+  #       CloudWatchLogs:
+  #         Status: ENABLED
+  #     ServiceRole: !Ref CodeBuildStagingRole
+
+  # CodeBuildStagingRole:
+  #   Type: AWS::IAM::Role
+  #   Properties:
+  #     AssumeRolePolicyDocument:
+  #       Version: "2012-10-17"
+  #       Statement:
+  #         - Effect: Allow
+  #           Principal:
+  #             Service:
+  #               - "codebuild.amazonaws.com"
+  #           Action: "sts:AssumeRole"
+  #     Policies:
+  #       - PolicyName: AllowCodeBuildLogsTwo
+  #         PolicyDocument:
+  #           Statement:
+  #             # Allow CodeBuild to Create Logs:
+  #             - Effect: Allow
+  #               Action:
+  #                 - logs:CreateLogGroup
+  #                 - logs:CreateLogStream
+  #                 - logs:PutLogEvents
+  #               Resource: !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/StagingTestPR-*:log-stream:*"
+
 
 Outputs:
   # EcrImageUri:
