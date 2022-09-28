@@ -1,0 +1,37 @@
+name: Update Staging Stack (PR)
+
+on:
+  pull_request:
+    - opened
+    - reopened
+    - synchronize
+    # - edited ?
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+  deploy_cf:
+    if: ${{ github.event.pull_request.head.repo.full_name == "asfadmin/Discovery-SearchAPI" }}
+    steps:
+
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Testing vars
+        run: |
+          echo $GITHUB_REPOSITORY
+          echo ${{github.event.pull_request.head.repo.full_name}}
+          echo ${{ github.event.pull_request.head.repo.full_name == $GITHUB_REPOSITORY }}
+
+
+      # - uses: aws-actions/configure-aws-credentials@v1
+      #   with:
+      #     aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
+      #     aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
+      #     aws-region: ${{ env.AWS_REGION }}
+
+      # - name: Deploy CloudFormation
+      #   shell: bash
+      #   run: |
+      #     aws cloudformation deploy
