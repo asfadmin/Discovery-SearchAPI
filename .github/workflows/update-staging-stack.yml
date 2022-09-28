@@ -11,7 +11,7 @@ on:
 jobs:
   deploy_cf:
     runs-on: ubuntu-latest
-    if: ${{ github.event.pull_request.head.repo.full_name == "asfadmin/Discovery-SearchAPI" }}
+    if: ${{ github.event.pull_request.head.repo.full_name }} == "asfadmin/Discovery-SearchAPI"
     steps:
 
       - uses: actions/checkout@v2
