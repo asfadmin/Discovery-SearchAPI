@@ -11,7 +11,7 @@ on:
 jobs:
   deploy_cf:
     runs-on: ubuntu-latest
-    if: github.event.pull_request.head.repo.full_name == env.GITHUB_REPOSITORY
+    if: github.event.pull_request.head.repo.full_name == github.repository
     steps:
 
       - uses: actions/checkout@v2
@@ -22,6 +22,7 @@ jobs:
         run: |
           echo $GITHUB_REPOSITORY
           echo ${{github.event.pull_request.head.repo.full_name}}
+          echo ${{github.repository}}
 
 
       # - uses: aws-actions/configure-aws-credentials@v1
