@@ -4,7 +4,7 @@
 
 AWSTemplateFormatVersion: 2010-09-09
 
-Description: "One SearchAPI Deployment per GitHub Branch."
+Description: "SearchAPI pipeline stack, for deploying an API automatically when a branch is updated."
 
 Parameters:
 
@@ -12,14 +12,14 @@ Parameters:
   #   Type: String
   #   Description: "For the whole account. In the form of: public.ecr.aws/o4c4z2t6"
   #   Default: "public.ecr.aws/o4c4z2t6"
-  
+
   GitHubBranch:
     Type: String
     Description: "Branch to run from. This also becomes the tag for the container in ECR."
     # You need to escape the slash, so *it* can escape the period... weird.
     # (To match the actual period, and not regex's "any character")
     AllowedPattern: "[A-Za-z0-9-\\.]+"
-  
+
   # # Not sure if this is the best place for this yet. Might need to be in the GH action:
   # CreateUatApi:
   #   Type: String
@@ -37,7 +37,7 @@ Resources:
         Fn::Transform:
           Name: String
           Parameters:
-            InputString: !Sub "searchapi-${GitHubBranch}-artifact-storage"
+            InputString: !Sub "${AWS::StackName}-artifact-storage"
             Operation: Lower
       LifecycleConfiguration:
         Rules:
@@ -134,7 +134,13 @@ Resources:
   MainECR:
     Type: AWS::ECR::Repository
     Properties:
-      RepositoryName: !Sub SearchAPI-${GitHubBranch}
+      RepositoryName:
+        # You need the Strings macro to use this (cloudformation/cf-strings-macro.yml):
+        Fn::Transform:
+          Name: String
+          Parameters:
+            InputString: !Ref AWS::StackName
+            Operation: Lower
 
   GitHubConnection:
     Type: AWS::CodeStarConnections::Connection
@@ -145,9 +151,12 @@ Resources:
         Fn::Transform:
           Name: String
           Parameters:
-            InputString: !Sub "SearchAPI-${GitHubBranch}-gh-connect"
+            InputString: !Ref AWS::StackName
             Operation: MaxLength
             Length: 32
+            # So that if '-staging' is on the end, it's the LAST thing to be stripped,
+            # And will never conflict with non-staging. (It could if branch name was long).
+            StripFrom: Left
 
   # IF you change this name, also update it's policy that writes logs.
   # Hard-coded the name there to avoid a circular dependency.
@@ -182,7 +191,7 @@ Resources:
   CodePipeline:
     Type: AWS::CodePipeline::Pipeline
     Properties:
-      Name: !Sub SearchAPI-${GitHubBranch}
+      Name: !Ref AWS::StackName
       ArtifactStore:
         Type: S3
         Location: !Ref S3ArtifactBucket
