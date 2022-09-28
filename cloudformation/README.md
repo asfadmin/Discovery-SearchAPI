@@ -1,5 +1,13 @@
 # Notes on Cloudformation
 
+## To Deploy
+
+For now, run:
+
+```bash
+make -e BRANCH=<github_branch> all
+```
+
 ## Working with the stack manually
 
 - After making changes, to lint the stack:
