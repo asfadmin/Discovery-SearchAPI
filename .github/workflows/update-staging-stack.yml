@@ -2,10 +2,11 @@ name: Update Staging Stack (PR)
 
 on:
   pull_request:
-    - opened
-    - reopened
-    - synchronize
-    # - edited ?
+    types:
+      - opened
+      - reopened
+      - synchronize
+      # - edited ?
 
 jobs:
   deploy:
