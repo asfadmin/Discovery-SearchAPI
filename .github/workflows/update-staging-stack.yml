@@ -11,6 +11,7 @@ on:
 jobs:
   deploy_cf:
     runs-on: ubuntu-latest
+    # Don't run ANY of this unless the PR came from one of our branches (so forks don't trigger)
     if: github.event.pull_request.head.repo.full_name == github.repository
     steps:
 
@@ -18,20 +19,14 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Testing vars
+      # TODO: Change to https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services
+      - uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy CloudFormation
+        shell: bash
         run: |
-          echo $GITHUB_REPOSITORY
-          echo ${{github.event.pull_request.head.repo.full_name}}
-          echo ${{github.repository}}
-
-
-      # - uses: aws-actions/configure-aws-credentials@v1
-      #   with:
-      #     aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
-      #     aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
-      #     aws-region: ${{ env.AWS_REGION }}
-
-      # - name: Deploy CloudFormation
-      #   shell: bash
-      #   run: |
-      #     aws cloudformation deploy
+          make -e BRANCH=${{github.ref_name}}-staging all
