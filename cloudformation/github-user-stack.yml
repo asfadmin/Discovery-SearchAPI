@@ -1,0 +1,56 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: "The user GitHub uses to deploy SearchAPI."
+
+Resources:
+
+  # ManageStackUser:
+  #   Type: AWS::IAM::User
+  #   Properties:
+  #     UserName: GitHub-manage-SearchAPI-stacks
+      
+
+  ManageStackRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - "cloudformation.amazonaws.com"
+            Action: "sts:AssumeRole"
+
+      Policies:
+
+        - PolicyName: AllowUpdateStack
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action:
+                  - cloudformation:DescribeStacks
+                  - cloudformation:CreateStack
+                  - cloudformation:DeleteStack
+                  - cloudformation:UpdateStack
+                  - cloudformation:DescribeChangeSet
+                  - cloudformation:CreateChangeSet
+                  - cloudformation:DeleteChangeSet
+                  - cloudformation:ExecuteChangeSet
+                  - cloudformation:SetStackPolicy
+                  - cloudformation:ValidateTemplate
+                Resource:
+                  # The String Macro's stack:
+                  - !Sub "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:transform/String"
+                  - !Sub "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/CFN-StringMacros/*"
+                  # The SearchAPI stack(s):
+                  - !Sub "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/SearchAPI-*/*"
+
+        - PolicyName: RunStringMacroLambda
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "lambda:InvokeFunction"
+                Resource:
+                  - !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:CFN-StringMacros-TransformFunction-*"
