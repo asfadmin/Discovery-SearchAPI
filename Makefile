@@ -19,8 +19,18 @@ update-macro-template:
 update-main-stack-template: guard-BRANCH
 	aws cloudformation deploy \
 		--stack-name "SearchAPI-$${BRANCH//[^[:alnum:]]/-}" \
-		--template-file cloudformation/cf-stack.yml \
+		--template-file cloudformation/SearchAPI-stack.yml \
 		--capabilities CAPABILITY_IAM \
 		--parameter-overrides GitHubBranch=${BRANCH}
 
+## Main workflow for deploying a API Stack:
 all: update-macro-template update-main-stack-template
+
+## Delete the SearchAPI stack
+delete: guard-BRANCH
+	# Delete it:
+	aws cloudformation delete-stack \
+		--stack-name "SearchAPI-$${BRANCH//[^[:alnum:]]/-}"
+	# Wait for delete to complete (And throw if delete failed):
+	aws cloudformation wait stack-delete-complete \
+		--stack-name "SearchAPI-$${BRANCH//[^[:alnum:]]/-}"
