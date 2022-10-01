@@ -1,0 +1,72 @@
+# TODO IN ORDER:
+#   add caching to ECR
+
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: Everything needed for a single SearchAPI
+
+Parameters:
+
+  GitHubBranch:
+    Type: String
+    Description: "Name of github branch the stack is hooked to. (also appends '-staging' if PR)"
+    # You need to escape the slash, so *it* can escape the period... weird.
+    # (To match the actual period, and not regex's "any character")
+    AllowedPattern: "[A-Za-z0-9-\\.]+"
+
+Resources:
+
+  DockerECR:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName:
+        # You need the Strings macro to use this (cloudformation/cf-strings-macro.yml):
+        Fn::Transform:
+          Name: String
+          Parameters:
+            InputString: !Ref AWS::StackName
+            Operation: Lower
+
+  LambdaContainer:
+    Type: AWS::Lambda::Function
+    Properties:
+      PackageType: Image
+      Code:
+        ## There's no image in the registry yet, so this fails...?
+        # ImageUri: !Sub "${DockerECR.RepositoryUri}:latest"
+        ## Placeholder image. Update it to this ecr after you push the first image:
+        ImageUri: !Sub "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/searchapi-test:searchapifunction-a31a5a025958-sam_image"
+      ImageConfig:
+        EntryPoint: [ "/lambda-entrypoint.sh" ]
+        Command: [ "SearchAPI.application.run_flask_lambda" ]
+      MemorySize: 10240 # Max is 10240
+      Timeout: 900 # Max is 900
+      Role: !GetAtt LambdaServiceRole.Arn
+
+  LambdaServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        # Create Logs
+        - PolicyName: CreateAndUpdateLogs
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${AWS::StackName}-*"
+
+Outputs:
+  LambdaFunction:
+    Value: !Ref LambdaContainer
+  DockerRegistry:
+    Value: !GetAtt DockerECR.RepositoryUri
