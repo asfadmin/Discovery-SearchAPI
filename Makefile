@@ -11,8 +11,25 @@ guard-%:
 update-macro-template:
 	aws cloudformation deploy \
 		--stack-name CFN-StringMacros \
-		--template-file cloudformation/cf-string-macros.yml \
+		--template-file cloudformation/single-deploy-string-macros.yml \
 		--capabilities CAPABILITY_IAM
+
+## Make sure the ECR all SearchAPI's share is up to date
+# stack-name ECR first, so it doesn't match SearchAPI-* stacks
+update-searchapi-ecr:
+	aws cloudformation deploy \
+		--stack-name ECR-SearchAPI \
+		--template-file cloudformation/single-deploy-ecr.yml
+
+## Update that registry with a container
+docker-update-ecr: guard-BRANCH
+	export DOCKER_ECR=$$(aws --profile=disco-nonprod cloudformation describe-stacks \
+					--query "Stacks[?StackName=='ECR-SearchAPI'].Outputs[0][?OutputKey=='RegistryUri'].OutputValue" \
+					--output=text) && \
+	([ -n "$${DOCKER_ECR}" ] || echo "ERROR: Couldn't query aws stack") && \
+	aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin "$${DOCKER_ECR}" && \
+	docker build -t "$${DOCKER_ECR}:$${BRANCH}" . && \
+	docker push "$${DOCKER_ECR}:$${BRANCH}"
 
 ## Finally deploy the main stack
 #	In --stack-name, after BRANCH, will replace all non-alpha chars with '-'
@@ -24,7 +41,7 @@ update-main-stack-template: guard-BRANCH
 		--parameter-overrides GitHubBranch=${BRANCH}
 
 ## Main workflow for deploying a API Stack:
-all: update-macro-template update-main-stack-template
+all: update-macro-template update-searchapi-ecr docker-update-ecr update-main-stack-template
 
 ## Delete the SearchAPI stack
 delete: guard-BRANCH
