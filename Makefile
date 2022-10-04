@@ -23,10 +23,11 @@ update-searchapi-ecr:
 
 ## Update that registry with a container
 docker-update-ecr: guard-BRANCH
-	export DOCKER_ECR=$$(aws --profile=disco-nonprod cloudformation describe-stacks \
+	export DOCKER_ECR=$$(aws cloudformation describe-stacks \
+					--stack-name "ECR-SearchAPI" \
 					--query "Stacks[?StackName=='ECR-SearchAPI'].Outputs[0][?OutputKey=='RegistryUri'].OutputValue" \
 					--output=text) && \
-	([ -n "$${DOCKER_ECR}" ] || echo "ERROR: Couldn't query aws stack") && \
+	([ -n "$${DOCKER_ECR}" ] || (echo "ERROR: Couldn't query aws stack" && exit -1)) && \
 	aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin "$${DOCKER_ECR}" && \
 	docker build -t "$${DOCKER_ECR}:$${BRANCH}" . && \
 	docker push "$${DOCKER_ECR}:$${BRANCH}"
