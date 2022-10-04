@@ -70,3 +70,17 @@ jobs:
           parameter-overrides: "GitHubBranch=${{ github.ref_name }}"
           no-fail-on-empty-changeset: "1"
 
+      # If the stack already exists, it won't update to the latest image.
+      - name: Update Lambda Function
+        env:
+          FUNCTION: ${{ steps.searchapi-stack.outputs.LambdaFunction }}
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: searchapi
+          IMAGE_TAG: ${{ github.ref_name }}
+        run: |
+          aws lambda update-function-code \
+            --function-name ${FUNCTION} \
+            --image-uri ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}
+          aws lambda wait function-updated \
+            --function-name ${FUNCTION}
+
