@@ -79,8 +79,12 @@ jobs:
           IMAGE_TAG: ${{ github.ref_name }}
         run: |
           aws lambda update-function-code \
-            --function-name ${FUNCTION} \
-            --image-uri ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}
+              --function-name "${FUNCTION}" \
+              --image-uri "${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}"
           aws lambda wait function-updated \
-            --function-name ${FUNCTION}
+              --function-name "${FUNCTION}"
 
+      ### TODO: Make this it's own (file?), that doesn't run on push. ONLY pr.
+      - name: Run Pytest
+        run: |
+          echo "TODO"
