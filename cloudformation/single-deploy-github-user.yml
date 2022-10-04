@@ -34,7 +34,6 @@ Resources:
                   - !Sub "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/SearchAPI-*/*"
                   # Update the ECR stack:
                   - !Sub "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/ECR-SearchAPI/*"
-                  
 
         - PolicyName: RunStringMacroLambda
           PolicyDocument:
@@ -50,19 +49,21 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
+                  # Minimum for pulling/pushing:
+                  - ecr:BatchGetImage
+                  - ecr:BatchCheckLayerAvailability
+                  - ecr:CompleteLayerUpload
+                  - ecr:GetDownloadUrlForLayer
+                  - ecr:InitiateLayerUpload
+                  - ecr:PutImage
+                  - ecr:UploadLayerPart
+                  # Extra's for updating the registry
                   - ecr:CreateRepository
                   - ecr:DescribeRepositories
                   - ecr:GetRepositoryPolicy
                   - ecr:SetRepositoryPolicy
-                  - ecr:BatchGetImage
-                  - ecr:BatchCheckLayerAvailability
-                  - ecr:CompleteLayerUpload
                   - ecr:DescribeImages
-                  - ecr:GetDownloadUrlForLayer
-                  - ecr:InitiateLayerUpload
                   - ecr:ListImages
-                  - ecr:PutImage
-                  - ecr:UploadLayerPart
                 Resource:
                   - !Sub "arn:aws:ecr:${AWS::Region}:${AWS::AccountId}:repository/searchapi"
 
@@ -89,7 +90,9 @@ Resources:
                   - lambda:CreateFunction
                   - lambda:DeleteFunction
                   - lambda:GetFunction
+                  - lambda:GetFunctionConfiguration
                   - lambda:UpdateFunctionConfiguration
+                  - lambda:UpdateFunctionCode
                 Resource:
                   - !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:SearchAPI-*-LambdaContainer-*"
 
@@ -99,5 +102,4 @@ Resources:
               - Effect: Allow
                 Action:
                   - ecr:GetAuthorizationToken
-                  - sts:GetServiceBearerToken
                 Resource: "*"
