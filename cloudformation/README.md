@@ -32,12 +32,4 @@ aws lambda update-function-code --function-name <function_name_here> --image-uri
 aws lambda wait function-updated --function-name <function_name_here>
 ```
 
-## Approve the GitHub Connection for a New Stack
 
-This has to be done in the AWS console, and you need to be logged into GitHub at the same time.
-
-1) After deploying the new stack, find the new CodePipeline in AWS.
-
-2) On the very left, you'll see a bunch of collapsed options (Source, Artifacts, Build, Deploy, ...), Open the last one (Settings), and click "Connections".
-
-3) You should see your new connection on the table, with status as "Pending". Walk though the steps in the GUI to connect it. (I'm not sure if you have to be a GitHub Owner or not. Let us know if it fails).
