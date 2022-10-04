@@ -1,5 +1,15 @@
 # Notes on Cloudformation
 
+TODO:
+
+- See if taking out the single-deploy's from the pipeline is a good idea, to limit github user permissions.
+- Completely re-write this readme. Include:
+  - How to re-deploy if account goes down.
+    - Setup access keys for github user. Can't be automatic.
+  - DO NOT automate the github user cloudformation note.
+  - Why the ECR isn't apart of the stack.
+  - Overall workflow, what's in Github Actions vs AWS
+
 ## To Deploy
 
 For now, run:
