@@ -64,8 +64,10 @@ jobs:
       - name: Deploy SearchAPI Stack
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         id: searchapi-stack
+        env:
+          STACK_NAME: "SearchAPI-${BRANCH//[^[:alnum:]]/-}"
         with:
-          name: "SearchAPI-${BRANCH//[^[:alnum:]]/-}"
+          name: ${STACK_NAME}
           template: cloudformation/SearchAPI-stack.yml
           parameter-overrides: "GitHubBranch=${{ github.ref_name }}"
           no-fail-on-empty-changeset: "1"
