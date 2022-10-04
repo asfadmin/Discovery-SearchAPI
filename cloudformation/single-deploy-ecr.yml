@@ -1,0 +1,30 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+## Needed to break this out from the SearchAPI stack itself, because
+#    there's no way to create an ecr, push a container, then have
+#    lambda *use* that container if they're all in the same stack.
+Description: Single ECR for every SearchAPI stack to use.
+
+Parameters:
+  RegistryName:
+    Type: String
+    Description: "Name of ECR that SearchAPI stacks will use. Converts to all lowercase."
+    Default: "SearchAPI"
+
+Resources:
+  DockerECR:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName:
+        # You need the Strings macro to use this (cloudformation/cf-strings-macro.yml):
+        Fn::Transform:
+          Name: String
+          Parameters:
+            InputString: !Ref RegistryName
+            Operation: Lower
+
+Outputs:
+  RegistryUri:
+    Value: !GetAtt DockerECR.RepositoryUri
+    Export:
+      Name: !Sub "${AWS::StackName}-RegistryUri"
