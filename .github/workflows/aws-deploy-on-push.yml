@@ -24,12 +24,14 @@ jobs:
           name: CFN-StringMacros
           template: cloudformation/single-deploy-string-macros.yml
           capabilities: CAPABILITY_IAM
+          no-fail-on-empty-changeset: "1"
 
       - name: Update SearchAPI ECR
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         with:
           name: ECR-SearchAPI
           template: cloudformation/single-deploy-ecr.yml
+          no-fail-on-empty-changeset: "1"
 
       - name: Get ECR URI
         shell: bash
