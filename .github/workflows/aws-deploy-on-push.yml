@@ -53,19 +53,19 @@ jobs:
           docker build -t "${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}" .
           docker push "${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}"
 
-      - name: Create name for SearchAPI Stack
-        id: stack-name
-        env:
-          BRANCH: ${{ github.ref_name }}
-        # Replace all non-alpha chars with a '-' in branch name:
-        run: |
-          echo "::set-output name=name::SearchAPI-${BRANCH//[^[:alnum:]]/-}"
+      # - name: Create name for SearchAPI Stack
+      #   id: stack-name
+      #   env:
+      #     BRANCH: ${{ github.ref_name }}
+      #   # Replace all non-alpha chars with a '-' in branch name:
+      #   run: |
+      #     echo "::set-output name=name::SearchAPI-${BRANCH//[^[:alnum:]]/-}"
 
       - name: Deploy SearchAPI Stack
         uses: aws-actions/aws-cloudformation-github-deploy@v1
         id: searchapi-stack
         with:
-          name: ${{ steps.stack-name.outputs.name }}
+          name: "SearchAPI-${BRANCH//[^[:alnum:]]/-}"
           template: cloudformation/SearchAPI-stack.yml
           parameter-overrides: "GitHubBranch=${{ github.ref_name }}"
           no-fail-on-empty-changeset: "1"
