@@ -9,6 +9,7 @@ TODO:
   - DO NOT automate the github user cloudformation note.
   - Why the ECR isn't apart of the stack.
   - Overall workflow, what's in Github Actions vs AWS
+- Make sure GitHub cache will pull the latest container still. (And look closer at any params the action exposes)
 
 ## To Deploy
 
