@@ -18,7 +18,24 @@ jobs:
           aws-secret-access-key: ${{ secret.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secret.AWS_REGION }}
 
-      - name: Deploy CloudFormation
+      - name: Update Strings Macro
+        uses: aws-actions/aws-cloudformation-github-deploy@v1
+        with:
+          name: CFN-StringMacros
+          template: cloudformation/single-deploy-string-macros.yml
+          capabilities: CAPABILITY_IAM
+
+      - name: Update SearchAPI ECR
+        uses: aws-actions/aws-cloudformation-github-deploy@v1
+        with:
+          name: ECR-SearchAPI
+          template: cloudformation/single-deploy-ecr.yml
+
+      - name: Get ECR URI
         shell: bash
         run: |
-          make -e BRANCH=${{github.ref_name}} all
+          export AWS_URI=$(aws cloudformation describe-stacks \
+            --query "Stacks[?StackName=='ECR-SearchAPI'].Outputs[0][?OutputKey=='RegistryUri'].OutputValue" \
+            --output=text)
+          echo "${AWS_URI}:${{github.ref_name}}"
+          echo "DOCKER_IMAGE=${AWS_URI}:${{github.ref_name}}" >> $GITHUB_ENV
