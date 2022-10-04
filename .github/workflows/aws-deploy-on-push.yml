@@ -33,15 +33,12 @@ jobs:
           template: cloudformation/single-deploy-ecr.yml
           no-fail-on-empty-changeset: "1"
 
-      # - name: Get ECR URI
-      #   shell: bash
-      #   run: |
-      #     export AWS_URI=$(aws cloudformation describe-stacks \
-      #       --stack-name ECR-SearchAPI \
-      #       --query "Stacks[?StackName=='ECR-SearchAPI'].Outputs[0][?OutputKey=='RegistryUri'].OutputValue" \
-      #       --output=text)
-      #     echo "${AWS_URI}:${{github.ref_name}}"
-      #     echo "DOCKER_IMAGE=${AWS_URI}:${{github.ref_name}}" >> $GITHUB_ENV
+      # In this step, this action saves a list of existing images,
+      # the cache is created without them in the post run.
+      # It also restores the cache if it exists.
+      - uses: satackey/action-docker-layer-caching@v0.0.11
+        # Ignore the failure of a step and avoid terminating the job.
+        continue-on-error: true
 
       - name: Log into Amazon ECR
         id: login-ecr
@@ -70,5 +67,6 @@ jobs:
         with:
           name: ${{ steps.stack-name.outputs.name }}
           template: cloudformation/SearchAPI-stack.yml
+          parameter-overrides: "GitHubBranch=${{ github.ref_name }}"
           no-fail-on-empty-changeset: "1"
 
