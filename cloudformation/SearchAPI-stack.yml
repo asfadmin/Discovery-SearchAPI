@@ -14,28 +14,25 @@ Parameters:
     # (To match the actual period, and not regex's "any character")
     AllowedPattern: "[A-Za-z0-9-\\.]+"
 
-Resources:
+  ImportValueEcrUri:
+    Type: String
+    Description: "Exported Value, holds SearchAPI registry. ({StackName}-RegistryUri)."
+    Default: "ECR-SearchAPI-RegistryUri"
 
-  DockerECR:
-    Type: AWS::ECR::Repository
-    Properties:
-      RepositoryName:
-        # You need the Strings macro to use this (cloudformation/cf-strings-macro.yml):
-        Fn::Transform:
-          Name: String
-          Parameters:
-            InputString: !Ref AWS::StackName
-            Operation: Lower
+Resources:
 
   LambdaContainer:
     Type: AWS::Lambda::Function
     Properties:
       PackageType: Image
       Code:
-        ## There's no image in the registry yet, so this fails...?
-        # ImageUri: !Sub "${DockerECR.RepositoryUri}:latest"
-        ## Placeholder image. Update it to this ecr after you push the first image:
-        ImageUri: !Sub "${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/searchapi-test:searchapifunction-a31a5a025958-sam_image"
+        # Can't have ECR as part of the stack. There's no image inside a fresh ECR,
+        # so lambda fails to deploy and fails the stack.
+        ImageUri: !Join
+          - ""
+          - - Fn::ImportValue: 
+                !Sub "${ImportValueEcrUri}"
+            - !Sub ":${GitHubBranch}"
       ImageConfig:
         EntryPoint: [ "/lambda-entrypoint.sh" ]
         Command: [ "SearchAPI.application.run_flask_lambda" ]
@@ -68,5 +65,3 @@ Resources:
 Outputs:
   LambdaFunction:
     Value: !Ref LambdaContainer
-  DockerRegistry:
-    Value: !GetAtt DockerECR.RepositoryUri
