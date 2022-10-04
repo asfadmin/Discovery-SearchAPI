@@ -1,10 +1,10 @@
-name: Update Main Stack
+name: Update SearchAPI Stack
 
 on:
   push:
 
 jobs:
-  deploy_cf:
+  deploy-SearchAPI:
     runs-on: ubuntu-latest
     steps:
 
