@@ -1,24 +1,24 @@
-name: Update Main Stack
+# name: Update Main Stack
 
-on:
-  push:
+# on:
+#   push:
 
-jobs:
-  deploy_cf:
-    runs-on: ubuntu-latest
-    steps:
+# jobs:
+#   deploy_cf:
+#     runs-on: ubuntu-latest
+#     steps:
 
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
+#       - uses: actions/checkout@v2
+#         with:
+#           fetch-depth: 0
 
-      - uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+#       - uses: aws-actions/configure-aws-credentials@v1
+#         with:
+#           aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
+#           aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
+#           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Deploy CloudFormation
-        shell: bash
-        run: |
-          make -e BRANCH=${{github.ref_name}} all
+#       - name: Deploy CloudFormation
+#         shell: bash
+#         run: |
+#           make -e BRANCH=${{github.ref_name}} all
