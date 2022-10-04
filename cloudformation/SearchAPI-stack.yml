@@ -40,12 +40,13 @@ Resources:
       Timeout: 900 # Max is 900
       Role: !GetAtt LambdaServiceRole.Arn
 
-  LambdaURL:
-    Type: AWS::Lambda::Url
-    Properties:
-      # AWS_IAM or None if you want everyone to use it:
-      AuthType: NONE
-      TargetFunctionArn: !GetAtt LambdaContainer.Arn
+  ### Just realized we use cloudfront for this, not lambda's built it stuff.
+  # LambdaURL:
+  #   Type: AWS::Lambda::Url
+  #   Properties:
+  #     # AWS_IAM or None if you want everyone to use it:
+  #     AuthType: NONE
+  #     TargetFunctionArn: !GetAtt LambdaContainer.Arn
 
   LambdaServiceRole:
     Type: AWS::IAM::Role
@@ -72,5 +73,5 @@ Resources:
 Outputs:
   LambdaFunction:
     Value: !Ref LambdaContainer
-  LambdaUrl:
-    Value: !GetAtt LambdaURL.FunctionUrl
+  # LambdaUrl:
+  #   Value: !GetAtt LambdaURL.FunctionUrl
