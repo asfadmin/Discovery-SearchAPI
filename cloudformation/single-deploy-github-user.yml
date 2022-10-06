@@ -29,20 +29,20 @@ Resources:
                 Resource:
                   # The String Macro's stack:
                   - !Sub "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:transform/String"
-                  - !Sub "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/CFN-StringMacros/*"
+                  # - !Sub "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/CFN-StringMacros/*"
                   # The SearchAPI stack(s):
                   - !Sub "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/SearchAPI-*/*"
                   # Update the ECR stack:
-                  - !Sub "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/ECR-SearchAPI/*"
+                  # - !Sub "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/ECR-SearchAPI/*"
 
-        - PolicyName: RunStringMacroLambda
-          PolicyDocument:
-            Statement:
-              - Effect: Allow
-                Action:
-                  - lambda:InvokeFunction
-                Resource:
-                  - !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:CFN-StringMacros-TransformFunction-*"
+        # - PolicyName: RunStringMacroLambda
+        #   PolicyDocument:
+        #     Statement:
+        #       - Effect: Allow
+        #         Action:
+        #           - lambda:InvokeFunction
+        #         Resource:
+        #           - !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:CFN-StringMacros-TransformFunction-*"
 
         - PolicyName: SearchAPIManagerECR
           PolicyDocument:
@@ -58,12 +58,12 @@ Resources:
                   - ecr:PutImage
                   - ecr:UploadLayerPart
                   # Extra's for updating the registry
-                  - ecr:CreateRepository
-                  - ecr:DescribeRepositories
-                  - ecr:GetRepositoryPolicy
-                  - ecr:SetRepositoryPolicy
-                  - ecr:DescribeImages
-                  - ecr:ListImages
+                  # - ecr:CreateRepository
+                  # - ecr:DescribeRepositories
+                  # - ecr:GetRepositoryPolicy
+                  # - ecr:SetRepositoryPolicy
+                  # - ecr:DescribeImages
+                  # - ecr:ListImages
                 Resource:
                   - !Sub "arn:aws:ecr:${AWS::Region}:${AWS::AccountId}:repository/searchapi"
 
@@ -80,7 +80,10 @@ Resources:
                   - iam:PutRolePolicy
                   - iam:PassRole
                 Resource:
+                  # Lambda service role:
                   - !Sub "arn:aws:iam::${AWS::AccountId}:role/SearchAPI-*-LambdaServiceRole-*"
+                  # Api Gateway V2 role:
+                  - !Sub "arn:aws:iam::${AWS::AccountId}:role/SearchAPI-*-ApiGatewayServiceRole-*"
 
         - PolicyName: SearchAPIManagerLambda
           PolicyDocument:
@@ -103,3 +106,14 @@ Resources:
                 Action:
                   - ecr:GetAuthorizationToken
                 Resource: "*"
+
+        - PolicyName: SearchAPIManagerApiGateway
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action:
+                  - apigateway:POST
+                Resource:
+                  - !Sub arn:aws:apigateway:${AWS::Region}::/tags/*
+                  - !Sub arn:aws:apigateway:${AWS::Region}::/apis
+
