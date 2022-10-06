@@ -39,7 +39,9 @@ update-main-stack-template: guard-BRANCH
 		--stack-name "SearchAPI-$${BRANCH//[^[:alnum:]]/-}" \
 		--template-file cloudformation/SearchAPI-stack.yml \
 		--capabilities CAPABILITY_IAM \
-		--parameter-overrides GitHubBranch=${BRANCH}
+		--parameter-overrides \
+			GitHubBranch=${BRANCH} \
+			Maturity=devel
 
 ## Main workflow for deploying a API Stack:
 all: update-macro-template update-searchapi-ecr docker-update-ecr update-main-stack-template
