@@ -52,7 +52,7 @@ jobs:
           REPOSITORY: searchapi
           IMAGE_TAG: ${{ github.ref_name }}
         run: |
-          docker build -t "${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}" .
+          docker build --build-arg GIT_COMMIT_HASH="${GITHUB_SHA}" -t "${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}" .
           docker push "${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}"
 
       - name: Create name for SearchAPI Stack
