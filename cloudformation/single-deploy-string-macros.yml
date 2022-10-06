@@ -32,6 +32,7 @@ Resources:
   TransformFunction:
     Type: AWS::Lambda::Function
     Properties:
+      Description: Adds extra functions you can use when deploying CloudFormation.
       Handler: index.handler
       Runtime: python3.9
       Role: !GetAtt TransformExecutionRole.Arn
