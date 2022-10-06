@@ -1,5 +1,7 @@
 # From aws's repository:
 FROM public.ecr.aws/lambda/python:3.9
+ARG GIT_COMMIT_HASH=unknown
+
 
 ## Install/update outside libraries:
 RUN yum update -y && \
@@ -36,6 +38,8 @@ RUN rm -rf /var/cache/yum
 ## Host to open queries too. (localhost=127.0.0.1, outside_world=0.0.0.0)
 ENV OPEN_TO_IP="127.0.0.1"
 EXPOSE 8080
-# ## Nuke "default" entrypoint (Since it's for running in lambda). It gets set BACK to default, in template.yaml
+## Save the hash of the code in this container
+RUN echo "{\"version\":\"${GIT_COMMIT_HASH}\"}" > SearchAPI/version.json
+## Nuke "default" entrypoint (Since it's for running in lambda). It gets set BACK to default, in template.yaml
 ENTRYPOINT ["/bin/bash", "-l", "-c"]
 CMD ["python3 -m gunicorn --timeout 0 --bind ${OPEN_TO_IP}:8080 --workers 2 --threads $(grep -c ^processor /proc/cpuinfo) SearchAPI.application:application"]
