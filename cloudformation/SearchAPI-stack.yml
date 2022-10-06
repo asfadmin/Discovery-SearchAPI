@@ -1,5 +1,3 @@
-# TODO IN ORDER:
-#   add caching to ECR
 
 AWSTemplateFormatVersion: 2010-09-09
 
@@ -9,10 +7,14 @@ Parameters:
 
   GitHubBranch:
     Type: String
-    Description: "Name of github branch the stack is hooked to. (also appends '-staging' if PR)"
+    Description: "Name of github branch the stack is hooked to. (also appends '-staging' if PR)."
     # You need to escape the slash, so *it* can escape the period... weird.
     # (To match the actual period, and not regex's "any character")
     AllowedPattern: "[A-Za-z0-9-\\.]+"
+
+  Maturity:
+    Type: String
+    Description: "Passed to container. Maturity to run the API."
 
   ImportValueEcrUri:
     Type: String
@@ -24,29 +26,24 @@ Resources:
   LambdaContainer:
     Type: AWS::Lambda::Function
     Properties:
+      Description: !Sub "For SearchAPI stack '${AWS::StackName}'"
       PackageType: Image
       Code:
         # Can't have ECR as part of the stack. There's no image inside a fresh ECR,
         # so lambda fails to deploy and fails the stack.
         ImageUri: !Join
-          - ""
-          - - Fn::ImportValue: 
-                !Sub "${ImportValueEcrUri}"
-            - !Sub ":${GitHubBranch}"
+          - ":"
+          - - Fn::ImportValue: !Sub "${ImportValueEcrUri}"
+            - !Ref GitHubBranch
       ImageConfig:
         EntryPoint: [ "/lambda-entrypoint.sh" ]
         Command: [ "SearchAPI.application.run_flask_lambda" ]
+      Environment:
+        Variables:
+          MATURITY: !Ref Maturity
       MemorySize: 10240 # Max is 10240
       Timeout: 900 # Max is 900
       Role: !GetAtt LambdaServiceRole.Arn
-
-  ### Just realized we use cloudfront for this, not lambda's built it stuff.
-  # LambdaURL:
-  #   Type: AWS::Lambda::Url
-  #   Properties:
-  #     # AWS_IAM or None if you want everyone to use it:
-  #     AuthType: NONE
-  #     TargetFunctionArn: !GetAtt LambdaContainer.Arn
 
   LambdaServiceRole:
     Type: AWS::IAM::Role
@@ -70,8 +67,35 @@ Resources:
                   - logs:PutLogEvents
                 Resource: !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${AWS::StackName}-*"
 
+  ApiGateway:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      Name: !Sub "${AWS::StackName}-ApiGatewayV2"
+      Description: !Sub "For SearchAPI stack '${AWS::StackName}'"
+      ProtocolType: HTTP
+      Target: !GetAtt LambdaContainer.Arn
+      CredentialsArn: !GetAtt ApiGatewayServiceRole.Arn
+  
+  ApiGatewayServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          Action: sts:AssumeRole
+          Principal:
+            Service: apigateway.amazonaws.com
+          Effect: Allow
+      Policies:
+        - PolicyName: policy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource: !GetAtt LambdaContainer.Arn
+
 Outputs:
   LambdaFunction:
     Value: !Ref LambdaContainer
-  # LambdaUrl:
-  #   Value: !GetAtt LambdaURL.FunctionUrl
