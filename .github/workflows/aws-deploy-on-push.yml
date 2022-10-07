@@ -27,6 +27,11 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: test
+        if ${{ github.event.push }}
+        run: |
+          echo "HITTTTT"
+
       - uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -50,7 +55,6 @@ jobs:
           REPOSITORY: searchapi
           IMAGE_TAG: ${{ github.ref_name }}
         run: |
-          echo ${{ github.event.push }}
           docker build --pull --build-arg GIT_COMMIT_HASH="${GITHUB_SHA}" -t "${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}" .
           docker push "${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}"
 
