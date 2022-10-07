@@ -2,10 +2,13 @@ name: Update SearchAPI Stack
 
 on:
   push:
+    branches-ignore:
+      - prod
 
 jobs:
   deploy-SearchAPI:
     runs-on: ubuntu-latest
+    environment: non-prod
     steps:
 
       - uses: actions/checkout@v2
@@ -17,23 +20,6 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
-
-      #### Toying with taking out single-deploy's from the pipeline.
-      # You shouldn't add the github user one anyways, and this lets
-      # us lock down the github user a little more.
-      # - name: Update Strings Macro
-      #   uses: aws-actions/aws-cloudformation-github-deploy@v1
-      #   with:
-      #     name: CFN-StringMacros
-      #     template: cloudformation/single-deploy-string-macros.yml
-      #     capabilities: CAPABILITY_IAM
-      #     no-fail-on-empty-changeset: "1"
-      # - name: Update SearchAPI ECR
-      #   uses: aws-actions/aws-cloudformation-github-deploy@v1
-      #   with:
-      #     name: ECR-SearchAPI
-      #     template: cloudformation/single-deploy-ecr.yml
-      #     no-fail-on-empty-changeset: "1"
 
       # In this step, this action saves a list of existing images,
       # the cache is created without them in the post run.
@@ -52,7 +38,7 @@ jobs:
           REPOSITORY: searchapi
           IMAGE_TAG: ${{ github.ref_name }}
         run: |
-          docker build --build-arg GIT_COMMIT_HASH="${GITHUB_SHA}" -t "${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}" .
+          docker build --pull --build-arg GIT_COMMIT_HASH="${GITHUB_SHA}" -t "${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}" .
           docker push "${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}"
 
       - name: Create name for SearchAPI Stack
