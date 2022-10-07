@@ -28,7 +28,7 @@ jobs:
           fetch-depth: 0
 
       - name: test
-        if: github.event_name == "push"
+        if: github.event_name == 'push'
         run: |
           echo "HITTTTT"
 
