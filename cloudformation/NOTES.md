@@ -7,6 +7,7 @@ TODO:
 - If looking at Lambda in GUI, the Gateway doesn't show up as a trigger. See if adding a link has a down side or not.
 - Lambda/Gateway can return "service unavailable" (I think if you're the first to hit it after a deploy?)
 - change the `cloudformation` dir to `automation`, so you can include github actions notes.
+- Get SearchAPI stack API url output working
 
 changes for re-writing full SearchAPI itself:
 
