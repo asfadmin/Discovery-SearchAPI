@@ -1,9 +1,17 @@
 name: Update SearchAPI Stack
 
+branches-ignore: &branches-ignore
+  - prod
+
 on:
   push:
-    branches-ignore:
-      - prod
+    branches-ignore: *branches-ignore
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+    branches-ignore: *branches-ignore
 
 jobs:
   deploy-SearchAPI:
