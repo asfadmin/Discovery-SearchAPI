@@ -55,6 +55,7 @@ jobs:
           REPOSITORY: searchapi
           IMAGE_TAG: ${{ github.ref_name }}
         run: |
+          if [ ${{ github.event_name }} == "push" ]; then export IMAGE_TAG="${IMAGE_TAG}-staging"; fi;
           docker build --pull --build-arg GIT_COMMIT_HASH="${GITHUB_SHA}" -t "${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}" .
           docker push "${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}"
 
@@ -64,6 +65,7 @@ jobs:
           BRANCH: ${{ github.ref_name }}
         # Replace all non-alpha chars with a '-' in branch name:
         run: |
+          if [ ${{ github.event_name }} == "push" ]; then export BRANCH="${BRANCH}-staging"; fi;
           echo "::set-output name=name::SearchAPI-${BRANCH//[^[:alnum:]]/-}"
 
       - name: Deploy SearchAPI Stack
@@ -72,7 +74,7 @@ jobs:
         with:
           name: ${{ steps.stack-name.outputs.name }}
           template: cloudformation/SearchAPI-stack.yml
-          parameter-overrides: "GitHubBranch=${{ github.ref_name }},Maturity=devel"
+          parameter-overrides: "GitHubBranch=${{ github.ref_name }},Maturity=${{ secrets.MATURITY }}"
           no-fail-on-empty-changeset: "1"
 
       # If the stack already exists, it won't update to the latest image.
