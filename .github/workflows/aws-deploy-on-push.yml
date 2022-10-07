@@ -1,22 +1,26 @@
 name: Update SearchAPI Stack
 
-branches-ignore: &branches-ignore
-  - prod
-
 on:
+  # Github Actions doesn't support Yaml Anchors! :smiling_face_with_tear:
+  # If you add a branch, change it in ALL triggers:
   push:
-    branches-ignore: *branches-ignore
+    branches-ignore:
+      - prod
+
   pull_request:
+    branches-ignore:
+      - prod
     types:
       - opened
       - reopened
       - synchronize
-    branches-ignore: *branches-ignore
 
 jobs:
   deploy-SearchAPI:
     runs-on: ubuntu-latest
     environment: non-prod
+    # Don't run ANY of this unless the PR came from one of our branches (so forks don't trigger)
+    # if: github.event.pull_request.head.repo.full_name == github.repository
     steps:
 
       - uses: actions/checkout@v2
@@ -46,6 +50,7 @@ jobs:
           REPOSITORY: searchapi
           IMAGE_TAG: ${{ github.ref_name }}
         run: |
+          echo ${{ github.event.push }}
           docker build --pull --build-arg GIT_COMMIT_HASH="${GITHUB_SHA}" -t "${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}" .
           docker push "${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}"
 
