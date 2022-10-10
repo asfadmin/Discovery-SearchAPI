@@ -57,6 +57,7 @@ jobs:
           IMAGE_TAG: ${{ github.ref_name }}
         run: |
           if [ ${{ github.event_name }} == 'pull_request' ]; then export IMAGE_TAG="${IMAGE_TAG}-staging"; fi;
+          echo "${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}"
           docker build --pull --build-arg GIT_COMMIT_HASH="${GITHUB_SHA}" -t "${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}" .
           docker push "${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}"
 
