@@ -50,25 +50,28 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
+      - name: Craft name for SearchAPI Stack
+        id: vars        
+        run: |
+          # If PR, append '-staging' to the end of the target branch
+          # If pushed directly to a branch, update that stack directly.
+          if [ ${{ github.event_name }} == 'pull_request' ]; then
+            export BRANCH="${{ github.base_ref }}-staging"
+          else
+            export BRANCH="${{ github.ref_name }}"
+          fi;
+          echo "::set-output name=branch-name::${BRANCH}"
+          # Replace all non-alpha chars with a '-' in branch name, to work as CloudFormation stack name:
+          echo "::set-output name=stack-name::SearchAPI-${BRANCH//[^[:alnum:]]/-}"
+
       - name: Build, Tag, and Push Container
         env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           REPOSITORY: searchapi
-          IMAGE_TAG: ${{ github.ref_name }}
+          IMAGE_TAG: ${{ steps.vars.outputs.branch-name }}
         run: |
-          if [ ${{ github.event_name }} == 'pull_request' ]; then export IMAGE_TAG="${IMAGE_TAG}-staging"; fi;
-          echo "${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}"
           docker build --pull --build-arg GIT_COMMIT_HASH="${GITHUB_SHA}" -t "${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}" .
           docker push "${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}"
-
-      - name: Craft name for SearchAPI Stack
-        id: stack-name
-        env:
-          BRANCH: ${{ github.ref_name }}
-        # Replace all non-alpha chars with a '-' in branch name first, to work as CloudFormation stack name:
-        run: |
-          if [ ${{ github.event_name }} == 'pull_request' ]; then export BRANCH="${BRANCH}-staging"; fi;
-          echo "::set-output name=name::SearchAPI-${BRANCH//[^[:alnum:]]/-}"
 
       - name: Deploy SearchAPI Stack
         uses: aws-actions/aws-cloudformation-github-deploy@v1
