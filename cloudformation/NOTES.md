@@ -2,7 +2,6 @@
 
 TODO:
 
-
 - GitHub User, look at locking down apigateway more? Gateway doesn't support arn like other resources, so it's weird.
 - If looking at Lambda in GUI, the Gateway doesn't show up as a trigger. See if adding a link has a down side or not.
 - change the `cloudformation` dir to `automation`, so you can include github actions notes.
@@ -50,5 +49,3 @@ aws lambda update-function-code --function-name <function_name_here> --image-uri
 # That command doesn't block. If you want to wait for the function to finish updating to continue:
 aws lambda wait function-updated --function-name <function_name_here>
 ```
-
-
