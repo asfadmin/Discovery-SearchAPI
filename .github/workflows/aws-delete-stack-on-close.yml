@@ -1,0 +1,51 @@
+name: Delete SearchAPI Stack
+
+on:
+  # Branch deleted
+  delete:
+    branches-ignore:
+      - prod
+
+  # Pull request closed (includes merged)
+  pull_request:
+    types:
+      - closed
+    branches-ignore:
+      - prod
+
+jobs:
+  delete-SearchAPI:
+    runs-on: ubuntu-latest
+    environment: non-prod
+    # Not sure I need the same fork check here. Just in case
+    if: |
+      (
+        github.event_name == 'delete' &&
+        github.event.ref_type == 'branch'
+      ) ||
+      (
+        github.event_name == 'pull_request' &&
+        github.event.pull_request.head.repo.full_name == github.repository
+      )
+    steps:
+
+      - uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Craft name for SearchAPI Stack
+        id: stack-name
+        env:
+          BRANCH: ${{ github.ref_name }}
+        # Replace all non-alpha chars with a '-' in branch name first, to work as CloudFormation stack name:
+        run: |
+          if [ ${{ github.event_name }} == 'pull_request' ]; then export BRANCH="${BRANCH}-staging"; fi;
+          echo "::set-output name=name::SearchAPI-${BRANCH//[^[:alnum:]]/-}"
+
+      - name: Delete SearchAPI Stack
+        env:
+          STACK: ${{ steps.stack-name.outputs.name }}
+        run: |
+          echo "Would delete stack $STACK here..."
