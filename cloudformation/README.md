@@ -23,6 +23,7 @@ aws cloudformation deploy \
 
 - Then Setup ECR. Every stack uses the same ECR, and reference this stack directly, so you can't delete this stack if ANY SearchAPI stack exists. (There's an optional param when deploying SearchAPI, that lets you point to a different ECR stack if needed.).
   - You can't have ECR tied into the SearchAPI stack, because you lambda requires a container that exists in ECR to run, and there's no way to push it up between CloudFormation setting up ECR, and then Lambda if they're not separate.
+- We attach a Lifecycle Policy to ECR here too, and this lets us remove older containers without giving the GitHub User permissions to delete images.
 
 ```bash
 aws cloudformation deploy \
