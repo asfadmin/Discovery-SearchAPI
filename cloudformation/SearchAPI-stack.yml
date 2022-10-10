@@ -99,5 +99,6 @@ Resources:
 Outputs:
   LambdaFunction:
     Value: !Ref LambdaContainer
-  # ApiUrl:
-  #   Value: !Sub "https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/"
+  ApiUrl:
+    # Everything goes to the default route, so no '/something' is needed at the end:
+    Value: !Sub "https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/"
