@@ -31,17 +31,13 @@ jobs:
 
       - name: Craft SearchAPI variables
         id: variables
+        env:
+          REF_NAME: ${{ github.ref_name }}
+        ## Special chars are replaced with '-', and:
+        #   If push, tag is name of branch
+        #   If pull_request, tag becomes '<pr_number>-merge' (slash is replaced by '-')
         run: |
-          # If PR, append '-staging' to the end of the target branch
-          # If pushed directly to a branch, update that stack directly.
-          if [ ${{ github.event_name }} == 'pull_request' ]; then
-            export BRANCH="${{ github.base_ref }}-staging"
-          else
-            export BRANCH="${{ github.ref_name }}"
-          fi;
-          echo "::set-output name=branch-name::${BRANCH}"
-          # Replace all non-alpha chars with a '-' in branch name, to work as CloudFormation stack name:
-          echo "::set-output name=stack-name::SearchAPI-${BRANCH//[^[:alnum:]]/-}"
+          echo "::set-output name=tag-name::${REF_NAME//[^[:alnum:]]/-}"
 
       - uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -52,6 +48,6 @@ jobs:
       - name: Delete SearchAPI Stack
         run: |
           aws cloudformation delete-stack \
-              --stack-name="${{ steps.variables.outputs.stack-name }}"
+              --stack-name="${{ steps.variables.outputs.tag-name }}"
           aws cloudformation wait stack-delete-complete \
-              --stack-name="${{ steps.variables.outputs.stack-name }}"
+              --stack-name="${{ steps.variables.outputs.tag-name }}"
