@@ -2,7 +2,7 @@
 
 TODO:
 
-- GitHub User, look at locking down apigateway more? Gateway doesn't support arn like other resources, so it's weird.
+- GitHub User, look at locking down apigateway more? Gateway doesn't support arn like other resources, so it's weird. (Especially the DELETE permission)
 - If looking at Lambda in GUI, the Gateway doesn't show up as a trigger. See if adding a link has a down side or not.
 - change the `cloudformation` dir to `automation`, so you can include github actions notes.
 - Add throdelling for SearchAPI stack? There's an account limit already in place.
