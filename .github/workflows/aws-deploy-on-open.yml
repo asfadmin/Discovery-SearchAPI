@@ -33,6 +33,20 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Craft SearchAPI variables
+        id: variables        
+        run: |
+          # If PR, append '-staging' to the end of the target branch
+          # If pushed directly to a branch, update that stack directly.
+          if [ ${{ github.event_name }} == 'pull_request' ]; then
+            export BRANCH="${{ github.base_ref }}-staging"
+          else
+            export BRANCH="${{ github.ref_name }}"
+          fi;
+          echo "::set-output name=branch-name::${BRANCH}"
+          # Replace all non-alpha chars with a '-' in branch name, to work as CloudFormation stack name:
+          echo "::set-output name=stack-name::SearchAPI-${BRANCH//[^[:alnum:]]/-}"
+
       - uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -49,20 +63,6 @@ jobs:
       - name: Log into Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
-
-      - name: Craft name for SearchAPI Stack
-        id: variables        
-        run: |
-          # If PR, append '-staging' to the end of the target branch
-          # If pushed directly to a branch, update that stack directly.
-          if [ ${{ github.event_name }} == 'pull_request' ]; then
-            export BRANCH="${{ github.base_ref }}-staging"
-          else
-            export BRANCH="${{ github.ref_name }}"
-          fi;
-          echo "::set-output name=branch-name::${BRANCH}"
-          # Replace all non-alpha chars with a '-' in branch name, to work as CloudFormation stack name:
-          echo "::set-output name=stack-name::SearchAPI-${BRANCH//[^[:alnum:]]/-}"
 
       - name: Build, Tag, and Push Container
         env:
