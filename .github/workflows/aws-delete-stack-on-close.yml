@@ -29,12 +29,6 @@ jobs:
       )
     steps:
 
-      - uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-
       - name: Craft SearchAPI variables
         id: variables
         run: |
@@ -49,8 +43,15 @@ jobs:
           # Replace all non-alpha chars with a '-' in branch name, to work as CloudFormation stack name:
           echo "::set-output name=stack-name::SearchAPI-${BRANCH//[^[:alnum:]]/-}"
 
+      - uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
       - name: Delete SearchAPI Stack
-        env:
-          STACK: ${{ steps.variables.outputs.stack-name }}
         run: |
-          echo "Would delete stack $STACK here..."
+          aws cloudformation delete-stack \
+              --stack-name="${{ steps.variables.outputs.stack-name }}"
+          aws cloudformation wait stack-delete-complete \
+              --stack-name="${{ steps.variables.outputs.stack-name }}"
