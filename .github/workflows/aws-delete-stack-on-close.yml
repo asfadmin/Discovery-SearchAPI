@@ -35,17 +35,22 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Craft name for SearchAPI Stack
-        id: stack-name
-        env:
-          BRANCH: ${{ github.ref_name }}
-        # Replace all non-alpha chars with a '-' in branch name first, to work as CloudFormation stack name:
+      - name: Craft SearchAPI variables
+        id: variables
         run: |
-          if [ ${{ github.event_name }} == 'pull_request' ]; then export BRANCH="${BRANCH}-staging"; fi;
-          echo "::set-output name=name::SearchAPI-${BRANCH//[^[:alnum:]]/-}"
+          # If PR, append '-staging' to the end of the target branch
+          # If pushed directly to a branch, update that stack directly.
+          if [ ${{ github.event_name }} == 'pull_request' ]; then
+            export BRANCH="${{ github.base_ref }}-staging"
+          else
+            export BRANCH="${{ github.ref_name }}"
+          fi;
+          echo "::set-output name=branch-name::${BRANCH}"
+          # Replace all non-alpha chars with a '-' in branch name, to work as CloudFormation stack name:
+          echo "::set-output name=stack-name::SearchAPI-${BRANCH//[^[:alnum:]]/-}"
 
       - name: Delete SearchAPI Stack
         env:
-          STACK: ${{ steps.stack-name.outputs.name }}
+          STACK: ${{ steps.variables.outputs.stack-name }}
         run: |
           echo "Would delete stack $STACK here..."
