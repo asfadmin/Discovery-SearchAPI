@@ -48,6 +48,6 @@ jobs:
       - name: Delete SearchAPI Stack
         run: |
           aws cloudformation delete-stack \
-              --stack-name="${{ steps.variables.outputs.tag-name }}"
+              --stack-name="SearchAPI-${{ steps.variables.outputs.tag-name }}"
           aws cloudformation wait stack-delete-complete \
-              --stack-name="${{ steps.variables.outputs.tag-name }}"
+              --stack-name="SearchAPI-${{ steps.variables.outputs.tag-name }}"
