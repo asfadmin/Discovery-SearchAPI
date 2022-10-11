@@ -1,5 +1,7 @@
 # SearchAPI, GitHub Actions, and CloudFormation
 
+A quick guide on SearchAPI Automation.
+
 ## Deploying Stacks
 
 **TLDR**: The `SearchAPI-stack.yml` cloudformation template is for a single API maturity (you need a second for a staging environment), and is automated though GitHub Actions. All the `single-deploy-*.yml`'s have to be deployed to the account for SearchAPI to work, but only need to be deployed ONCE by an admin.
