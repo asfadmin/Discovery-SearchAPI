@@ -37,8 +37,14 @@ jobs:
         #   If push, tag is name of branch
         #   If pull_request, tag becomes '<pr_number>-merge' (slash is replaced by '-')
         run: |
+          # If delete, ref_name holds the default branch. Point to the branch deleted instead:
+          if [ github.event_name == 'delete' ]; then
+            export NAME="${{ github.event.ref }}"
+          else
+            export NAME="${{ github.ref_name }}"
+          fi
           echo "Checking: ${{ github.event.ref }}"
-          echo "::set-output name=tag-name::${REF_NAME//[^[:alnum:]]/-}"
+          echo "::set-output name=tag-name::${NAME//[^[:alnum:]]/-}"
 
       - uses: aws-actions/configure-aws-credentials@v1
         with:
