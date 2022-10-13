@@ -29,32 +29,40 @@ jobs:
       )
     steps:
 
-      - name: Craft SearchAPI variables
-        id: variables
-        env:
-          REF_NAME: ${{ github.ref_name }}
-        ## Special chars are replaced with '-', and:
-        #   If push, tag is name of branch
-        #   If pull_request, tag becomes '<pr_number>-merge' (slash is replaced by '-')
-        run: |
-          # If delete, ref_name holds the default branch. Point to the branch deleted instead:
-          if [ github.event_name == 'delete' ]; then
-            export NAME="${{ github.event.ref }}"
-          else
-            export NAME="${{ github.ref_name }}"
-          fi
-          echo "Checking: ${{ github.event.ref }}"
-          echo "::set-output name=tag-name::${NAME//[^[:alnum:]]/-}"
+        - name: Figure out what everything's supposed to actually be
+          env:
+            REF: ${{ github.ref }}
+            REF_NAME: ${{ github.ref_name }}
+            EVENT_REF: ${{ github.event.ref }}
+            HEAD_REF: ${{ github.head_ref}}
+            BASE_REF: ${{ github.base_ref}}
+          run: |
+            echo "done"
 
-      - uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+      # - name: Craft SearchAPI variables
+      #   id: variables
+      #   ## Special chars are replaced with '-', and:
+      #   #   If push, tag is name of branch
+      #   #   If pull_request, tag becomes '<pr_number>-merge' (slash is replaced by '-')
+      #   run: |
+      #     # If delete, ref_name holds the default branch. Point to the branch deleted instead:
+      #     if [ github.event_name == 'delete' ]; then
+      #       export NAME="${{ github.event.ref }}"
+      #     else
+      #       export NAME="${{ github.ref_name }}"
+      #     fi
+      #     echo "Checking: ${{ github.event.ref }}"
+      #     echo "::set-output name=tag-name::${NAME//[^[:alnum:]]/-}"
 
-      - name: Delete SearchAPI Stack
-        run: |
-          aws cloudformation delete-stack \
-              --stack-name="SearchAPI-${{ steps.variables.outputs.tag-name }}"
-          aws cloudformation wait stack-delete-complete \
-              --stack-name="SearchAPI-${{ steps.variables.outputs.tag-name }}"
+      # - uses: aws-actions/configure-aws-credentials@v1
+      #   with:
+      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     aws-region: ${{ secrets.AWS_REGION }}
+
+      # - name: Delete SearchAPI Stack
+      #   run: |
+      #     aws cloudformation delete-stack \
+      #         --stack-name="SearchAPI-${{ steps.variables.outputs.tag-name }}"
+      #     aws cloudformation wait stack-delete-complete \
+      #         --stack-name="SearchAPI-${{ steps.variables.outputs.tag-name }}"
