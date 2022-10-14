@@ -7,7 +7,6 @@ TODO:
 - change the `cloudformation` dir to `automation`, so you can include github actions notes.
 - Add throdelling for SearchAPI stack? There's an account limit already in place.
 - Add cron to keep lambda warm. Look into what the clock should be.
-changes for re-writing full SearchAPI itself.
 - Attach a Lifecycle Policy to the ECR stack directly
 - Will we need cloudfront in front of API Gateway, or use gateway directly?
 - use build-push docker action "docker/build-push-action@3"
