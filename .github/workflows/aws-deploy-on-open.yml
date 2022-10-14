@@ -33,7 +33,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: ./.github/workflows/reusable-deploy-SearchAPI
+      - uses: ./.github/workflows/reusable-deploy-SearchAPI.yml
         with:
           # Inputs:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
