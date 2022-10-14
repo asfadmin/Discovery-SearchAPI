@@ -35,10 +35,11 @@ jobs:
 
       - uses: ./.github/workflows/reusable-deploy-SearchAPI
         with:
+          # Inputs:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           TAG: ${{ github.ref_name }}
           MATURITY: devel
-        secrets:
+          # Secrets:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
