@@ -33,64 +33,14 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Craft SearchAPI variables
-        id: variables
-        env:
-          REF_NAME: ${{ github.ref_name }}
-        ## Special chars are replaced with '-', and:
-        #   If push, tag is name of branch
-        #   If pull_request, tag becomes '<pr_number>-merge' (slash is replaced by '-')
-        run: |
-          echo "::set-output name=tag-name::${REF_NAME//[^[:alnum:]]/-}"
-
-      - uses: aws-actions/configure-aws-credentials@v1
+      - uses: .github/workflows/reusable-deploy-SearchAPI.yml
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
-
-      # In this step, this action saves a list of existing images,
-      # the cache is created without them in the post run.
-      # It also restores the cache if it exists.
-      - uses: satackey/action-docker-layer-caching@v0.0.11
-        # Ignore the failure of a step and avoid terminating the job.
-        continue-on-error: true
-
-      - name: Log into Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
-
-      - name: Build, Tag, and Push Container
-        env:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          REPOSITORY: searchapi
-          IMAGE_TAG: ${{ steps.variables.outputs.tag-name }}
-        run: |
-          docker build --pull --build-arg GIT_COMMIT_HASH="${GITHUB_SHA}" -t "${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}" .
-          docker push "${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}"
-
-      - name: Deploy SearchAPI Stack
-        uses: aws-actions/aws-cloudformation-github-deploy@v1
-        id: searchapi-stack
-        with:
-          name: SearchAPI-${{ steps.variables.outputs.tag-name }}
-          template: cloudformation/SearchAPI-stack.yml
-          parameter-overrides: "GitHubBranch=${{ steps.variables.outputs.tag-name }},Maturity=${{ secrets.MATURITY }}"
-          no-fail-on-empty-changeset: "1"
-
-      # If the stack already exists, it won't update to the latest image.
-      - name: Update Lambda Function
-        env:
-          FUNCTION: ${{ steps.searchapi-stack.outputs.LambdaFunction }}
-          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          REPOSITORY: searchapi
-          IMAGE_TAG: ${{ steps.variables.outputs.tag-name }}
-        run: |
-          aws lambda update-function-code \
-              --function-name "${FUNCTION}" \
-              --image-uri "${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}"
-          aws lambda wait function-updated \
-              --function-name "${FUNCTION}"
+          TAG: ${{ github.ref_name }}
+          MATURITY: devel
+        secrets:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       - name: Run Pytest
         # If it's writing to a branch, the pull request to that branch already
