@@ -10,6 +10,7 @@ TODO:
 changes for re-writing full SearchAPI itself.
 - Attach a Lifecycle Policy to the ECR stack directly
 - Will we need cloudfront in front of API Gateway, or use gateway directly?
+- use build-push docker action "docker/build-push-action@3"
 
 SearchAPI Rewrite Notes:
 
