@@ -28,7 +28,7 @@ Resources:
                   - cloudformation:GetTemplateSummary
                 Resource:
                   # The String Macro's stack:
-                  - !Sub "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:transform/String"
+                  # - !Sub "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:transform/String"
                   # - !Sub "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/CFN-StringMacros/*"
                   # The SearchAPI stack(s):
                   - !Sub "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/SearchAPI-*/*"
