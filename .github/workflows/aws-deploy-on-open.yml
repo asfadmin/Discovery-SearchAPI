@@ -41,7 +41,6 @@ jobs:
         #   If push, tag is name of branch
         #   If pull_request, tag becomes '<pr_number>-merge' (slash is replaced by '-')
         run: |
-          echo "Checking: ${{ github.event.ref }}"
           echo "::set-output name=tag-name::${REF_NAME//[^[:alnum:]]/-}"
 
       - uses: aws-actions/configure-aws-credentials@v1
