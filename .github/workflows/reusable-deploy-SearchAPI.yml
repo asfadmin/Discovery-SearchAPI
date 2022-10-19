@@ -4,9 +4,6 @@ on:
     inputs:
 
       # For building the docker image:
-      REGISTRY:
-        required: True
-        type: string
       REPOSITORY:
         required: False
         default: searchapi
