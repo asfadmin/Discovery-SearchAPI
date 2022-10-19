@@ -23,18 +23,24 @@ on:
         required: True
         type: string
 
-    secrets:
-      # AWS Auth:
-      AWS_ACCESS_KEY_ID:
+      # What github environment to use:
+      environment:
         required: True
-      AWS_SECRET_ACCESS_KEY:
-        required: True
+        type: string
+
+    # secrets:
+    #   # AWS Auth:
+    #   AWS_ACCESS_KEY_ID:
+    #     required: True
+    #   AWS_SECRET_ACCESS_KEY:
+    #     required: True
 
 
 
 jobs:
   deploy-SearchAPI:
     runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
     steps:
 
       - uses: actions/checkout@v2
