@@ -1,4 +1,4 @@
-name: Update SearchAPI Stack
+name: Update SearchAPI Stack (non-prod)
 
 on:
   # Github Actions doesn't support Yaml Anchors! :smiling_face_with_tear:
@@ -17,7 +17,7 @@ on:
 
 jobs:
 
-  deploy-SearchAPI:
+  deploy-SearchAPI-non-prod:
     # Run if someone with write permissions did the change (the push trigger),
     # OR Run *only* if the PR came from a branch we control (so forks don't trigger)
     if: |
@@ -31,7 +31,7 @@ jobs:
       TAG: ${{ github.ref_name }}
       MATURITY: devel
       environment: non-prod
-    # secrets: inherit
+    # What secrets from the environment, the workflow should have access to:
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
