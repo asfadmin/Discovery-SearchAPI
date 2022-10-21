@@ -10,6 +10,12 @@ on:
         description: The unique ID for the stack, everything after 'SearchAPI-'.
         type: string
 
+      AWS_REGION:
+        required: False
+        description: What region in AWS to run in.
+        default: us-east-1
+        type: string
+
       environment:
         required: True
         description: The GitHub Environment to use.
@@ -40,7 +46,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          aws-region: ${{ inputs.AWS_REGION }}
 
       - name: Delete SearchAPI Stack
         run: |
