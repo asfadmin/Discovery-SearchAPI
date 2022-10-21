@@ -56,12 +56,12 @@ jobs:
       - name: Craft SearchAPI variables
         id: variables
         env:
-          REF_NAME: ${{ github.ref_name }}
+          NAME: ${{ github.ref_name }}
         ## Special chars are replaced with '-', and:
         #   If push, tag is name of branch
         #   If pull_request, tag becomes '<pr_number>-merge' (slash is replaced by '-')
         run: |
-          echo "::set-output name=tag-name::${REF_NAME//[^[:alnum:]]/-}"
+          echo "::set-output name=tag-name::${NAME//[^[:alnum:]]/-}"
 
       - uses: aws-actions/configure-aws-credentials@v1
         with:

@@ -38,6 +38,8 @@ jobs:
 
       - name: Craft SearchAPI variables
         id: variables
+        env:
+          NAME: ${{ inputs.TAG_NAME }}
         ## Special chars are replaced with '-', and:
         run: |
           echo "::set-output name=tag-name::${NAME//[^[:alnum:]]/-}"
