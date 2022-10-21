@@ -1,0 +1,31 @@
+name: Deleted Branch - SearchAPI Stack (non-prod)
+
+on:
+  delete:
+    branches-ignore:
+      - prod
+
+jobs:
+  delete-stack-non-prod-branch:
+    runs-on: ubuntu-latest
+    environment: non-prod
+    # Not sure I need the same fork check here. Just in case
+    if: |
+      (
+        github.event_name == 'delete' &&
+        github.event.ref_type == 'branch'
+      ) ||
+      (
+        github.event_name == 'pull_request' &&
+        github.event.pull_request.head.repo.full_name == github.repository
+      )
+    uses: ./.github/workflows/reusable-DeleteStack-SearchAPI.yml
+    with:
+      # TAG_NAME different for both delete branch, and delete PR.
+      TAG_NAME: ${{ github.event.ref }}
+      environment: non-prod
+    # What secrets from the environment, the workflow should have access to:
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
