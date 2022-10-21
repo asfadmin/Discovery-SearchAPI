@@ -11,12 +11,8 @@ jobs:
   delete-stack-non-prod-pr:
     runs-on: ubuntu-latest
     environment: non-prod
-    # Not sure I need the same fork check here. Just in case
-    if: |
-      (
-        github.event_name == 'pull_request' &&
-        github.event.pull_request.head.repo.full_name == github.repository
-      )
+    # If a fork triggered this, don't do anything.
+    if: github.event.pull_request.head.repo.full_name == github.repository
     uses: ./.github/workflows/reusable-DeleteStack-SearchAPI.yml
     with:
       # TAG_NAME different for both delete branch, and delete PR.

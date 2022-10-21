@@ -5,20 +5,14 @@ on:
     branches-ignore:
       - prod
 
+
+
 jobs:
   delete-stack-non-prod-branch:
     runs-on: ubuntu-latest
     environment: non-prod
-    # Not sure I need the same fork check here. Just in case
-    if: |
-      (
-        github.event_name == 'delete' &&
-        github.event.ref_type == 'branch'
-      ) ||
-      (
-        github.event_name == 'pull_request' &&
-        github.event.pull_request.head.repo.full_name == github.repository
-      )
+    # If a branch specifically, was deleted.
+    if: github.event.ref_type == 'branch'
     uses: ./.github/workflows/reusable-DeleteStack-SearchAPI.yml
     with:
       # TAG_NAME different for both delete branch, and delete PR.
