@@ -8,6 +8,7 @@ on:
       TAG_NAME:
         required: true
         description: The unique ID for the stack, everything after 'SearchAPI-'.
+        type: string
 
       environment:
         required: True
