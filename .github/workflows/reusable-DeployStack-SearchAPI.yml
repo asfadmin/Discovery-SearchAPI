@@ -6,33 +6,39 @@ on:
       # For building the docker image:
       REPOSITORY:
         required: False
+        description: The specific ECR of the AWS account to use.
         default: searchapi
         type: string
       TAG:
         required: True
+        description: The tag of the container. Branch-name or GitHub PR.
         type: string
 
       # Where to deploy:
       AWS_REGION:
         required: False
+        description: What region in AWS to run in.
         default: us-east-1
         type: string
 
       # Pass into the container, what to run as:
       MATURITY:
         required: True
+        description: Passed into the container, what maturity the API runs as.
         type: string
 
-      # What github environment to use:
       environment:
         required: True
+        description: The GitHub Environment to use.
         type: string
 
     secrets:
       # AWS Auth:
       AWS_ACCESS_KEY_ID:
+        description: The access key for AWS.
         required: True
       AWS_SECRET_ACCESS_KEY:
+        description: The secret access key for AWS.
         required: True
 
 
@@ -50,12 +56,12 @@ jobs:
       - name: Craft SearchAPI variables
         id: variables
         env:
-          REF_NAME: ${{ github.ref_name }}
+          NAME: ${{ github.ref_name }}
         ## Special chars are replaced with '-', and:
         #   If push, tag is name of branch
         #   If pull_request, tag becomes '<pr_number>-merge' (slash is replaced by '-')
         run: |
-          echo "::set-output name=tag-name::${REF_NAME//[^[:alnum:]]/-}"
+          echo "::set-output name=tag-name::${NAME//[^[:alnum:]]/-}"
 
       - uses: aws-actions/configure-aws-credentials@v1
         with:
