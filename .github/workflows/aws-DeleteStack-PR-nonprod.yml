@@ -1,12 +1,6 @@
-name: Deleted Branch - SearchAPI Stack (non-prod)
+name: Deleted PR - SearchAPI Stack (non-prod)
 
 on:
-  # Branch deleted
-  delete:
-    branches-ignore:
-      - prod
-
-  # Pull request closed (includes merged)
   pull_request:
     types:
       - closed
@@ -14,32 +8,11 @@ on:
       - prod
 
 jobs:
-  delete-SearchAPI-non-prod:
-    runs-on: ubuntu-latest
-    environment: non-prod
-    # Not sure I need the same fork check here. Just in case
-    if: |
-      (
-        github.event_name == 'delete' &&
-        github.event.ref_type == 'branch'
-      ) ||
-      (
-        github.event_name == 'pull_request' &&
-        github.event.pull_request.head.repo.full_name == github.repository
-      )
-
-
-
-jobs:
   delete-stack-non-prod-pr:
     runs-on: ubuntu-latest
     environment: non-prod
     # Not sure I need the same fork check here. Just in case
     if: |
-      (
-        github.event_name == 'delete' &&
-        github.event.ref_type == 'branch'
-      ) ||
       (
         github.event_name == 'pull_request' &&
         github.event.pull_request.head.repo.full_name == github.repository
