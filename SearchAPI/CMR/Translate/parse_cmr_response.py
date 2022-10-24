@@ -68,7 +68,7 @@ def parse_granule(granule, req_fields):
         remove_field('platform')
 
     if 'frameNumber' in req_fields:
-        asf_frame_platforms = ['Sentinel-1A', 'Sentinel-1B', 'ALOS']
+        asf_frame_platforms = ['Sentinel-1A', 'Sentinel-1B', 'ALOS', 'SENTINEL-1A', 'SENTINEL-1B']
         result['frameNumber'] = get_val(attr_path('FRAME_NUMBER')) \
             if result['platform'] in asf_frame_platforms \
             else get_val(attr_path('CENTER_ESA_FRAME'))
@@ -147,43 +147,6 @@ def parse_granule(granule, req_fields):
             result['canInsar'] = False
         remove_field('canInsar')
 
-    if get_val(field_paths['relativeBurstID']):
-        burst = {}
-        burst['relativeBurstID'] = get_val(field_paths['relativeBurstID'])
-        burst['burstIndex'] = get_val(field_paths['burstIndex'])
-        burst['burstAnx'] = get_val(field_paths['burstAnx'])
-        burst['burstAnxDelta'] = get_val(field_paths['burstAnxDelta'])
-        burst['IW2MidRange'] = get_val(field_paths['IW2MidRange'])
-        burst['swath'] = get_val(field_paths['swath'])
-        burst['annotationPath'] = get_val(field_paths['annotationPath'])
-        burst['azimuthFrameRate'] = get_val(field_paths['azimuthFrameRate'])
-        burst['azimuthSteerRate'] = get_val(field_paths['azimuthSteerRate'])
-        burst['azimuthTimeInterval'] = get_val(field_paths['azimuthTimeInterval'])
-        burst['byteLength'] = get_val(field_paths['byteLength'])
-        burst['byteOffset'] = get_val(field_paths['byteOffset'])
-        burst['firstValidLine'] = get_val(field_paths['firstValidLine'])
-        burst['firstValidSample'] = get_val(field_paths['firstValidSample'])
-        burst['lastValidLine'] = get_val(field_paths['lastValidLine'])
-        burst['lastValidSample'] = get_val(field_paths['lastValidSample'])
-        burst['lines'] = get_val(field_paths['lines'])
-        burst['measurementPath'] = get_val(field_paths['measurementPath'])
-        burst['operaID'] = get_val(field_paths['operaID'])
-        burst['prfRAWData'] = get_val(field_paths['prfRAWData'])
-        burst['radarCenterFrequency'] = get_val(field_paths['radarCenterFrequency'])
-        burst['rangeBandwidth'] = get_val(field_paths['rangeBandwidth'])
-        burst['rangeChirpRate'] = get_val(field_paths['rangeChirpRate'])
-        burst['rangePixelSpacing'] = get_val(field_paths['rangePixelSpacing'])
-        burst['rangeSamplingRate'] = get_val(field_paths['rangeSamplingRate'])
-        burst['rangeWindowCoefficient'] = get_val(field_paths['rangeWindowCoefficient'])
-        burst['rangeWindowType'] = get_val(field_paths['rangeWindowType'])
-        burst['rank'] = get_val(field_paths['rank'])
-        burst['samples'] = get_val(field_paths['samples'])
-        burst['slantRangeTime'] = get_val(field_paths['slantRangeTime'])
-        burst['SLCStartAnx'] = get_val(field_paths['SLCStartAnx'])
-        burst['startingRange'] = get_val(field_paths['startingRange'])
-        burst['swathIndex'] = get_val(field_paths['swathIndex'])
-        burst['wavelength'] = get_val(field_paths['wavelength'])
-        result['burst'] = burst
         
     # These fields are always None or NA and should be fully deprecated/removed in the future
     deprecated_fields = [
@@ -224,6 +187,24 @@ def parse_granule(granule, req_fields):
     for k in result:
         if result[k] in ['NULL', 'NA', 'None']:
             result[k] = None
+
+    if result['processingLevel'] == 'BURST':
+        burst = {}
+        burst['relativeBurstID'] = get_val(field_paths['relativeBurstID'])
+        burst['absoluteBurstID'] = get_val(field_paths['absoluteBurstID'])
+        burst['relativeBurstID'] = get_val(field_paths['relativeBurstID'])
+        burst['fullBurstID'] = get_val(field_paths['fullBurstID'])
+        burst['burstIndex'] = get_val(field_paths['burstIndex'])
+        burst['burstAnxTime'] = get_val(field_paths['burstAnxTime'])
+        burst['burstAnxTimeDelta'] = get_val(field_paths['burstAnxTimeDelta'])
+        burst['linesPerBurst'] = get_val(field_paths['linesPerBurst'])
+        burst['samplesPerBurst'] = get_val(field_paths['samplesPerBurst'])
+        burst['subswath'] = get_val(field_paths['subswath'])
+
+        result['burst'] = burst
+
+        result['granuleName'] = get_val(field_paths['groupID'])
+        result['sizeMB'] = int(get_val(field_paths['byteLength'])) / 1000000
 
     return result
 
