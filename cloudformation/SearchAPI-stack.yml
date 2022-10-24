@@ -18,7 +18,7 @@ Parameters:
 
   ImportValueEcrUri:
     Type: String
-    Description: "Exported Value, holds SearchAPI registry. ({StackName}-RegistryUri)."
+    Description: "Exported Value, holds SearchAPI registry. (Output of that stack: {StackName}-RegistryUri)."
     Default: "ECR-SearchAPI-RegistryUri"
 
 Resources:
@@ -45,6 +45,14 @@ Resources:
       Timeout: 900 # Max is 900
       Role: !GetAtt LambdaServiceRole.Arn
 
+  LambdaConcurrencyConfig:
+    Type: AWS::Lambda::Version
+    Properties:
+      Description: !Sub "Lambda concurrency config for stack '${AWS::StackName}'."
+      FunctionName: !Ref LambdaContainer
+      ProvisionedConcurrencyConfig:
+         ProvisionedConcurrentExecutions: 2
+
   LambdaServiceRole:
     Type: AWS::IAM::Role
     Properties:
@@ -66,6 +74,15 @@ Resources:
                   - logs:CreateLogStream
                   - logs:PutLogEvents
                 Resource: !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${AWS::StackName}-*"
+        # Update Cloudwatch
+        - PolicyName: UpdateCloudwatch
+          PolicyDocument:
+            Statement:
+              # cloudwatch:PutMetricData requires ALL resources. Keep this minimal:
+              - Effect: Allow
+                Action:
+                  - cloudwatch:PutMetricData
+                Resource: "*"
 
   ApiGateway:
     Type: AWS::ApiGatewayV2::Api
