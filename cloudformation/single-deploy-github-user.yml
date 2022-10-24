@@ -27,22 +27,7 @@ Resources:
                   - cloudformation:ValidateTemplate
                   - cloudformation:GetTemplateSummary
                 Resource:
-                  # The String Macro's stack:
-                  # - !Sub "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:transform/String"
-                  # - !Sub "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/CFN-StringMacros/*"
-                  # The SearchAPI stack(s):
                   - !Sub "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/SearchAPI-*/*"
-                  # Update the ECR stack:
-                  # - !Sub "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/ECR-SearchAPI/*"
-
-        # - PolicyName: RunStringMacroLambda
-        #   PolicyDocument:
-        #     Statement:
-        #       - Effect: Allow
-        #         Action:
-        #           - lambda:InvokeFunction
-        #         Resource:
-        #           - !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:CFN-StringMacros-TransformFunction-*"
 
         - PolicyName: SearchAPIManagerECR
           PolicyDocument:
@@ -57,13 +42,6 @@ Resources:
                   - ecr:InitiateLayerUpload
                   - ecr:PutImage
                   - ecr:UploadLayerPart
-                  # Extra's for updating the registry
-                  # - ecr:CreateRepository
-                  # - ecr:DescribeRepositories
-                  # - ecr:GetRepositoryPolicy
-                  # - ecr:SetRepositoryPolicy
-                  # - ecr:DescribeImages
-                  # - ecr:ListImages
                 Resource:
                   - !Sub "arn:aws:ecr:${AWS::Region}:${AWS::AccountId}:repository/searchapi"
 
@@ -90,12 +68,18 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
+                  # Generic lambda permissions:
                   - lambda:CreateFunction
                   - lambda:DeleteFunction
                   - lambda:GetFunction
                   - lambda:GetFunctionConfiguration
                   - lambda:UpdateFunctionConfiguration
                   - lambda:UpdateFunctionCode
+                  # Needed for Lambda concurrency:
+                  - lambda:ListVersionsByFunction
+                  - lambda:PublishVersion
+                  - lambda:GetProvisionedConcurrencyConfig
+                  - lambda:PutProvisionedConcurrencyConfig
                 Resource:
                   - !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:SearchAPI-*-LambdaContainer-*"
 
