@@ -43,6 +43,8 @@ aws cloudformation describe-stacks \
     --output=text
 ```
 
+There's no way to automatically delete tagged images though lifecycle policies (unless you already know their name). Someone will have to jump in and delete old tags once in a while, from each registry. Untagged images are deleted automatically if there's too many, so this will take a while to fill up.
+
 #### single-deploy-github-user.yml
 
 This sets up a user with minimal permissions to create SearchAPI stacks from. We use this user in GitHub to automate stacks when branches are created.
