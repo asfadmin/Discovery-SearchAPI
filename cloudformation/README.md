@@ -95,9 +95,7 @@ Repo secrets - same for every Environment but still expected to exist:
 
 ## GitHub Actions
 
-TODO: Figure out what info might be useful here once the actions are refactored more. (Maybe why codepipeline didn't work? What's in GitHub Actions vs AWS?).
-
-- Useful link: <https://docs.github.com/en/actions/learn-github-actions/contexts#github-context>
+Guide for the Actions themselves can be found [here](./../.github/workflows/README.md).
 
 ## Notes for re-creating SearchAPI
 
