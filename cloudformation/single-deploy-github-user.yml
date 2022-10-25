@@ -29,6 +29,14 @@ Resources:
                 Resource:
                   - !Sub "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/SearchAPI-*/*"
 
+        - PolicyName: AllowEcrLogin
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ecr:GetAuthorizationToken
+                Resource: "*"
+
         - PolicyName: SearchAPIManagerECR
           PolicyDocument:
             Statement:
