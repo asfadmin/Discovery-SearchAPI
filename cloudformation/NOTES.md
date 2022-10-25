@@ -5,6 +5,7 @@ TODO:
 - Write up notes for the GitHub Actions side.
 - Add throdelling for SearchAPI stack? There's an account limit already in place.
 - use build-push docker action "docker/build-push-action@3"
+- Instead of using aws deploy actions, move commands to the makefile? Forces the makefile to stay up to date, and there's some commands that don't have actions anyways.
 
 Questions for Andrew's meetup:
 
