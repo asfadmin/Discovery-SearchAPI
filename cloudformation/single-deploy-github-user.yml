@@ -91,22 +91,21 @@ Resources:
                   - ecr:GetAuthorizationToken
                 Resource: "*"
 
-        - PolicyName: SearchAPIManagerApiGateway-Create
+        - PolicyName: SearchAPIManagerApiGateway-Tags
           PolicyDocument:
             Statement:
               - Effect: Allow
                 Action:
                   - apigateway:POST
-                  - apigateway:DELETE
                 Resource:
                   - !Sub arn:aws:apigateway:${AWS::Region}::/tags/*
-                  - !Sub arn:aws:apigateway:${AWS::Region}::/apis
 
-        - PolicyName: SearchAPIManagerApiGateway-Delete
+        - PolicyName: SearchAPIManagerApiGateway-APIs
           PolicyDocument:
             Statement:
               - Effect: Allow
                 Action:
+                  - apigateway:POST
                   - apigateway:DELETE
                 Resource:
                   - !Sub arn:aws:apigateway:${AWS::Region}::/apis
