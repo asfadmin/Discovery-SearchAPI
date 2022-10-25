@@ -24,6 +24,7 @@ Resources:
             Operation: Lower
       LifecyclePolicy:
         # 1) Always keep one prod image around. NOTE: You can't match it directly! A tag like "prod-asdf" will also match, since it's prefixed.
+        # 2) Don't fill up on untagged images, they're outdated if untagged anyways.
         LifecyclePolicyText: |
           {
             "rules": [
@@ -54,6 +55,7 @@ Resources:
               }
             ]
           }
+      # Let lambda functions in this account, pull this container to use
       RepositoryPolicyText: |
         {
           "Version": "2012-10-17",
