@@ -2,14 +2,17 @@
 
 TODO:
 
+- Write up notes for the GitHub Actions side.
+- Add throdelling for SearchAPI stack? There's an account limit already in place.
+- use build-push docker action "docker/build-push-action@3"
+
+Questions for Andrew's meetup:
+
 - GitHub User, look at locking down apigateway more? Gateway doesn't support arn like other resources, so it's weird. (Especially the DELETE permission)
 - If looking at Lambda in GUI, the Gateway doesn't show up as a trigger. See if adding a link has a down side or not.
-- change the `cloudformation` dir to `automation`, so you can include github actions notes.
-- Add throdelling for SearchAPI stack? There's an account limit already in place.
 - Add cron to keep lambda warm. Look into what the clock should be.
-- Attach a Lifecycle Policy to the ECR stack directly
+  - (Instead, trying out ProvisionedConcurrency. Might also help with AWS random resets, that a keep-worm cloudwatch can still hit. Any idea how good this is, and how may to use at once?).
 - Will we need cloudfront in front of API Gateway, or use gateway directly?
-- use build-push docker action "docker/build-push-action@3"
 
 SearchAPI Rewrite Notes:
 
