@@ -22,6 +22,39 @@ Resources:
           Parameters:
             InputString: !Ref RegistryName
             Operation: Lower
+      LifecyclePolicy:
+        # 1) Always keep one prod image around. NOTE: You can't match it directly! A tag like "prod-asdf" will also match, since it's prefixed.
+        LifecyclePolicyText: |
+          {
+            "rules": [
+              {
+                "rulePriority": 1,
+                "description": "Keep ALL 'prod*' images around, regardless of any other rules. No way to specify JUST 'prod', so keeping everything.",
+                "selection": {
+                    "tagStatus": "tagged",
+                    "tagPrefixList": ["prod"],
+                    "countType": "imageCountMoreThan",
+                    "countNumber": 999999999
+                },
+                "action": {
+                    "type": "expire"
+                }
+              },
+              {
+                "rulePriority": 2,
+                "description": "Keep only some untagged images for cache, expire all others.",
+                "selection": {
+                    "tagStatus": "untagged",
+                    "countType": "imageCountMoreThan",
+                    "countNumber": 30
+                },
+                "action": {
+                    "type": "expire"
+                }
+              }
+
+            ]
+          }
 
 Outputs:
   RegistryUri:
