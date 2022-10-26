@@ -188,23 +188,6 @@ def parse_granule(granule, req_fields):
         if result[k] in ['NULL', 'NA', 'None']:
             result[k] = None
 
-    if result['processingLevel'] == 'BURST':
-        burst = {}
-        burst['relativeBurstID'] = int(get_val(field_paths['relativeBurstID']))
-        burst['absoluteBurstID'] = int(get_val(field_paths['absoluteBurstID']))
-        burst['fullBurstID'] = get_val(field_paths['fullBurstID'])
-        burst['burstIndex'] = int(get_val(field_paths['burstIndex']))
-        burst['burstAnxTime'] = get_val(field_paths['burstAnxTime'])
-        burst['burstAnxTimeDelta'] = float(get_val(field_paths['burstAnxTimeDelta']))
-        burst['linesPerBurst'] = int(get_val(field_paths['linesPerBurst']))
-        burst['samplesPerBurst'] = int(get_val(field_paths['samplesPerBurst']))
-        burst['subswath'] = get_val(field_paths['subswath'])
-
-        result['burst'] = burst
-
-        result['granuleName'] = get_val(field_paths['groupID'])
-        result['sizeMB'] = int(get_val(field_paths['byteLength'])) / 1000000
-
     return result
 
 
