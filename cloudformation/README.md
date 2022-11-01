@@ -4,21 +4,20 @@ A quick guide on SearchAPI Automation.
 
 ## Deploying Stacks
 
-**TLDR**: The `SearchAPI-stack.yml` cloudformation template is for a single API maturity (you need a second for a staging environment), and is automated though GitHub Actions. All the `single-deploy-*.yml`'s have to be deployed to the account for SearchAPI to work, but only need to be deployed ONCE by an admin.
+**TLDR**: The `SearchAPI-stack.yml` cloudformation template is for a single API maturity (you'd need a second for a staging environment), and is automated though the [Makefile](../Makefile). All the `single-deploy-*.yml`'s have to be deployed to the account FIRST for SearchAPI to work, but only need to be deployed ONCE by an admin.
 
 ### Deploying single-deploy Stacks
 
 Deploy **in the order** listed here:
+
+Note: anywhere in make commands you see `-e KEY=Value`, you can also do `export KEY=VALUE` separately to not have to add it every time. This might be useful when developing on stacks.
 
 #### single-deploy-strings-macros.yml
 
 - First deploy the Strings Macro template. It adds functions to CloudFormation that the other templates rely on:
 
 ```bash
-aws cloudformation deploy \
-    --stack-name CFN-StringMacros \
-    --template-file cloudformation/single-deploy-string-macros.yml \
-    --capabilities CAPABILITY_IAM
+make -e AWS_PROFILE=<admin_profile_here> single-deploy-macro-template
 ```
 
 #### single-deploy-ecr.yml
@@ -28,56 +27,62 @@ aws cloudformation deploy \
 - We attach a Lifecycle Policy to ECR here too, and this lets us remove older containers without giving the GitHub User permissions to delete images.
 
 ```bash
-aws cloudformation deploy \
-    --stack-name ECR-SearchAPI \
-    --template-file cloudformation/single-deploy-ecr.yml
+make -e AWS_PROFILE=<admin_profile_here> single-deploy-searchapi-ecr
 ```
 
 You can access the ECR URI by the command line, by running:
 
 ```bash
-# IF you ever change this stack name, you'll have to override a default param (ImportValueEcrUri) when deploying SearchAPI to point to the different ECR stack.
-aws cloudformation describe-stacks \
-    --stack-name "ECR-SearchAPI" \
-    --query "Stacks[?StackName=='ECR-SearchAPI'].Outputs[0][?OutputKey=='RegistryUri'].OutputValue" \
-    --output=text
+make get-ecr-uri
 ```
 
-There's no way to automatically delete tagged images though lifecycle policies (unless you already know their name). Someone will have to jump in and delete old tags once in a while, from each registry. Untagged images are deleted automatically if there's too many, so this will take a while to fill up.
+There's no way to automatically delete **tagged** images though lifecycle policies (unless you already know their name). Someone will have to jump in and delete old tags once in a while. Untagged images are deleted automatically if there's too many, and MOST of the images will be untagged. This won't have to happen that often at all.
 
 #### single-deploy-github-user.yml
 
 This sets up a user with minimal permissions to create SearchAPI stacks from. We use this user in GitHub to automate stacks when branches are created.
 
 ```bash
-aws cloudformation deploy \
-    --template-file cloudformation/single-deploy-github-user.yml \
-    --stack-name GitHub-SearchAPI-User \
-    --capabilities CAPABILITY_NAMED_IAM
+make -e AWS_PROFILE=<admin_profile_here> single-deploy-github-user
 ```
 
 Of note, we can't / don't want to automate creating access and secret access keys! Once the user is created, you'll have to manually do this and add the secrets to a GitHub Environment. (Environments are nice for having the same GitHub workflow be usable on multiple aws accounts. You can add them to the repo directly if you only have one aws account).
 
 ### Deploying a SearchAPI Stack
 
-If possible, just create a branch/fork in GitHub to have this done automatically. These notes are more for learning how it works to develop on the pipeline directly.
-
-The generic deploy command looks like so:
+The generic deploy command looks like:
 
 ```bash
-export BRANCH="some_github_branch"
-aws cloudformation deploy \
-    --stack-name "SearchAPI-$${BRANCH//[^[:alnum:]]/-}" \
-    --template-file cloudformation/SearchAPI-stack.yml \
-    --capabilities CAPABILITY_IAM \
-    --parameter-overrides \
-        GitHubBranch=${BRANCH} \
-        Maturity=devel
+make -e MATURITY=<api_maturity> -e TAG=<deploy_tag> deploy-searchapi-stack
 ```
 
-This will replace all non-alpha chars with "-", since stack names are a little restrictive. (Above would create a stack `SearchAPI-some-github-branch`, that points to `some_github_branch` on GitHub).
+So for example:
 
-- The container must already exist in ECR for the deployment to work. (ECR URI: `${aws_registry}/searchapi:${GitHubBranch}` if the default ECR stack is used).
+```bash
+make -e MATURITY=devel -e TAG=test
+```
+
+Will create an API to develop against, with the stack name `SearchAPI-test`. The "SearchAPI-" part is appended automatically! This will also create a docker tag `test` inside ECR that the stack uses.
+
+The `TAG` value will replace all non-alpha chars with "-", since stack names are a little restrictive. (If a branch named `some_github_branch` triggered the pipeline, that would become the `TAG`, and it would create a stack named `SearchAPI-some-github-branch`).
+
+### Deleting a SearchAPI Stack
+
+The generic delete command looks like:
+
+```bash
+make -e TAG=<same_tag_as_before> delete-searchapi-stack
+```
+
+## Developing on the SearchAPI Stack itself
+
+- After making changes, lint the stack:
+
+  ```bash
+  cfn-lint cloudformation/cf-stack.yml
+  ```
+
+  This'll return back feedback FAR faster than trying to deploy the stack.
 
 ## GitHub Environments
 
@@ -104,4 +109,4 @@ For when we switch to using `asf_search` directly. Different notes to keep in mi
 - Keep testing requirements completely standalone and separate from the package code? Lets the test suite action be minimal. Maybe it's not worth, and just have it install everything?
 - Have less SearchAPI maturities. Maybe even two? prod, and non-prod?. Right now they're being set though github environments, so having 5 seems awkward unless there's a better way. But a lot of that stuff can be something like environment variables with defaults/package constants (which CMR to use), or removed completely (health endpoint: "this_api". If they're there, they know the api. Not sure how to automatically populate that, so it's the main blocker I see for cutting down maturities).
   - Have cmr_url be a parameter-overrides option? What else?
-
+  - If you need a "prod cmr_uat" API, create a third environment for that? Problem is you'd need a separate gh action for each environment. I hope there's a way to say "If branch name matches environment, run there. Else run in this non-prod environment".
