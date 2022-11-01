@@ -47,6 +47,12 @@ define get-ecr
 	([ -n "$${AWS_ECR}" ] || (echo "ERROR: Couldn't query aws stack" && exit -1))
 endef
 
+# To print the ECR URI:
+get-ecr-uri:
+	$(call get-ecr,AWS_ECR) && \
+	echo "The SearchAPI ECR URI is:" && \
+	echo "$${AWS_ECR}"
+
 ###########################
 ## MAIN PIPELINE METHODS ##
 ###########################
