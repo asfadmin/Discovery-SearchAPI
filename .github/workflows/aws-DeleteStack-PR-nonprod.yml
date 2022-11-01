@@ -14,7 +14,7 @@ jobs:
     uses: ./.github/workflows/reusable-DeleteStack-SearchAPI.yml
     with:
       # TAG different for both delete branch, and delete PR.
-      TAG: ${{ github.ref_name }}
+      TAG: ${{ github.event.ref }}
       environment: non-prod
     # What secrets from the environment, the workflow should have access to:
     secrets:
