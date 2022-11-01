@@ -33,6 +33,10 @@ jobs:
     environment: ${{ inputs.environment }}
     steps:
 
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
       - uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
