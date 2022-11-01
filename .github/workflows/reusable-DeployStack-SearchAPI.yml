@@ -72,4 +72,4 @@ jobs:
         if: github.event_name == 'pull_request'
         run: |
           echo "TODO"
-          echo "Stack endpoint: ${{ steps.searchapi-stack.outputs.ApiUrl }}"
+          make -e TAG=${{ github.ref_name }} get-api-url

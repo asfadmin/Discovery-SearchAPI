@@ -66,6 +66,12 @@ Will create an API to develop against, with the stack name `SearchAPI-test`. The
 
 The `TAG` value will replace all non-alpha chars with "-", since stack names are a little restrictive. (If a branch named `some_github_branch` triggered the pipeline, that would become the `TAG`, and it would create a stack named `SearchAPI-some-github-branch`).
 
+You can also get the URL of a stack with:
+
+```bash
+make -e TAG=<deploy_tag> get-api-url
+```
+
 ### Deleting a SearchAPI Stack
 
 The generic delete command looks like:

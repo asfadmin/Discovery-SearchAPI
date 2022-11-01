@@ -53,6 +53,15 @@ get-ecr-uri:
 	echo "The SearchAPI ECR URI is:" && \
 	echo "$${AWS_ECR}"
 
+get-api-url: guard-TAG
+	export API_URL=$$(aws cloudformation describe-stacks \
+		--stack-name "SearchAPI-$${TAG}" \
+		--query "Stacks[?StackName=='SearchAPI-$${TAG}'][].Outputs[?OutputKey=='ApiUrl'].OutputValue" \
+		--output=text) && \
+	echo "API URL for SearchAPI-$${TAG} is" && \
+	echo "$${API_URL}"
+
+
 ###########################
 ## MAIN PIPELINE METHODS ##
 ###########################
