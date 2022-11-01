@@ -5,7 +5,7 @@ Description: Everything needed for a single SearchAPI
 
 Parameters:
 
-  GitHubBranch:
+  ContainerTag:
     Type: String
     Description: "Name of github branch the stack is hooked to. (also appends '-staging' if PR)."
     # You need to escape the slash, so *it* can escape the period... weird.
@@ -34,7 +34,7 @@ Resources:
         ImageUri: !Join
           - ":"
           - - Fn::ImportValue: !Sub "${ImportValueEcrUri}"
-            - !Ref GitHubBranch
+            - !Ref ContainerTag
       ImageConfig:
         EntryPoint: [ "/lambda-entrypoint.sh" ]
         Command: [ "SearchAPI.application.run_flask_lambda" ]
