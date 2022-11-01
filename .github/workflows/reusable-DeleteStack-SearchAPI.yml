@@ -1,11 +1,8 @@
-
-
-
 on:
   workflow_call:
     inputs:
 
-      TAG_NAME:
+      TAG:
         required: true
         description: The unique ID for the stack, everything after 'SearchAPI-'.
         type: string
@@ -36,23 +33,12 @@ jobs:
     environment: ${{ inputs.environment }}
     steps:
 
-      - name: Craft SearchAPI variables
-        id: variables
-        env:
-          NAME: ${{ inputs.TAG_NAME }}
-        ## Special chars are replaced with '-', and:
-        run: |
-          echo "::set-output name=tag-name::${NAME//[^[:alnum:]]/-}"
-
       - uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ inputs.AWS_REGION }}
 
-      - name: Delete SearchAPI Stack
+      - name: Delete SearchAPI Stack w/ Makefile
         run: |
-          aws cloudformation delete-stack \
-              --stack-name="SearchAPI-${{ steps.variables.outputs.tag-name }}"
-          aws cloudformation wait stack-delete-complete \
-              --stack-name="SearchAPI-${{ steps.variables.outputs.tag-name }}"
+          make -e TAG=${{ inputs.TAG }} delete-searchapi-stack

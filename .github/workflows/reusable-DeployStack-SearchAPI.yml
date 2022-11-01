@@ -4,11 +4,6 @@ on:
     inputs:
 
       # For building the docker image:
-      REPOSITORY:
-        required: False
-        description: The specific ECR of the AWS account to use.
-        default: searchapi
-        type: string
       TAG:
         required: True
         description: The tag of the container. Branch-name or GitHub PR.
@@ -53,16 +48,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Craft SearchAPI variables
-        id: variables
-        env:
-          NAME: ${{ github.ref_name }}
-        ## Special chars are replaced with '-', and:
-        #   If push, tag is name of branch
-        #   If pull_request, tag becomes '<pr_number>-merge' (slash is replaced by '-')
-        run: |
-          echo "::set-output name=tag-name::${NAME//[^[:alnum:]]/-}"
-
       - uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -76,41 +61,9 @@ jobs:
         # Ignore the failure of a step and avoid terminating the job.
         continue-on-error: true
 
-      - name: Log into Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
-
-      - name: Build, Tag, and Push Container
-        env:
-          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          REPOSITORY: searchapi
-          IMAGE_TAG: ${{ steps.variables.outputs.tag-name }}
-        run: |
-          docker build --pull --build-arg GIT_COMMIT_HASH="${GITHUB_SHA}" -t "${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}" .
-          docker push "${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}"
-
-      - name: Deploy SearchAPI Stack
-        uses: aws-actions/aws-cloudformation-github-deploy@v1
-        id: searchapi-stack
-        with:
-          name: SearchAPI-${{ steps.variables.outputs.tag-name }}
-          template: cloudformation/SearchAPI-stack.yml
-          parameter-overrides: "GitHubBranch=${{ steps.variables.outputs.tag-name }},Maturity=${{ inputs.MATURITY }}"
-          no-fail-on-empty-changeset: "1"
-
-      # If the stack already exists, it won't update to the latest image.
-      - name: Update Lambda Function
-        env:
-          FUNCTION: ${{ steps.searchapi-stack.outputs.LambdaFunction }}
-          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          REPOSITORY: searchapi
-          IMAGE_TAG: ${{ steps.variables.outputs.tag-name }}
-        run: |
-          aws lambda update-function-code \
-              --function-name "${FUNCTION}" \
-              --image-uri "${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}"
-          aws lambda wait function-updated \
-              --function-name "${FUNCTION}"
+      - name: Deploy SearchAPI Stack w/ Makefile
+        run:
+          make -e TAG=${{ github.ref_name }} -e MATURITY=${{ inputs.MATURITY }} deploy-searchapi-stack
 
       - name: Run Pytest
         # If it's writing to a branch, the pull request to that branch already
