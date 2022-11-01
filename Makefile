@@ -53,6 +53,16 @@ get-ecr-uri:
 	echo "The SearchAPI ECR URI is:" && \
 	echo "$${AWS_ECR}"
 
+get-api-url: guard-TAG
+	export TAG="$${TAG//[^[:alnum:]]/-}" && \
+	export API_URL=$$(aws cloudformation describe-stacks \
+		--stack-name "SearchAPI-$${TAG}" \
+		--query "Stacks[?StackName=='SearchAPI-$${TAG}'][].Outputs[?OutputKey=='ApiUrl'].OutputValue" \
+		--output=text) && \
+	echo "API URL for SearchAPI-$${TAG} is" && \
+	echo "$${API_URL}"
+
+
 ###########################
 ## MAIN PIPELINE METHODS ##
 ###########################
@@ -71,12 +81,13 @@ docker-update-ecr: guard-TAG
 ## Deploy the API stack
 #	In --stack-name, after TAG, will replace all non-alpha chars with '-'
 update-api-stack-template: guard-TAG guard-MATURITY
+	export TAG="$${TAG//[^[:alnum:]]/-}" && \
 	aws cloudformation deploy \
-		--stack-name "SearchAPI-$${TAG//[^[:alnum:]]/-}" \
+		--stack-name "SearchAPI-$${TAG}" \
 		--template-file cloudformation/SearchAPI-stack.yml \
 		--capabilities CAPABILITY_IAM \
 		--parameter-overrides \
-			ContainerTag=${TAG} \
+			ContainerTag="$${TAG}" \
 			Maturity=${MATURITY}
 
 ## Update the Lambda, with the latest container
@@ -109,9 +120,10 @@ deploy-searchapi-stack: guard-TAG guard-MATURITY \
 ## Delete the SearchAPI stack
 delete-searchapi-stack: guard-TAG
 	# Delete it:
+	export TAG="$${TAG//[^[:alnum:]]/-}" && \
 	aws cloudformation delete-stack \
-		--stack-name "SearchAPI-$${TAG//[^[:alnum:]]/-}"
-	echo "Waiting for stack delete to finish...."
+		--stack-name "SearchAPI-$${TAG}" && \
+	echo "Waiting for stack delete to finish...." && \
 	aws cloudformation wait stack-delete-complete \
-		--stack-name "SearchAPI-$${TAG//[^[:alnum:]]/-}"
+		--stack-name "SearchAPI-$${TAG}" && \
 	echo "Deleting stack DONE."
