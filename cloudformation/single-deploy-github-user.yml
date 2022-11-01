@@ -4,117 +4,127 @@ Description: "The user GitHub uses to deploy SearchAPI."
 
 Resources:
 
+  CloudformationPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - cloudformation:DescribeStacks
+              - cloudformation:CreateStack
+              - cloudformation:DeleteStack
+              - cloudformation:UpdateStack
+              - cloudformation:DescribeChangeSet
+              - cloudformation:CreateChangeSet
+              - cloudformation:DeleteChangeSet
+              - cloudformation:ExecuteChangeSet
+              - cloudformation:SetStackPolicy
+              - cloudformation:ValidateTemplate
+              - cloudformation:GetTemplateSummary
+            Resource:
+              - !Sub "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/SearchAPI-*/*"
+          - Effect: Allow
+            Action:
+              - cloudformation:DescribeStacks
+            Resource:
+              - !Sub "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/ECR-SearchAPI/*"
+
+  EcrPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - ecr:GetAuthorizationToken
+            Resource: "*"
+          - Effect: Allow
+            Action:
+              # Minimum for pulling/pushing:
+              - ecr:BatchGetImage
+              - ecr:BatchCheckLayerAvailability
+              - ecr:CompleteLayerUpload
+              - ecr:GetDownloadUrlForLayer
+              - ecr:InitiateLayerUpload
+              - ecr:PutImage
+              - ecr:UploadLayerPart
+            Resource:
+              - !Sub "arn:aws:ecr:${AWS::Region}:${AWS::AccountId}:repository/searchapi"
+
+  IamPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - iam:GetRole
+              - iam:GetRolePolicy
+              - iam:CreateRole
+              - iam:DeleteRole
+              - iam:DeleteRolePolicy
+              - iam:PutRolePolicy
+              - iam:PassRole
+            Resource:
+              # Lambda service role:
+              - !Sub "arn:aws:iam::${AWS::AccountId}:role/SearchAPI-*-LambdaServiceRole-*"
+              # Api Gateway V2 role:
+              - !Sub "arn:aws:iam::${AWS::AccountId}:role/SearchAPI-*-ApiGatewayServiceRole-*"
+
+  LambdaPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              # Generic lambda permissions:
+              - lambda:CreateFunction
+              - lambda:DeleteFunction
+              - lambda:GetFunction
+              - lambda:GetFunctionConfiguration
+              - lambda:UpdateFunctionConfiguration
+              - lambda:UpdateFunctionCode
+              # Needed for Lambda concurrency:
+              - lambda:ListVersionsByFunction
+              - lambda:PublishVersion
+              - lambda:GetProvisionedConcurrencyConfig
+              - lambda:PutProvisionedConcurrencyConfig
+            Resource:
+              - !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:SearchAPI-*-LambdaContainer-*"
+
+  ApiGatewayPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - apigateway:POST
+            Resource:
+              - !Sub arn:aws:apigateway:${AWS::Region}::/tags/*
+          - Effect: Allow
+            Action:
+              - apigateway:GET
+              - apigateway:POST
+              - apigateway:DELETE
+            Resource:
+              - !Sub arn:aws:apigateway:${AWS::Region}::/apis
+              - !Sub arn:aws:apigateway:${AWS::Region}::/apis/*
+
   ManageStackUser:
     Type: AWS::IAM::User
     Properties:
       UserName: GitHub-manage-SearchAPI-stacks
-      Policies:
-
-        - PolicyName: SearchAPIManagerCloudformation
-          PolicyDocument:
-            Statement:
-              - Effect: Allow
-                Action:
-                  - cloudformation:DescribeStacks
-                  - cloudformation:CreateStack
-                  - cloudformation:DeleteStack
-                  - cloudformation:UpdateStack
-                  - cloudformation:DescribeChangeSet
-                  - cloudformation:CreateChangeSet
-                  - cloudformation:DeleteChangeSet
-                  - cloudformation:ExecuteChangeSet
-                  - cloudformation:SetStackPolicy
-                  - cloudformation:ValidateTemplate
-                  - cloudformation:GetTemplateSummary
-                Resource:
-                  - !Sub "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/SearchAPI-*/*"
-
-        - PolicyName: AllowEcrLogin
-          PolicyDocument:
-            Statement:
-              - Effect: Allow
-                Action:
-                  - ecr:GetAuthorizationToken
-                Resource: "*"
-
-        - PolicyName: SearchAPIManagerECR
-          PolicyDocument:
-            Statement:
-              - Effect: Allow
-                Action:
-                  # Minimum for pulling/pushing:
-                  - ecr:BatchGetImage
-                  - ecr:BatchCheckLayerAvailability
-                  - ecr:CompleteLayerUpload
-                  - ecr:GetDownloadUrlForLayer
-                  - ecr:InitiateLayerUpload
-                  - ecr:PutImage
-                  - ecr:UploadLayerPart
-                Resource:
-                  - !Sub "arn:aws:ecr:${AWS::Region}:${AWS::AccountId}:repository/searchapi"
-
-        - PolicyName: SearchAPIManagerIAM
-          PolicyDocument:
-            Statement:
-              - Effect: Allow
-                Action:
-                  - iam:GetRole
-                  - iam:GetRolePolicy
-                  - iam:CreateRole
-                  - iam:DeleteRole
-                  - iam:DeleteRolePolicy
-                  - iam:PutRolePolicy
-                  - iam:PassRole
-                Resource:
-                  # Lambda service role:
-                  - !Sub "arn:aws:iam::${AWS::AccountId}:role/SearchAPI-*-LambdaServiceRole-*"
-                  # Api Gateway V2 role:
-                  - !Sub "arn:aws:iam::${AWS::AccountId}:role/SearchAPI-*-ApiGatewayServiceRole-*"
-
-        - PolicyName: SearchAPIManagerLambda
-          PolicyDocument:
-            Statement:
-              - Effect: Allow
-                Action:
-                  # Generic lambda permissions:
-                  - lambda:CreateFunction
-                  - lambda:DeleteFunction
-                  - lambda:GetFunction
-                  - lambda:GetFunctionConfiguration
-                  - lambda:UpdateFunctionConfiguration
-                  - lambda:UpdateFunctionCode
-                  # Needed for Lambda concurrency:
-                  - lambda:ListVersionsByFunction
-                  - lambda:PublishVersion
-                  - lambda:GetProvisionedConcurrencyConfig
-                  - lambda:PutProvisionedConcurrencyConfig
-                Resource:
-                  - !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:SearchAPI-*-LambdaContainer-*"
-
-        - PolicyName: AllowEcrLogin
-          PolicyDocument:
-            Statement:
-              - Effect: Allow
-                Action:
-                  - ecr:GetAuthorizationToken
-                Resource: "*"
-
-        - PolicyName: SearchAPIManagerApiGateway-Tags
-          PolicyDocument:
-            Statement:
-              - Effect: Allow
-                Action:
-                  - apigateway:POST
-                Resource:
-                  - !Sub arn:aws:apigateway:${AWS::Region}::/tags/*
-
-        - PolicyName: SearchAPIManagerApiGateway-APIs
-          PolicyDocument:
-            Statement:
-              - Effect: Allow
-                Action:
-                  - apigateway:POST
-                  - apigateway:DELETE
-                Resource:
-                  - !Sub arn:aws:apigateway:${AWS::Region}::/apis
-                  - !Sub arn:aws:apigateway:${AWS::Region}::/apis/*
+      ManagedPolicyArns:
+        - !Ref CloudformationPolicy
+        - !Ref EcrPolicy
+        - !Ref IamPolicy
+        - !Ref LambdaPolicy
+        - !Ref ApiGatewayPolicy
