@@ -13,8 +13,8 @@ jobs:
     if: github.event.pull_request.head.repo.full_name == github.repository
     uses: ./.github/workflows/reusable-DeleteStack-SearchAPI.yml
     with:
-      # TAG_NAME different for both delete branch, and delete PR.
-      TAG_NAME: ${{ github.ref_name }}
+      # TAG different for both delete branch, and delete PR.
+      TAG: ${{ github.ref_name }}
       environment: non-prod
     # What secrets from the environment, the workflow should have access to:
     secrets:
