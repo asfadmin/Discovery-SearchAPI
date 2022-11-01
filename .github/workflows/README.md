@@ -2,18 +2,23 @@
 
 ## Notes on this specific Repo
 
+Some actions will only trigger from the default branch (like `delete`). Make sure the `devel` branch has your action changes, if you're updating the trigger lists!
+
+We have github actions use the makefile directly, to not duplicate code. It also forces the makefile to never fall behind, and is a powerful tool for creating quick deployments easily.
+
 ### Reusable Actions
 
-Any actions that begin with `reusable-*`, are designed to be called by multiple triggers. The trigger action will pass in the environment to use, so that the reusable actions can be called from `both` prod and `non-prod` environments.
+Any actions that begin with `reusable-*`, are designed to be called by multiple triggers. The "trigger action" will pass in the environment to use, so that the same reusable action can be called from **both** `prod` and `non-prod` environments.
 
-### AWS Actions
+### AWS "Trigger" Actions
 
-Any action that begins with `aws-*`, is for managing a stack in AWS. The filename should also contain what they do tto that stack, and then which account they deploy to.
+Any action that begins with `aws-*`, is the "trigger action" for managing a stack in AWS. The filename should also contain what they do to that stack, and then which account they deploy to.
 
 #### Creating a new API
 
-To create an API, add your branch to the actions that apply to where you want to deploy.
+To create an API, you can use a makefile for a one time deployment. OR add your branch to the actions that apply to where you want to deploy.
 
+- For makefile deployments, see [this guide](../../cloudformation/README.md).
 - If you want a new API in prod, but never delete it automatically with the branch, just add your branch to the different triggers in `aws-DeployStack-prod.yml`.
 - If you wanted one to develop from instead, you might add your branch to ALL `aws-*Stack-*-nonprod.yml` actions.
 
