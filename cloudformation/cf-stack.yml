@@ -280,7 +280,6 @@ Resources:
   #                 - logs:PutLogEvents
   #               Resource: !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/codebuild/StagingTestPR-*:log-stream:*"
 
-
 Outputs:
   # EcrImageUri:
   #   Value: !Sub ${LambdaDockerRegistry}/searchapi-${GitHubBranch}
