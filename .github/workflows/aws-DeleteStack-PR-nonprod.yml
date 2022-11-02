@@ -13,8 +13,9 @@ jobs:
     if: github.event.pull_request.head.repo.full_name == github.repository
     uses: ./.github/workflows/reusable-DeleteStack-SearchAPI.yml
     with:
-      # TAG different for both delete branch, and delete PR.
-      TAG: ${{ github.ref_name }}
+      # Can't just use github.ref_name, changes if the PR is merged vs closed.
+      # Craft the PR label ourself:
+      TAG: "${{ github.event.number }}/merge"
       environment: non-prod
     # What secrets from the environment, the workflow should have access to:
     secrets:

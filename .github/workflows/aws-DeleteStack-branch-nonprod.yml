@@ -13,7 +13,7 @@ jobs:
     if: github.event.ref_type == 'branch'
     uses: ./.github/workflows/reusable-DeleteStack-SearchAPI.yml
     with:
-      # TAG different for both delete branch, and delete PR.
+      # Unique ID for each stack. (The branch you're on)
       TAG: ${{ github.event.ref }}
       environment: non-prod
     # What secrets from the environment, the workflow should have access to:
