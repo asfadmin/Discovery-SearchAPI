@@ -27,3 +27,22 @@ To create an API, you can use a makefile for a one time deployment. OR add your 
 With looking at what variables are available, what `on` triggers exist, etc, check out the main docs at <https://docs.github.com/en/actions/learn-github-actions/contexts#github-context>.
 
 With specifically setting up reusable workflows, there's a good guide at <https://docs.github.com/en/actions/using-workflows/reusing-workflows>. The tools team keeps theirs at <https://github.com/ASFHyP3/actions>, so they'd be good examples to go off of, and you might just find the action you need.
+
+If you're debugging, a trick that might help is to see what the different variables you have access to are [from here](https://docs.github.com/en/actions/learn-github-actions/contexts#example-printing-context-information-to-the-log):
+
+```yml
+steps:
+    - name: Dump GitHub context
+      id: github_context_step
+      run: echo '${{ toJSON(github) }}'
+    - name: Dump job context
+      run: echo '${{ toJSON(job) }}'
+    - name: Dump steps context
+      run: echo '${{ toJSON(steps) }}'
+    - name: Dump runner context
+      run: echo '${{ toJSON(runner) }}'
+    - name: Dump strategy context
+      run: echo '${{ toJSON(strategy) }}'
+    - name: Dump matrix context
+      run: echo '${{ toJSON(matrix) }}'
+```
