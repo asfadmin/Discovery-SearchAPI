@@ -22,7 +22,7 @@ Parameters:
     Default: "ECR-SearchAPI-RegistryUri"
 
   NumConcurrentExecutions:
-    Type: Integer
+    Type: Number
     Description: "The number of lambda functions to keep warm at once."
     Default: 2
 
