@@ -30,6 +30,7 @@ jobs:
     with:
       TAG: ${{ github.ref_name }}
       MATURITY: devel
+      NumConcurrentExecutions: 2
       environment: non-prod
     # What secrets from the environment, the workflow should have access to:
     secrets:

@@ -53,13 +53,13 @@ Of note, we can't / don't want to automate creating access and secret access key
 The generic deploy command looks like:
 
 ```bash
-make -e MATURITY=<api_maturity> -e TAG=<deploy_tag> deploy-searchapi-stack
+make -e MATURITY=<api_maturity> -e TAG=<deploy_tag> -e NumConcurrentExecutions=<num_lambdas> deploy-searchapi-stack
 ```
 
 So for example:
 
 ```bash
-make -e MATURITY=devel -e TAG=test
+make -e MATURITY=devel -e TAG=test -e NumConcurrentExecutions=2 deploy-searchapi-stack
 ```
 
 Will create an API to develop against, with the stack name `SearchAPI-test`. The "SearchAPI-" part is appended automatically! This will also create a docker tag `test` inside ECR that the stack uses.

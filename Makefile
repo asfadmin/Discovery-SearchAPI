@@ -80,7 +80,7 @@ docker-update-ecr: guard-TAG
 
 ## Deploy the API stack
 #	In --stack-name, after TAG, will replace all non-alpha chars with '-'
-update-api-stack-template: guard-TAG guard-MATURITY
+update-api-stack-template: guard-TAG guard-MATURITY guard-NumConcurrentExecutions
 	export TAG="$${TAG//[^[:alnum:]]/-}" && \
 	aws cloudformation deploy \
 		--stack-name "SearchAPI-$${TAG}" \
@@ -88,7 +88,8 @@ update-api-stack-template: guard-TAG guard-MATURITY
 		--capabilities CAPABILITY_IAM \
 		--parameter-overrides \
 			ContainerTag="$${TAG}" \
-			Maturity=${MATURITY}
+			Maturity="${MATURITY}" \
+			NumConcurrentExecutions="$${NumConcurrentExecutions}"
 
 ## Update the Lambda, with the latest container
 #    If the stack already exists, it won't grab the latest by itself
@@ -111,7 +112,7 @@ update-lambda-function: guard-TAG
 # Main deploy method.
 # First list ANY of the guards that the functions it calls uses,
 # to fail fast instead of failing when it finally gets to that job:
-deploy-searchapi-stack: guard-TAG guard-MATURITY \
+deploy-searchapi-stack: guard-TAG guard-MATURITY guard-NumConcurrentExecutions \
 	docker-update-ecr update-api-stack-template update-lambda-function
 
 ##################

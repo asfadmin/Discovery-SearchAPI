@@ -21,6 +21,11 @@ Parameters:
     Description: "Exported Value, holds SearchAPI registry. (Output of that stack: {StackName}-RegistryUri)."
     Default: "ECR-SearchAPI-RegistryUri"
 
+  NumConcurrentExecutions:
+    Type: Integer
+    Description: "The number of lambda functions to keep warm at once."
+    Default: 2
+
 Resources:
 
   LambdaContainer:
@@ -51,7 +56,7 @@ Resources:
       Description: !Sub "Lambda concurrency config for stack '${AWS::StackName}'."
       FunctionName: !Ref LambdaContainer
       ProvisionedConcurrencyConfig:
-         ProvisionedConcurrentExecutions: 2
+         ProvisionedConcurrentExecutions: !Ref NumConcurrentExecutions
 
   LambdaServiceRole:
     Type: AWS::IAM::Role

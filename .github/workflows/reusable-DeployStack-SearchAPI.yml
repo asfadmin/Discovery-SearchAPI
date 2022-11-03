@@ -15,6 +15,11 @@ on:
         description: What region in AWS to run in.
         default: us-east-1
         type: string
+      
+      NumConcurrentExecutions:
+        required: True
+        description: How many lambdas to keep warm at once.
+        type: string
 
       # Pass into the container, what to run as:
       MATURITY:
@@ -25,7 +30,7 @@ on:
       environment:
         required: True
         description: The GitHub Environment to use.
-        type: string
+        type: environment
 
     secrets:
       # AWS Auth:
@@ -62,8 +67,12 @@ jobs:
         continue-on-error: true
 
       - name: Deploy SearchAPI Stack w/ Makefile
-        run:
-          make -e TAG=${{ github.ref_name }} -e MATURITY=${{ inputs.MATURITY }} deploy-searchapi-stack
+        run: |
+          make 
+            -e TAG=${{ github.ref_name }}
+            -e MATURITY=${{ inputs.MATURITY }} 
+            -e NumConcurrentExecutions=${{ inputs.NumConcurrentExecutions }}
+            deploy-searchapi-stack
 
       - name: Run Pytest
         # If it's writing to a branch, the pull request to that branch already
