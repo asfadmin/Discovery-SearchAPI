@@ -19,7 +19,7 @@ on:
       NumConcurrentExecutions:
         required: True
         description: How many lambdas to keep warm at once.
-        type: string
+        type: number
 
       # Pass into the container, what to run as:
       MATURITY:
@@ -30,7 +30,7 @@ on:
       environment:
         required: True
         description: The GitHub Environment to use.
-        type: environment
+        type: string
 
     secrets:
       # AWS Auth:
