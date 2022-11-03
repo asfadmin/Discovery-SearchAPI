@@ -67,7 +67,7 @@ jobs:
         continue-on-error: true
 
       - name: Deploy SearchAPI Stack w/ Makefile
-        run: |
+        run: >
           make 
             -e TAG=${{ github.ref_name }}
             -e MATURITY=${{ inputs.MATURITY }} 
