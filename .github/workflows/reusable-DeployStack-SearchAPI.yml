@@ -69,10 +69,10 @@ jobs:
       - name: Deploy SearchAPI Stack w/ Makefile
         run: >
           make 
-            -e TAG=${{ github.ref_name }}
-            -e MATURITY=${{ inputs.MATURITY }} 
-            -e NumConcurrentExecutions=${{ inputs.NumConcurrentExecutions }}
-            deploy-searchapi-stack
+          -e TAG=${{ github.ref_name }}
+          -e MATURITY=${{ inputs.MATURITY }} 
+          -e NumConcurrentExecutions=${{ inputs.NumConcurrentExecutions }}
+          deploy-searchapi-stack
 
       - name: Run Pytest
         # If it's writing to a branch, the pull request to that branch already
