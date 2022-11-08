@@ -32,6 +32,12 @@ on:
         description: The GitHub Environment to use.
         type: string
 
+      # Test suite args
+      PYTEST_ARGS:
+        required: False
+        description: Extra commands to append to the pytest command.
+        type: string
+
     secrets:
       # AWS Auth:
       AWS_ACCESS_KEY_ID:
@@ -81,4 +87,4 @@ jobs:
         if: github.event_name == 'pull_request'
         run: |
           python3 -m pip install -r requirements.txt
-          make -e TAG=${{ github.ref_name }} -e NUM_THREADS=auto -e PYTEST_ARGS="--df known_bugs --df prod_only" test-api
+          make -e TAG=${{ github.ref_name }} -e NUM_THREADS=auto -e PYTEST_ARGS=${{ inputs.PYTEST_ARGS }} test-api
