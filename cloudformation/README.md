@@ -100,12 +100,20 @@ The `deploy-searchapi-stack` command calls three other commands in the makefile,
   make -e TAG=devel update-lambda-function
   ```
 
-### Deleting a SearchAPI Stack
+## Deleting a SearchAPI Stack
 
 The generic delete command looks like:
 
 ```bash
 make -e TAG=<same_tag_as_before> delete-searchapi-stack
+```
+
+## Testing against the Stack
+
+This shows an example to run the test suite against a deployed API. NUM_THREADS defaults to 0, so it's disabled. You can add an optional PYTEST_ARGS, to pass arguments along to the suite, like ignoring the known_bugs file shown below.
+
+```bash
+make -e TAG=<api_tag> -e NUM_THREADS=auto -e PYTEST_ARGS="--df known_bugs" test-api
 ```
 
 ## Developing on the SearchAPI Stack itself
