@@ -87,7 +87,6 @@ jobs:
         if: github.event_name == 'pull_request'
         run: |
           python3 -m pip install -r requirements.txt
-
       - name: Run Pytest
         if: github.event_name == 'pull_request'
         run: |
