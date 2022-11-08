@@ -128,3 +128,14 @@ delete-searchapi-stack: guard-TAG
 	aws cloudformation wait stack-delete-complete \
 		--stack-name "SearchAPI-$${TAG}" && \
 	echo "Deleting stack DONE."
+
+##############
+### Test API:
+
+test-api: guard-TAG
+	export TAG="$${TAG//[^[:alnum:]]/-}" && \
+	export API_URL=$$(aws cloudformation describe-stacks \
+		--stack-name "SearchAPI-$${TAG}" \
+		--query "Stacks[?StackName=='SearchAPI-$${TAG}'][].Outputs[?OutputKey=='ApiUrl'].OutputValue" \
+		--output=text) && \
+	pytest -n "$${NUM_THREADS:-0}" "$${PYTEST_ARGS}" . --api $${API_URL}
