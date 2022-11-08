@@ -80,11 +80,15 @@ jobs:
           -e NumConcurrentExecutions=${{ inputs.NumConcurrentExecutions }}
           deploy-searchapi-stack
 
-      - name: Run Pytest
-        # If it's writing to a branch, the pull request to that branch already
-        # passed, OR it's a developing branch that doesn't need PR's. No need
-        # to run suite either way.
+      # If it's writing to a branch, the pull request to that branch already
+      # passed, OR it's a developing branch that doesn't need PR's. No need
+      # to run suite either way.
+      - name: Install pytest requirements
         if: github.event_name == 'pull_request'
         run: |
           python3 -m pip install -r requirements.txt
+
+      - name: Run Pytest
+        if: github.event_name == 'pull_request'
+        run: |
           make -e TAG=${{ github.ref_name }} -e NUM_THREADS=auto -e PYTEST_ARGS=${{ inputs.PYTEST_ARGS }} test-api
