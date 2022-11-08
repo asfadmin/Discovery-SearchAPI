@@ -80,5 +80,5 @@ jobs:
         # to run suite either way.
         if: github.event_name == 'pull_request'
         run: |
-          echo "TODO"
-          make -e TAG=${{ github.ref_name }} get-api-url
+          python3 -m pip install -r requirements.txt
+          make -e TAG=${{ github.ref_name }} -e NUM_THREADS=auto -e PYTEST_ARGS="--df known_bugs --df prod_only" test-api
