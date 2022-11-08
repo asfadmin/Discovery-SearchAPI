@@ -72,6 +72,34 @@ You can also get the URL of a stack with:
 make -e TAG=<deploy_tag> get-api-url
 ```
 
+#### Independent parts of Deploying SearchAPI
+
+The `deploy-searchapi-stack` command calls three other commands in the makefile, back to back. You can directly call these instead, if you're developing against a specific part and don't need a full deployment. They're ran in this order:
+
+- **docker-update-ecr**
+
+  This will build the container, log in, and push it to ECR. (ECR that's apart of the 'ECR-SearchAPI' stack). If GIT_COMMIT_HASH is set, the version in the health endpoint becomes it's value.
+
+  ```bash
+  make -e TAG=devel docker-update-ecr
+  ```
+
+- **update-api-stack-template**
+
+  This will deploy/update the SearchAPI stack itself. If the stack already exists, this does NOT force lambda to pull the later docker container if there's a new one. The next command will.
+
+  ```bash
+  make -e TAG=devel -e MATURITY=prod update-api-stack-template
+  ```
+
+- **update-lambda-function**
+
+  This forces lambda to grab the latest tag that exists. (Not the tag "latest". If you update the "devel" container, you have to tell lambda there's a later container and grab that. It'll stay on the container that was used when the stack was created otherwise).
+
+  ```bash
+  make -e TAG=devel update-lambda-function
+  ```
+
 ### Deleting a SearchAPI Stack
 
 The generic delete command looks like:
