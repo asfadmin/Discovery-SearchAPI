@@ -138,4 +138,4 @@ test-api: guard-TAG
 		--stack-name "SearchAPI-$${TAG}" \
 		--query "Stacks[?StackName=='SearchAPI-$${TAG}'][].Outputs[?OutputKey=='ApiUrl'].OutputValue" \
 		--output=text) && \
-	pytest -n "$${NUM_THREADS:-0}" "$${PYTEST_ARGS}" . --api $${API_URL}
+	pytest -n "$${NUM_THREADS:-0}" $${PYTEST_ARGS} . --api $${API_URL}
