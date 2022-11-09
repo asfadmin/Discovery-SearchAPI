@@ -29,7 +29,7 @@ jobs:
     uses: ./.github/workflows/reusable-DeployStack-SearchAPI.yml
     with:
       TAG: ${{ github.ref_name }}
-      MATURITY: prod
+      MATURITY: devel
       NumConcurrentExecutions: 2
       environment: non-prod
       PYTEST_ARGS: --df known_bugs --df prod_only
