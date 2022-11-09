@@ -32,6 +32,7 @@ jobs:
       MATURITY: devel
       NumConcurrentExecutions: 2
       environment: non-prod
+      PYTEST_ARGS: --df known_bugs --df prod_only
     # What secrets from the environment, the workflow should have access to:
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
