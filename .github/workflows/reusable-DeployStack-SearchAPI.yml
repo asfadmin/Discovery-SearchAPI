@@ -15,7 +15,7 @@ on:
         description: What region in AWS to run in.
         default: us-east-1
         type: string
-      
+
       NumConcurrentExecutions:
         required: True
         description: How many lambdas to keep warm at once.
@@ -74,9 +74,9 @@ jobs:
 
       - name: Deploy SearchAPI Stack w/ Makefile
         run: >
-          make 
+          make
           -e TAG=${{ github.ref_name }}
-          -e MATURITY=${{ inputs.MATURITY }} 
+          -e MATURITY=${{ inputs.MATURITY }}
           -e NumConcurrentExecutions=${{ inputs.NumConcurrentExecutions }}
           deploy-searchapi-stack
 
