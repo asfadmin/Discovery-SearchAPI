@@ -90,4 +90,4 @@ jobs:
       - name: Run Pytest
         if: github.event_name == 'pull_request'
         run: |
-          make -e TAG=${{ github.ref_name }} -e NUM_THREADS=auto -e PYTEST_ARGS=${{ inputs.PYTEST_ARGS }} test-api
+          make -e TAG=${{ github.ref_name }} -e NUM_THREADS=auto -e PYTEST_ARGS="${{ inputs.PYTEST_ARGS }}" test-api
