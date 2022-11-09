@@ -111,13 +111,12 @@ Resources:
               - !Sub arn:aws:apigateway:${AWS::Region}::/tags/*
           - Effect: Allow
             Action:
-              # - apigateway:GET
-              # - apigateway:POST
-              # - apigateway:DELETE
-              # - apigateway:PATCH
-              # - apigateway:PUT
-              # - apigateway:TagResource
-              - apigateway:*
+              - apigateway:GET
+              - apigateway:POST
+              - apigateway:DELETE
+              - apigateway:PATCH
+              - apigateway:PUT
+              - apigateway:TagResource
             Resource:
               - !Sub arn:aws:apigateway:${AWS::Region}::/apis
               - !Sub arn:aws:apigateway:${AWS::Region}::/apis/*
