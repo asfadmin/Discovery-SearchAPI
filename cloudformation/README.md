@@ -22,8 +22,8 @@ make -e AWS_PROFILE=<admin_profile_here> single-deploy-macro-template
 
 #### single-deploy-ecr.yml
 
-- Then Setup ECR. Every stack uses the same ECR, and reference this stack directly, so you can't delete this stack if ANY SearchAPI stack exists. (There's an optional param when deploying SearchAPI, that lets you point to a different ECR stack if needed.).
-  - You can't have ECR tied into the SearchAPI stack, because you lambda requires a container that exists in ECR to run, and there's no way to push it up between CloudFormation setting up ECR, and then Lambda if they're not separate.
+- Every SearchAPI stack uses the same ECR stack, by referencing it directly. You can't delete the ECR stack if ANY SearchAPI stack exists. (There's an optional param when deploying SearchAPI, that lets you point to a different ECR stack if needed.).
+  - You can't have ECR itself inside the SearchAPI stack, because lambda requires a container that already exists in ECR to run, and there's no way to push it up between CloudFormation setting up ECR, and then Lambda, if they're not separate.
 - We attach a Lifecycle Policy to ECR here too, and this lets us remove older containers without giving the GitHub User permissions to delete images.
 
 ```bash
@@ -62,9 +62,9 @@ So for example:
 make -e MATURITY=devel -e TAG=test -e NumConcurrentExecutions=2 deploy-searchapi-stack
 ```
 
-Will create an API to develop against, with the stack name `SearchAPI-test`. The "SearchAPI-" part is appended automatically! This will also create a docker tag `test` inside ECR that the stack uses.
+Will create an API to develop against, with the stack name `SearchAPI-test`. (The "SearchAPI-" part is appended automatically). This will also create a docker image tagged `test` inside ECR that the stack uses.
 
-The `TAG` value will replace all non-alpha chars with "-", since stack names are a little restrictive. (If a branch named `some_github_branch` triggered the pipeline, that would become the `TAG`, and it would create a stack named `SearchAPI-some-github-branch`).
+The `TAG` value will replace all non-alpha chars with "-", since stack names are a little restrictive. (If a branch named `some.github_branch` triggered the pipeline, that would pass the name to the `TAG`, and it would create a stack named `SearchAPI-some-github-branch`).
 
 You can also get the URL of a stack with:
 
@@ -89,12 +89,12 @@ The `deploy-searchapi-stack` command calls three other commands in the makefile,
   This will deploy/update the SearchAPI stack itself. If the stack already exists, this does NOT force lambda to pull the later docker container if there's a new one. The next command will.
 
   ```bash
-  make -e TAG=devel -e MATURITY=prod update-api-stack-template
+  make -e TAG=test -e MATURITY=devel -e NumConcurrentExecutions=2 update-api-stack-template
   ```
 
 - **update-lambda-function**
 
-  This forces lambda to grab the latest tag that exists. (Not the tag "latest". If you update the "devel" container, you have to tell lambda there's a later container and grab that. It'll stay on the container that was used when the stack was created otherwise).
+  This forces lambda to grab the latest tag that exists. (NOT the tag "latest". If you update a container tagged "devel", you have to tell lambda there's a later container and grab to that. It'll stay on the container that was used when the stack was **created** otherwise).
 
   ```bash
   make -e TAG=devel update-lambda-function

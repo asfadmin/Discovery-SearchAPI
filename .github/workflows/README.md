@@ -2,9 +2,9 @@
 
 ## Notes on this specific Repo
 
-Some actions will only trigger from the default branch (like `delete`). Make sure the `devel` branch has your action changes, if you're updating the trigger lists!
+Some actions will only trigger from the **default** branch (like `delete`). Make sure the `devel` branch has your action changes, if you're updating the trigger lists!
 
-We have github actions use the makefile directly, to not duplicate code. It also forces the makefile to never fall behind, and is a powerful tool for creating quick deployments easily.
+We have github actions use the makefile directly, to not duplicate code. It also forces the makefile to never fall behind, and is a powerful tool for creating quick deployments locally easily.
 
 ### Reusable Actions
 
