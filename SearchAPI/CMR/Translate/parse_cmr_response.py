@@ -79,7 +79,8 @@ def parse_granule(granule, req_fields):
         remove_field('browse')
 
     if 'fileName' in req_fields:
-        result['fileName'] = get_val("./OnlineAccessURLs/OnlineAccessURL/URL").split('/')[-1]
+        file_name = get_val("./OnlineAccessURLs/OnlineAccessURL/URL")
+        result['fileName'] = file_name.split('/')[-1] if file_name else None
         remove_field('fileName')
 
     if 'stateVectors' in req_fields or ('canInsar' in req_fields and result['platform'] not in ['ALOS', 'RADARSAT-1', 'JERS-1', 'ERS-1', 'ERS-2']):
