@@ -93,12 +93,13 @@ Resources:
     Type: AWS::ApiGatewayV2::Api
     Properties:
       Name: !Sub "${AWS::StackName}-ApiGatewayV2"
-      Description: !Sub "For SearchAPI stack '${AWS::StackName}'"
+      Description: !Sub "Lambda proxy for SearchAPI stack '${AWS::StackName}'"
       ProtocolType: HTTP
       Target: !GetAtt LambdaContainer.Arn
       CredentialsArn: !GetAtt ApiGatewayServiceRole.Arn
-      # CorsConfiguration:
-      #    CorsBlockHere
+      CorsConfiguration:
+         AllowOrigins:
+          - "*"
 
   # Use this instead of "AWS::ApiGatewayV2::Stage", because you can't create "$default": already exists.
   # Causes an "internal failure" when deploying the stack. Come back to this so we get API logs
@@ -143,6 +144,23 @@ Resources:
                   - logs:PutLogEvents
                 Resource:
                   - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/apigateway/${AWS::StackName}-*
+
+  # CloudFrontApiGateway:
+  # # https://stackoverflow.com/questions/32825413/how-do-you-add-cloudfront-in-front-of-api-gateway
+  
+  #   Type: AWS::CloudFront::Distribution
+  #   Properties:
+  #     DistributionConfig:
+  #       # CacheBehaviors:
+  #       #   - https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-cloudfront-distribution-cachebehavior.html
+  #       Comment: !Sub "For Stack '${AWS::StackName}'. Points to an HTTP API Gateway."
+  #       DefaultCacheBehavior:
+  #         Enabled: True
+  #         AllowedMethods: [GET, HEAD, OPTIONS, PUT, POST, PATCH, DELETE]
+  #         # AllowedMethods: [GET, HEAD, OPTIONS]
+  #         CachedMethods: [GET, HEAD, OPTIONS]
+  #         Compress: False
+
 
 Outputs:
   LambdaFunction:
