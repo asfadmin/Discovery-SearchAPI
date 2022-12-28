@@ -106,6 +106,7 @@ Resources:
         Statement:
           - Effect: Allow
             Action:
+              - apigateway:GET
               - apigateway:POST
             Resource:
               - !Sub arn:aws:apigateway:${AWS::Region}::/tags/*
