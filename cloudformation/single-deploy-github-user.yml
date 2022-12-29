@@ -4,7 +4,7 @@ Description: "The user GitHub uses to deploy SearchAPI."
 
 Resources:
 
-  CloudformationPolicy:
+  CloudFormationPolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
       PolicyDocument:
@@ -159,14 +159,43 @@ Resources:
             Resource:
               - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*
 
+  CloudFrontPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          # Create distributions inside the account:
+          # (Allowed for ANY distribution, keep this minimal so it can 
+          #       tag the resource and the other policy can take over).
+          - Effect: Allow
+            Action:
+              - cloudfront:CreateDistribution
+              - cloudfront:GetDistribution
+            Resource:
+              - !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/*
+          # Edit ONLY SearchAPI-* Distributions:
+          # (More destructive permissions, only allow for Resources tagged "SearchAPI-*")
+          - Effect: Allow
+            Action:
+              - cloudfront:TagResource
+              - cloudfront:UpdateDistribution
+              - cloudfront:DeleteDistribution
+            Resource:
+              - !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/*
+            Condition:
+              StringLike:
+                "aws:ResourceTag/Name": "SearchAPI-*"
+
   ManageStackUser:
     Type: AWS::IAM::User
     Properties:
       UserName: GitHub-manage-SearchAPI-stacks
       ManagedPolicyArns:
-        - !Ref CloudformationPolicy
+        - !Ref CloudFormationPolicy
         - !Ref EcrPolicy
         - !Ref IamPolicy
         - !Ref LambdaPolicy
         - !Ref ApiGatewayPolicy
         - !Ref CreateLogsPolicy
+        - !Ref CloudFrontPolicy
