@@ -7,8 +7,5 @@ TODO:
 - Do I need to enable CORS for the API?
 - Add WAF to cloudfront directly, or just API?
 - Cloudfront cache disabled on old distro. Is that what we want?
+- With CloudFront cert, is the ID/Arn private?
 - Same Tag lockdown I did to cloudfront, do to apigateway
-
-Notes from Andrew's meetup:
-
-- Trying out ProvisionedConcurrency. Might also help with AWS random resets, that a keep-worm cloudwatch can still hit. Use 8-10 for prod.

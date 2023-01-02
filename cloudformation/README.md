@@ -53,13 +53,13 @@ Of note, we can't / don't want to automate creating access and secret access key
 The generic deploy command looks like:
 
 ```bash
-make -e MATURITY=<api_maturity> -e TAG=<deploy_tag> -e NumConcurrentExecutions=<num_lambdas> deploy-searchapi-stack
+make -e MATURITY=<api_maturity> -e TAG=<deploy_tag> deploy-searchapi-stack
 ```
 
 So for example:
 
 ```bash
-make -e MATURITY=devel -e TAG=test -e NumConcurrentExecutions=2 deploy-searchapi-stack
+make -e MATURITY=devel -e TAG=test deploy-searchapi-stack
 ```
 
 Will create an API to develop against, with the stack name `SearchAPI-test`. (The "SearchAPI-" part is appended automatically). This will also create a docker image tagged `test` inside ECR that the stack uses.
@@ -72,9 +72,23 @@ You can also get the URL of a stack with:
 make -e TAG=<deploy_tag> get-api-url
 ```
 
-#### Independent parts of Deploying SearchAPI
+#### Deploy Optional Parameters
 
-The `deploy-searchapi-stack` command calls three other commands in the makefile, back to back. You can directly call these instead, if you're developing against a specific part and don't need a full deployment. They're ran in this order:
+- **NumConcurrentExecutions**: (Default=1) The number of lambda's to keep alive at one time.
+
+  ```bash
+  make -e MATURITY=devel -e TAG=test -e NumConcurrentExecutions=1 deploy-searchapi-stack
+  ```
+
+- **AcmCertificateArn**: (Default="") The ARN of the https certificate to use for CloudFront.
+
+  ```bash
+  make -e MATURITY=devel -e TAG=test -e AcmCertificateArn=<aws_arn_here> deploy-searchapi-stack
+  ```
+
+#### Independent parts of Makefile Deploying SearchAPI
+
+The `deploy-searchapi-stack` command calls three other commands in the makefile, back to back. You can directly call these instead, if you're developing against a specific part and don't need a full deployment update. They're ran in this order:
 
 - **docker-update-ecr**
 
@@ -89,7 +103,7 @@ The `deploy-searchapi-stack` command calls three other commands in the makefile,
   This will deploy/update the SearchAPI stack itself. If the stack already exists, this does NOT force lambda to pull the later docker container if there's a new one. The next command will.
 
   ```bash
-  make -e TAG=test -e MATURITY=devel -e NumConcurrentExecutions=2 update-api-stack-template
+  make -e TAG=test -e MATURITY=devel update-api-stack-template
   ```
 
 - **update-lambda-function**
