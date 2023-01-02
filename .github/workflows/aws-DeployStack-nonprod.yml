@@ -31,10 +31,10 @@ jobs:
       TAG: ${{ github.ref_name }}
       MATURITY: devel
       NumConcurrentExecutions: 1
-      AcmCertificateArn: ${{ secrets.CERT_ARN }}
       environment: non-prod
       PYTEST_ARGS: --df known_bugs --df prod_only
     # What secrets from the environment, the workflow should have access to:
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AcmCertificateArn: ${{ secrets.CERT_ARN }}
