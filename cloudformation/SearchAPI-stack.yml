@@ -24,7 +24,16 @@ Parameters:
   NumConcurrentExecutions:
     Type: Number
     Description: "The number of lambda functions to keep warm at once."
-    Default: 2
+    # Default set in Makefile
+
+  AcmCertificateArn:
+    Type: String
+    Description: "Arn for the Viewer Certificate that's attached to CloudFront."
+    Default: ""
+
+Conditions:
+  # If you gave an ARN to the cert, use it:
+  shouldAttachCert: !Not [ !Equals [ !Ref AcmCertificateArn, ""]]
 
 Resources:
 
@@ -171,6 +180,16 @@ Resources:
               OriginKeepaliveTimeout: 60 # Default: 5
               OriginReadTimeout: 60 # Default: 30
               OriginProtocolPolicy: https-only
+        ViewerCertificate:
+          !If
+            - shouldAttachCert
+            # If True:
+            - AcmCertificateArn: !Ref AcmCertificateArn
+              MinimumProtocolVersion: TLSv1.2_2021
+              SslSupportMethod: sni-only
+            # If False:
+            - !Ref AWS::NoValue
+
       Tags:
         - Key: Name
           Value: !Ref AWS::StackName
