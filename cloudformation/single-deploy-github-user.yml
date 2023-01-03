@@ -181,11 +181,20 @@ Resources:
               - cloudfront:TagResource
               - cloudfront:UpdateDistribution
               - cloudfront:DeleteDistribution
+              # You need List* when you use ACM certs for some reason. I tried adding
+              # each permission manually (all at once), and it failed. (Maybe there's a hidden one?)
+              - cloudfront:List*
             Resource:
               - !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/*
             Condition:
               StringLike:
                 "aws:ResourceTag/Name": "SearchAPI-*"
+          # Allow user to read HTTPS certs from ACM:
+          - Effect: Allow
+            Action:
+              - acm:GetCertificate
+            Resource:
+              - !Sub arn:aws:acm:us-east-1:${AWS::AccountId}:certificate/*
 
   ManageStackUser:
     Type: AWS::IAM::User
