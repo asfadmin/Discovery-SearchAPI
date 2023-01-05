@@ -128,7 +128,7 @@ Resources:
       PolicyDocument:
         Version: 2012-10-17
         Statement:
-          # Write logs for apigateway
+          # Write logs SearchAPI Resources
           - Effect: Allow
             Action:
               - logs:CreateLogGroup
@@ -138,6 +138,7 @@ Resources:
               - logs:DeleteLogGroup
             Resource:
               - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/apigateway/SearchAPI-*
+              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/SearchAPI-*
           # Needed after adding apigateway logs (with the stage override):
           # (Keep this minimal, idk why you can't attach a strict resource to deliveries)
           - Effect: Allow
