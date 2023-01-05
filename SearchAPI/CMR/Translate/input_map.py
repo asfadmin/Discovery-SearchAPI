@@ -50,7 +50,8 @@ def input_map():
         'temporal':             ['temporal',                '{0}',                              None], # start/end end up here
         'groupid':              ['attribute[]',             'string,GROUP_ID,{0}',              parse_string_list],
         'insarstackid':         ['attribute[]',             'int,INSAR_STACK_ID,{0}',           parse_string],
-        'instrument':           ['instrument[]',            '{0}',                              parse_string]
-    }
+        'instrument':           ['instrument[]',            '{0}',                              parse_string],
+        'collections':          ['echo_collection_id[]',            '{0}',                              parse_string_list]
+    } #exclude[concept_id]
 
     return parameter_map

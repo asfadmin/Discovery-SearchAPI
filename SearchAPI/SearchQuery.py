@@ -86,7 +86,7 @@ class APISearchQuery:
         self.cmr_params, self.output, self.max_results = \
             translate_params(self.request.local_values)
 
-        self.cmr_params = input_fixer(self.cmr_params)
+        self.cmr_params = input_fixer(self.cmr_params, self.request.cmr_provider if self.request.cmr_provider else 'ASF')
 
     def cmr_query(self):
         logging.debug(f'Handle query from {self.request.access_route[-1]}')
