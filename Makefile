@@ -75,7 +75,7 @@ docker-update-ecr: guard-TAG
 	export TAG="$${TAG//[^[:alnum:]]/-}" && \
 	$(call get-ecr,AWS_ECR) && \
 	aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin "$${AWS_ECR}" && \
-	docker build --pull --build-arg GIT_COMMIT_HASH="$${GITHUB_SHA:=local}" -t "$${AWS_ECR}:$${TAG}" . && \
+	docker build --pull --build-arg GIT_COMMIT_HASH="$${GITHUB_SHA:=Manual Makefile Deployment}" -t "$${AWS_ECR}:$${TAG}" . && \
 	docker push "$${AWS_ECR}:$${TAG}"
 
 ## Deploy the API stack
