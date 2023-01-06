@@ -105,7 +105,7 @@ def input_fixer(params, is_prod: bool = False, provider: str = "ASF"):
                 for a in platform_list
             ]))
             
-            if processing_level_unspecified:
+            if any_processing_level:
                 fixed_params['collections'] = collection_list
 
         elif k == 'beammode':
