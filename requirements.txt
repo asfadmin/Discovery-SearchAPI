@@ -25,7 +25,7 @@ docutils==0.17.1
 Dumper==1.2.0
 durationpy==0.5
 execnet==1.9.0
-Fiona==1.8.20
+# Fiona==1.8.20
 Flask==2.0.2
 Flask-Compress==1.10.1
 Flask-Cors==3.0.10
