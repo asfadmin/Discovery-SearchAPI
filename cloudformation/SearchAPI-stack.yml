@@ -209,5 +209,5 @@ Outputs:
   LambdaFunction:
     Value: !Ref LambdaContainer
   ApiUrl:
-    # Value: !Sub "https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/"
+    # Value: !Sub "https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com"
     Value: !Sub "https://${CloudFrontApiGateway.DomainName}"
