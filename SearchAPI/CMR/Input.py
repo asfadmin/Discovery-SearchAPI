@@ -151,6 +151,21 @@ def parse_bbox_string(v):
         raise ValueError(f'Invalid bbox, must be 4 values: {v}')
     return v
 
+# Parse and validate a circle coordiante string
+def parse_circle_string(v):
+    try:
+        for c in v.split(','):
+            try:
+                float(c)
+            except ValueError as e:
+                raise ValueError(f'Invalid coordinate: {c}') from e
+    except ValueError as e:
+        raise ValueError(f'Invalid circle: {e}') from e
+    
+    if len(v.split(',')) != 3:
+        raise ValueError(f'Invalid circle, must be 3 values: {v}')
+    return v
+
 # Parse and validate a point coordinate string
 def parse_point_string(v):
     try:

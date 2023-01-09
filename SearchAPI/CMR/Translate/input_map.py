@@ -2,7 +2,7 @@ from SearchAPI.CMR.Input import (
     parse_int, parse_float, parse_string, parse_wkt, parse_date,
     parse_string_list, parse_int_list, parse_int_or_range_list,
     parse_float_or_range_list,
-    parse_coord_string, parse_bbox_string, parse_point_string
+    parse_coord_string, parse_bbox_string, parse_circle_string, parse_point_string
 )
 
 def input_map():
@@ -41,6 +41,7 @@ def input_map():
         'linestring':           ['line',                    '{0}',                              parse_coord_string], # or here
         'point':                ['point',                   '{0}',                              parse_point_string], # or here
         'bbox':                 ['bounding_box',            '{0}',                              parse_bbox_string],
+        'circle':               ['circle[]',                  '{0}',                            parse_circle_string],
         'processinglevel':      ['attribute[]',             'string,PROCESSING_TYPE,{0}',       parse_string_list],
         'relativeorbit':        ['attribute[]',             'int,PATH_NUMBER,{0}',              parse_int_or_range_list],
         'processingdate':       ['updated_since',           '{0}',                              parse_date],

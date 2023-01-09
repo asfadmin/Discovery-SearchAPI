@@ -1,0 +1,211 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: "The user GitHub uses to deploy SearchAPI."
+
+Resources:
+
+  CloudFormationPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - cloudformation:DescribeStacks
+              - cloudformation:CreateStack
+              - cloudformation:DeleteStack
+              - cloudformation:UpdateStack
+              - cloudformation:DescribeChangeSet
+              - cloudformation:CreateChangeSet
+              - cloudformation:DeleteChangeSet
+              - cloudformation:ExecuteChangeSet
+              - cloudformation:SetStackPolicy
+              - cloudformation:ValidateTemplate
+              - cloudformation:GetTemplateSummary
+            Resource:
+              - !Sub "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/SearchAPI-*/*"
+          - Effect: Allow
+            Action:
+              - cloudformation:DescribeStacks
+            Resource:
+              - !Sub "arn:aws:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/ECR-SearchAPI/*"
+
+  EcrPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - ecr:GetAuthorizationToken
+            Resource: "*"
+          - Effect: Allow
+            Action:
+              # Minimum for pulling/pushing:
+              - ecr:BatchGetImage
+              - ecr:BatchCheckLayerAvailability
+              - ecr:CompleteLayerUpload
+              - ecr:GetDownloadUrlForLayer
+              - ecr:InitiateLayerUpload
+              - ecr:PutImage
+              - ecr:UploadLayerPart
+            Resource:
+              - !Sub "arn:aws:ecr:${AWS::Region}:${AWS::AccountId}:repository/searchapi"
+
+  IamPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - iam:GetRole
+              - iam:GetRolePolicy
+              - iam:CreateRole
+              - iam:DeleteRole
+              - iam:DeleteRolePolicy
+              - iam:PutRolePolicy
+              - iam:PassRole
+            Resource:
+              # Lambda service role:
+              - !Sub "arn:aws:iam::${AWS::AccountId}:role/SearchAPI-*-LambdaServiceRole-*"
+              # Api Gateway V2 role:
+              - !Sub "arn:aws:iam::${AWS::AccountId}:role/SearchAPI-*-ApiGatewayServiceRole-*"
+
+  LambdaPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              # Generic lambda permissions:
+              - lambda:CreateFunction
+              - lambda:DeleteFunction
+              - lambda:GetFunction
+              - lambda:GetFunctionConfiguration
+              - lambda:UpdateFunctionConfiguration
+              - lambda:UpdateFunctionCode
+              # Needed for Lambda concurrency:
+              - lambda:ListVersionsByFunction
+              - lambda:PublishVersion
+              - lambda:GetProvisionedConcurrencyConfig
+              - lambda:PutProvisionedConcurrencyConfig
+            Resource:
+              - !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:SearchAPI-*-LambdaContainer-*"
+
+  ApiGatewayPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - apigateway:GET
+              - apigateway:POST
+            Resource:
+              - !Sub arn:aws:apigateway:${AWS::Region}::/tags/*
+          - Effect: Allow
+            Action:
+              - apigateway:GET
+              - apigateway:POST
+              - apigateway:DELETE
+              - apigateway:PATCH
+              - apigateway:PUT
+              - apigateway:TagResource
+            Resource:
+              - !Sub arn:aws:apigateway:${AWS::Region}::/apis
+              - !Sub arn:aws:apigateway:${AWS::Region}::/apis/*
+
+  CreateLogsPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          # Write logs SearchAPI Resources
+          - Effect: Allow
+            Action:
+              - logs:CreateLogGroup
+              - logs:PutRetentionPolicy
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+              - logs:DeleteLogGroup
+            Resource:
+              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/apigateway/SearchAPI-*
+              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/SearchAPI-*
+          # Needed after adding apigateway logs (with the stage override):
+          # (Keep this minimal, idk why you can't attach a strict resource to deliveries)
+          - Effect: Allow
+            Action:
+              - logs:ListLogDeliveries
+              - logs:CreateLogDelivery
+              - logs:GetLogDelivery
+              - logs:UpdateLogDelivery
+              - logs:DeleteLogDelivery
+            Resource:
+              - "*"
+          # View ALL log groups (Keep this minimal)
+          # Needed to add when creating API gateway logs. Not sure why, but deployment failed.
+          - Effect: Allow
+            Action:
+              - logs:DescribeLogGroups
+              - logs:PutResourcePolicy
+              - logs:DescribeResourcePolicies
+            Resource:
+              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*
+
+  CloudFrontPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          # Create distributions inside the account:
+          # (Allowed for ANY distribution, keep this minimal so it can 
+          #       tag the resource and the other policy can take over).
+          - Effect: Allow
+            Action:
+              - cloudfront:CreateDistribution
+              - cloudfront:GetDistribution
+            Resource:
+              - !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/*
+          # Edit ONLY SearchAPI-* Distributions:
+          # (More destructive permissions, only allow for Resources tagged "SearchAPI-*")
+          - Effect: Allow
+            Action:
+              - cloudfront:TagResource
+              - cloudfront:UpdateDistribution
+              - cloudfront:DeleteDistribution
+              # You need List* when you use ACM certs for some reason. I tried adding
+              # each permission manually (all at once), and it failed. (Maybe there's a hidden one?)
+              - cloudfront:List*
+            Resource:
+              - !Sub arn:aws:cloudfront::${AWS::AccountId}:distribution/*
+            Condition:
+              StringLike:
+                "aws:ResourceTag/Name": "SearchAPI-*"
+          # Allow user to read HTTPS certs from ACM:
+          - Effect: Allow
+            Action:
+              - acm:GetCertificate
+            Resource:
+              - !Sub arn:aws:acm:us-east-1:${AWS::AccountId}:certificate/*
+
+  ManageStackUser:
+    Type: AWS::IAM::User
+    Properties:
+      UserName: GitHub-manage-SearchAPI-stacks
+      ManagedPolicyArns:
+        - !Ref CloudFormationPolicy
+        - !Ref EcrPolicy
+        - !Ref IamPolicy
+        - !Ref LambdaPolicy
+        - !Ref ApiGatewayPolicy
+        - !Ref CreateLogsPolicy
+        - !Ref CloudFrontPolicy

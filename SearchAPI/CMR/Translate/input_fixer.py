@@ -168,7 +168,7 @@ def fix_polygon(v):
     if r.status_code == 200:
         logging.debug('Winding order looks good')
     else:
-        if 'Please check the order of your points.' in r.text:
+        if 'Points must be provided in counter-clockwise order.' in r.text or 'Please check the order of your points.' in r.text:
             logging.debug('Backwards polygon, attempting to repair')
             logging.debug(r.text)
             it = iter(v)
