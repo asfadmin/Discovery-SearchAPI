@@ -52,7 +52,8 @@ def input_map():
         'groupid':              ['attribute[]',             'string,GROUP_ID,{0}',              parse_string_list],
         'insarstackid':         ['attribute[]',             'int,INSAR_STACK_ID,{0}',           parse_string],
         'instrument':           ['instrument[]',            '{0}',                              parse_string],
-        'collections':          ['echo_collection_id[]',            '{0}',                              parse_string_list]
-    } #exclude[concept_id]
+        'collections':          ['echo_collection_id[]',            '{0}',                      parse_string_list],
+        'relativeburstid':      ['attribute[]',             'int,RELATIVE_BURST_ID,{0}',        parse_int_list]
+    }
 
     return parameter_map

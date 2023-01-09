@@ -31,7 +31,17 @@ def req_fields_jsonlite():
         'startTime',
         'stopTime',
         'stringFootprint',
-        'thumbnailUrl'
+        'thumbnailUrl',
+        'absoluteBurstID',
+        'relativeBurstID',
+        'fullBurstID',
+        'burstIndex',
+        'burstAnxTime',
+        'burstAnxTimeDelta',
+        'linesPerBurst',
+        'samplesPerBurst',
+        'subswath',
+        'byteLength'
     ]
     return fields
 
@@ -158,5 +168,21 @@ class JSONLiteStreamArray(JSONStreamArray):
         if self.includeBaseline:
             result['temporalBaseline'] = p['temporalBaseline']
             result['perpendicularBaseline'] = p['perpendicularBaseline']
+        
+        if p.get('processingLevel') == 'BURST': # is a burst product
+            burst = {}
+            burst['relativeBurstID'] = int(p['relativeBurstID'])
+            burst['absoluteBurstID'] = int(p['absoluteBurstID'])
+            burst['fullBurstID'] = p['fullBurstID']
+            burst['burstIndex'] = int(p['burstIndex'])
+            burst['burstAnxTime'] = p['burstAnxTime']
+            burst['burstAnxTimeDelta'] = float(p['burstAnxTimeDelta'])
+            burst['linesPerBurst'] = int(p['linesPerBurst'])
+            burst['samplesPerBurst'] = int(p['samplesPerBurst'])
+            burst['subswath'] = p['subswath']
+
+            result['burst'] = burst
+            result['granuleName'] = p['groupID']
+            result['sizeMB'] = int(p['byteLength']) / 1000000
 
         return result
