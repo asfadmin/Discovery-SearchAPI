@@ -1,0 +1,40 @@
+name: Update SearchAPI Stack (non-prod)
+
+on:
+  # Github Actions doesn't support Yaml Anchors! :smiling_face_with_tear:
+  # If you add a branch, change it in ALL triggers
+  push:
+    branches-ignore:
+      - prod
+
+  pull_request:
+    branches-ignore:
+      - prod
+    types:
+      - opened
+      - reopened
+      - synchronize
+
+jobs:
+
+  deploy-SearchAPI-non-prod:
+    # Run if someone with write permissions did the change (the push trigger),
+    # OR Run *only* if the PR came from a branch we control (so forks don't trigger)
+    if: |
+      github.event_name == 'push' ||
+      (
+        github.event_name == 'pull_request' &&
+        github.event.pull_request.head.repo.full_name == github.repository
+      )
+    uses: ./.github/workflows/reusable-DeployStack-SearchAPI.yml
+    with:
+      TAG: ${{ github.ref_name }}
+      MATURITY: devel
+      NumConcurrentExecutions: 1
+      environment: non-prod
+      PYTEST_ARGS: --df known_bugs --df prod_only
+    # What secrets from the environment, the workflow should have access to:
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      CERT_ARN: ${{ secrets.CERT_ARN }}

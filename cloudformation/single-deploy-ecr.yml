@@ -1,0 +1,81 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+## Needed to break this out from the SearchAPI stack itself, because
+#    there's no way to create an ecr, push a container, then have
+#    lambda *use* that container if they're all in the same stack.
+Description: Single ECR for every SearchAPI stack to use.
+
+Parameters:
+  RegistryName:
+    Type: String
+    Description: "Name of ECR that SearchAPI stacks will use. Converts to all lowercase."
+    Default: "SearchAPI"
+
+Resources:
+  DockerECR:
+    Type: AWS::ECR::Repository
+    Properties:
+      RepositoryName:
+        # You need the Strings macro to use this (cloudformation/cf-strings-macro.yml):
+        Fn::Transform:
+          Name: String
+          Parameters:
+            InputString: !Ref RegistryName
+            Operation: Lower
+      LifecyclePolicy:
+        # 1) Always keep one prod image around. NOTE: You can't match it directly! A tag like "prod-asdf" will also match, since it's prefixed.
+        # 2) Don't fill up on untagged images, they're outdated if untagged anyways.
+        LifecyclePolicyText: |
+          {
+            "rules": [
+              {
+                "rulePriority": 1,
+                "description": "Keep ALL 'prod*' images around, regardless of any other rules. No way to specify JUST 'prod', so keeping everything.",
+                "selection": {
+                  "tagStatus": "tagged",
+                  "tagPrefixList": ["prod"],
+                  "countType": "imageCountMoreThan",
+                  "countNumber": 999999999
+                },
+                "action": {
+                  "type": "expire"
+                }
+              },
+              {
+                "rulePriority": 2,
+                "description": "Keep only some untagged images for cache, expire all others.",
+                "selection": {
+                  "tagStatus": "untagged",
+                  "countType": "imageCountMoreThan",
+                  "countNumber": 30
+                },
+                "action": {
+                  "type": "expire"
+                }
+              }
+            ]
+          }
+      # Let lambda functions in this account, pull this container to use
+      RepositoryPolicyText: |
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "LambdaECRImageRetrievalPolicy",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              },
+              "Action": [
+                "ecr:BatchGetImage",
+                "ecr:GetDownloadUrlForLayer"
+              ]
+            }
+          ]
+        }
+
+Outputs:
+  RegistryUri:
+    Value: !GetAtt DockerECR.RepositoryUri
+    Export:
+      Name: !Sub "${AWS::StackName}-RegistryUri"

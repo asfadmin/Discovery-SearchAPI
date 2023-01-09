@@ -1,0 +1,213 @@
+
+AWSTemplateFormatVersion: 2010-09-09
+
+Description: Everything needed for a single SearchAPI
+
+Parameters:
+
+  ContainerTag:
+    Type: String
+    Description: "Name of github branch the stack is hooked to. (also appends '-staging' if PR)."
+    # You need to escape the slash, so *it* can escape the period... weird.
+    # (To match the actual period, and not regex's "any character")
+    AllowedPattern: "[A-Za-z0-9-\\.]+"
+
+  Maturity:
+    Type: String
+    Description: "Passed to container. Maturity to run the API."
+
+  ImportValueEcrUri:
+    Type: String
+    Description: "Exported Value, holds SearchAPI registry. (Output of that stack: {StackName}-RegistryUri)."
+    Default: "ECR-SearchAPI-RegistryUri"
+
+  NumConcurrentExecutions:
+    Type: Number
+    Description: "The number of lambda functions to keep warm at once."
+    # Default set in Makefile
+
+  AcmCertificateArn:
+    Type: String
+    Description: "Arn for the Viewer Certificate that's attached to CloudFront."
+    Default: ""
+
+Conditions:
+  # If you gave an ARN to the cert, use it:
+  shouldAttachCert: !Not [ !Equals [ !Ref AcmCertificateArn, ""]]
+
+Resources:
+
+  LambdaContainer:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: !Sub "For SearchAPI stack '${AWS::StackName}'"
+      PackageType: Image
+      Code:
+        # Can't have ECR as part of the stack. There's no image inside a fresh ECR,
+        # so lambda fails to deploy and fails the stack.
+        ImageUri: !Join
+          - ":"
+          - - Fn::ImportValue: !Sub "${ImportValueEcrUri}"
+            - !Ref ContainerTag
+      ImageConfig:
+        EntryPoint: [ "/lambda-entrypoint.sh" ]
+        Command: [ "SearchAPI.application.run_flask_lambda" ]
+      Environment:
+        Variables:
+          MATURITY: !Ref Maturity
+      MemorySize: 10240 # Max is 10240
+      Timeout: 900 # Max is 900. BUT Gateway times-out at 30. Let THAT timeout first, to get 503 response.
+      Role: !GetAtt LambdaServiceRole.Arn
+
+  LambdaConcurrencyConfig:
+    Type: AWS::Lambda::Version
+    Properties:
+      Description: !Sub "Lambda concurrency config for stack '${AWS::StackName}'."
+      FunctionName: !Ref LambdaContainer
+      ProvisionedConcurrencyConfig:
+         ProvisionedConcurrentExecutions: !Ref NumConcurrentExecutions
+
+  LambdaLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${LambdaContainer}
+      RetentionInDays: 60
+
+  LambdaServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        # Create Logs
+        - PolicyName: CreateAndUpdateLogs
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${AWS::StackName}-*"
+        # Update Cloudwatch
+        - PolicyName: UpdateCloudwatch
+          PolicyDocument:
+            Statement:
+              # cloudwatch:PutMetricData requires ALL resources. Keep this minimal:
+              - Effect: Allow
+                Action:
+                  - cloudwatch:PutMetricData
+                Resource: "*"
+
+  ApiGateway:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      Name: !Sub "${AWS::StackName}-ApiGatewayV2"
+      Description: !Sub "Lambda proxy for SearchAPI stack '${AWS::StackName}'"
+      ProtocolType: HTTP
+      Target: !GetAtt LambdaContainer.Arn
+      CredentialsArn: !GetAtt ApiGatewayServiceRole.Arn
+      CorsConfiguration:
+         AllowOrigins:
+          - "*"
+
+  # Use this instead of "AWS::ApiGatewayV2::Stage", because you can't create "$default": already exists.
+  # Causes an "internal failure" when deploying the stack. Come back to this so we get API logs
+  ApiGatewayStageOverride:
+    Type: AWS::ApiGatewayV2::ApiGatewayManagedOverrides
+    Properties:
+      ApiId: !Ref ApiGateway
+      Stage:
+        AccessLogSettings:
+          DestinationArn: !GetAtt ApiGatewayLogGroup.Arn
+          Format: '{ "requestId":"$context.requestId", "ip": "$context.identity.sourceIp", "httpMethod":"$context.httpMethod", "path": "$context.path", "routeKey":"$context.routeKey", "statusCode":"$context.status","protocol":"$context.protocol", "requestTime":"$context.requestTime", "responseLength":"$context.responseLength" }'
+
+  ApiGatewayLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/apigateway/${AWS::StackName}-${ApiGateway}
+      RetentionInDays: 60
+
+  ApiGatewayServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          Action: sts:AssumeRole
+          Principal:
+            Service: apigateway.amazonaws.com
+          Effect: Allow
+      Policies:
+        - PolicyName: policy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource:
+                  - !GetAtt LambdaContainer.Arn
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource:
+                  - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/apigateway/${AWS::StackName}-*
+
+  CloudFrontApiGateway:
+  # https://stackoverflow.com/questions/32825413/how-do-you-add-cloudfront-in-front-of-api-gateway
+  
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        # CacheBehaviors:
+        #   - https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-cloudfront-distribution-cachebehavior.html
+        Comment: !Sub "For Stack '${AWS::StackName}'. Points to an HTTP API Gateway."
+        Enabled: True
+        DefaultCacheBehavior:
+          TargetOriginId: !Ref ApiGateway
+          # Caching Disabled, built in policy
+          # (From here: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-managed-cache-policies.html#managed-cache-policies-list)
+          CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad
+          # Elemental-MediaTailor-PersonalizedManifests, built in policy
+          # (From here: https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-managed-origin-request-policies.html)
+          # It's the only AWS Managed one that forwards query strings, but blocks cookies and most headers
+          OriginRequestPolicyId: 775133bc-15f2-49f9-abea-afb2e0bf67d2
+          ViewerProtocolPolicy: redirect-to-https
+          AllowedMethods: [GET, HEAD, OPTIONS, PUT, POST, PATCH, DELETE]
+          CachedMethods: [GET, HEAD, OPTIONS]
+          Compress: False
+        Origins:
+          - Id: !Ref ApiGateway
+            DomainName: !Sub "${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com"
+            CustomOriginConfig:
+              OriginKeepaliveTimeout: 60 # Default: 5
+              OriginReadTimeout: 60 # Default: 30
+              OriginProtocolPolicy: https-only
+        ViewerCertificate:
+          !If
+            - shouldAttachCert
+            # If True:
+            - AcmCertificateArn: !Ref AcmCertificateArn
+              MinimumProtocolVersion: TLSv1.2_2021
+              SslSupportMethod: sni-only
+            # If False:
+            - !Ref AWS::NoValue
+
+      Tags:
+        - Key: Name
+          Value: !Ref AWS::StackName
+
+
+Outputs:
+  LambdaFunction:
+    Value: !Ref LambdaContainer
+  ApiUrl:
+    # Value: !Sub "https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/"
+    Value: !Sub "https://${CloudFrontApiGateway.DomainName}"
