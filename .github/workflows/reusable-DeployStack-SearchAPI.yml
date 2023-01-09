@@ -90,8 +90,8 @@ jobs:
       - name: Install pytest requirements
         if: github.event_name == 'pull_request'
         run: |
-          apt-get update
-          apt-get install libgdal-dev
+          sudo apt-get update
+          sudo apt-get install libgdal-dev
           python3 -m pip install --no-cache-dir --upgrade pip
           python3 -m pip install --no-cache-dir wheel Cython
           python3 -m pip install -r requirements.txt
