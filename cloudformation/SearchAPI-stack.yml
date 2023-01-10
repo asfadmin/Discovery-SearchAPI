@@ -115,6 +115,8 @@ Resources:
       CorsConfiguration:
          AllowOrigins:
           - "*"
+      Tags:
+          Name: !Ref AWS::StackName
 
   # Use this instead of "AWS::ApiGatewayV2::Stage", because you can't create "$default": already exists.
   # Causes an "internal failure" when deploying the stack. Come back to this so we get API logs

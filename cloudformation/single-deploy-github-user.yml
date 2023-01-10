@@ -110,6 +110,9 @@ Resources:
               - apigateway:POST
             Resource:
               - !Sub arn:aws:apigateway:${AWS::Region}::/tags/*
+            Condition:
+              StringLike:
+                "aws:ResourceTag/Name": "SearchAPI-*"
           - Effect: Allow
             Action:
               - apigateway:GET
@@ -121,6 +124,9 @@ Resources:
             Resource:
               - !Sub arn:aws:apigateway:${AWS::Region}::/apis
               - !Sub arn:aws:apigateway:${AWS::Region}::/apis/*
+            Condition:
+              StringLike:
+                "aws:ResourceTag/Name": "SearchAPI-*"
 
   CreateLogsPolicy:
     Type: AWS::IAM::ManagedPolicy
