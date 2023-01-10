@@ -173,7 +173,7 @@ Resources:
         Version: 2012-10-17
         Statement:
           # Create distributions inside the account:
-          # (Allowed for ANY distribution, keep this minimal so it can 
+          # (Allowed for ANY distribution, keep this minimal so it can
           #       tag the resource and the other policy can take over).
           - Effect: Allow
             Action:

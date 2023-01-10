@@ -164,7 +164,7 @@ Resources:
 
   CloudFrontApiGateway:
   # https://stackoverflow.com/questions/32825413/how-do-you-add-cloudfront-in-front-of-api-gateway
-  
+
     Type: AWS::CloudFront::Distribution
     Properties:
       DistributionConfig:
