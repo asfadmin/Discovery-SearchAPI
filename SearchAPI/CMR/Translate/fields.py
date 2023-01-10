@@ -66,10 +66,8 @@ def get_field_paths():
         'fullBurstID':              attr_path('BURST_ID_FULL'),
         'burstIndex':               attr_path('BURST_INDEX'),
         'burstAnxTime':             attr_path('BURST_ANX_TIME'),
-        'burstAnxTimeDelta':        attr_path('BURST_ANX_TIME_DELTA'),
-        'linesPerBurst':            attr_path('LINES_PER_BURST'),     
+        'timeFromAnxSeconds':        attr_path('TIME_FROM_ANX_SEC'),   
         'samplesPerBurst':          attr_path('SAMPLES_PER_BURST'),
         'subswath':                 attr_path('SUBSWATH_NAME'),
-        'byteLength':               attr_path('BYTE_LENGTH'),
     }
     return paths
