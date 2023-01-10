@@ -115,6 +115,8 @@ Resources:
       CorsConfiguration:
          AllowOrigins:
           - "*"
+      Tags:
+          Name: !Ref AWS::StackName
 
   # Use this instead of "AWS::ApiGatewayV2::Stage", because you can't create "$default": already exists.
   # Causes an "internal failure" when deploying the stack. Come back to this so we get API logs
@@ -162,7 +164,7 @@ Resources:
 
   CloudFrontApiGateway:
   # https://stackoverflow.com/questions/32825413/how-do-you-add-cloudfront-in-front-of-api-gateway
-  
+
     Type: AWS::CloudFront::Distribution
     Properties:
       DistributionConfig:
@@ -209,5 +211,5 @@ Outputs:
   LambdaFunction:
     Value: !Ref LambdaContainer
   ApiUrl:
-    # Value: !Sub "https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/"
+    # Value: !Sub "https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com"
     Value: !Sub "https://${CloudFrontApiGateway.DomainName}"

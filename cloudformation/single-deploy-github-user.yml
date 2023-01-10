@@ -110,6 +110,9 @@ Resources:
               - apigateway:POST
             Resource:
               - !Sub arn:aws:apigateway:${AWS::Region}::/tags/*
+            Condition:
+              StringLike:
+                "aws:ResourceTag/Name": "SearchAPI-*"
           - Effect: Allow
             Action:
               - apigateway:GET
@@ -121,6 +124,9 @@ Resources:
             Resource:
               - !Sub arn:aws:apigateway:${AWS::Region}::/apis
               - !Sub arn:aws:apigateway:${AWS::Region}::/apis/*
+            Condition:
+              StringLike:
+                "aws:ResourceTag/Name": "SearchAPI-*"
 
   CreateLogsPolicy:
     Type: AWS::IAM::ManagedPolicy
@@ -167,7 +173,7 @@ Resources:
         Version: 2012-10-17
         Statement:
           # Create distributions inside the account:
-          # (Allowed for ANY distribution, keep this minimal so it can 
+          # (Allowed for ANY distribution, keep this minimal so it can
           #       tag the resource and the other policy can take over).
           - Effect: Allow
             Action:
