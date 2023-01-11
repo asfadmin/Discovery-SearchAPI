@@ -100,12 +100,6 @@ class JSONLiteStreamArray(JSONStreamArray):
             pass
         
         try:
-            if p['fileName'] is None:
-                p['fileName'] = p['product_file_id']
-        except TypeError:
-            pass
-
-        try:
             if p['groupID'] is None:
                 p['groupID'] = p['granuleName']
         except TypeError:
