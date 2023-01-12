@@ -145,6 +145,7 @@ Resources:
             Resource:
               - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/apigateway/SearchAPI-*
               - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/SearchAPI-*
+              - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/wafv2/SearchAPI-*
           # Needed after adding apigateway logs (with the stage override):
           # (Keep this minimal, idk why you can't attach a strict resource to deliveries)
           - Effect: Allow
@@ -201,7 +202,37 @@ Resources:
             Action:
               - acm:GetCertificate
             Resource:
-              - !Sub arn:aws:acm:us-east-1:${AWS::AccountId}:certificate/*
+              - !Sub arn:aws:acm:${AWS::Region}:${AWS::AccountId}:certificate/*
+
+  WAFv2Policy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          # List from: https://docs.aws.amazon.com/service-authorization/latest/reference/list_awswafv2.html
+          - Effect: Allow
+            Action:
+              - wafv2:CreateWebACL
+              - wafv2:GetWebACL
+              - wafv2:AssociateWebACL
+              - wafv2:GetLoggingConfiguration
+              - wafv2:GetRateBasedStatementManagedKeys
+              - wafv2:GetSampledRequests
+              - wafv2:ListResourcesForWebACL
+              - wafv2:PutFirewallManagerRuleGroups
+              - wafv2:PutLoggingConfiguration
+              - wafv2:TagResource
+              - wafv2:ListTagsForResource
+              - wafv2:UpdateWebACL
+              - wafv2:ListDeletedWebACLs
+
+              - wafv2:DisassociateFirewallManager
+              - wafv2:DeleteWebACL
+              - wafv2:DeleteFirewallManagerRuleGroups
+              - wafv2:DeleteLoggingConfiguration
+            Resource:
+              - !Sub arn:aws:wafv2:${AWS::Region}:${AWS::AccountId}:global/webacl/SearchAPI-*/*
 
   ManageStackUser:
     Type: AWS::IAM::User
@@ -215,3 +246,4 @@ Resources:
         - !Ref ApiGatewayPolicy
         - !Ref CreateLogsPolicy
         - !Ref CloudFrontPolicy
+        - !Ref WAFv2Policy
