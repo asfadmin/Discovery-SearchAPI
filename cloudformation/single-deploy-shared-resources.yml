@@ -1,9 +1,6 @@
 AWSTemplateFormatVersion: 2010-09-09
 
-## Needed to break this out from the SearchAPI stack itself, because
-#    there's no way to create an ecr, push a container, then have
-#    lambda *use* that container if they're all in the same stack.
-Description: Single ECR for every SearchAPI stack to use.
+Description: Resources that every SearchAPI stack share
 
 Parameters:
   RegistryName:
@@ -12,6 +9,10 @@ Parameters:
     Default: "SearchAPI"
 
 Resources:
+
+  ## Needed to break this out from the SearchAPI stack itself, because
+  #    there's no way to create an ecr, push a container, then have
+  #    lambda *use* that container if they're all in the same stack.
   DockerECR:
     Type: AWS::ECR::Repository
     Properties:
@@ -74,8 +75,54 @@ Resources:
           ]
         }
 
+  # A WAF for all lambda-based instances to share
+  CloudFrontWAF:
+    Type: AWS::WAFv2::WebACL
+    Properties:
+      Name: !Sub ${AWS::StackName}-WAF
+      DefaultAction:
+        Allow: {}
+      Scope: CLOUDFRONT
+      Rules:
+        - Name: !Sub ${AWS::StackName}-RateLimiter
+          Priority: 0
+          Action:
+            Block:
+              CustomResponse:
+                CustomResponseBodyKey: rate_limit_response_1250
+                ResponseCode: 429
+          Statement:
+            RateBasedStatement:
+              Limit: 1250
+              AggregateKeyType: IP
+              ScopeDownStatement:
+                ByteMatchStatement:
+                  SearchString: /services/search/param
+                  FieldToMatch:
+                    UriPath: {}
+                  PositionalConstraint: STARTS_WITH
+                  TextTransformations:
+                    - Priority: 0
+                      Type: NONE
+          VisibilityConfig:
+            SampledRequestsEnabled: True
+            CloudWatchMetricsEnabled: True
+            MetricName: ip_rate_limit
+      VisibilityConfig:
+        SampledRequestsEnabled: True
+        CloudWatchMetricsEnabled: True
+        MetricName: !Sub /aws/wafv2/${AWS::StackName}-RateLimiter
+      CustomResponseBodies:
+        rate_limit_response_1250:
+          ContentType: APPLICATION_JSON
+          Content: "{\n    \"error\": {\n        \"report\": \"Rate limited, please reduce your request rate to 250/minute or less\",\n        \"type\": \"RATE_LIMITED\"\n    }\n}"
+
 Outputs:
   RegistryUri:
     Value: !GetAtt DockerECR.RepositoryUri
     Export:
       Name: !Sub "${AWS::StackName}-RegistryUri"
+  WafLambdaArn:
+    Value: !GetAtt CloudFrontWAF.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-WafLambda-Arn"
