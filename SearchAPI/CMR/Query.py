@@ -109,7 +109,7 @@ def subquery_list_from(params):
     def chunk_list(source_list, n):
         return [source_list[i * n:(i + 1) * n] for i in range((len(source_list) + n - 1) // n)]
 
-    chunk_lists = ['granule_list', 'product_list'] # these list parameters will be broken into chunks for subquerying
+    chunk_lists = ['granule_list', 'product_list', 'relativeburstid', 'absoluteburstid', 'fullburstid'] # these list parameters will be broken into chunks for subquerying
     for chunk_type in chunk_lists:
         if chunk_type in params:
             params[chunk_type] = chunk_list(list(set(params[chunk_type])), 500) # distinct and split
