@@ -16,11 +16,6 @@ Parameters:
     Type: String
     Description: "Passed to container. Maturity to run the API."
 
-  ImportValueEcrUri:
-    Type: String
-    Description: "Exported Value, holds SearchAPI registry. (Output of that stack: {StackName}-RegistryUri)."
-    Default: "ECR-SearchAPI-RegistryUri"
-
   NumConcurrentExecutions:
     Type: Number
     Description: "The number of lambda functions to keep warm at once."
@@ -30,6 +25,16 @@ Parameters:
     Type: String
     Description: "Arn for the Viewer Certificate that's attached to CloudFront."
     Default: ""
+
+  ### From single-deploy-shared-resources stack ###
+  ImportValueEcrUri:
+    Type: String
+    Description: "Exported Value, holds SearchAPI registry. (Output of that stack: {StackName}-RegistryUri)."
+    Default: "SearchAPI-shared-resources-RegistryUri"
+  ImportValueWafLambdaArn:
+    Type: String
+    Description: "Exported Value, holds SearchAPI WAF for lambda-based stacks. (Output of that stack: {StackName}-WafLambda)."
+    Default: "SearchAPI-shared-resources-WafLambda-Arn"
 
 Conditions:
   # If you gave an ARN to the cert, use it:
@@ -201,6 +206,9 @@ Resources:
               SslSupportMethod: sni-only
             # If False:
             - !Ref AWS::NoValue
+        WebACLId:
+          Fn::ImportValue:
+            !Sub ${ImportValueWafLambdaArn}
 
       Tags:
         - Key: Name

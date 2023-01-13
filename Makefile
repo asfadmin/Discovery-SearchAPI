@@ -20,10 +20,10 @@ single-deploy-macro-template: guard-AWS_PROFILE
 
 ## Make sure the ECR all SearchAPI's share is up to date
 # stack-name ECR first, so it doesn't match SearchAPI-* stacks
-single-deploy-searchapi-ecr: guard-AWS_PROFILE
+single-deploy-searchapi-shared: guard-AWS_PROFILE
 	aws --profile=$${AWS_PROFILE} cloudformation deploy \
-			--stack-name 'ECR-SearchAPI' \
-			--template-file cloudformation/single-deploy-ecr.yml
+			--stack-name 'SearchAPI-shared-resources' \
+			--template-file cloudformation/single-deploy-shared-resources.yml
 
 ## Deploy/update the minimal user, that can manage SearchAPI stacks
 single-deploy-github-user: guard-AWS_PROFILE
@@ -41,8 +41,8 @@ single-deploy-github-user: guard-AWS_PROFILE
 # with the searchapi ECR URI.
 define get-ecr
 	$(1)=$$(aws cloudformation describe-stacks \
-		--stack-name "ECR-SearchAPI" \
-		--query "Stacks[?StackName=='ECR-SearchAPI'][].Outputs[?OutputKey=='RegistryUri'].OutputValue" \
+		--stack-name "SearchAPI-shared-resources" \
+		--query "Stacks[?StackName=='SearchAPI-shared-resources'][].Outputs[?OutputKey=='RegistryUri'].OutputValue" \
 		--output=text) && \
 	([ -n "$${AWS_ECR}" ] || (echo "ERROR: Couldn't query aws stack" && exit -1))
 endef

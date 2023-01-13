@@ -20,17 +20,18 @@ Note: anywhere in make commands you see `-e KEY=Value`, you can also do `export 
 make -e AWS_PROFILE=<admin_profile_here> single-deploy-macro-template
 ```
 
-#### single-deploy-ecr.yml
+#### single-deploy-shared-resources.yml
 
 - Every SearchAPI stack uses the same ECR stack, by referencing it directly. You can't delete the ECR stack if ANY SearchAPI stack exists. (There's an optional param when deploying SearchAPI, that lets you point to a different ECR stack if needed.).
   - You can't have ECR itself inside the SearchAPI stack, because lambda requires a container that already exists in ECR to run, and there's no way to push it up between CloudFormation setting up ECR, and then Lambda, if they're not separate.
 - We attach a Lifecycle Policy to ECR here too, and this lets us remove older containers without giving the GitHub User permissions to delete images.
+- Every stack also shares a WAF. AWS charges for each WAF, and this also lets us lock down one and know no stacks are left behind.
 
 ```bash
-make -e AWS_PROFILE=<admin_profile_here> single-deploy-searchapi-ecr
+make -e AWS_PROFILE=<admin_profile_here> single-deploy-searchapi-shared-resources
 ```
 
-You can access the ECR URI by the command line, by running:
+You can access the shared ECR URI by the command line, by running:
 
 ```bash
 make get-ecr-uri
