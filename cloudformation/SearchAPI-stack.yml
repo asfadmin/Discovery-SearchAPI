@@ -16,11 +16,6 @@ Parameters:
     Type: String
     Description: "Passed to container. Maturity to run the API."
 
-  ImportValueEcrUri:
-    Type: String
-    Description: "Exported Value, holds SearchAPI registry. (Output of that stack: {StackName}-RegistryUri)."
-    Default: "ECR-SearchAPI-RegistryUri"
-
   NumConcurrentExecutions:
     Type: Number
     Description: "The number of lambda functions to keep warm at once."
@@ -30,6 +25,16 @@ Parameters:
     Type: String
     Description: "Arn for the Viewer Certificate that's attached to CloudFront."
     Default: ""
+
+  ### From single-deploy-shared-resources stack ###
+  ImportValueEcrUri:
+    Type: String
+    Description: "Exported Value, holds SearchAPI registry. (Output of that stack: {StackName}-RegistryUri)."
+    Default: "SearchAPI-shared-resources-RegistryUri"
+  ImportValueWafLambdaArn:
+    Type: String
+    Description: "Exported Value, holds SearchAPI WAF for lambda-based stacks. (Output of that stack: {StackName}-WafLambda)."
+    Default: "SearchAPI-shared-resources-WafLambda-Arn"
 
 Conditions:
   # If you gave an ARN to the cert, use it:
@@ -201,52 +206,13 @@ Resources:
               SslSupportMethod: sni-only
             # If False:
             - !Ref AWS::NoValue
-        WebACLId: !GetAtt CloudFrontWAF.Arn
+        WebACLId:
+          Fn::ImportValue:
+            !Sub ${ImportValueWafLambdaArn}
 
       Tags:
         - Key: Name
           Value: !Ref AWS::StackName
-
-  CloudFrontWAF:
-    Type: AWS::WAFv2::WebACL
-    Properties:
-      Name: !Sub ${AWS::StackName}-WAF
-      DefaultAction:
-        Allow: {}
-      Scope: CLOUDFRONT
-      Rules:
-        - Name: !Sub ${AWS::StackName}-RateLimiter
-          Priority: 0
-          Action:
-            Block:
-              CustomResponse:
-                CustomResponseBodyKey: rate_limit_response_1250
-                ResponseCode: 429
-          Statement:
-            RateBasedStatement:
-              Limit: 1250
-              AggregateKeyType: IP
-              ScopeDownStatement:
-                ByteMatchStatement:
-                  SearchString: /services/search/param
-                  FieldToMatch:
-                    UriPath: {}
-                  PositionalConstraint: STARTS_WITH
-                  TextTransformations:
-                    - Priority: 0
-                      Type: NONE
-          VisibilityConfig:
-            SampledRequestsEnabled: True
-            CloudWatchMetricsEnabled: True
-            MetricName: ip_rate_limit
-      VisibilityConfig:
-        SampledRequestsEnabled: True
-        CloudWatchMetricsEnabled: True
-        MetricName: !Sub /aws/wafv2/${AWS::StackName}-RateLimiter
-      CustomResponseBodies:
-        rate_limit_response_1250:
-          ContentType: APPLICATION_JSON
-          Content: "{\n    \"error\": {\n        \"report\": \"Rate limited, please reduce your request rate to 250/minute or less\",\n        \"type\": \"RATE_LIMITED\"\n    }\n}"
 
 
 Outputs:
