@@ -283,7 +283,7 @@ wget -d -O API-PROD-polar-dualVH-valid.csv "https://api.daac.asf.alaska.edu/serv
 wget -d -O API-PROD-polar-dualvh-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?polarization=dual+vh&maxresults=10&output=csv"
 
 # polygon Keyword
-wget -d -O API-PROD-polygon-multi-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?polygon=12.13,41.74,13.4,41.74,13.4,42.75,12.13,42.75,12.13,41.74&platform=Sentinel-1A,Sentinel-1B&processingLevel=SLC&start=2018-05-01T00:00:00UTC&output=csv"
+wget -d -O API-PROD-polygon-multi-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?polygon=12.13,41.74,13.4,41.74,13.4,42.75,12.13,42.75,12.13,41.74&platform=Sentinel-1A,Sentinel-1B&processingLevel=SLC&start=2018-05-01T00:00:00UTC&output=csv&maxResults=2000"
 wget -d -O API-PROD-polygon-4-valid.csv "https://api.daac.asf.alaska.edu/services/search/param?polygon=-148.52,64.63,-150.41,64.64,-149.58,63.86,-148.52,64.63&maxResults=100&output=csv"
 
 # processingLevel Keyword
