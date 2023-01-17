@@ -31,7 +31,15 @@ def req_fields_jsonlite():
         'startTime',
         'stopTime',
         'stringFootprint',
-        'thumbnailUrl'
+        'thumbnailUrl',
+        'absoluteBurstID',
+        'relativeBurstID',
+        'fullBurstID',
+        'burstIndex',
+        'burstAnxTime',
+        'timeFromAnxSeconds',
+        'samplesPerBurst',
+        'subswath',
     ]
     return fields
 
@@ -79,6 +87,18 @@ class JSONLiteStreamArray(JSONStreamArray):
         except TypeError:
             pass
 
+        try:
+            if p['downloadUrl'] is None:
+                p['downloadUrl'] = ''
+        except TypeError:
+            pass
+
+        try:
+            if p['granuleName'] is None:
+                p['granuleName'] = p['product_file_id']
+        except TypeError:
+            pass
+        
         try:
             if p['groupID'] is None:
                 p['groupID'] = p['granuleName']
@@ -140,5 +160,19 @@ class JSONLiteStreamArray(JSONStreamArray):
         if self.includeBaseline:
             result['temporalBaseline'] = p['temporalBaseline']
             result['perpendicularBaseline'] = p['perpendicularBaseline']
+        
+        if p.get('processingLevel') == 'BURST': # is a burst product
+            burst = {}
+            burst['relativeBurstID'] = int(p['relativeBurstID'])
+            burst['absoluteBurstID'] = int(p['absoluteBurstID'])
+            burst['fullBurstID'] = p['fullBurstID']
+            burst['burstIndex'] = int(p['burstIndex'])
+            burst['burstAnxTime'] = p['burstAnxTime']
+            burst['timeFromAnxSeconds'] = float(p['timeFromAnxSeconds'])
+            burst['samplesPerBurst'] = int(p['samplesPerBurst'])
+            burst['subswath'] = p['subswath']
+
+            result['burst'] = burst
+            result['granuleName'] = p['groupID']
 
         return result

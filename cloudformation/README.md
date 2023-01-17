@@ -164,6 +164,7 @@ Guide for the Actions themselves can be found [here](./../.github/workflows/READ
 For when we switch to using `asf_search` directly. Different notes to keep in mind from the pipeline point of view, that *might* make things easier?
 
 - Keep testing requirements completely standalone and separate from the package code? Lets the test suite action be minimal. Maybe it's not worth, and just have it install everything?
+  - It might be possible to have a testing container, that's based on the "slim" SearchAPI container? Then have the final stage of the pipeline, run that container to run the test suite. This might work if github actions lets runners, run containers in their workflows.
 - Have less SearchAPI maturities. Maybe even two? prod, and non-prod?. Right now they're being set though github environments, so having 5 seems awkward unless there's a better way. But a lot of that stuff can be something like environment variables with defaults/package constants (which CMR to use), or removed completely (health endpoint: "this_api". If they're there, they know the api. Not sure how to automatically populate that, so it's the main blocker I see for cutting down maturities).
   - Have cmr_url be a parameter-overrides option? What else?
   - If you need a "prod cmr_uat" API, create a third environment for that? Problem is you'd need a separate gh action for each environment. I hope there's a way to say "If branch name matches environment, run there. Else run in this non-prod environment".
