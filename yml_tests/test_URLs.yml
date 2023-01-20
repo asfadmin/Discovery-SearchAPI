@@ -556,23 +556,23 @@ tests:
 
 - intersectsWith linestring:
     intersectsWith: linestring(-119.543 37.925, -118.443 37.7421)
-    maxResults: 1000
+    maxResults: 100
     output: csv
 
     expected file: csv
     expected code: 200
 
-- intersectsWith point 1000:
+- intersectsWith point 100:
     intersectsWith: point(-119.543 37.925)
-    maxResults: 1000
+    maxResults: 100
     output: CSV
 
     expected file: csv
     expected code: 200
 
-- intersectsWith polygon 1000:
+- intersectsWith polygon 100:
     intersectsWith: polygon((-119.543 37.925, -118.443 37.7421, -118.682 36.8525, -119.77 37.0352, -119.543 37.925))
-    maxResults: 1000
+    maxResults: 100
     output: CSV
 
     expected file: csv
@@ -943,7 +943,7 @@ tests:
 
 - output csv:
     platform: SB
-    maxResults: 2000
+    maxResults: 200
     output: csv
 
     expected file: csv
@@ -958,7 +958,7 @@ tests:
 
 - output download Sentinel:
     platform: SB
-    maxResults: 2000
+    maxResults: 200
     output: download
 
     expected file: download
@@ -975,7 +975,7 @@ tests:
 
 - output geojson Sentinel:
     platform: SB
-    maxResults: 2000
+    maxResults: 200
     output: geojson
 
     expected file: geojson
@@ -992,7 +992,7 @@ tests:
 
 - output asf_search Sentinel:
     platform: SB
-    maxResults: 2000
+    maxResults: 200
     output: asf_search
 
     expected file: geojson
@@ -1009,7 +1009,7 @@ tests:
 
 - output json:
     platform: SB
-    maxResults: 1000
+    maxResults: 100
     output: json
 
     expected file: json
@@ -1017,7 +1017,7 @@ tests:
 
 - output jsonlite:
     platform: SB
-    maxResults: 2000
+    maxResults: 200
     output: jsonlite
 
     expected file: jsonlite
@@ -1025,7 +1025,7 @@ tests:
 
 - output kml Sentinel:
     platform: SB
-    maxResults: 2000
+    maxResults: 200
     output: kml
 
     expected file: kml
@@ -1042,7 +1042,7 @@ tests:
 
 - output metalink Sentinel:
     platform: SB
-    maxResults: 2000
+    maxResults: 200
     output: metalink
 
     expected file: metalink
@@ -1062,7 +1062,7 @@ tests:
     start: "2015-01-01T00:00:00Z"
     end: "2016-01-02T00:00:00Z"
     output: csv
-    maxResults: 2000
+    maxResults: 200
 
     expected file: csv
     expected code: 200
@@ -1071,7 +1071,7 @@ tests:
     platform: SB
     start: 1+year+ago
     end: now
-    maxResults: 2000
+    maxResults: 200
     output: csv
 
     expected file: csv
@@ -1964,6 +1964,7 @@ tests:
     processingLevel: SLC
     start: 2015-05-01T00:00:00UTC
     output: csv
+    maxResults: 100
 
     expected file: csv
     expected code: 200
@@ -1974,6 +1975,7 @@ tests:
     processingLevel: SLC
     start: 2015-05-01T00:00:00UTC
     output: csv
+    maxResults: 100
 
     expected file: csv
     expected code: 200
@@ -1984,6 +1986,7 @@ tests:
     processingLevel: SLC
     start: 2015-05-01T00:00:00UTC
     output: csv
+    maxResults: 100
 
     expected file: csv
     expected code: 200
@@ -1994,13 +1997,14 @@ tests:
     processingLevel: SLC
     start: 2015-05-01T00:00:00UTC
     output: csv
+    maxResults: 100
 
     expected file: csv
     expected code: 200
 
 - polygon closure 4:
     polygon: -155.08,65.82,-153.5,61.91,-149.50,63.07,-149.94,64.55
-    maxResults: 1000
+    maxResults: 100
     output: Csv
 
     expected file: csv
@@ -2255,7 +2259,7 @@ tests:
 - season 32-90 S1:
     season: 32,90
     platform: SA,SB
-    maxResults: 1000
+    maxResults: 100
     output: csv
 
     expected file: csv
@@ -2264,7 +2268,7 @@ tests:
 - season 1-100 S1:
     season: 1,100
     platform: sa,sb
-    maxResults: 1000
+    maxResults: 100
     output: csv
 
     expected file: csv
@@ -2273,7 +2277,7 @@ tests:
 - season 1-175 AIRSAR:
     season: 1,175
     platform: AS
-    maxResults: 1000
+    maxResults: 100
     output: csv
 
     expected file: csv
@@ -2284,7 +2288,7 @@ tests:
     platform: SA,SB
     start: "2017-01-01T00:00:00Z"
     end: "2019-01-01T01:00:00Z"
-    maxResults: 1000
+    maxResults: 100
     output: csv
 
     expected file: csv
@@ -2295,7 +2299,7 @@ tests:
     platform: sa,sb
     start: "2015-01-01T00:00:00Z"
     end: "2018-01-01T01:00:00Z"
-    maxResults: 1000
+    maxResults: 100
     output: csv
 
     expected file: csv
@@ -2306,7 +2310,7 @@ tests:
     platform: SA,Sb
     start: 1+year+ago
     end: now
-    maxResults: 1000
+    maxResults: 100
     output: csv
 
     expected file: csv
@@ -2317,7 +2321,7 @@ tests:
     platform: sa,sb
     start: 2+year+ago
     end: now
-    maxResults: 1000
+    maxResults: 100
     output: csv
 
     expected file: csv
@@ -2328,7 +2332,7 @@ tests:
     platform: SA,SB
     start: 2+year+ago
     end: now
-    maxResults: 1000
+    maxResults: 100
     output: csv
 
     expected file: csv
@@ -2339,7 +2343,7 @@ tests:
     platform: SP
     start: 2015-July-15
     end: now
-    maxResults: 1000
+    maxResults: 100
     output: csv
 
     expected file: csv
@@ -2350,7 +2354,7 @@ tests:
     platform: SA,SB
     start: 2018-July-15
     end: now
-    maxResults: 1000
+    maxResults: 100
     output: csv
 
     expected file: csv
@@ -2361,7 +2365,7 @@ tests:
     platform: SP
     start: 3+year+ago
     end: now
-    maxResults: 1000
+    maxResults: 100
     output: csv
 
     expected file: csv
@@ -2381,7 +2385,7 @@ tests:
     platform: Ua
     start: "2005-01-01T00:00:00Z"
     end: "2014-01-01T01:00:00Z"
-    maxResults: 1000
+    maxResults: 100
     output: csv
 
     expected file: csv
@@ -2600,7 +2604,7 @@ tests:
     platform: Sentinel-1A
     start: 2017-05-30
     end: 2018-05-31%22
-    maxResults: 1000
+    maxResults: 100
     skip_file_check: True
 
     expected file: csv
