@@ -2590,7 +2590,7 @@ tests:
 - realworld 7:
     platform: SA,SB
     relativeOrbit: 100-200
-    frame: 580-585
+    asfframe: 580-585
     start: 2015-06-01
     end: 2019-05-30
     output: csv
