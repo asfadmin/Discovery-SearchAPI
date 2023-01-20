@@ -400,7 +400,7 @@ tests:
     expected code: 200
 
 - frame zero range:
-    frame: 582-582
+    asfframe: 582-582
     platform: SA,SB
     maxresults: 10
     output: csv
@@ -409,7 +409,7 @@ tests:
     expected code: 200
 
 - frame zero range list:
-    frame: 582-582,590
+    asfframe: 582-582,590
     platform: SB
     maxresults: 10
     output: csv
