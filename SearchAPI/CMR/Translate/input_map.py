@@ -2,7 +2,7 @@ from SearchAPI.CMR.Input import (
     parse_int, parse_float, parse_string, parse_wkt, parse_date,
     parse_string_list, parse_int_list, parse_int_or_range_list,
     parse_float_or_range_list,
-    parse_coord_string, parse_bbox_string, parse_point_string
+    parse_coord_string, parse_bbox_string, parse_circle_string, parse_point_string
 )
 
 def input_map():
@@ -41,6 +41,7 @@ def input_map():
         'linestring':           ['line',                    '{0}',                              parse_coord_string], # or here
         'point':                ['point',                   '{0}',                              parse_point_string], # or here
         'bbox':                 ['bounding_box',            '{0}',                              parse_bbox_string],
+        'circle':               ['circle[]',                  '{0}',                            parse_circle_string],
         'processinglevel':      ['attribute[]',             'string,PROCESSING_TYPE,{0}',       parse_string_list],
         'relativeorbit':        ['attribute[]',             'int,PATH_NUMBER,{0}',              parse_int_or_range_list],
         'processingdate':       ['updated_since',           '{0}',                              parse_date],
@@ -50,7 +51,11 @@ def input_map():
         'temporal':             ['temporal',                '{0}',                              None], # start/end end up here
         'groupid':              ['attribute[]',             'string,GROUP_ID,{0}',              parse_string_list],
         'insarstackid':         ['attribute[]',             'int,INSAR_STACK_ID,{0}',           parse_string],
-        'instrument':           ['instrument[]',            '{0}',                              parse_string]
+        'instrument':           ['instrument[]',            '{0}',                              parse_string],
+        'collections':          ['echo_collection_id[]',            '{0}',                      parse_string_list],
+        'relativeburstid':      ['attribute[]',             'int,BURST_ID_RELATIVE,{0}',        parse_int_list],
+        'absoluteburstid':      ['attribute[]',             'int,BURST_ID_ABSOLUTE,{0}',        parse_int_list],
+        'fullburstid':          ['attribute[]',             'string,BURST_ID_FULL,{0}',         parse_string_list]
     }
 
     return parameter_map

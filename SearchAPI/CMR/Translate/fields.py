@@ -59,5 +59,15 @@ def get_field_paths():
         'stopTime':                 "./Temporal/RangeDateTime/EndingDateTime",
         'thumbnailUrl':             attr_path('THUMBNAIL_URL'),
         'track':                    attr_path('PATH_NUMBER'),
+        
+        # BURST FIELDS
+        'absoluteBurstID':          attr_path('BURST_ID_ABSOLUTE'),
+        'relativeBurstID':          attr_path('BURST_ID_RELATIVE'),
+        'fullBurstID':              attr_path('BURST_ID_FULL'),
+        'burstIndex':               attr_path('BURST_INDEX'),
+        'burstAnxTime':             attr_path('BURST_ANX_TIME'),
+        'timeFromAnxSeconds':        attr_path('TIME_FROM_ANX_SEC'),   
+        'samplesPerBurst':          attr_path('SAMPLES_PER_BURST'),
+        'subswath':                 attr_path('SUBSWATH_NAME'),
     }
     return paths
