@@ -22,7 +22,7 @@ class APISearchQuery:
         self.should_stream = should_stream
 
     def get_response(self):
-
+        logging.info(f"Query Strings: {self.request.local_values=}")
         validated = self.can_use_cmr()
         if validated is not True:
             return self.validation_error(validated)
@@ -46,7 +46,7 @@ class APISearchQuery:
             self.check_has_search_params()
             self.check_and_set_cmr_params()
         except ValueError as e:
-            logging.debug(f'ValueError: {e}')
+            logging.exception(f'ValueError: {e}')
             return e
 
         return True
@@ -54,7 +54,7 @@ class APISearchQuery:
     def check_has_search_params(self):
         non_searchable_param = ['output', 'maxresults', 'pagesize', 'maturity']
         searchables = [
-            v for v in self.request.local_values if v not in non_searchable_param
+            v for v in self.request.local_values if v.lower() not in non_searchable_param
         ]
 
         if len(searchables) <= 0:
@@ -67,16 +67,6 @@ class APISearchQuery:
                 'granule_list may not be used in conjunction with other search parameters'
             )
 
-        if 'product_list' in searchables and len(searchables) > 1:
-            raise ValueError(
-                'product_list may not be used in conjunction with other search parameters'
-            )
-
-        if 'granule_list' in searchables and len(searchables) > 1:
-            raise ValueError(
-                'granule_list may not be used in conjunction with other search parameters'
-            )
-        
         if 'product_list' in searchables and len(searchables) > 1:
             raise ValueError(
                 'product_list may not be used in conjunction with other search parameters'
