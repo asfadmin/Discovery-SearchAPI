@@ -151,14 +151,14 @@ def check_reference(reference, stack):
 def get_platform(reference):
     return reference[0:2].upper()
 
-def get_default_product_type(reference):
+def get_default_product_type(reference: str):
     if get_platform(reference) in ['AL']:
         return 'L1.1'
     if get_platform(reference) in ['R1', 'E1', 'E2', 'J1']:
         return 'L0'
     if get_platform(reference) in ['S1']:
-        if reference[-3:] in ['IW2', 'IW3']:
-            return 'S1_SLC_BURSTS'
+        if reference.endswith('BURST'):
+            return 'BURST'
         return 'SLC'
     return None
 
