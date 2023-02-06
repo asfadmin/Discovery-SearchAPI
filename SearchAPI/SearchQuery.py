@@ -53,8 +53,10 @@ class APISearchQuery:
 
     def check_has_search_params(self):
         non_searchable_param = ['output', 'maxresults', 'pagesize', 'maturity']
+        list_param_exceptions = ['collections']
+        
         searchables = [
-            v for v in self.request.local_values if v.lower() not in non_searchable_param
+            v for v in self.request.local_values if v.lower() not in [*non_searchable_param, *list_param_exceptions]
         ]
 
         if len(searchables) <= 0:
