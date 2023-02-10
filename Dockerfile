@@ -20,6 +20,7 @@ WORKDIR "${LAMBDA_TASK_ROOT}/Discovery-SearchAPI"
 COPY requirements.txt .
 RUN mkdir "${LAMBDA_TASK_ROOT}/python-packages"
 ENV PYTHONPATH "${PYTHONPATH}:${LAMBDA_TASK_ROOT}/python-packages"
+ENV SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL=True
 RUN python3 -m pip install --no-cache-dir -r requirements.txt --target "${LAMBDA_TASK_ROOT}/python-packages"
 
 ## Copy required files (Already inside Discovery-SearchAPI dir):
