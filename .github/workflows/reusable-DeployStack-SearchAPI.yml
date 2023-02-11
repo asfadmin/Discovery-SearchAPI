@@ -94,7 +94,7 @@ jobs:
           sudo apt-get install libgdal-dev
           python3 -m pip install --no-cache-dir --upgrade pip
           python3 -m pip install --no-cache-dir wheel Cython
-          python3 -m pip install -r requirements.txt
+          python3 -m pip install -r requirements.txt --use-deprecated=legacy-resolver
       - name: Run Pytest
         if: github.event_name == 'pull_request'
         run: |

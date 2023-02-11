@@ -189,6 +189,9 @@ def parse_granule(granule, req_fields):
         if result[k] in ['NULL', 'NA', 'None']:
             result[k] = None
 
+    if get_val(field_paths['processingLevel']) == 'BURST':
+        result['granuleName'] = get_val(field_paths['product_file_id'])
+
     return result
 
 
