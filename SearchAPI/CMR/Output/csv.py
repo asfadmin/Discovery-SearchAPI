@@ -34,7 +34,15 @@ def req_fields_csv():
         'insarStackSize',
         'baselinePerp',
         'doppler',
-        'groupID'
+        'groupID',
+        'relativeBurstID',
+        'absoluteBurstID',
+        'fullBurstID',
+        'burstIndex',
+        'burstAnxTime',
+        'timeFromAnxSeconds',
+        'samplesPerBurst',
+        'subswath',
     ]
     return fields
 

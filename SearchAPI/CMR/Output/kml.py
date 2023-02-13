@@ -15,12 +15,21 @@ def req_fields_kml():
         'platform',
         'pointingAngle',
         'processingTypeDisplay',
+        'processingLevel',
         'relativeOrbit',
         'sceneDate',
         'shape',
         'startTime',
         'stopTime',
-        'thumbnailUrl'
+        'thumbnailUrl',
+        'absoluteBurstID',
+        'relativeBurstID',
+        'fullBurstID',
+        'burstIndex',
+        'burstAnxTime',
+        'timeFromAnxSeconds',
+        'samplesPerBurst',
+        'subswath',
     ]
     return fields
 
