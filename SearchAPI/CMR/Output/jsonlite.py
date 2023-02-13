@@ -173,6 +173,5 @@ class JSONLiteStreamArray(JSONStreamArray):
             burst['subswath'] = p['subswath']
 
             result['burst'] = burst
-            result['granuleName'] = p['groupID']
 
         return result
