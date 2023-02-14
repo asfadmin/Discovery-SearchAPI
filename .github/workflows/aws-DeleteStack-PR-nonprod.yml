@@ -1,0 +1,23 @@
+name: Deleted PR - SearchAPI Stack (non-prod)
+
+on:
+  pull_request:
+    types:
+      - closed
+    branches-ignore:
+      - prod
+
+jobs:
+  delete-stack-non-prod-pr:
+    # If a fork triggered this, don't do anything.
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    uses: ./.github/workflows/reusable-DeleteStack-SearchAPI.yml
+    with:
+      # Can't just use github.ref_name, changes if the PR is merged vs closed.
+      # Craft the PR label ourself:
+      TAG: "${{ github.event.number }}/merge"
+      environment: non-prod
+    # What secrets from the environment, the workflow should have access to:
+    secrets:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

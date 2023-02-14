@@ -70,7 +70,15 @@ def req_fields_json():
         'stringFootprint',
         'thumbnailUrl',
         'track',
-        'varianceTroposphere'
+        'varianceTroposphere',
+        'absoluteBurstID',
+        'relativeBurstID',
+        'fullBurstID',
+        'burstIndex',
+        'burstAnxTime',
+        'timeFromAnxSeconds',
+        'samplesPerBurst',
+        'subswath',
     ]
     return fields
 
@@ -119,4 +127,7 @@ class JSONStreamArray(list):
         p['browse'] = p['browse'][0] if len(p['browse']) > 0 else None
         p['absoluteOrbit'] = p['absoluteOrbit'][0] if len(p['absoluteOrbit']) > 0 else None
 
+        if p['processingLevel'] != 'BURST':
+            legacy_json_keys = legacy_json_keys[:-8]
+        
         return dict((k, p[k]) for k in legacy_json_keys if k in p)

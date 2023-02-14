@@ -4,9 +4,9 @@ import logging
 import requests
 
 from SearchAPI.asf_env import get_config
+from .collections_by_platform import collections_by_platform, collections_by_platform_uat, collections_by_platform_uat_asfdev
 
-
-def input_fixer(params):
+def input_fixer(params, is_prod: bool = False, provider: str = "ASF"):
     """
     A few inputs need to be specially handled to make the flexible input the
     legacy API allowed match what's at CMR, since we can't use wildcards on
@@ -69,17 +69,44 @@ def input_fixer(params):
             }
 
             platform_list = []
+            collection_list = []
+            
+            # If CMR adds supports for excluding results by their collection id, this would let us hide RAW data from results
+            # exclude_concept_ids = ['C1214470532-ASF', 'C1214470561-ASF', 'C1327985650-ASF', 'C1327985647-ASF']
+            # fixed_params['collections'] = exclude_concept_ids
+            
+            any_processing_level = 'processinglevel' not in params 
+                       
+            if any_processing_level:
+                if is_prod:
+                    to_collections = collections_by_platform
+                elif provider == 'ASF':
+                    to_collections = collections_by_platform_uat
+                else:
+                    to_collections = collections_by_platform_uat_asfdev
+            
             for p in v:
                 if p.upper() in plat_aliases:
                     for x in plat_aliases[p.upper()]:
-                        platform_list.append(x)
+                        if x in ['SENTINEL-1A', 'SENTINEL-1B'] and any_processing_level:
+                            collection_list.extend([id_by_platform['concept-id'] for id_by_platform in to_collections[x]])
+                        else:
+                            platform_list.append(x)
+                elif ((p.upper() in plat_names and p.upper() in ['SA', 'SB']) or p.upper() in ['SENTINEL-1A', 'SENTINEL-1B'])  and any_processing_level:
+                    if p.upper() in plat_names and p.upper() in ['SA', 'SB']:
+                        collection_list.extend([id_by_platform['concept-id'] for id_by_platform in to_collections[plat_names[p.upper()]]])
+                    else:
+                        collection_list.extend([id_by_platform['concept-id'] for id_by_platform in to_collections[p.upper()]])
                 else:
                     platform_list.append(p)
-
+            
             fixed_params[k] = list(set([
                 plat_names[a.upper()] if a.upper() in plat_names else a
                 for a in platform_list
             ]))
+            
+            if any_processing_level:
+                fixed_params['collections'] = collection_list
 
         elif k == 'beammode':
             beammap = {

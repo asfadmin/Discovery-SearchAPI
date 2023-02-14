@@ -20,6 +20,7 @@ WORKDIR "${LAMBDA_TASK_ROOT}/Discovery-SearchAPI"
 COPY requirements.txt .
 RUN mkdir "${LAMBDA_TASK_ROOT}/python-packages"
 ENV PYTHONPATH "${PYTHONPATH}:${LAMBDA_TASK_ROOT}/python-packages"
+ENV SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL=True
 RUN python3 -m pip install --no-cache-dir -r requirements.txt --target "${LAMBDA_TASK_ROOT}/python-packages"
 
 ## Copy required files (Already inside Discovery-SearchAPI dir):
@@ -33,9 +34,14 @@ RUN python3 -m pip install --no-cache-dir --target "${LAMBDA_TASK_ROOT}/python-p
 ## Cleanup to save space:
 RUN rm -rf /var/cache/yum
 
+## Save the hash of the code in this container
+# (these BOTH need to be at the bottom, so layers above can be cached if nothing changed)
+ARG GIT_COMMIT_HASH=unknown
+RUN echo "{\"version\":\"${GIT_COMMIT_HASH}\"}" > SearchAPI/version.json
+
 ## Host to open queries too. (localhost=127.0.0.1, outside_world=0.0.0.0)
 ENV OPEN_TO_IP="127.0.0.1"
 EXPOSE 8080
-# ## Nuke "default" entrypoint (Since it's for running in lambda). It gets set BACK to default, in template.yaml
+## Nuke "default" entrypoint (Since it's for running in lambda). It gets set BACK to default, in template.yaml
 ENTRYPOINT ["/bin/bash", "-l", "-c"]
 CMD ["python3 -m gunicorn --timeout 0 --bind ${OPEN_TO_IP}:8080 --workers 2 --threads $(grep -c ^processor /proc/cpuinfo) SearchAPI.application:application"]

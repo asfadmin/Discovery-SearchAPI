@@ -1,0 +1,101 @@
+
+on:
+  workflow_call:
+    inputs:
+
+      # For building the docker image:
+      TAG:
+        required: True
+        description: The tag of the container. Branch-name or GitHub PR.
+        type: string
+
+      # Where to deploy:
+      AWS_REGION:
+        required: False
+        description: What region in AWS to run in.
+        default: us-east-1
+        type: string
+
+      NumConcurrentExecutions:
+        required: True
+        description: How many lambdas to keep warm at once.
+        type: number
+
+      # Pass into the container, what to run as:
+      MATURITY:
+        required: True
+        description: Passed into the container, what maturity the API runs as.
+        type: string
+
+      environment:
+        required: True
+        description: The GitHub Environment to use.
+        type: string
+
+      # Test suite args
+      PYTEST_ARGS:
+        required: False
+        description: Extra commands to append to the pytest command.
+        type: string
+
+    secrets:
+      # AWS Auth:
+      AWS_ACCESS_KEY_ID:
+        description: The access key for AWS.
+        required: True
+      AWS_SECRET_ACCESS_KEY:
+        description: The secret access key for AWS.
+        required: True
+      CERT_ARN:
+        description: AWS ARN of the https certificate.
+        required: True
+
+
+
+jobs:
+  deploy-SearchAPI:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ inputs.AWS_REGION }}
+
+      # In this step, this action saves a list of existing images,
+      # the cache is created without them in the post run.
+      # It also restores the cache if it exists.
+      - uses: satackey/action-docker-layer-caching@v0.0.11
+        # Ignore the failure of a step and avoid terminating the job.
+        continue-on-error: true
+
+      - name: Deploy SearchAPI Stack w/ Makefile
+        run: >
+          make
+          -e TAG=${{ inputs.TAG }}
+          -e MATURITY=${{ inputs.MATURITY }}
+          -e NumConcurrentExecutions=${{ inputs.NumConcurrentExecutions }}
+          -e AcmCertificateArn=${{ secrets.CERT_ARN }}
+          deploy-searchapi-stack
+
+      # If it's writing to a branch, the pull request to that branch already
+      # passed, OR it's a developing branch that doesn't need PR's. No need
+      # to run suite either way.
+      - name: Install pytest requirements
+        if: github.event_name == 'pull_request'
+        run: |
+          sudo apt-get update
+          sudo apt-get install libgdal-dev
+          python3 -m pip install --no-cache-dir --upgrade pip
+          python3 -m pip install --no-cache-dir wheel Cython
+          python3 -m pip install -r requirements.txt --use-deprecated=legacy-resolver
+      - name: Run Pytest
+        if: github.event_name == 'pull_request'
+        run: |
+          make -e TAG=${{ inputs.TAG }} -e NUM_THREADS=auto -e PYTEST_ARGS="${{ inputs.PYTEST_ARGS }}" test-api

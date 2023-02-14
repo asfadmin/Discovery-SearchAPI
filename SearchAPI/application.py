@@ -21,6 +21,15 @@ import boto3
 
 import SearchAPI.endpoints as endpoints
 
+# To get logs to show up in CloudWatch.
+# AWS has a custom logger handler
+root = logging.getLogger()
+if root.handlers:
+    for handler in root.handlers:
+        root.removeHandler(handler)
+FORMAT = "[%(filename)18s:%(lineno)-4s - %(funcName)18s() ] %(message)s"
+logging.basicConfig(format=FORMAT,level=logging.DEBUG)
+
 application = Flask(__name__)
 # ALSO update upload size in .ebextentions/04_enable_streaming.config:
 application.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024 # limit to 10 MB, primarily affects file uploads
@@ -153,7 +162,7 @@ def postflight(e):
                 Namespace = 'SearchAPI'
             )
     except Exception as e:
-        logging.critical(f'Failure during request teardown: {e}')
+        logging.exception(f'Failure during request teardown: {e}')
 
 # Lambda hook, to run in AWS:
 def run_flask_lambda(event, context):
@@ -172,8 +181,6 @@ def run_flask():
         os.environ['OPEN_TO_IP'] = '127.0.0.1'
 
     sys.dont_write_bytecode = True  # prevent clutter
-    FORMAT = "[%(filename)18s:%(lineno)-4s - %(funcName)18s() ] %(message)s"
-    logging.basicConfig(level=logging.DEBUG, format=FORMAT) # enable debugging output
     application.run(threaded=True, host=os.environ['OPEN_TO_IP'], port=8080)  # run threaded to prevent a broken pipe error
 
 # Run a dev server

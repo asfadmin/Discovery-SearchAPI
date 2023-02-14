@@ -22,7 +22,7 @@ class APISearchQuery:
         self.should_stream = should_stream
 
     def get_response(self):
-
+        logging.info(f"Query Strings: {self.request.local_values=}")
         validated = self.can_use_cmr()
         if validated is not True:
             return self.validation_error(validated)
@@ -46,15 +46,17 @@ class APISearchQuery:
             self.check_has_search_params()
             self.check_and_set_cmr_params()
         except ValueError as e:
-            logging.debug(f'ValueError: {e}')
+            logging.exception(f'ValueError: {e}')
             return e
 
         return True
 
     def check_has_search_params(self):
         non_searchable_param = ['output', 'maxresults', 'pagesize', 'maturity']
+        list_param_exceptions = ['collections']
+        
         searchables = [
-            v for v in self.request.local_values if v not in non_searchable_param
+            v for v in self.request.local_values if v.lower() not in [*non_searchable_param, *list_param_exceptions]
         ]
 
         if len(searchables) <= 0:
@@ -72,21 +74,13 @@ class APISearchQuery:
                 'product_list may not be used in conjunction with other search parameters'
             )
 
-        if 'granule_list' in searchables and len(searchables) > 1:
-            raise ValueError(
-                'granule_list may not be used in conjunction with other search parameters'
-            )
-        
-        if 'product_list' in searchables and len(searchables) > 1:
-            raise ValueError(
-                'product_list may not be used in conjunction with other search parameters'
-            )
-
     def check_and_set_cmr_params(self):
         self.cmr_params, self.output, self.max_results = \
             translate_params(self.request.local_values)
 
-        self.cmr_params = input_fixer(self.cmr_params)
+        self.cmr_params = input_fixer(self.cmr_params, 
+                                      self.request.asf_config['cmr_base'] == 'https://cmr.earthdata.nasa.gov', 
+                                      getattr(self.request, 'cmr_provider', 'ASF'))
 
     def cmr_query(self):
         logging.debug(f'Handle query from {self.request.access_route[-1]}')
