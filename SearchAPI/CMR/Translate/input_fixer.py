@@ -90,14 +90,13 @@ def input_fixer(params, is_prod: bool = False, provider: str = "ASF"):
                     for x in plat_aliases[p.upper()]:
                         if x in ['SENTINEL-1A', 'SENTINEL-1B'] and any_processing_level:
                             collection_list.extend([id_by_platform['concept-id'] for id_by_platform in to_collections[x]])
-                        else:
-                            platform_list.append(x)
-                elif ((p.upper() in plat_names and p.upper() in ['SA', 'SB']) or p.upper() in ['SENTINEL-1A', 'SENTINEL-1B'])  and any_processing_level:
-                    if p.upper() in plat_names and p.upper() in ['SA', 'SB']:
-                        collection_list.extend([id_by_platform['concept-id'] for id_by_platform in to_collections[plat_names[p.upper()]]])
-                    else:
-                        collection_list.extend([id_by_platform['concept-id'] for id_by_platform in to_collections[p.upper()]])
+                        platform_list.append(x)
                 else:
+                    if ((p.upper() in plat_names and p.upper() in ['SA', 'SB']) or p.upper() in ['SENTINEL-1A', 'SENTINEL-1B'])  and any_processing_level:
+                        if p.upper() in plat_names and p.upper() in ['SA', 'SB']:
+                            collection_list.extend([id_by_platform['concept-id'] for id_by_platform in to_collections[plat_names[p.upper()]]])
+                        else:
+                            collection_list.extend([id_by_platform['concept-id'] for id_by_platform in to_collections[p.upper()]])                
                     platform_list.append(p)
             
             fixed_params[k] = list(set([
