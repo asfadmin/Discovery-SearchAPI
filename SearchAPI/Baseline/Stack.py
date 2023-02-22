@@ -157,8 +157,6 @@ def get_default_product_type(reference):
     if get_platform(reference) in ['R1', 'E1', 'E2', 'J1']:
         return 'L0'
     if get_platform(reference) in ['S1']:
-        if reference[-3:] in ['IW2', 'IW3']:
-            return 'S1_SLC_BURSTS'
         return 'SLC'
     return None
 
