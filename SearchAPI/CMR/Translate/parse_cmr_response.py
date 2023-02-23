@@ -68,7 +68,7 @@ def parse_granule(granule, req_fields):
         remove_field('platform')
 
     if 'frameNumber' in req_fields:
-        asf_frame_platforms = ['Sentinel-1A', 'Sentinel-1B', 'ALOS']
+        asf_frame_platforms = ['Sentinel-1A', 'Sentinel-1B', 'ALOS', 'SENTINEL-1A', 'SENTINEL-1B']
         result['frameNumber'] = get_val(attr_path('FRAME_NUMBER')) \
             if result['platform'] in asf_frame_platforms \
             else get_val(attr_path('CENTER_ESA_FRAME'))
