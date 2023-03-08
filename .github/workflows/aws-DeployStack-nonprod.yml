@@ -30,7 +30,7 @@ jobs:
     with:
       TAG: ${{ github.ref_name }}
       MATURITY: devel
-      NumConcurrentExecutions: 1
+      NumConcurrentExecutions: 0
       environment: non-prod
       PYTEST_ARGS: --df known_bugs --df prod_only
     # What secrets from the environment, the workflow should have access to:
