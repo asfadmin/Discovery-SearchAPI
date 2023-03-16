@@ -92,6 +92,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install libgdal-dev
+          export SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL=True
           python3 -m pip install --no-cache-dir --upgrade pip
           python3 -m pip install --no-cache-dir wheel Cython
           python3 -m pip install -r requirements.txt --use-deprecated=legacy-resolver
