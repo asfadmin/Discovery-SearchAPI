@@ -1,6 +1,7 @@
 import argparse
 import requests
 import warnings
+import datetime
 
 from SearchAPI.asf_env import load_config_file
 
@@ -33,13 +34,19 @@ def api_type(user_input: str) -> str:
         api_info["this_api"] = user_input
 
     # Assume it's a url now, and try to connect:
-    try:
-        requests.get(api_info["this_api"]).raise_for_status()
-    except (requests.ConnectionError, requests.exceptions.HTTPError) as e:
-        raise argparse.ArgumentTypeError(f"ERROR: Could not connect to url '{user_input}'. Message: '{e}'.")
+    # Try for a bit. It's possible lambda isn't up yet or something
+    endTime = datetime.datetime.now() + datetime.timedelta(minutes=2)
+    while datetime.datetime.now() < endTime:
+        try:
+            r = requests.get(api_info["this_api"], timeout=30)
+        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
+            # Jump back up to the top and try again:
+            continue
+        if r.status_code == 200:
+            # It connected!! You're good:
+            return api_info
+    raise argparse.ArgumentTypeError(f"ERROR: Could not connect to url '{user_input}'. Message: '{e}'.")
 
-    # It connected!! You're good:
-    return api_info
 
 def pytest_addoption(parser):
     parser.addoption("--api", action="store", type=api_type, default="local",
