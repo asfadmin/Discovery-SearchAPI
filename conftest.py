@@ -2,6 +2,7 @@ import argparse
 import requests
 import warnings
 import datetime
+import time
 
 from SearchAPI.asf_env import load_config_file
 
@@ -40,6 +41,8 @@ def api_type(user_input: str) -> str:
         try:
             r = requests.get(api_info["this_api"], timeout=30)
         except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
+            # If it throws instantly, don't bombard the API:
+            time.sleep(2.0)
             # Jump back up to the top and try again:
             continue
         if r.status_code == 200:
