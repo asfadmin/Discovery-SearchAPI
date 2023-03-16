@@ -169,3 +169,4 @@ For when we switch to using `asf_search` directly. Different notes to keep in mi
   - Have cmr_url be a parameter-overrides option? What else?
   - If you need a "prod cmr_uat" API, create a third environment for that? Problem is you'd need a separate gh action for each environment. I hope there's a way to say "If branch name matches environment, run there. Else run in this non-prod environment".
 - With test suite, figure out most compact way to deal with flexing maturity. We won't have a list of known prod urls, since CFN pr's are automatic. This ties into the default config, you won't know which default is best. For now I added a keyword to the test suite command, to control this (`--flex true/false`).
+  - Is there a good way to tie in --flex, so you don't have to specifically check for the flag in each test type? Somehow do the check in one location, and each test type just grab it from there instead.
