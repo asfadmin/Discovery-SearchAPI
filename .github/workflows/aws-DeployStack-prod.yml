@@ -32,7 +32,7 @@ jobs:
       MATURITY: prod-private
       NumConcurrentExecutions: 1
       environment: prod
-      PYTEST_ARGS: --df known_bugs
+      PYTEST_ARGS: --df known_bugs --flex False
     # What secrets from the environment, the workflow should have access to:
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
