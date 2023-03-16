@@ -19,6 +19,7 @@ Parameters:
   NumConcurrentExecutions:
     Type: Number
     Description: "The number of lambda functions to keep warm at once."
+    MinValue: 0
     # Default set in Makefile
 
   AcmCertificateArn:
@@ -39,6 +40,8 @@ Parameters:
 Conditions:
   # If you gave an ARN to the cert, use it:
   shouldAttachCert: !Not [ !Equals [ !Ref AcmCertificateArn, ""]]
+  # If we should setup a lambda config (Configs can't be modified once they're created):
+  HasProvisionedConcurrency: !Not [ !Equals [ !Ref NumConcurrentExecutions, 0 ] ]
 
 Resources:
 
@@ -66,6 +69,7 @@ Resources:
 
   LambdaConcurrencyConfig:
     Type: AWS::Lambda::Version
+    Condition: HasProvisionedConcurrency
     Properties:
       Description: !Sub "Lambda concurrency config for stack '${AWS::StackName}'."
       FunctionName: !Ref LambdaContainer
