@@ -45,7 +45,7 @@ def api_type(user_input: str) -> str:
         if r.status_code == 200:
             # It connected!! You're good:
             return api_info
-    raise argparse.ArgumentTypeError(f"ERROR: Could not connect to url '{user_input}'. Message: '{e}'.")
+    raise argparse.ArgumentTypeError(f"ERROR: Could not connect to url '{user_input}'.")
 
 
 def pytest_addoption(parser):
