@@ -47,8 +47,19 @@ def api_type(user_input: str) -> str:
             return api_info
     raise argparse.ArgumentTypeError(f"ERROR: Could not connect to url '{user_input}'.")
 
+def string_to_bool(user_input: str) -> bool:
+    user_input = str(user_input).upper()
+    if 'TRUE'.startswith(user_input):
+       return True
+    elif 'FALSE'.startswith(user_input):
+       return False
+    else:
+       raise argparse.ArgumentTypeError(f"ERROR: Could not convert '{user_input}' to bool (true/false/t/f).")
 
 def pytest_addoption(parser):
     parser.addoption("--api", action="store", type=api_type, default="local",
-        help = "Which API to hit when running tests (LOCAL/DEV/TEST/PROD, or url).")
-
+        help = "Which API to hit when running tests (LOCAL/DEV/TEST/PROD, or url)."
+    )
+    parser.addoption("--flex", action="store", type=string_to_bool,
+        help = "'flexible_maturity': wether to attach 'maturity' to the URL strings."
+    )

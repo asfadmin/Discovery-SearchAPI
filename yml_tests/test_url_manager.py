@@ -25,10 +25,13 @@ class test_URL_Manager():
         url_parts = [test_api, test_vars["endpoint"]+"?"]
         full_url = '/'.join(s.strip('/') for s in url_parts) # If both/neither have '/' between them, this still joins them correctly
 
-        # If you're overriding if you want to show the maturity:
+        # If the test itself stated the maturity, it's testing it:
         if "use_maturity" in test_info:
             use_cmr_maturity = test_info["use_maturity"]
-        # Defalut use it, if you're not running against a prod api:
+        # If the CLI option is declared, override everything else to it:
+        elif args["config"].getoption("--flex") is not None:
+            use_cmr_maturity = args["config"].getoption("--flex")
+        # Default use it, if you're not running against a prod api:
         else:
             use_cmr_maturity = api_info["flexible_maturity"]
 
