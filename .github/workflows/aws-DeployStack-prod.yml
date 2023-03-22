@@ -17,7 +17,7 @@ on:
 
 jobs:
 
-  deploy-SearchAPI-non-prod:
+  deploy-SearchAPI-prod:
     # Run if someone with write permissions did the change (the push trigger),
     # OR Run *only* if the PR came from a branch we control (so forks don't trigger)
     if: |
@@ -33,6 +33,7 @@ jobs:
       NumConcurrentExecutions: 1
       environment: prod
       PYTEST_ARGS: --df known_bugs --flex False
+      PYTEST_THREADS: auto
     # What secrets from the environment, the workflow should have access to:
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
