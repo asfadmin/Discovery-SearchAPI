@@ -37,6 +37,11 @@ on:
         required: False
         description: Extra commands to append to the pytest command.
         type: string
+      PYTEST_THREADS:
+        required: False
+        description: How many threads to use when running the test suite. (Default '0'. Supports 'auto')
+        default: 0
+        type: string
 
     secrets:
       # AWS Auth:
@@ -99,5 +104,4 @@ jobs:
       - name: Run Pytest
         if: github.event_name == 'pull_request'
         run: |
-          make -e TAG=${{ inputs.TAG }} -e PYTEST_ARGS="${{ inputs.PYTEST_ARGS }}" test-api
-        # make -e TAG=${{ inputs.TAG }} -e NUM_THREADS=auto -e PYTEST_ARGS="${{ inputs.PYTEST_ARGS }}" test-api
+          make -e TAG="${{ inputs.TAG }}" -e NUM_THREADS="${{ inputs.PYTEST_THREADS }}" -e PYTEST_ARGS="${{ inputs.PYTEST_ARGS }}" test-api
