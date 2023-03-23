@@ -1,6 +1,8 @@
 import argparse
 import requests
 import warnings
+import datetime
+import time
 
 from SearchAPI.asf_env import load_config_file
 
@@ -33,15 +35,34 @@ def api_type(user_input: str) -> str:
         api_info["this_api"] = user_input
 
     # Assume it's a url now, and try to connect:
-    try:
-        requests.get(api_info["this_api"]).raise_for_status()
-    except (requests.ConnectionError, requests.exceptions.HTTPError) as e:
-        raise argparse.ArgumentTypeError(f"ERROR: Could not connect to url '{user_input}'. Message: '{e}'.")
+    # Try for a bit. It's possible lambda isn't up yet or something
+    endTime = datetime.datetime.now() + datetime.timedelta(minutes=2)
+    while datetime.datetime.now() < endTime:
+        try:
+            r = requests.get(api_info["this_api"], timeout=30)
+        except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
+            # If it throws instantly, don't bombard the API:
+            time.sleep(2.0)
+            # Jump back up to the top and try again:
+            continue
+        if r.status_code == 200:
+            # It connected!! You're good:
+            return api_info
+    raise argparse.ArgumentTypeError(f"ERROR: Could not connect to url '{user_input}'.")
 
-    # It connected!! You're good:
-    return api_info
+def string_to_bool(user_input: str) -> bool:
+    user_input = str(user_input).upper()
+    if 'TRUE'.startswith(user_input):
+       return True
+    elif 'FALSE'.startswith(user_input):
+       return False
+    else:
+       raise argparse.ArgumentTypeError(f"ERROR: Could not convert '{user_input}' to bool (true/false/t/f).")
 
 def pytest_addoption(parser):
     parser.addoption("--api", action="store", type=api_type, default="local",
-        help = "Which API to hit when running tests (LOCAL/DEV/TEST/PROD, or url).")
-
+        help = "Which API to hit when running tests (LOCAL/DEV/TEST/PROD, or url)."
+    )
+    parser.addoption("--flex", action="store", type=string_to_bool,
+        help = "'flexible_maturity': wether to attach 'maturity' to the URL strings."
+    )
