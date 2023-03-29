@@ -36,8 +36,7 @@ def req_fields_jsonlite():
         'relativeBurstID',
         'fullBurstID',
         'burstIndex',
-        'burstAnxTime',
-        'timeFromAnxSeconds',
+        'azimuthAnxTime',
         'samplesPerBurst',
         'subswath',
     ]
@@ -167,8 +166,7 @@ class JSONLiteStreamArray(JSONStreamArray):
             burst['absoluteBurstID'] = int(p['absoluteBurstID'])
             burst['fullBurstID'] = p['fullBurstID']
             burst['burstIndex'] = int(p['burstIndex'])
-            burst['burstAnxTime'] = p['burstAnxTime']
-            burst['timeFromAnxSeconds'] = float(p['timeFromAnxSeconds'])
+            burst['azimuthAnxTime'] = float(p['azimuthAnxTime'])
             burst['samplesPerBurst'] = int(p['samplesPerBurst'])
             burst['subswath'] = p['subswath']
 
