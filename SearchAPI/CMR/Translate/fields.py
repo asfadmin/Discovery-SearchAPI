@@ -65,8 +65,7 @@ def get_field_paths():
         'relativeBurstID':          attr_path('BURST_ID_RELATIVE'),
         'fullBurstID':              attr_path('BURST_ID_FULL'),
         'burstIndex':               attr_path('BURST_INDEX'),
-        'burstAnxTime':             attr_path('BURST_ANX_TIME'),
-        'timeFromAnxSeconds':        attr_path('TIME_FROM_ANX_SEC'),   
+        'azimuthAnxTime':           attr_path('AZIMUTH_ANX_TIME'),   
         'samplesPerBurst':          attr_path('SAMPLES_PER_BURST'),
         'subswath':                 attr_path('SUBSWATH_NAME'),
     }

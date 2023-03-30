@@ -191,6 +191,8 @@ def parse_granule(granule, req_fields):
 
     if get_val(field_paths['processingLevel']) == 'BURST':
         result['granuleName'] = get_val(field_paths['product_file_id'])
+        result['beamMode'] = get_val(attr_path('BEAM_MODE'))
+
 
     return result
 
