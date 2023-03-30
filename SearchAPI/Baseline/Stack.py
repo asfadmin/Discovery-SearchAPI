@@ -92,16 +92,17 @@ def get_stack_params(reference, product_type=None):
         stack_params['platform'] = get_platform(reference)
         stack_params['beamMode'] = reference_results[0]['beamMode']
         stack_params['flightDirection'] = reference_results[0]['flightDirection']
-        if stack_params['processingLevel'] != 'BURST':
-            stack_params['lookDirection'] = reference_results[0]['lookDirection']
         stack_params['relativeorbit'] = reference_results[0]['relativeOrbit'] # path
-        stack_params['polarization'] = reference_results[0]['polarization']
-        
+
+        stack_params['polarization'] = reference_results[0]['polarization']        
         if stack_params['processingLevel'] != 'BURST':
             if stack_params['polarization'] in ['HH', 'HH+HV']:
                 stack_params['polarization'] = 'HH,HH+HV'
             elif stack_params['polarization'] in ['VV', 'VV+VH']:
                 stack_params['polarization'] = 'VV,VV+VH'
+
+            stack_params['lookDirection'] = reference_results[0]['lookDirection']
+        
         stack_params['point'] = f"{reference_results[0]['centerLon']},{reference_results[0]['centerLat']}" # flexible alternative to frame
 
     return stack_params
