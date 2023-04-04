@@ -39,7 +39,7 @@ def req_fields_csv():
         'absoluteBurstID',
         'fullBurstID',
         'burstIndex',
-        'azimuthTime'
+        'azimuthTime',
         'azimuthAnxTime',
         'samplesPerBurst',
         'subswath',

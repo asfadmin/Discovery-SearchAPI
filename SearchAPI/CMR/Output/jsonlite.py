@@ -36,7 +36,7 @@ def req_fields_jsonlite():
         'relativeBurstID',
         'fullBurstID',
         'burstIndex',
-        'azimuthTime'
+        'azimuthTime',
         'azimuthAnxTime',
         'samplesPerBurst',
         'subswath',
