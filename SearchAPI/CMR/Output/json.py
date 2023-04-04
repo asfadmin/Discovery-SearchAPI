@@ -75,6 +75,7 @@ def req_fields_json():
         'relativeBurstID',
         'fullBurstID',
         'burstIndex',
+        'azimuthTime',
         'azimuthAnxTime',
         'samplesPerBurst',
         'subswath',
