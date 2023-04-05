@@ -26,6 +26,7 @@ def req_fields_kml():
         'relativeBurstID',
         'fullBurstID',
         'burstIndex',
+        'azimuthTime',
         'azimuthAnxTime',
         'samplesPerBurst',
         'subswath',
