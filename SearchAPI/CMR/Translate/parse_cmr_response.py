@@ -192,6 +192,9 @@ def parse_granule(granule, req_fields):
     if get_val(field_paths['processingLevel']) == 'BURST':
         result['granuleName'] = get_val(field_paths['product_file_id'])
         result['beamMode'] = get_val(attr_path('BEAM_MODE'))
+        urls = get_all_vals('./OnlineResources/OnlineResource/URL')
+        result['fileName'] = urls[0].split('/')[-1] if len(urls) else None
+        result['downloadUrl'] = urls[0]
 
 
     return result
