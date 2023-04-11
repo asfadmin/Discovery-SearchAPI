@@ -47,6 +47,10 @@ class CMRSubQuery:
             if p[0] in ['readable_granule_name[]', 'granule_ur[]']:
                 for g in p[1].split(','):
                     final.append((p[0], g))
+            elif 'BURST_ID' in str(p[1]):
+                prefix = ','.join(p[1].split(',')[:2]) + ','
+                for g in p[1].split(',')[2:]:
+                    final.append((p[0], prefix + g))
             else:
                 final.append(p)
         return final
