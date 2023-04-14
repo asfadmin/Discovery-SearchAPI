@@ -40,6 +40,7 @@ def req_fields_jsonlite():
         'azimuthAnxTime',
         'samplesPerBurst',
         'subswath',
+        'PGEVersion'
     ]
     return fields
 
@@ -154,7 +155,8 @@ class JSONLiteStreamArray(JSONStreamArray):
             'stopTime': p['stopTime'],
             'thumb': p['thumbnailUrl'],
             'wkt': p['stringFootprint'],
-            'wkt_unwrapped': unwrap_wkt(p['stringFootprint'])
+            'wkt_unwrapped': unwrap_wkt(p['stringFootprint']),
+            'PGEVersion': p['PGEVersion']
         }
 
         if self.includeBaseline:
