@@ -59,13 +59,15 @@ def get_field_paths():
         'stopTime':                 "./Temporal/RangeDateTime/EndingDateTime",
         'thumbnailUrl':             attr_path('THUMBNAIL_URL'),
         'track':                    attr_path('PATH_NUMBER'),
+        'PGEVersion':               "./PGEVersionClass/PGEVersion",
         
         # BURST FIELDS
         'absoluteBurstID':          attr_path('BURST_ID_ABSOLUTE'),
         'relativeBurstID':          attr_path('BURST_ID_RELATIVE'),
         'fullBurstID':              attr_path('BURST_ID_FULL'),
         'burstIndex':               attr_path('BURST_INDEX'),
-        'azimuthAnxTime':        attr_path('AZIMUTH_ANX_TIME'),   
+        'azimuthTime':              attr_path('AZIMUTH_TIME'),
+        'azimuthAnxTime':           attr_path('AZIMUTH_ANX_TIME'),
         'samplesPerBurst':          attr_path('SAMPLES_PER_BURST'),
         'subswath':                 attr_path('SUBSWATH_NAME'),
     }

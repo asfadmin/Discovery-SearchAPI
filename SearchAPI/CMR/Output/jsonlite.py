@@ -36,9 +36,11 @@ def req_fields_jsonlite():
         'relativeBurstID',
         'fullBurstID',
         'burstIndex',
+        'azimuthTime',
         'azimuthAnxTime',
         'samplesPerBurst',
         'subswath',
+        'PGEVersion'
     ]
     return fields
 
@@ -153,7 +155,8 @@ class JSONLiteStreamArray(JSONStreamArray):
             'stopTime': p['stopTime'],
             'thumb': p['thumbnailUrl'],
             'wkt': p['stringFootprint'],
-            'wkt_unwrapped': unwrap_wkt(p['stringFootprint'])
+            'wkt_unwrapped': unwrap_wkt(p['stringFootprint']),
+            'PGEVersion': p['PGEVersion']
         }
 
         if self.includeBaseline:
@@ -166,6 +169,7 @@ class JSONLiteStreamArray(JSONStreamArray):
             burst['absoluteBurstID'] = int(p['absoluteBurstID'])
             burst['fullBurstID'] = p['fullBurstID']
             burst['burstIndex'] = int(p['burstIndex'])
+            burst['azimuthTime']  = p['azimuthTime']
             burst['azimuthAnxTime'] = float(p['azimuthAnxTime'])
             burst['samplesPerBurst'] = int(p['samplesPerBurst'])
             burst['subswath'] = p['subswath']

@@ -46,6 +46,7 @@
             <li> Relative Burst ID: {{r.relativeBurstID}}</li>
             <li> Full Burst ID: {{r.fullBurstID}}</li>
             <li> Burst Index: {{r.burstIndex}}</li>
+            <li> Azimuth Time: {{r.azimuthTime}}</li>
             <li> Azimuth Anx Time: {{r.azimuthAnxTime}}</li>
             <li> Samples per Burst: {{r.samplesPerBurst}}</li>
             <li> Subswath: {{r.subswath}}</li>
