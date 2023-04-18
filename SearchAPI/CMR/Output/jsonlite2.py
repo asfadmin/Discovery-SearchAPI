@@ -37,6 +37,7 @@ class JSONLite2StreamArray(JSONLiteStreamArray):
             'on': p['offNadirAngle'], # ALOS
             'p': p['path'],
             'pid': p['productID'].replace(p['granuleName'], '{gn}'),
+            'pge': p['pgeVersion'],
             'pa': p['pointingAngle'],
             'po': p['polarization'],
             'pt': p['productType'],
