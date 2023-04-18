@@ -79,7 +79,7 @@ def req_fields_json():
         'azimuthAnxTime',
         'samplesPerBurst',
         'subswath',
-        'PGEVersion'
+        'pgeVersion'
     ]
     return fields
 
