@@ -64,7 +64,8 @@ def get_stack_params(reference, product_type=None):
             'lookDirection',
             'platform',
             'polarization',
-            'relativeOrbit'
+            'relativeOrbit',
+            'fullBurstID'
         ])
     query = CMRQuery(
         req_fields,
