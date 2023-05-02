@@ -54,6 +54,9 @@ on:
       CERT_ARN:
         description: AWS ARN of the https certificate.
         required: True
+      CLOUDFRONT_LOGS_BUCKET:
+        description: Bucket to store CloudFront Logs (must already exist).
+        required: True
 
 
 
@@ -87,6 +90,7 @@ jobs:
           -e MATURITY=${{ inputs.MATURITY }}
           -e NumConcurrentExecutions=${{ inputs.NumConcurrentExecutions }}
           -e AcmCertificateArn=${{ secrets.CERT_ARN }}
+          -e CloudFrontLogsBucket=${{ secrets.CLOUDFRONT_LOGS_BUCKET }}
           deploy-searchapi-stack
 
       # If it's writing to a branch, the pull request to that branch already
