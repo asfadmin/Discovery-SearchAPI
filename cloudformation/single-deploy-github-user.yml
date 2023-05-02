@@ -166,6 +166,15 @@ Resources:
               - logs:DescribeResourcePolicies
             Resource:
               - !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*
+          # Allow editing bucket settings, to save logs for new stacks inside bucket
+          # (CloudFront enable standard logging)
+          - Effect: Allow
+            Action:
+              - s3:GetBucketAcl
+              - s3:PutBucketAcl
+            Resource:
+              - arn:aws:s3:::discoverylogs-nonprod
+              - arn:aws:s3:::discoverylogs-prod
 
   CloudFrontPolicy:
     Type: AWS::IAM::ManagedPolicy
