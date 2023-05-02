@@ -5,6 +5,13 @@ Description: Everything needed for a single SearchAPI
 
 Parameters:
 
+  CloudFrontLogsBucket:
+    # NOTE: This bucket should probably be inside single-deploy-shared-resources
+    # instead, but it already exists. Move it when we do the re-write to v3
+    Type: String
+    Description: Name of bucket to store logs. Required for Standard Logging
+    Default: discoverylogs-nonprod
+
   ContainerTag:
     Type: String
     Description: "Name of github branch the stack is hooked to. (also appends '-staging' if PR)."
@@ -213,6 +220,10 @@ Resources:
         WebACLId:
           Fn::ImportValue:
             !Sub ${ImportValueWafLambdaArn}
+        Logging:
+          Bucket: !Sub "${CloudFrontLogsBucket}.s3.amazonaws.com"
+          IncludeCookies: False
+          Prefix: !Sub "${AWS::StackName}-"
 
       Tags:
         - Key: Name
