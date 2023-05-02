@@ -223,7 +223,7 @@ Resources:
         Logging:
           Bucket: !Sub "${CloudFrontLogsBucket}.s3.amazonaws.com"
           IncludeCookies: False
-          Prefix: !Sub "${AWS::StackName}-"
+          Prefix: !Ref AWS::StackName
 
       Tags:
         - Key: Name
