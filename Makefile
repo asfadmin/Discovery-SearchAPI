@@ -90,7 +90,7 @@ update-api-stack-template: guard-TAG guard-MATURITY
 			ContainerTag="$${TAG}" \
 			Maturity="$${MATURITY}" \
 			NumConcurrentExecutions="$${NumConcurrentExecutions:=1}" \
-			CloudFrontLogsBucket="$${CloudFrontLogsBucket:=discoverylogs-nonprod}"
+			CloudFrontLogsBucket="$${CloudFrontLogsBucket:=discoverylogs-nonprod}" \
 			AcmCertificateArn="$${AcmCertificateArn:=}"
 
 ## Update the Lambda, with the latest container
