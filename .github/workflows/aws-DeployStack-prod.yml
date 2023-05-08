@@ -39,3 +39,4 @@ jobs:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       CERT_ARN: ${{ secrets.CERT_ARN }}
+      CLOUDFRONT_LOGS_BUCKET: ${{ secrets.CLOUDFRONT_LOGS_BUCKET }}
