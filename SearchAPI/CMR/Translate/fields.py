@@ -59,6 +59,7 @@ def get_field_paths():
         'stopTime':                 "./Temporal/RangeDateTime/EndingDateTime",
         'thumbnailUrl':             attr_path('THUMBNAIL_URL'),
         'track':                    attr_path('PATH_NUMBER'),
+        'pgeVersion':               "./PGEVersionClass/PGEVersion",
         
         # BURST FIELDS
         'absoluteBurstID':          attr_path('BURST_ID_ABSOLUTE'),
