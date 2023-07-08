@@ -8,6 +8,25 @@ precalc_datasets = ['AL', 'R1', 'E1', 'E2', 'J1']
 def get_stack(reference, req_fields=None, product_type=None):
     warnings = None
 
+    stack_params, req_fields = build_stack_params(reference, req_fields, product_type)
+
+    stack = query_stack(stack_params, req_fields)
+
+    if len(stack) <= 0:
+        raise ValueError('No products found matching stack parameters')
+
+    reference, stack, warnings = check_reference(reference, stack)
+
+    stack = calculate_temporal_baselines(reference, stack)
+
+    if get_platform(reference) in precalc_datasets:
+        stack = offset_perpendicular_baselines(reference, stack)
+    else:
+        stack = calculate_perpendicular_baselines(reference, stack)
+
+    return stack, warnings
+
+def build_stack_params(reference, req_fields=None, product_type=None):
     try:
         stack_params = get_stack_params(reference, product_type=product_type)
     except ValueError as e:
@@ -26,24 +45,11 @@ def get_stack(reference, req_fields=None, product_type=None):
             'stateVectors',
             'stopTime'
         ])
+    
+    return stack_params, req_fields
 
-    stack = query_stack(stack_params, req_fields)
-
-    if len(stack) <= 0:
-        raise ValueError('No products found matching stack parameters')
-
-    reference, stack, warnings = check_reference(reference, stack)
-
-    stack = calculate_temporal_baselines(reference, stack)
-
-    if get_platform(reference) in precalc_datasets:
-        stack = offset_perpendicular_baselines(reference, stack)
-    else:
-        stack = calculate_perpendicular_baselines(reference, stack)
-
-    return stack, warnings
-
-def get_stack_params(reference, product_type=None):
+def get_stack_params(reference, product_type=None, is_count=False
+):
     params = {'granule_list': reference}
     if product_type is not None:
         params['processingLevel'] = product_type
