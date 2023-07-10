@@ -8,7 +8,7 @@ precalc_datasets = ['AL', 'R1', 'E1', 'E2', 'J1']
 def get_stack(reference, req_fields=None, product_type=None):
     warnings = None
 
-    stack_params, req_fields = build_stack_params(reference, req_fields, product_type)
+    stack_params, req_fields = build_stack_query(reference, req_fields, product_type)
 
     stack = query_stack(stack_params, req_fields)
 
@@ -26,7 +26,7 @@ def get_stack(reference, req_fields=None, product_type=None):
 
     return stack, warnings
 
-def build_stack_params(reference, req_fields=None, product_type=None):
+def build_stack_query(reference, req_fields=None, product_type=None):
     try:
         stack_params = get_stack_params(reference, product_type=product_type)
     except ValueError as e:
