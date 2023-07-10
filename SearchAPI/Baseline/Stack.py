@@ -48,8 +48,7 @@ def build_stack_params(reference, req_fields=None, product_type=None):
     
     return stack_params, req_fields
 
-def get_stack_params(reference, product_type=None, is_count=False
-):
+def get_stack_params(reference, product_type=None):
     params = {'granule_list': reference}
     if product_type is not None:
         params['processingLevel'] = product_type
