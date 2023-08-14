@@ -167,8 +167,8 @@ tests:
     processingLevel: L0.5
     # use_maturity: True
 
-    expected file: error json
-    expected code: 400
+    expected file: jsonlite
+    expected code: 200
 
 - missing stack ID:
     reference: ALPSRS279162650

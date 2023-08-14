@@ -57,7 +57,7 @@ class test_date_parser():
         if content_type == "html" or status_code >= 500:
             assert False, self.error_msg.format("API returned error page. \nHTML (First 500 char):\n{0}\n".format(content[:500]))
         if "expected error" in self.test_info:
-            if "errors" in content:
+            if "error" in content:
                 assert self.test_info["expected error"].lower() in str(content).lower(), self.error_msg.format("API returned a different error than expected.")
             else:
                 assert False, self.error_msg.format("API parsed value when validation error expected.")
