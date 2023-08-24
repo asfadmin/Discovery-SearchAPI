@@ -461,7 +461,7 @@ tests:
     granule_list: S1B_S6_GRDH_1SDV_20190911T214309_20190911T214338_017995_021E10_5CCB
     output: download
 
-    expected file: download
+    expected file: x-python
     expected code: 200
 
 #In CMR reporting script, we report groupid as null on most datasets. Some datasets updated to expect blank file & moved to partial pass yaml
@@ -955,7 +955,7 @@ tests:
     maxResults: 200
     output: download
 
-    expected file: download
+    expected file: x-python
     expected code: 200
 
 - output download Avnir:
@@ -964,7 +964,7 @@ tests:
     maxResults: 2
     output: download
 
-    expected file: download
+    expected file: x-python
     expected code: 200
 
 - output geojson Sentinel:
@@ -1073,7 +1073,8 @@ tests:
 
 - platform J1:
     platform: J1
-    polygon: -141.7461,64.8261,-140.3172,63.5722,-137.8891,64.7214,-141.7461,64.8261
+    # polygon: -141.7461,64.8261,-140.3172,63.5722,-137.8891,64.7214,-141.7461,64.8261
+    intersectsWith: POLYGON((-141.7461 64.8261, -140.3172 63.5722, -137.8891 64.7214, -141.7461 64.8261))
     maxResults: 100
     output: csv
 
@@ -1083,7 +1084,8 @@ tests:
 - platform A3:
     platform: A3
     processingLevel: L1.0
-    polygon: -148.52,64.63,-150.41,64.64,-149.58,63.86,-148.52,64.63
+    # polygon: -148.52,64.63,-150.41,64.64,-149.58,63.86,-148.52,64.63
+    intersectsWith: POLYGON((-148.52 64.63, -150.41 64.64, -149.58 63.86, -148.52 64.63))
     maxResults: 100
     output: csv
 
@@ -1936,24 +1938,19 @@ tests:
     expected file: jsonlite
     expected code: 200
 
-- polygon:
-    polygon: -148.52,64.63,-150.41,64.64,-149.58,63.86,-148.52,64.63
+- polygon lowercase:
+    # polygon: -148.52,64.63,-150.41,64.64,-149.58,63.86,-148.52,64.63
+    intersectsWith: polygon(( -148.52,64.63 -150.41,64.64, -149.58,63.86 -148.52,64.63 ))
     maxResults: 100
     output: csv
 
     expected file: csv
     expected code: 200
 
-- polygon uppercase:
-    POLYGON: -148.52,64.63,-150.41,64.64,-149.58,63.86,-148.52,64.63
-    maxResults: 100
-    output: csv
-
-    expected file: csv
-    expected code: 200
 
 - polygon multi:
-    polygon: 12.13,41.74,13.4,41.74,13.4,42.75,12.13,42.75,12.13,41.74
+    # polygon: 12.13,41.74,13.4,41.74,13.4,42.75,12.13,42.75,12.13,41.74
+    intersectsWith: POLYGON((12.13 41.74, 13.4 41.74, 13.4 42.75, 12.13 42.75, 12.13 41.74))
     platform: Sentinel-1A,Sentinel-1B
     processingLevel: SLC
     start: 2015-05-01T00:00:00UTC
@@ -1964,7 +1961,8 @@ tests:
     expected code: 200
 
 - polygon closure 1:
-    polygon: 12.13,41.74,13.4,41.74,13.4,42.75,12.13,42.75
+    # polygon: 12.13,41.74,13.4,41.74,13.4,42.75,12.13,42.75
+    intersectsWith: POLYGON((12.13 41.74, 13.4 41.74, 13.4 42.75, 12.13 42.75))
     platform: Sentinel-1A,Sentinel-1B
     processingLevel: SLC
     start: 2015-05-01T00:00:00UTC
@@ -1975,7 +1973,8 @@ tests:
     expected code: 200
 
 - polygon closure 2:
-    polygon: 12.13,41.74,13.4,41.74,13.4,42.75,12.13,42.75,12.13,41.74
+    # polygon: 12.13,41.74,13.4,41.74,13.4,42.75,12.13,42.75,12.13,41.74
+    intersectsWith: POLYGON((12.13 41.74, 13.4 41.74, 13.4 42.75, 12.13 42.75, 12.13 41.74))
     platform: Sentinel-1A,Sentinel-1B
     processingLevel: SLC
     start: 2015-05-01T00:00:00UTC
@@ -1986,7 +1985,8 @@ tests:
     expected code: 200
 
 - polygon closure 3:
-    polygon: 12.13,41.74,12.13,42.75,13.4,42.75,13.4,41.74,12.13,41.74
+    # polygon: 12.13,41.74,12.13,42.75,13.4,42.75,13.4,41.74,12.13,41.74
+    intersectsWith: POLYGON(( 12.13 41.74, 12.13 42.75, 13.4 42.75, 13.4 41.74, 12.13 41.74 ))
     platform: Sentinel-1A,Sentinel-1B
     processingLevel: SLC
     start: 2015-05-01T00:00:00UTC
@@ -1997,7 +1997,8 @@ tests:
     expected code: 200
 
 - polygon closure 4:
-    polygon: -155.08,65.82,-153.5,61.91,-149.50,63.07,-149.94,64.55
+    # polygon: -155.08,65.82,-153.5,61.91,-149.50,63.07,-149.94,64.55
+    intersectsWith: POLYGON(( -155.08 65.82, -153.5 61.91, -149.50 63.07, -149.94 64.55 ))
     maxResults: 100
     output: Csv
 

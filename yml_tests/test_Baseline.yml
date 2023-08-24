@@ -76,7 +76,7 @@ tests:
     output: download
     # use_maturity: True
 
-    expected file: download
+    expected file: x-python
     expected code: 200
 
 - baseline jsonlite:

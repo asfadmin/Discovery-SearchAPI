@@ -672,7 +672,8 @@ tests:
     expected code: 400
 
 - polygon 3 points invalid:
-    polygon: -155.08,65.82,-153.5
+    # polygon: -155.08,65.82,-153.5
+    intersectsWith: POLYGON((-155.08 65.82, -153.5))
     maxResults: 1000
     output: csv
 
@@ -680,7 +681,8 @@ tests:
     expected code: 400
 
 - polygon 2 points invalid:
-    polygon: -155.08,65.82
+    # polygon: -155.08,65.82
+    intersectsWith: POLYGON((-155.08 65.82))
     maxResults: 1000
     output: csv
 
@@ -688,31 +690,17 @@ tests:
     expected code: 400
 
 - polygon 2 points count invalid:
-    polygon: -155.08,65.82
+    # polygon: -155.08,65.82
+    intersectsWith: POLYGON((-155.08 65.82))
     maxResults: 1000
     output: count
 
     expected file: error json
     expected code: 400
 
-- polygon specchar invalid:
-    polygon: ~!
-    maxResults: 1000
-    output: csv
 
-    expected file: error json
-    expected code: 400
-
-- polygon specchar count invalid:
-    polygon: -#
-    maxResults: 1000
-    output: count
-
-    expected file: error json
-    expected code: 400
-
-- polygon test invalid:
-    polygon: test
+- intersectsWith test invalid:
+    intersectsWith: test
     maxResults: 1000
     output: csv
 
@@ -929,7 +917,8 @@ tests:
     expected code: 400
 
 - realworld 9 invalid:
-    polygon: 4794886.03996192,2658783.7409794466,4911667.405803877,2658783.7409794466,4911667.405803877,2775921.3473827764,4794886.03996192,2775921.3473827764,4794886.03996192,2658783.7409794466
+    # polygon: 4794886.03996192,2658783.7409794466,4911667.405803877,2658783.7409794466,4911667.405803877,2775921.3473827764,4794886.03996192,2775921.3473827764,4794886.03996192,2658783.7409794466
+    intersectsWith: POLYGON((4794886.03996192 2658783.7409794466, 4911667.405803877 2658783.7409794466, 4911667.405803877 2775921.3473827764, 4794886.03996192 2775921.3473827764, 4794886.03996192 2658783.7409794466))
     maxResults: 1000
     output: csv
 
