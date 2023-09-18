@@ -1,13 +1,15 @@
 import json
+from SearchAPI.CMR.Query import CMRQuery
 
 from flask import Response, make_response
 from datetime import datetime
 import logging
+from SearchAPI.CMR.Translate import input_fixer, translate_params
 
 import SearchAPI.api_headers as api_headers
 from SearchAPI.CMR.Input import parse_string
 from SearchAPI.CMR.Output import output_translators
-from SearchAPI.Baseline import get_stack, get_default_product_type
+from SearchAPI.Baseline import get_stack, get_default_product_type, build_stack_query
 
 
 class APIStackQuery:
@@ -28,12 +30,23 @@ class APIStackQuery:
             translator, mimetype, suffix, req_fields = translators.get(self.params['output'], translators['metalink'])
 
             is_count = self.params['output'].lower() == 'count'
-            stack, warnings = get_stack(
-                reference=self.params['reference'],
-                req_fields=req_fields,
-                product_type=self.params['processinglevel'])
+
             if is_count:
-                return make_response(f'{len(stack)}\n')
+                params, req_fields = build_stack_query(
+                    reference=self.params['reference'],
+                    req_fields=req_fields,
+                    product_type=self.params['processinglevel'])
+
+                params,_,_ = translate_params(params)
+                params = input_fixer(params)
+                stack = CMRQuery(req_fields, params=dict(params))
+                return make_response(f'{stack.get_count()}\n')
+            else:
+                stack, warnings = get_stack(
+                    reference=self.params['reference'],
+                    req_fields=req_fields,
+                    product_type=self.params['processinglevel'])
+  
 
 
             filename = make_filename(suffix)
