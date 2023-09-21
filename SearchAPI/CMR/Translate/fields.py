@@ -70,5 +70,8 @@ def get_field_paths():
         'azimuthAnxTime':           attr_path('AZIMUTH_ANX_TIME'),
         'samplesPerBurst':          attr_path('SAMPLES_PER_BURST'),
         'subswath':                 attr_path('SUBSWATH_NAME'),
+        
+        # OPERA RTC FIELDS
+        'operaBurstID':                  attr_path('OPERA_BURST_ID'),
     }
     return paths

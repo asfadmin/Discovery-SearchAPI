@@ -58,4 +58,7 @@ class JSONLite2StreamArray(JSONLiteStreamArray):
         if p.get('burst') is not None: # is a burst product
             result['s1b'] = p['burst']
 
+        if p.get('opera') is not None:
+            result['s1o'] = p['opera']
+
         return result
