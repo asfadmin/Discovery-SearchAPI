@@ -53,13 +53,16 @@ class APISearchQuery:
 
     def check_has_search_params(self):
         non_searchable_param = ['output', 'maxresults', 'pagesize', 'maturity']
-        list_param_exceptions = ['collections']
+        list_param_exceptions = ['collections'] # allows collections in granule/product search
         
+        params = [v.lower() for v in self.request.local_values]
+        is_collection_search = 'collections' in params
+
         searchables = [
-            v for v in self.request.local_values if v.lower() not in [*non_searchable_param, *list_param_exceptions]
+            v for v in params if v not in [*non_searchable_param, *list_param_exceptions]
         ]
 
-        if len(searchables) <= 0:
+        if len(searchables) <= 0 and not is_collection_search:
             raise ValueError(
                 'No searchable parameters specified, queries must include'
                 ' parameters besides output= and maxresults='
