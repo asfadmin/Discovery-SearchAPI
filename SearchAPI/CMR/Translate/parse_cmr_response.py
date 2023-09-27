@@ -198,7 +198,8 @@ def parse_granule(granule, req_fields):
             result['downloadUrl'] = urls[0]
             result['fileName'] = result['granuleName'] + '.' + urls[0].split('.')[-1]
 
-
+    if result.get('product_file_id', '').startswith('OPERA'):
+        result['additionalUrls'] = [url for url in get_all_vals('./OnlineAccessURLs/OnlineAccessURL/URL') if not url.endswith('.md5') and not url.startswith('s3://')]
     return result
 
 

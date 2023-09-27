@@ -160,7 +160,7 @@ class CMRSubQuery:
             api_url = self.cmr_api_url()
             response = session.post(api_url, data=self.params, headers=self.headers)
 
-            if 'CMR-Search-After' in response.headers:            
+            if 'CMR-Search-After' in response.headers:
                 session.headers.update({'CMR-Search-After': response.headers['CMR-Search-After']})
         
             query_duration = perf_counter() - q_start

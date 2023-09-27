@@ -42,6 +42,7 @@ def req_fields_jsonlite():
         'subswath',
         'pgeVersion',
         'operaBurstID',
+        'additionalUrls'
     ]
     return fields
 
@@ -177,9 +178,10 @@ class JSONLiteStreamArray(JSONStreamArray):
 
             result['burst'] = burst
 
-        if p.get('operaBurstID') is not None:
+        if p.get('operaBurstID') is not None or result['productID'].startswith('OPERA'):
             result['opera'] = {
-                'operaBurstID': p.get('operaBurstID')
+                'operaBurstID': p.get('operaBurstID'),
+                'additionalUrls': p.get('additionalUrls')
             }
 
         return result
