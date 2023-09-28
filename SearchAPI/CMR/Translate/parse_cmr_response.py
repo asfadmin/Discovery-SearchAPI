@@ -73,9 +73,10 @@ def parse_granule(granule, req_fields):
             'ERS-1', 'ERS-2', 'JERS-1', 'RADARSAT-1'
         ]
 
-        frame_type = 'FRAME_NUMBER' \
-            if result['platform'] in asf_frame_platforms \
-            else 'CENTER_ESA_FRAME'
+        if result['platform'] in asf_frame_platforms:
+            frame_type = 'FRAME_NUMBER'
+        else:
+            frame_type = 'CENTER_ESA_FRAME'
 
         result['frameNumber'] = get_val(attr_path(frame_type))
         remove_field('frameNumber')
