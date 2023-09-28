@@ -68,10 +68,16 @@ def parse_granule(granule, req_fields):
         remove_field('platform')
 
     if 'frameNumber' in req_fields:
-        asf_frame_platforms = ['Sentinel-1A', 'Sentinel-1B', 'ALOS', 'SENTINEL-1A', 'SENTINEL-1B']
-        result['frameNumber'] = get_val(attr_path('FRAME_NUMBER')) \
+        asf_frame_platforms = [
+            'Sentinel-1A', 'Sentinel-1B', 'ALOS', 'SENTINEL-1A', 'SENTINEL-1B',
+            'ERS-1', 'ERS-2', 'JERS-1', 'RADARSAT-1'
+        ]
+
+        frame_type = 'FRAME_NUMBER' \
             if result['platform'] in asf_frame_platforms \
-            else get_val(attr_path('CENTER_ESA_FRAME'))
+            else 'CENTER_ESA_FRAME'
+
+        result['frameNumber'] = get_val(attr_path(frame_type))
         remove_field('frameNumber')
 
     if 'browse' in req_fields:
@@ -126,13 +132,13 @@ def parse_granule(granule, req_fields):
     if 'canInsar' in req_fields:
         if result['platform'] in ['ALOS', 'RADARSAT-1', 'JERS-1', 'ERS-1', 'ERS-2']:
             result['insarGrouping'] = get_val(field_paths['insarGrouping'])
-            
+
             insarBaseline = get_val(field_paths['insarBaseline'])
             if insarBaseline is not None:
                 insarBaseline = float(insarBaseline)
             result['baseline'] = {
                 'insarBaseline': insarBaseline
-                } 
+                }
             remove_field('insarGrouping')
             if result['insarGrouping'] not in [None, 0, '0', 'NA', 'NULL']:
                 result['canInsar'] = True
@@ -148,7 +154,7 @@ def parse_granule(granule, req_fields):
             result['canInsar'] = False
         remove_field('canInsar')
 
-        
+
     # These fields are always None or NA and should be fully deprecated/removed in the future
     deprecated_fields = [
         'beamSwath',
