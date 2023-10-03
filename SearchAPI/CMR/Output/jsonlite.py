@@ -40,7 +40,9 @@ def req_fields_jsonlite():
         'azimuthAnxTime',
         'samplesPerBurst',
         'subswath',
-        'pgeVersion'
+        'pgeVersion',
+        'operaBurstID',
+        'additionalUrls'
     ]
     return fields
 
@@ -175,5 +177,11 @@ class JSONLiteStreamArray(JSONStreamArray):
             burst['subswath'] = p['subswath']
 
             result['burst'] = burst
+
+        if p.get('operaBurstID') is not None or result['productID'].startswith('OPERA'):
+            result['opera'] = {
+                'operaBurstID': p.get('operaBurstID'),
+                'additionalUrls': p.get('additionalUrls')
+            }
 
         return result

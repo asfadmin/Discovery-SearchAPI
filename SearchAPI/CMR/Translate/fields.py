@@ -60,7 +60,8 @@ def get_field_paths():
         'thumbnailUrl':             attr_path('THUMBNAIL_URL'),
         'track':                    attr_path('PATH_NUMBER'),
         'pgeVersion':               "./PGEVersionClass/PGEVersion",
-        
+        'additionalUrls':           "./OnlineAccessURLs",
+
         # BURST FIELDS
         'absoluteBurstID':          attr_path('BURST_ID_ABSOLUTE'),
         'relativeBurstID':          attr_path('BURST_ID_RELATIVE'),
@@ -70,5 +71,8 @@ def get_field_paths():
         'azimuthAnxTime':           attr_path('AZIMUTH_ANX_TIME'),
         'samplesPerBurst':          attr_path('SAMPLES_PER_BURST'),
         'subswath':                 attr_path('SUBSWATH_NAME'),
+        
+        # OPERA RTC FIELDS
+        'operaBurstID':                  attr_path('OPERA_BURST_ID'),
     }
     return paths
