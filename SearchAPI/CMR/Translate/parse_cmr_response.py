@@ -199,10 +199,12 @@ def parse_granule(granule, req_fields):
             result['fileName'] = result['granuleName'] + '.' + urls[0].split('.')[-1]
 
     if result.get('product_file_id', '').startswith('OPERA'):
-        
-        accessUrls = [url for url in get_all_vals('./OnlineAccessURLs/OnlineAccessURL/URL') if not url.endswith('.md5') and not url.startswith('s3://') and not 's3credentials' in url and not url.endswith('.iso')]
-        OnlineResources = [url for url in get_all_vals('./OnlineResources/OnlineResource/URL') if not url.endswith('.md5') and not url.startswith('s3://') and not 's3credentials' in url and not url.endswith('.iso')]
+        result['beamMode'] = get_val(attr_path('BEAM_MODE'))
+        accessUrls = [url for url in get_all_vals('./OnlineAccessURLs/OnlineAccessURL/URL') if not url.endswith('.md5') and not url.startswith('s3://') and not 's3credentials' in url]
+        OnlineResources = [url for url in get_all_vals('./OnlineResources/OnlineResource/URL') if not url.endswith('.md5') and not url.startswith('s3://') and not 's3credentials' in url]
         result['additionalUrls'] = list(set([*accessUrls, *OnlineResources]))
+        result['configurationName'] = "Interferometric Wide. 250 km swath, 5 m x 20 m spatial resolution and burst synchronization for interferometry. IW is considered to be the standard mode over land masses."
+
     return result
 
 
