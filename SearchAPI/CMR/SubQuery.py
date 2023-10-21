@@ -240,7 +240,7 @@ class CMRSubQuery:
                                     'Value': request.asf_base_maturity
                                 }
                             ],
-                            'Unit': 'Seconds',
+                            'Unit': 'None',
                             'Value': elapsed_time
                         }
                     ],
