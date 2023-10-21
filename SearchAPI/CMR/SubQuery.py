@@ -225,7 +225,7 @@ class CMRSubQuery:
         logging.error(session.headers)
         logging.error(f'Error body: {response.text}')
 
-    def log_subquery_time(elapsed_time):
+    def log_subquery_time(self, elapsed_time):
         try:
             if request.asf_config['cloudwatch_metrics']:
                 logging.debug('Logging subquery run time to cloudwatch metrics')
@@ -240,7 +240,7 @@ class CMRSubQuery:
                                     'Value': request.asf_base_maturity
                                 }
                             ],
-                            'Unit': 'None',
+                            'Unit': 'Seconds',
                             'Value': elapsed_time
                         }
                     ],
