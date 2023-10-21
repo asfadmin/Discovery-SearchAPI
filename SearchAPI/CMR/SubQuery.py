@@ -9,7 +9,6 @@ from flask import request
 from SearchAPI.asf_env import get_config
 from SearchAPI.CMR.Translate import parse_cmr_response
 from SearchAPI.CMR.Exceptions import CMRError
-import boto3
 
 class CMRSubQuery:
     def __init__(self, req_fields, params, extra_params):
@@ -18,6 +17,7 @@ class CMRSubQuery:
         self.req_fields = req_fields
         self.hits = 0
         self.results = []
+        self.query_times = []
 
         self.params = self.combine_params(self.params, self.extra_params)
 
@@ -168,9 +168,9 @@ class CMRSubQuery:
 
             if query_duration > 10:
                 self.log_slow_cmr_response(session, response, query_duration)
-
-            self.log_subquery_time(query_duration)
             
+            self.query_times.append(query_duration)
+
             if response.status_code != 200:
                 self.log_bad_cmr_response(
                     attempt, max_retry, response, session
@@ -224,27 +224,3 @@ class CMRSubQuery:
         logging.error('Headers sent to CMR:')
         logging.error(session.headers)
         logging.error(f'Error body: {response.text}')
-
-    def log_subquery_time(self, elapsed_time):
-        try:
-            if request.asf_config['cloudwatch_metrics']:
-                logging.debug('Logging subquery run time to cloudwatch metrics')
-                cloudwatch = boto3.client('cloudwatch')
-                cloudwatch.put_metric_data(
-                    MetricData = [
-                        {
-                            'MetricName': 'SubqueryRuntime',
-                            'Dimensions': [
-                                {
-                                    'Name': 'maturity',
-                                    'Value': request.asf_base_maturity
-                                }
-                            ],
-                            'Unit': 'Seconds',
-                            'Value': elapsed_time
-                        }
-                    ],
-                    Namespace = 'SearchAPI'
-                )
-        except Exception as e:
-            logging.exception(f'Failure during subquery run time logging: {e}')

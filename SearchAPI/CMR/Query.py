@@ -8,6 +8,8 @@ from SearchAPI.CMR.Translate import input_map
 from SearchAPI.CMR.SubQuery import CMRSubQuery
 from flask import request
 
+import boto3
+
 
 class CMRQuery:
     def __init__(self, req_fields, params=None, max_results=None):
@@ -17,6 +19,7 @@ class CMRQuery:
         self.req_fields = req_fields
         self.page_size = cfg['cmr_page_size']
         self.params = params
+        self.subquery_times = []
 
         provider = request.args.get("cmr_provider")
         if provider == None:
@@ -45,6 +48,7 @@ class CMRQuery:
             )
             for query in subquery_list_from(self.params)
         ]
+        
 
         logging.debug('New CMRQuery object ready to go')
 
@@ -94,6 +98,33 @@ class CMRQuery:
             self.max_results is not None and
             self.result_counter >= self.max_results
         )
+    
+
+
+    def log_subquery_time(self, subqueries):
+        try:
+            if request.asf_config['cloudwatch_metrics']:
+                logging.debug('Logging subquery run time to cloudwatch metrics')
+                cloudwatch = boto3.client('cloudwatch')
+                cloudwatch.put_metric_data(
+                    MetricData = [
+                        {
+                            'MetricName': 'SubqueryRuntime',
+                            'Dimensions': [
+                                {
+                                    'Name': 'maturity',
+                                    'Value': request.asf_base_maturity
+                                }
+                            ],
+                            'Unit': 'Seconds',
+                            'Values': self.queryTimes
+                        }
+                    ],
+                    Namespace = 'SearchAPI'
+                )
+        except Exception as e:
+            logging.exception(f'Failure during subquery run time logging: {e}')
+
 
 
 def subquery_list_from(params):
