@@ -19,7 +19,6 @@ class CMRQuery:
         self.req_fields = req_fields
         self.page_size = cfg['cmr_page_size']
         self.params = params
-        self.subquery_times = []
 
         provider = request.args.get("cmr_provider")
         if provider == None:
@@ -71,10 +70,12 @@ class CMRQuery:
                 if self.is_out_of_time():
                     logging.warning('Query ran too long, terminating')
                     logging.warning(self.params)
+                    self.log_subquery_time()
                     return
 
                 if self.max_results_reached():
                     logging.debug('Max results reached, terminating')
+                    self.log_subquery_time()
                     return
 
                 if result is None:
@@ -86,9 +87,11 @@ class CMRQuery:
                 # it's a little silly but run this check again here so we don't accidentally fetch an extra page
                 if self.max_results_reached():
                     logging.debug('Max results reached, terminating')
+                    self.log_subquery_time()
                     return
 
             logging.debug('End of available results reached')
+            self.log_subquery_time()
 
     def is_out_of_time(self):
         return time.time() > self.cutoff_time
@@ -101,7 +104,10 @@ class CMRQuery:
     
 
 
-    def log_subquery_time(self, subqueries):
+    def log_subquery_time(self):
+        subquery_times = []
+        for subquery in self.sub_queries:
+            subquery_times.extend(subquery.query_times)
         try:
             if request.asf_config['cloudwatch_metrics']:
                 logging.debug('Logging subquery run time to cloudwatch metrics')
@@ -117,7 +123,7 @@ class CMRQuery:
                                 }
                             ],
                             'Unit': 'Seconds',
-                            'Values': self.queryTimes
+                            'Values': subquery_times
                         }
                     ],
                     Namespace = 'SearchAPI'
