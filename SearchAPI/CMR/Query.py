@@ -122,7 +122,7 @@ class CMRQuery:
                                     'Value': request.asf_base_maturity
                                 }
                             ],
-                            'Unit': 'Seconds',
+                            'Unit': 'None',
                             'Values': subquery_times
                         }
                     ],
