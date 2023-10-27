@@ -8,8 +8,6 @@ from SearchAPI.CMR.Translate import input_map
 from SearchAPI.CMR.SubQuery import CMRSubQuery
 from flask import request
 
-import boto3
-
 
 class CMRQuery:
     def __init__(self, req_fields, params=None, max_results=None):
@@ -70,12 +68,10 @@ class CMRQuery:
                 if self.is_out_of_time():
                     logging.warning('Query ran too long, terminating')
                     logging.warning(self.params)
-                    self.log_subquery_time()
                     return
 
                 if self.max_results_reached():
                     logging.debug('Max results reached, terminating')
-                    self.log_subquery_time()
                     return
 
                 if result is None:
@@ -87,11 +83,9 @@ class CMRQuery:
                 # it's a little silly but run this check again here so we don't accidentally fetch an extra page
                 if self.max_results_reached():
                     logging.debug('Max results reached, terminating')
-                    self.log_subquery_time()
                     return
 
             logging.debug('End of available results reached')
-            self.log_subquery_time()
 
     def is_out_of_time(self):
         return time.time() > self.cutoff_time
@@ -101,37 +95,6 @@ class CMRQuery:
             self.max_results is not None and
             self.result_counter >= self.max_results
         )
-    
-
-
-    def log_subquery_time(self):
-        subquery_times = []
-        for subquery in self.sub_queries:
-            subquery_times.extend(subquery.query_times)
-        try:
-            if request.asf_config['cloudwatch_metrics']:
-                logging.debug('Logging subquery run time to cloudwatch metrics')
-                cloudwatch = boto3.client('cloudwatch')
-                cloudwatch.put_metric_data(
-                    MetricData = [
-                        {
-                            'MetricName': 'SubqueryRuntime',
-                            'Dimensions': [
-                                {
-                                    'Name': 'maturity',
-                                    'Value': request.asf_base_maturity
-                                }
-                            ],
-                            'Unit': 'None',
-                            'Values': subquery_times
-                        }
-                    ],
-                    Namespace = 'SearchAPI'
-                )
-        except Exception as e:
-            logging.exception(f'Failure during subquery run time logging: {e}')
-
-
 
 def subquery_list_from(params):
     """
