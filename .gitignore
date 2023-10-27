@@ -22,4 +22,4 @@ jsonlite_cache/*
 venv/*
 .DS_Store
 .vscode
-
+.env
