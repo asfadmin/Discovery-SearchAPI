@@ -114,6 +114,8 @@ platform_datasets = {
     "OPERA-S1": [
         "C2777443834-ASF",
         "C2777436413-ASF",
+        "C2795135174-ASF", # RTC-STATIC
+        "C2795135668-ASF", # CSLC-STATIC
         "C1258354200-ASF",  # maybe extra?
         "C1259982010-ASF",
         "C1257995185-ASF",
