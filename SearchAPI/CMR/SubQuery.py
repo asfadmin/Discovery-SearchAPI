@@ -7,7 +7,7 @@ import requests
 from flask import request
 
 from SearchAPI.asf_env import get_config
-from SearchAPI.CMR.Translate import parse_cmr_response
+from SearchAPI.CMR.Translate import parse_cmr_response, platform_datasets
 from SearchAPI.CMR.Exceptions import CMRError
 
 import boto3
@@ -58,9 +58,15 @@ class CMRSubQuery:
 
     def should_use_asf_frame(self):
         asf_frame_platforms = ['SENTINEL-1A', 'SENTINEL-1B', 'ALOS']
-
+        asf_frame_datasets = ['SENTINEL-1', 'OPERA-S1', 'SLC-BURST', 'ALOS PALSAR', 'ALOS AVNIR-2']
+        
+        asf_frame_collections = []
+        for dataset in asf_frame_datasets:
+            asf_frame_collections.extend(platform_datasets.get(dataset))
+        
         return any([
-            p[0] == 'platform[]' and p[1] in asf_frame_platforms
+            p[0] == 'platform[]' and p[1] in asf_frame_platforms 
+            or p[0] == 'echo_collection_id[]' and p[1] in asf_frame_collections
             for p in self.params
         ])
 
