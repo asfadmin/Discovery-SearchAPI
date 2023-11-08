@@ -167,7 +167,7 @@ class CMRSubQuery:
             query_duration = perf_counter() - q_start
             logging.debug(f'CMR query time: {query_duration}')
 
-            self.log_subquery_time({'time': query_duration, 'status': response.status_code})
+            # self.log_subquery_time({'time': query_duration, 'status': response.status_code})
             
             if query_duration > 10:
                 self.log_slow_cmr_response(session, response, query_duration)
