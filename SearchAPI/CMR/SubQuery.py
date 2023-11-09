@@ -7,9 +7,10 @@ import requests
 from flask import request
 
 from SearchAPI.asf_env import get_config
-from SearchAPI.CMR.Translate import parse_cmr_response
+from SearchAPI.CMR.Translate import parse_cmr_response, platform_datasets
 from SearchAPI.CMR.Exceptions import CMRError
 
+import boto3
 
 class CMRSubQuery:
     def __init__(self, req_fields, params, extra_params):
@@ -57,9 +58,15 @@ class CMRSubQuery:
 
     def should_use_asf_frame(self):
         asf_frame_platforms = ['SENTINEL-1A', 'SENTINEL-1B', 'ALOS']
-
+        asf_frame_datasets = ['SENTINEL-1', 'OPERA-S1', 'SLC-BURST', 'ALOS PALSAR', 'ALOS AVNIR-2']
+        
+        asf_frame_collections = []
+        for dataset in asf_frame_datasets:
+            asf_frame_collections.extend(platform_datasets.get(dataset))
+        
         return any([
-            p[0] == 'platform[]' and p[1] in asf_frame_platforms
+            p[0] == 'platform[]' and p[1] in asf_frame_platforms 
+            or p[0] == 'echo_collection_id[]' and p[1] in asf_frame_collections
             for p in self.params
         ])
 
@@ -166,9 +173,10 @@ class CMRSubQuery:
             query_duration = perf_counter() - q_start
             logging.debug(f'CMR query time: {query_duration}')
 
+            # self.log_subquery_time({'time': query_duration, 'status': response.status_code})
+            
             if query_duration > 10:
                 self.log_slow_cmr_response(session, response, query_duration)
-
             if response.status_code != 200:
                 self.log_bad_cmr_response(
                     attempt, max_retry, response, session
@@ -222,3 +230,31 @@ class CMRSubQuery:
         logging.error('Headers sent to CMR:')
         logging.error(session.headers)
         logging.error(f'Error body: {response.text}')
+
+
+    def log_subquery_time(self, query_metric):
+        try:
+            if request.asf_config['cloudwatch_metrics']:
+                logging.debug('Logging subquery run time to cloudwatch metrics')
+                cloudwatch = boto3.client('cloudwatch')
+                cloudwatch.put_metric_data(
+                    MetricData = [
+                        {
+                            'MetricName': 'SubqueryRuntime',
+                            'Dimensions': [
+                                {
+                                    'Name': 'maturity',
+                                    'Value': request.asf_base_maturity
+                                }, {
+                                    'Name': 'status',
+                                    'Value': query_metric['status']
+                                }
+                            ],
+                            'Unit': 'None',
+                            'Value': query_metric['time']
+                        }
+                    ],
+                    Namespace = 'SearchAPI'
+                )
+        except Exception as e:
+            logging.exception(f'Failure during subquery run time logging: {e}')

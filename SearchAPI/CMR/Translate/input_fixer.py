@@ -5,6 +5,7 @@ import requests
 
 from SearchAPI.asf_env import get_config
 from .collections_by_platform import collections_by_platform, collections_by_platform_uat, collections_by_platform_uat_asfdev
+from .datasets import platform_datasets
 
 def input_fixer(params, is_prod: bool = False, provider: str = "ASF"):
     """
@@ -107,6 +108,15 @@ def input_fixer(params, is_prod: bool = False, provider: str = "ASF"):
             if any_processing_level:
                 fixed_params['collections'] = collection_list
 
+        elif k == 'dataset':
+            fixed_params['collections'] = []
+            for dataset in params[k]:
+                if platform_datasets.get(dataset):
+                    fixed_params['collections'].extend(platform_datasets.get(dataset))
+                else:
+                    raise ValueError(f'Could not find dataset named "{dataset}" provided for dataset keyword.')
+                              
+            logging.warn(fixed_params)
         elif k == 'beammode':
             beammap = {
                 'STD': 'Standard'
