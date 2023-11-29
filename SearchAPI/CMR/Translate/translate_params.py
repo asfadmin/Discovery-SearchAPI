@@ -20,7 +20,7 @@ def translate_params(p):
         if p.get('collections') is None:
             p['collections'] = ','.join(collections)
         else:
-            p['collections'] + ',' + ','.join(collections)
+            p['collections'] += ',' + ','.join(collections)
         
     
     params = {}
