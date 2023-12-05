@@ -211,7 +211,13 @@ def parse_granule(granule, req_fields):
         OnlineResources = [url for url in get_all_vals('./OnlineResources/OnlineResource/URL') if not url.endswith('.md5') and not url.startswith('s3://') and not 's3credentials' in url]
         result['additionalUrls'] = list(set([*accessUrls, *OnlineResources]))
         result['configurationName'] = "Interferometric Wide. 250 km swath, 5 m x 20 m spatial resolution and burst synchronization for interferometry. IW is considered to be the standard mode over land masses."
-        result['browse'] = [url for url in get_all_vals('./AssociatedBrowseImageUrls/ProviderBrowseUrl/URL') if not url.startswith('s3://')]
+        
+        if (providerbrowseUrls := get_all_vals('./AssociatedBrowseImageUrls/ProviderBrowseUrl/URL')):
+            result['browse'] = [url for url in providerbrowseUrls if not url.startswith('s3://')]
+
+        if 'STATIC' in result['processingLevel']:
+            result['validityStartDate'] = get_val('./Temporal/SingleDateTime')
+
     return result
 
 
