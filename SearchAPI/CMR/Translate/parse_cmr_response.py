@@ -214,7 +214,7 @@ def parse_granule(granule, req_fields):
         result['browse'] = [url for url in get_all_vals('./AssociatedBrowseImageUrls/ProviderBrowseUrl/URL') if not url.startswith('s3://')]
 
         if 'STATIC' in result['processingLevel']:
-            result['ValidityStartDate'] = get_val('./Temporal/SingleDateTime')
+            result['validityStartDate'] = get_val('./Temporal/SingleDateTime')
 
     return result
 
