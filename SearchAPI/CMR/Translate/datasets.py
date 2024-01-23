@@ -114,8 +114,8 @@ platform_datasets = {
     "OPERA-S1": [
         "C2777443834-ASF",
         "C2777436413-ASF",
-        "C2795135174-ASF", # RTC-STATIC
-        "C2795135668-ASF", # CSLC-STATIC
+        "C2795135174-ASF",  # RTC-STATIC
+        "C2795135668-ASF",  # CSLC-STATIC
         "C1258354200-ASF",  # maybe extra?
         "C1259982010-ASF",
         "C1257995185-ASF",
@@ -124,10 +124,18 @@ platform_datasets = {
         "C1259981910-ASF",
         "C1257995186-ASF",
         "C1259974840-ASF",
-        "C1260726384-ASF",
-        "C1260721945-ASF",
-        "C1260721853-ASF",
-        "C1260726378-ASF",
+    ],
+    "OPERA-S1-CALIBRATION": [
+        "C1260721945-ASF",  # CSLC
+        "C2803501758-ASF",
+        "C1260721853-ASF",  # RTC
+        "C2803501097-ASF",
+    ],
+    "OPERA-S1-CALIBRATION-STATIC": [
+        "C1260726384-ASF",  # CSLC STATIC
+        "C2803502140-ASF",
+        "C1260726378-ASF",  # RTC STATIC
+        "C2803500298-ASF",
     ],
     "SLC-BURST": ["C2709161906-ASF", "C1257024016-ASF"],
     "ALOS PALSAR": [
