@@ -1069,8 +1069,8 @@ tests:
 
 - platform SB:
     platform: SB
-    start: 1+year+ago
-    end: now
+    start: "2015-01-01T00:00:00Z"
+    end: "2016-01-02T00:00:00Z"
     maxResults: 200
     output: csv
 
