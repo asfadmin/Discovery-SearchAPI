@@ -131,12 +131,6 @@ platform_datasets = {
         "C1260721853-ASF",  # RTC
         "C2803501097-ASF",
     ],
-    "OPERA-S1-CALIBRATION-STATIC": [
-        "C1260726384-ASF",  # CSLC STATIC
-        "C2803502140-ASF",
-        "C1260726378-ASF",  # RTC STATIC
-        "C2803500298-ASF",
-    ],
     "SLC-BURST": ["C2709161906-ASF", "C1257024016-ASF"],
     "ALOS PALSAR": [
         "C1206487504-ASF",
