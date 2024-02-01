@@ -125,7 +125,7 @@ platform_datasets = {
         "C1257995186-ASF",
         "C1259974840-ASF",
     ],
-    "OPERA-S1-CALIBRATION": [
+    "OPERA-S1-CALVAL": [
         "C1260721945-ASF",  # CSLC
         "C2803501758-ASF",
         "C1260721853-ASF",  # RTC
