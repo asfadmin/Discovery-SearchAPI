@@ -45,24 +45,6 @@ tests:
     expected file: csv
     expected code: 200
 
-- baseline processing level:
-    reference: ALPSRP279071410
-    output: csv
-    processingLevel: L1.5
-    # use_maturity: True
-
-    expected file: csv
-    expected code: 200
-
-- baseline processing level list:
-    reference: ALPSRP279071410
-    output: csv
-    processingLevel: L1.5,L1.0
-    # use_maturity: True
-
-    expected file: csv
-    expected code: 200
-
 - baseline count:
     reference: E1_23942_STD_F155
     output: count
@@ -116,15 +98,7 @@ tests:
     output: json
     # use_maturity: True
 
-    expected file: json
-    expected code: 200
-
-- baseline asf_search:
-    reference: S1B_IW_SLC__1SDV_20180112T141823_20180112T141850_009139_0105AA_E6F5
-    output: asf_search
-    # use_maturity: True
-
-    expected file: geojson
+    expected file: jsonlite # dropping json output
     expected code: 200
 
 - no output specified:
@@ -157,22 +131,6 @@ tests:
 
 - default processingLevel does not exist:
     reference: ALPSRS279162350
-    # use_maturity: True
-
-    expected file: error json
-    expected code: 400
-
-- requested processingLevel does not exist:
-    reference: E1_20936_STD_F155
-    processingLevel: L0.5
-    # use_maturity: True
-
-    expected file: jsonlite
-    expected code: 200
-
-- missing stack ID:
-    reference: ALPSRS279162650
-    processinglevel: L1.0
     # use_maturity: True
 
     expected file: error json

@@ -1,3 +1,4 @@
+import logging
 import requests, urllib     # For talking w/ API
 import json, csv            # File stuff
 import re                   # Opening/Reading the file stuff
@@ -129,6 +130,7 @@ class test_baseline():
         h = requests.head(self.query)
         content_header = h.headers.get('content-type')
         file_content = requests.get(self.query).content.decode("utf-8")
+        
         # text/csv; charset=utf-8
         try:
             content_type = content_header.split('/')[1]
@@ -136,7 +138,7 @@ class test_baseline():
             assert False, self.error_msg.format("Header is not formatted as expected. Header: {0}. File Content: \n{1}\n".format(content_header, file_content))
         # Take out the "csv; charset=utf-8", without crahsing on things without charset
         content_type = content_type.split(';')[0] if ';' in content_type else content_type
-
+        logging.warning(content_header)
         ## COUNT / HTML:
         if content_type == "html":
             # They return a number in the html. Convert to a real int:
