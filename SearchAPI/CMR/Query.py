@@ -45,6 +45,7 @@ class CMRQuery:
             )
             for query in subquery_list_from(self.params)
         ]
+        
 
         logging.debug('New CMRQuery object ready to go')
 
@@ -94,7 +95,6 @@ class CMRQuery:
             self.max_results is not None and
             self.result_counter >= self.max_results
         )
-
 
 def subquery_list_from(params):
     """
