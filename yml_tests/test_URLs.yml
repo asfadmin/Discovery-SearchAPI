@@ -257,7 +257,7 @@ tests:
     maxresults: 100
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - collectionName Big Island 100:
@@ -265,7 +265,7 @@ tests:
     maxresults: 100
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - collectionName Cascade 100:
@@ -273,7 +273,7 @@ tests:
     maxresults: 100
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - end csv:
@@ -374,7 +374,7 @@ tests:
     maxresults: 10
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - flightLine Bonanza Creek:
@@ -382,7 +382,7 @@ tests:
     maxresults: 10
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - frame list range:
@@ -443,19 +443,12 @@ tests:
     granule_list: S1B_S6_GRDH_1SDV_20190911T214309_20190911T214338_017995_021E10_5CCB
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - granule_list single geojson:
     granule_list: S1B_S6_GRDH_1SDV_20190911T214309_20190911T214338_017995_021E10_5CCB
     output: geojson
-
-- granule_list single asf_search:
-    granule_list: S1B_S6_GRDH_1SDV_20190911T214309_20190911T214338_017995_021E10_5CCB
-    output: asf_search
-
-    expected file: geojson
-    expected code: 200
 
 - granule_list single download:
     granule_list: S1B_S6_GRDH_1SDV_20190911T214309_20190911T214338_017995_021E10_5CCB
@@ -469,42 +462,42 @@ tests:
     groupid: S1B_S1DV_0492_0497_017567_041
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - groupid S1 Insar:
     groupid: S1-GUNW-D-R-087-tops-20190816_20190804-161614-19149N_17138N-PP-fee7-v2_0_2
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - groupid SMAP:
     groupid: SP_24535_A_006
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - groupid UAVSAR:
     groupid: UA_ChiVol_00700_15030_010_150330_L090_CX_01
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - groupid ALOS PALSAR:
     groupid: ALPSRP279071100
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - groupid AIRSAR:
     groupid: ts1899
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - instrument alos palsar:
@@ -512,7 +505,7 @@ tests:
     maxResults: 20
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - instrument alos avnir:
@@ -520,7 +513,7 @@ tests:
     maxResults: 20
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - instrument alos avnir jsonlite:
@@ -699,7 +692,7 @@ tests:
     maxResults: 10
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - lookDirection L:
@@ -707,7 +700,7 @@ tests:
     maxResults: 10
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - lookDirection RIGHT:
@@ -715,7 +708,7 @@ tests:
     maxResults: 10
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - lookDirection R:
@@ -723,7 +716,7 @@ tests:
     maxResults: 10
     output: JSON
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - maxBaselinePerp:
@@ -836,7 +829,7 @@ tests:
     maxResults: 1
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - maxResults 2 json:
@@ -844,7 +837,7 @@ tests:
     maxResults: 2
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - maxResults 1 geojson:
@@ -877,22 +870,6 @@ tests:
     output: jsonlite
 
     expected file: jsonlite
-    expected code: 200
-
-- maxResults 1 asf_search:
-    platform: SENTINEL-1
-    maxResults: 1
-    output: asf_search
-
-    expected file: geojson
-    expected code: 200
-
-- maxResults 2 asf_search:
-    platform: SENTINEL-1
-    maxResults: 2
-    output: asf_search
-
-    expected file: geojson
     expected code: 200
 
 - offNadirAngle single:
@@ -984,29 +961,12 @@ tests:
     expected file: geojson
     expected code: 200
 
-- output asf_search Sentinel:
-    platform: SB
-    maxResults: 200
-    output: asf_search
-
-    expected file: geojson
-    expected code: 200
-
-- output asf_search Avnir:
-    platform: Alos
-    instrument: Avnir-2
-    maxResults: 2
-    output: asf_search
-
-    expected file: geojson
-    expected code: 200
-
 - output json:
     platform: SB
     maxResults: 100
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - output jsonlite:
@@ -1123,7 +1083,7 @@ tests:
     maxResults: 10
     output: jSoN
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - platform R1 2:
@@ -1806,7 +1766,7 @@ tests:
     maxResults: 10
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - polarization VV:
@@ -1815,7 +1775,7 @@ tests:
     maxResults: 10
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - polarization HH HV:
@@ -1823,7 +1783,7 @@ tests:
     maxResults: 10
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - polarization Dual VV:
@@ -1831,7 +1791,7 @@ tests:
     maxResults: 10
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - polarization QUADRATURE:
@@ -1839,7 +1799,7 @@ tests:
     maxResults: 10
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - polarization VV VH:
@@ -1855,7 +1815,7 @@ tests:
     maxResults: 10
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - polarization Dual VH:
@@ -1863,7 +1823,7 @@ tests:
     maxResults: 10
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - polarization hH:
@@ -1871,7 +1831,7 @@ tests:
     maxResults: 10
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - polarization Vv:
@@ -1879,7 +1839,7 @@ tests:
     maxResults: 10
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - polarization Hh hV:
@@ -1887,7 +1847,7 @@ tests:
     maxResults: 10
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - polarization Dual vv:
@@ -1895,7 +1855,7 @@ tests:
     maxResults: 10
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - polarization quadrature:
@@ -1903,7 +1863,7 @@ tests:
     maxResults: 10
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - polarization vv VH:
@@ -1911,7 +1871,7 @@ tests:
     maxResults: 10
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - polarization Dual hv:
@@ -1919,7 +1879,7 @@ tests:
     maxResults: 10
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - polarization dual VH:
@@ -1927,7 +1887,7 @@ tests:
     maxResults: 10
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - polarization dual vh:
@@ -2153,7 +2113,7 @@ tests:
     product_list: S1B_IW_GRDH_1SDV_20190410T153301_20190410T153328_015746_01D8D2_0E9B-GRD_HD,S1B_S6_GRDH_1SDV_20190911T214309_20190911T214338_017995_021E10_5CCB-GRD_HD,S1B_IW_SLC__1SDV_20180517T005744_20180517T005757_010954_0140DF_9891-SLC,S1B_WV_OCN__2SSV_20180513T055028_20180513T062610_010898_013F0C_059A-METADATA_OCN
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - product_list mix:
@@ -2162,7 +2122,7 @@ tests:
         - ts1902-PSTOKES,ts1902-PTIF,ts1888-LTIF
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - product_list multi:
@@ -2174,7 +2134,7 @@ tests:
         - ts1899
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - product_list multi list:
@@ -2183,7 +2143,7 @@ tests:
         - ts726-CSTOKES,ts726-DEM,ts726-LSTOKES,ts726-LTIF,ts726-CTIF,ts1721-LTIF,ts1733-PTIF
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - relativeOrbit single:
