@@ -368,4 +368,5 @@ platform_datasets = {
         "C1206752770-ASF",
         "C1206144699-ASF",
     ],
+    "NISAR": []
 }
