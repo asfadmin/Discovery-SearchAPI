@@ -238,16 +238,19 @@ def wkt_from_gpolygon(gpoly):
             # Close the shape if needed
             shapes[-1].append(shapes[-1][0])
 
-    longest = shapes[0]
-    for shape in shapes:
-        if len(shape) > len(longest):
-            longest = shape
+    if len(shapes):
+        longest = shapes[0]
+        for shape in shapes:
+            if len(shape) > len(longest):
+                longest = shape
 
-    wkt_shape = 'POLYGON(({0}))'.format(
-        ','.join(['{0} {1}'.format(x['lon'], x['lat']) for x in longest])
-    )
+        wkt_shape = 'POLYGON(({0}))'.format(
+            ','.join(['{0} {1}'.format(x['lon'], x['lat']) for x in longest])
+        )
 
-    return longest, wkt_shape
+        return longest, wkt_shape
+    
+    return '', ''
 
 
 def shape_not_closed(shapes):
