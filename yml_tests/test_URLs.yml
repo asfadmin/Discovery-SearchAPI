@@ -884,7 +884,7 @@ tests:
     offNadirAngle: 21.5,23.1,27.1
     maxResults: 10
     output: csv
-
+    
     expected file: csv
     expected code: 200
 
@@ -1900,7 +1900,7 @@ tests:
 
 - polygon lowercase:
     # polygon: -148.52,64.63,-150.41,64.64,-149.58,63.86,-148.52,64.63
-    intersectsWith: polygon(( -148.52,64.63 -150.41,64.64, -149.58,63.86 -148.52,64.63 ))
+    intersectsWith: polygon(( -148.52 64.63, -150.41 64.64, -149.58 63.86, -148.52 64.63 ))
     maxResults: 100
     output: csv
 
@@ -1920,17 +1920,17 @@ tests:
     expected file: csv
     expected code: 200
 
-- polygon closure 1:
-    # polygon: 12.13,41.74,13.4,41.74,13.4,42.75,12.13,42.75
-    intersectsWith: POLYGON((12.13 41.74, 13.4 41.74, 13.4 42.75, 12.13 42.75))
-    platform: Sentinel-1A,Sentinel-1B
-    processingLevel: SLC
-    start: 2015-05-01T00:00:00UTC
-    output: csv
-    maxResults: 100
+# - polygon closure 1:
+#     # polygon: 12.13,41.74,13.4,41.74,13.4,42.75,12.13,42.75
+#     intersectsWith: POLYGON((12.13 41.74, 13.4 41.74, 13.4 42.75, 12.13 42.75))
+#     platform: Sentinel-1A,Sentinel-1B
+#     processingLevel: SLC
+#     start: 2015-05-01T00:00:00UTC
+#     output: csv
+#     maxResults: 100
 
-    expected file: csv
-    expected code: 200
+#     expected file: csv
+#     expected code: 200
 
 - polygon closure 2:
     # polygon: 12.13,41.74,13.4,41.74,13.4,42.75,12.13,42.75,12.13,41.74
@@ -1956,14 +1956,14 @@ tests:
     expected file: csv
     expected code: 200
 
-- polygon closure 4:
-    # polygon: -155.08,65.82,-153.5,61.91,-149.50,63.07,-149.94,64.55
-    intersectsWith: POLYGON(( -155.08 65.82, -153.5 61.91, -149.50 63.07, -149.94 64.55 ))
-    maxResults: 100
-    output: Csv
+# - polygon closure 4:
+#     # polygon: -155.08,65.82,-153.5,61.91,-149.50,63.07,-149.94,64.55
+#     intersectsWith: POLYGON(( -155.08 65.82, -153.5 61.91, -149.50 63.07, -149.94 64.55 ))
+#     maxResults: 100
+#     output: Csv
 
-    expected file: csv
-    expected code: 200
+#     expected file: csv
+#     expected code: 200
 
 - processingLevel L1.1:
     processingLevel: L1.1

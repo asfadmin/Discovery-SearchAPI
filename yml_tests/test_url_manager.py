@@ -165,13 +165,13 @@ class test_URL_Manager():
             if file_content["count"] == 0:
                 content_type = "blank csv"
         ## DOWNLOAD / PLAIN
-        elif content_type == "plain":
+        elif content_type == "plain" or content_type == "x-python":
             file_content = downloadToDict(file_content)
             # how many granules are in the script:
             if file_content["count"] == 0:
                 content_type = "blank download"
             else:
-                content_type = "download"
+                content_type = "x-python"
         ## GEOJSON
         elif content_type == "geojson":
             if file_content == '{\n  "features": [],\n  "type": "FeatureCollection"\n}':
