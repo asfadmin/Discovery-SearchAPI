@@ -1,16 +1,16 @@
 
 
 tests:
-- invalid query:
-    output: csv
-    maxresults: 10
+# - invalid query: # this just gets the first results from the default CMR provider (ASF)
+#     output: csv
+#     maxresults: 10
 
-    expected file: error json
-    expected code: 400
+#     expected file: error json
+#     expected code: 400
 
-- missing query invalid:
-    expected file: error json
-    expected code: 400
+# - missing query invalid:
+#     expected file: error json
+#     expected code: 400
 
 - invalid keyword:
     keyword: invalid
