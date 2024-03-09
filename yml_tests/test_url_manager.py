@@ -144,11 +144,13 @@ class test_URL_Manager():
         # text/csv; charset=utf-8
         try:
             content_type = content_header.split('/')[1]
+            print(f"  - HIT CONTENT TYPE BEFORE 1: {content_type}")
         except AttributeError:
             assert False, self.error_msg.format("Header is not formatted as expected. Header: {0}.\nFile Content (First 500 char): \n{1}\n".format(content_header, file_content[:500]))
         # Take out the "csv; charset=utf-8", without crahsing on things that don't have a charset
+        print(f"  - HIT CONTENT TYPE BEFORE 2: {content_type}")
         content_type = content_type.split(';')[0] if ';' in content_type else content_type
-
+        print(f"  - HIT CONTENT TYPE AFTER: {content_type}")
         ## COUNT / HTML:
         if content_type == "html":
             # They return a number in the html. Convert to a real int:
@@ -163,13 +165,13 @@ class test_URL_Manager():
             if file_content["count"] == 0:
                 content_type = "blank csv"
         ## DOWNLOAD / PLAIN
-        elif content_type == "plain":
+        elif content_type == "plain" or content_type == "x-python":
             file_content = downloadToDict(file_content)
             # how many granules are in the script:
             if file_content["count"] == 0:
                 content_type = "blank download"
             else:
-                content_type = "download"
+                content_type = "x-python"
         ## GEOJSON
         elif content_type == "geojson":
             if file_content == '{\n  "features": [],\n  "type": "FeatureCollection"\n}':

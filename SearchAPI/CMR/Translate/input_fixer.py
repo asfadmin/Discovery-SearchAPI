@@ -108,12 +108,14 @@ def input_fixer(params, is_prod: bool = False, provider: str = "ASF"):
             if any_processing_level:
                 fixed_params['collections'] = collection_list
 
-        elif k == 'datasets':
+        elif k == 'dataset':
             fixed_params['collections'] = []
             for dataset in params[k]:
-                logging.warn(dataset)
-                logging.warn(platform_datasets.get(dataset))
-                fixed_params['collections'].extend(platform_datasets.get(dataset))
+                if platform_datasets.get(dataset):
+                    fixed_params['collections'].extend(platform_datasets.get(dataset))
+                else:
+                    raise ValueError(f'Could not find dataset named "{dataset}" provided for dataset keyword.')
+                              
             logging.warn(fixed_params)
         elif k == 'beammode':
             beammap = {

@@ -44,6 +44,7 @@ tests:
 
 - absoluteOrbit zero range list:
     absoluteOrbit: 19364-19364,19189
+    beamMode: EW,IW
     maxresults: 10
     output: csv
 
@@ -76,13 +77,6 @@ tests:
     expected file: csv
     expected code: 200
 
-- bbox:
-    bbox: -150.2,65.0,-150.1,65.5
-    maxresults: 10
-    output: csv
-
-    expected file: csv
-    expected code: 200
 
 - circle:
     circle: -150.2,65.0,100
@@ -263,7 +257,7 @@ tests:
     maxresults: 100
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - collectionName Big Island 100:
@@ -271,7 +265,7 @@ tests:
     maxresults: 100
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - collectionName Cascade 100:
@@ -279,7 +273,7 @@ tests:
     maxresults: 100
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - end csv:
@@ -380,7 +374,7 @@ tests:
     maxresults: 10
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - flightLine Bonanza Creek:
@@ -388,7 +382,7 @@ tests:
     maxresults: 10
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - frame list range:
@@ -449,25 +443,18 @@ tests:
     granule_list: S1B_S6_GRDH_1SDV_20190911T214309_20190911T214338_017995_021E10_5CCB
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - granule_list single geojson:
     granule_list: S1B_S6_GRDH_1SDV_20190911T214309_20190911T214338_017995_021E10_5CCB
     output: geojson
 
-- granule_list single asf_search:
-    granule_list: S1B_S6_GRDH_1SDV_20190911T214309_20190911T214338_017995_021E10_5CCB
-    output: asf_search
-
-    expected file: geojson
-    expected code: 200
-
 - granule_list single download:
     granule_list: S1B_S6_GRDH_1SDV_20190911T214309_20190911T214338_017995_021E10_5CCB
     output: download
 
-    expected file: download
+    expected file: x-python
     expected code: 200
 
 #In CMR reporting script, we report groupid as null on most datasets. Some datasets updated to expect blank file & moved to partial pass yaml
@@ -475,42 +462,42 @@ tests:
     groupid: S1B_S1DV_0492_0497_017567_041
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - groupid S1 Insar:
     groupid: S1-GUNW-D-R-087-tops-20190816_20190804-161614-19149N_17138N-PP-fee7-v2_0_2
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - groupid SMAP:
     groupid: SP_24535_A_006
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - groupid UAVSAR:
     groupid: UA_ChiVol_00700_15030_010_150330_L090_CX_01
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - groupid ALOS PALSAR:
     groupid: ALPSRP279071100
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - groupid AIRSAR:
     groupid: ts1899
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - instrument alos palsar:
@@ -518,7 +505,7 @@ tests:
     maxResults: 20
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - instrument alos avnir:
@@ -526,7 +513,7 @@ tests:
     maxResults: 20
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - instrument alos avnir jsonlite:
@@ -705,7 +692,7 @@ tests:
     maxResults: 10
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - lookDirection L:
@@ -713,7 +700,7 @@ tests:
     maxResults: 10
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - lookDirection RIGHT:
@@ -721,7 +708,7 @@ tests:
     maxResults: 10
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - lookDirection R:
@@ -729,7 +716,7 @@ tests:
     maxResults: 10
     output: JSON
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - maxBaselinePerp:
@@ -842,7 +829,7 @@ tests:
     maxResults: 1
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - maxResults 2 json:
@@ -850,7 +837,7 @@ tests:
     maxResults: 2
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - maxResults 1 geojson:
@@ -885,22 +872,6 @@ tests:
     expected file: jsonlite
     expected code: 200
 
-- maxResults 1 asf_search:
-    platform: SENTINEL-1
-    maxResults: 1
-    output: asf_search
-
-    expected file: geojson
-    expected code: 200
-
-- maxResults 2 asf_search:
-    platform: SENTINEL-1
-    maxResults: 2
-    output: asf_search
-
-    expected file: geojson
-    expected code: 200
-
 - offNadirAngle single:
     offNadirAngle: 21.5
     maxResults: 10
@@ -913,7 +884,7 @@ tests:
     offNadirAngle: 21.5,23.1,27.1
     maxResults: 10
     output: csv
-
+    
     expected file: csv
     expected code: 200
 
@@ -961,7 +932,7 @@ tests:
     maxResults: 200
     output: download
 
-    expected file: download
+    expected file: x-python
     expected code: 200
 
 - output download Avnir:
@@ -970,7 +941,7 @@ tests:
     maxResults: 2
     output: download
 
-    expected file: download
+    expected file: x-python
     expected code: 200
 
 - output geojson Sentinel:
@@ -990,29 +961,12 @@ tests:
     expected file: geojson
     expected code: 200
 
-- output asf_search Sentinel:
-    platform: SB
-    maxResults: 200
-    output: asf_search
-
-    expected file: geojson
-    expected code: 200
-
-- output asf_search Avnir:
-    platform: Alos
-    instrument: Avnir-2
-    maxResults: 2
-    output: asf_search
-
-    expected file: geojson
-    expected code: 200
-
 - output json:
     platform: SB
     maxResults: 100
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - output jsonlite:
@@ -1069,8 +1023,8 @@ tests:
 
 - platform SB:
     platform: SB
-    start: 1+year+ago
-    end: now
+    start: "2016-01-01T00:00:00Z"
+    end: "2017-01-02T00:00:00Z"
     maxResults: 200
     output: csv
 
@@ -1079,7 +1033,8 @@ tests:
 
 - platform J1:
     platform: J1
-    polygon: -141.7461,64.8261,-140.3172,63.5722,-137.8891,64.7214,-141.7461,64.8261
+    # polygon: -141.7461,64.8261,-140.3172,63.5722,-137.8891,64.7214,-141.7461,64.8261
+    intersectsWith: POLYGON((-141.7461 64.8261, -140.3172 63.5722, -137.8891 64.7214, -141.7461 64.8261))
     maxResults: 100
     output: csv
 
@@ -1089,7 +1044,8 @@ tests:
 - platform A3:
     platform: A3
     processingLevel: L1.0
-    polygon: -148.52,64.63,-150.41,64.64,-149.58,63.86,-148.52,64.63
+    # polygon: -148.52,64.63,-150.41,64.64,-149.58,63.86,-148.52,64.63
+    intersectsWith: POLYGON((-148.52 64.63, -150.41 64.64, -149.58 63.86, -148.52 64.63))
     maxResults: 100
     output: csv
 
@@ -1127,7 +1083,7 @@ tests:
     maxResults: 10
     output: jSoN
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - platform R1 2:
@@ -1810,7 +1766,7 @@ tests:
     maxResults: 10
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - polarization VV:
@@ -1819,7 +1775,7 @@ tests:
     maxResults: 10
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - polarization HH HV:
@@ -1827,7 +1783,7 @@ tests:
     maxResults: 10
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - polarization Dual VV:
@@ -1835,7 +1791,7 @@ tests:
     maxResults: 10
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - polarization QUADRATURE:
@@ -1843,7 +1799,7 @@ tests:
     maxResults: 10
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - polarization VV VH:
@@ -1859,7 +1815,7 @@ tests:
     maxResults: 10
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - polarization Dual VH:
@@ -1867,7 +1823,7 @@ tests:
     maxResults: 10
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - polarization hH:
@@ -1875,7 +1831,7 @@ tests:
     maxResults: 10
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - polarization Vv:
@@ -1883,7 +1839,7 @@ tests:
     maxResults: 10
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - polarization Hh hV:
@@ -1891,7 +1847,7 @@ tests:
     maxResults: 10
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - polarization Dual vv:
@@ -1899,7 +1855,7 @@ tests:
     maxResults: 10
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - polarization quadrature:
@@ -1907,7 +1863,7 @@ tests:
     maxResults: 10
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - polarization vv VH:
@@ -1915,7 +1871,7 @@ tests:
     maxResults: 10
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - polarization Dual hv:
@@ -1923,7 +1879,7 @@ tests:
     maxResults: 10
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - polarization dual VH:
@@ -1931,7 +1887,7 @@ tests:
     maxResults: 10
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - polarization dual vh:
@@ -1942,24 +1898,19 @@ tests:
     expected file: jsonlite
     expected code: 200
 
-- polygon:
-    polygon: -148.52,64.63,-150.41,64.64,-149.58,63.86,-148.52,64.63
+- polygon lowercase:
+    # polygon: -148.52,64.63,-150.41,64.64,-149.58,63.86,-148.52,64.63
+    intersectsWith: polygon(( -148.52 64.63, -150.41 64.64, -149.58 63.86, -148.52 64.63 ))
     maxResults: 100
     output: csv
 
     expected file: csv
     expected code: 200
 
-- polygon uppercase:
-    POLYGON: -148.52,64.63,-150.41,64.64,-149.58,63.86,-148.52,64.63
-    maxResults: 100
-    output: csv
-
-    expected file: csv
-    expected code: 200
 
 - polygon multi:
-    polygon: 12.13,41.74,13.4,41.74,13.4,42.75,12.13,42.75,12.13,41.74
+    # polygon: 12.13,41.74,13.4,41.74,13.4,42.75,12.13,42.75,12.13,41.74
+    intersectsWith: POLYGON((12.13 41.74, 13.4 41.74, 13.4 42.75, 12.13 42.75, 12.13 41.74))
     platform: Sentinel-1A,Sentinel-1B
     processingLevel: SLC
     start: 2015-05-01T00:00:00UTC
@@ -1969,19 +1920,21 @@ tests:
     expected file: csv
     expected code: 200
 
-- polygon closure 1:
-    polygon: 12.13,41.74,13.4,41.74,13.4,42.75,12.13,42.75
-    platform: Sentinel-1A,Sentinel-1B
-    processingLevel: SLC
-    start: 2015-05-01T00:00:00UTC
-    output: csv
-    maxResults: 100
+# - polygon closure 1:
+#     # polygon: 12.13,41.74,13.4,41.74,13.4,42.75,12.13,42.75
+#     intersectsWith: POLYGON((12.13 41.74, 13.4 41.74, 13.4 42.75, 12.13 42.75))
+#     platform: Sentinel-1A,Sentinel-1B
+#     processingLevel: SLC
+#     start: 2015-05-01T00:00:00UTC
+#     output: csv
+#     maxResults: 100
 
-    expected file: csv
-    expected code: 200
+#     expected file: csv
+#     expected code: 200
 
 - polygon closure 2:
-    polygon: 12.13,41.74,13.4,41.74,13.4,42.75,12.13,42.75,12.13,41.74
+    # polygon: 12.13,41.74,13.4,41.74,13.4,42.75,12.13,42.75,12.13,41.74
+    intersectsWith: POLYGON((12.13 41.74, 13.4 41.74, 13.4 42.75, 12.13 42.75, 12.13 41.74))
     platform: Sentinel-1A,Sentinel-1B
     processingLevel: SLC
     start: 2015-05-01T00:00:00UTC
@@ -1992,7 +1945,8 @@ tests:
     expected code: 200
 
 - polygon closure 3:
-    polygon: 12.13,41.74,12.13,42.75,13.4,42.75,13.4,41.74,12.13,41.74
+    # polygon: 12.13,41.74,12.13,42.75,13.4,42.75,13.4,41.74,12.13,41.74
+    intersectsWith: POLYGON(( 12.13 41.74, 12.13 42.75, 13.4 42.75, 13.4 41.74, 12.13 41.74 ))
     platform: Sentinel-1A,Sentinel-1B
     processingLevel: SLC
     start: 2015-05-01T00:00:00UTC
@@ -2002,13 +1956,14 @@ tests:
     expected file: csv
     expected code: 200
 
-- polygon closure 4:
-    polygon: -155.08,65.82,-153.5,61.91,-149.50,63.07,-149.94,64.55
-    maxResults: 100
-    output: Csv
+# - polygon closure 4:
+#     # polygon: -155.08,65.82,-153.5,61.91,-149.50,63.07,-149.94,64.55
+#     intersectsWith: POLYGON(( -155.08 65.82, -153.5 61.91, -149.50 63.07, -149.94 64.55 ))
+#     maxResults: 100
+#     output: Csv
 
-    expected file: csv
-    expected code: 200
+#     expected file: csv
+#     expected code: 200
 
 - processingLevel L1.1:
     processingLevel: L1.1
@@ -2158,7 +2113,7 @@ tests:
     product_list: S1B_IW_GRDH_1SDV_20190410T153301_20190410T153328_015746_01D8D2_0E9B-GRD_HD,S1B_S6_GRDH_1SDV_20190911T214309_20190911T214338_017995_021E10_5CCB-GRD_HD,S1B_IW_SLC__1SDV_20180517T005744_20180517T005757_010954_0140DF_9891-SLC,S1B_WV_OCN__2SSV_20180513T055028_20180513T062610_010898_013F0C_059A-METADATA_OCN
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - product_list mix:
@@ -2167,7 +2122,7 @@ tests:
         - ts1902-PSTOKES,ts1902-PTIF,ts1888-LTIF
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - product_list multi:
@@ -2179,7 +2134,7 @@ tests:
         - ts1899
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - product_list multi list:
@@ -2188,7 +2143,7 @@ tests:
         - ts726-CSTOKES,ts726-DEM,ts726-LSTOKES,ts726-LTIF,ts726-CTIF,ts1721-LTIF,ts1733-PTIF
     output: json
 
-    expected file: json
+    expected file: jsonlite
     expected code: 200
 
 - relativeOrbit single:

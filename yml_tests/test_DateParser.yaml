@@ -3,7 +3,7 @@ tests:
 - blank date:
     date: ""
     expected file: error json
-    expected code: 200
+    expected code: 400
     expected error: could not parse date
 
 - today:
@@ -15,13 +15,13 @@ tests:
 - last day:
     date: last+day
     expected file: error json
-    expected code: 200
+    expected code: 400
     expected error: could not parse date
 
 - last 10 days:
     date: last+10+days
     expected file: error json
-    expected code: 200
+    expected code: 400
     expected error: could not parse date
 
 - last week:
@@ -45,19 +45,19 @@ tests:
 - next day:
     date: next+day
     expected file: error json
-    expected code: 200
+    expected code: 400
     expected error: could not parse date
 
 - next 10 days:
     date: next+10+days
     expected file: error json
-    expected code: 200
+    expected code: 400
     expected error: could not parse date
 
 - next hour:
     date: next+hour
     expected file: error json
-    expected code: 200
+    expected code: 400
     expected error: could not parse date
 
 - next week:
@@ -81,37 +81,37 @@ tests:
 - yesterday morning:
     date: yesterday+morning
     expected file: error json
-    expected code: 200
+    expected code: 400
     expected error: could not parse date
 
 - yesterday evening:
     date: yesterday+evening
     expected file: error json
-    expected code: 200
+    expected code: 400
     expected error: could not parse date
 
 - 7daysago no spaces:
     date: 7daysago
     expected file: error json
-    expected code: 200
+    expected code: 400
     expected error: could not parse date
 
 - ayearago no spaces:
     date: ayearago
     expected file: error json
-    expected code: 200
+    expected code: 400
     expected error: could not parse date
 
 - beginning of last week:
     date: beginning+of+last+week
     expected file: error json
-    expected code: 200
+    expected code: 400
     expected error: could not parse date
 
 - beginning of the year:
     date: beginning+of+the+year
     expected file: error json
-    expected code: 200
+    expected code: 400
     expected error: could not parse date
 
 - le 01-02-2020:
@@ -129,7 +129,7 @@ tests:
 - now in Italian:
     date: adesso
     expected file: error json
-    expected code: 200
+    expected code: 400
     expected error: could not parse date
 
 - tomorrow in Italian:
@@ -225,7 +225,7 @@ tests:
 - last February:
     date: last+February
     expected file: error json
-    expected code: 200
+    expected code: 400
     expected error: could not parse date
 
 - February:
@@ -347,13 +347,13 @@ tests:
 - one oclock yesterday:
     date: one+oclock+yesterday
     expected file: error json
-    expected code: 200
+    expected code: 400
     expected error: could not parse date
 
 - 1oclock yesterday:
     date: 1oclock+yesterday
     expected file: error json
-    expected code: 200
+    expected code: 400
     expected error: could not parse date
 
 - midnight yesterday:
@@ -422,19 +422,19 @@ tests:
 - Thur:
     date: Thur
     expected file: error json
-    expected code: 200
+    expected code: 400
     expected error: could not parse date
 
 - Thurs:
     date: Thurs
     expected file: error json
-    expected code: 200
+    expected code: 400
     expected error: could not parse date
 
 - last Sunday:
     date: last+Sunday
     expected file: error json
-    expected code: 200
+    expected code: 400
     expected error: could not parse date
 
 - Tuesday:
@@ -498,23 +498,23 @@ tests:
 - Special Characters 1:
     date: $@
     expected file: error json
-    expected code: 200
+    expected code: 400
     expected error: could not parse date
 
 - Special Characters 2:
     date: _+
     expected file: error json
-    expected code: 200
+    expected code: 400
     expected error: could not parse date
 
 - Special Characters 3:
     date: $!)
     expected file: error json
-    expected code: 200
+    expected code: 400
     expected error: could not parse date
 
 - Special Characters 4:
     date: ~~~
     expected file: error json
-    expected code: 200
+    expected code: 400
     expected error: could not parse date

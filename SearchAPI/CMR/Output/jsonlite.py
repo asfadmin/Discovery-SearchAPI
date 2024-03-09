@@ -181,7 +181,9 @@ class JSONLiteStreamArray(JSONStreamArray):
         if p.get('operaBurstID') is not None or result['productID'].startswith('OPERA'):
             result['opera'] = {
                 'operaBurstID': p.get('operaBurstID'),
-                'additionalUrls': p.get('additionalUrls')
+                'additionalUrls': p.get('additionalUrls'),
             }
+            if p.get('validityStartDate'):
+                result['opera']['validityStartDate'] = p.get('validityStartDate')
 
         return result
