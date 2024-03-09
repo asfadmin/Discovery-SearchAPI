@@ -11,8 +11,8 @@ tests:
     beamMode: TEST
     output: csv,count
 
-    expected file: blank metalink
-    expected code: 200
+    expected file: error json
+    expected code: 400
 
 - beamMode specchar blank:
     beamMode: $~
@@ -32,8 +32,8 @@ tests:
     beamSwath: TEST
     output: csv,count
 
-    expected file: blank metalink
-    expected code: 200
+    expected file: error json
+    expected code: 400
 
 - beamSwath specchar blank:
     beamSwath: ~!
@@ -172,14 +172,14 @@ tests:
     groupid: 12345
     output: json
 
-    expected file: blank json
+    expected file: blank jsonlite
     expected code: 200
 
 - groupid hash blank:
     groupid: sdfkhgsdfkhgsdf
     output: json
 
-    expected file: blank json
+    expected file: blank jsonlite
     expected code: 200
 
 - groupid TEST blank:
@@ -200,35 +200,35 @@ tests:
     groupid: R1_57704_ST7_F173
     output: json
 
-    expected file: blank json
+    expected file: blank jsonlite
     expected code: 200
 
 - groupid ERS blank not in CMR:
     groupid: E2_84699_STD_F309
     output: json
 
-    expected file: blank json
+    expected file: blank jsonlite
     expected code: 200
 
 - groupid JERS blank not in CMR:
     groupid: J1_36439_STD_F268
     output: json
 
-    expected file: blank json
+    expected file: blank jsonlite
     expected code: 200
 
 - groupid Seasat blank not in CMR:
     groupid: SS_01502_STD
     output: json
 
-    expected file: blank json
+    expected file: blank jsonlite
     expected code: 200
 
 - instrument test:
     instrument: test
     output: json
 
-    expected file: blank json
+    expected file: blank jsonlite
     expected code: 200
 
 - instrument notvalid:
@@ -245,7 +245,7 @@ tests:
     output: json
     maxResults: 100
 
-    expected file: blank json
+    expected file: blank jsonlite
     expected code: 200
 
 - output test:
@@ -254,8 +254,8 @@ tests:
     output: TEST
     maxResults: 100
 
-    expected file: metalink
-    expected code: 200
+    expected file: error json
+    expected code: 400
 
 - output csc:
     platform: S1
@@ -263,8 +263,8 @@ tests:
     maxResults: 1
     output: CSC
 
-    expected file: metalink
-    expected code: 200
+    expected file: error json
+    expected code: 400
 
 - platform count RADARSAT-1 blank:
     platform: RADARSAT-1

@@ -7,7 +7,7 @@ def make_request(full_url, files=None, data=None):
     if data is None:
         data = {}
     try:
-        r = requests.post(full_url, files=files, data=data)
+        r = requests.post(full_url, files=files, json=data)
     except (requests.ConnectionError, requests.Timeout, requests.TooManyRedirects) as e:
         assert False, "Cannot connect to API: {0}. Error: '{1}'.".format(full_url, str(e))
     return r
