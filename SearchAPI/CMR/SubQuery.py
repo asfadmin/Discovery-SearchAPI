@@ -25,6 +25,9 @@ class CMRSubQuery:
         self.headers = {}
         
         token = request.args.get("cmr_token")
+        if token is None:
+            token = request.form.get('cmr_token')
+        
         if token != None:
             self.headers['Authorization'] = f'Bearer {token}'
 
