@@ -58,13 +58,19 @@ class GeoJSONStreamArray(JSONStreamArray):
         except TypeError:
             pass
 
+        if p.get('absoluteOrbit') is not None and len(p.get('absoluteOrbit')):
+            p['absoluteOrbit'] = p['absoluteOrbit'][0]
+        
+        coordinates = []
+        
+        if p.get('shape') is not None:
+            coordinates = [[float(c['lon']), float(c['lat'])] for c in p.get('shape')]
+        
         result = {
             'type': 'Feature',
             'geometry': {
                 'type': 'Polygon',
-                'coordinates': [
-                    [[float(c['lon']), float(c['lat'])] for c in p['shape']]
-                ]
+                'coordinates': coordinates
             },
             'properties': {
                 'beamModeType': p['beamModeType'],
@@ -82,7 +88,7 @@ class GeoJSONStreamArray(JSONStreamArray):
                 'insarStackId': p['insarGrouping'],
                 'md5sum': p['md5sum'],
                 'offNadirAngle': p['offNadirAngle'],
-                'orbit': p['absoluteOrbit'][0],
+                'orbit': p['absoluteOrbit'],
                 'pathNumber': p['relativeOrbit'],
                 'platform': p['platform'],
                 'pointingAngle': p['pointingAngle'],
