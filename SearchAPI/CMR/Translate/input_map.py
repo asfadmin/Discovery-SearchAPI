@@ -57,7 +57,8 @@ def input_map():
         'absoluteburstid':      ['attribute[]',             'int,BURST_ID_ABSOLUTE,{0}',        parse_int_list],
         'fullburstid':          ['attribute[]',             'string,BURST_ID_FULL,{0}',         parse_string_list],
         'operaburstid':         ['attribute[]',             'string,OPERA_BURST_ID,{0}',        parse_string_list],
-        'dataset':              [None,                      '{0}',                              parse_string_list]
+        'dataset':              [None,                      '{0}',                              parse_string_list],
+        'shortname':            ['shortName',                      '{0}',                       parse_string_list]
     }
 
     return parameter_map
