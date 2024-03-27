@@ -217,7 +217,14 @@ def parse_granule(granule, req_fields):
 
         if 'STATIC' in result['processingLevel']:
             result['validityStartDate'] = get_val('./Temporal/SingleDateTime')
-
+    if result.get('platform', '') == 'NISAR':
+        accessUrls = [url for url in get_all_vals('./OnlineAccessURLs/OnlineAccessURL/URL') if not url.endswith('.md5') and not url.startswith('s3://') and not 's3credentials' in url]
+        OnlineResources = [url for url in get_all_vals('./OnlineResources/OnlineResource/URL') if not url.endswith('.md5') and not url.startswith('s3://') and not 's3credentials' in url]
+        result['additionalUrls'] = list(set([*accessUrls, *OnlineResources]))
+        result['s3Urls'] = list(set(
+            *[url for url in get_all_vals('./OnlineResources/OnlineAccessURL/URL') if not url.endswith('.md5') and (url.startswith('s3://') or 's3credentials' in url)],
+            *[url for url in get_all_vals('./OnlineResources/OnlineResource/URL') if not url.endswith('.md5') and (url.startswith('s3://') or 's3credentials' in url)]
+            ))
     return result
 
 

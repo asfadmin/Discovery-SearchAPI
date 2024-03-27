@@ -61,4 +61,7 @@ class JSONLite2StreamArray(JSONLiteStreamArray):
         if p.get('opera') is not None:
             result['s1o'] = p['opera']
 
+        if p.get('platform') == 'NISAR':
+            result['s3du'] = p.get('s3Urls', [])
+        
         return result

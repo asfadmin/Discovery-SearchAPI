@@ -42,7 +42,8 @@ def req_fields_jsonlite():
         'subswath',
         'pgeVersion',
         'operaBurstID',
-        'additionalUrls'
+        'additionalUrls',
+        's3Urls'
     ]
     return fields
 
@@ -185,5 +186,8 @@ class JSONLiteStreamArray(JSONStreamArray):
             }
             if p.get('validityStartDate'):
                 result['opera']['validityStartDate'] = p.get('validityStartDate')
+
+        if p.get('platform') == 'NISAR':
+            result['s3Urls'] = p.get('s3Urls', [])
 
         return result
