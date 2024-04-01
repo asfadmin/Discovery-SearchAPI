@@ -221,9 +221,18 @@ def parse_granule(granule, req_fields):
         accessUrls = [url for url in get_all_vals('./OnlineAccessURLs/OnlineAccessURL/URL') if not url.endswith('.md5') and not url.startswith('s3://') and not 's3credentials' in url]
         OnlineResources = [url for url in get_all_vals('./OnlineResources/OnlineResource/URL') if not url.endswith('.md5') and not url.startswith('s3://') and not 's3credentials' in url]
         result['additionalUrls'] = list(set([*accessUrls, *OnlineResources]))
+
+        accessUrls = get_all_vals('./OnlineAccessURLs/OnlineAccessURL/URL')
+        if accessUrls is None:
+            accessUrls = []
+        resourceUrls = get_all_vals('./OnlineResources/OnlineResource/URL')
+        if resourceUrls is None:
+            resourceUrls = []
+
         result['s3Urls'] = list(set(
-            *[url for url in get_all_vals('./OnlineResources/OnlineAccessURL/URL') if not url.endswith('.md5') and (url.startswith('s3://') or 's3credentials' in url)],
-            *[url for url in get_all_vals('./OnlineResources/OnlineResource/URL') if not url.endswith('.md5') and (url.startswith('s3://') or 's3credentials' in url)]
+            [*[url for url in accessUrls if not url.endswith('.md5') and (url.startswith('s3://') or 's3credentials' in url)],
+            *[url for url in resourceUrls if not url.endswith('.md5') and (url.startswith('s3://') or 's3credentials' in url)]
+            ]
             ))
     return result
 

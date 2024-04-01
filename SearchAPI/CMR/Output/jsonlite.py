@@ -188,6 +188,9 @@ class JSONLiteStreamArray(JSONStreamArray):
                 result['opera']['validityStartDate'] = p.get('validityStartDate')
 
         if p.get('platform') == 'NISAR':
-            result['s3Urls'] = p.get('s3Urls', [])
+            result['nisar'] = {
+                'additionalUrls': p.get('additionalUrls', []),
+                's3Urls': p.get('s3Urls', [])
+            }
 
         return result
