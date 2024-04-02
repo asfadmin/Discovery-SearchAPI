@@ -205,11 +205,31 @@ def parse_granule(granule, req_fields):
             result['downloadUrl'] = urls[0]
             result['fileName'] = result['granuleName'] + '.' + urls[0].split('.')[-1]
 
+
+    
+    def get_all_urls():
+        accessPath = './OnlineAccessURLs/OnlineAccessURL/URL'
+        resourcesPath = './OnlineResources/OnlineResource/URL'
+
+        access_urls = get_all_vals(accessPath)
+        if access_urls is None:
+            access_urls = []
+        
+        resource_urls = get_all_vals(resourcesPath)
+        if resource_urls is None:
+            resource_urls = []
+        
+        return list(set([*access_urls, *resource_urls]))
+    
+    def get_http_urls():
+        return [url for url in get_all_urls() if not url.endswith('.md5') and not url.startswith('s3://') and not 's3credentials' in url]
+
+    def get_s3_urls():
+        return [url for url in get_all_urls() if not url.endswith('.md5') and (url.startswith('s3://') or 's3credentials' in url)]
+
     if result.get('product_file_id', '').startswith('OPERA'):
         result['beamMode'] = get_val(attr_path('BEAM_MODE'))
-        accessUrls = [url for url in get_all_vals('./OnlineAccessURLs/OnlineAccessURL/URL') if not url.endswith('.md5') and not url.startswith('s3://') and not 's3credentials' in url]
-        OnlineResources = [url for url in get_all_vals('./OnlineResources/OnlineResource/URL') if not url.endswith('.md5') and not url.startswith('s3://') and not 's3credentials' in url]
-        result['additionalUrls'] = list(set([*accessUrls, *OnlineResources]))
+        result['additionalUrls'] = get_http_urls()
         result['configurationName'] = "Interferometric Wide. 250 km swath, 5 m x 20 m spatial resolution and burst synchronization for interferometry. IW is considered to be the standard mode over land masses."
         
         if (providerbrowseUrls := get_all_vals('./AssociatedBrowseImageUrls/ProviderBrowseUrl/URL')):
@@ -218,22 +238,8 @@ def parse_granule(granule, req_fields):
         if 'STATIC' in result['processingLevel']:
             result['validityStartDate'] = get_val('./Temporal/SingleDateTime')
     if result.get('platform', '') == 'NISAR':
-        accessUrls = [url for url in get_all_vals('./OnlineAccessURLs/OnlineAccessURL/URL') if not url.endswith('.md5') and not url.startswith('s3://') and not 's3credentials' in url]
-        OnlineResources = [url for url in get_all_vals('./OnlineResources/OnlineResource/URL') if not url.endswith('.md5') and not url.startswith('s3://') and not 's3credentials' in url]
-        result['additionalUrls'] = list(set([*accessUrls, *OnlineResources]))
-
-        accessUrls = get_all_vals('./OnlineAccessURLs/OnlineAccessURL/URL')
-        if accessUrls is None:
-            accessUrls = []
-        resourceUrls = get_all_vals('./OnlineResources/OnlineResource/URL')
-        if resourceUrls is None:
-            resourceUrls = []
-
-        result['s3Urls'] = list(set(
-            [*[url for url in accessUrls if not url.endswith('.md5') and (url.startswith('s3://') or 's3credentials' in url)],
-            *[url for url in resourceUrls if not url.endswith('.md5') and (url.startswith('s3://') or 's3credentials' in url)]
-            ]
-            ))
+        result['additionalUrls'] = get_http_urls()
+        result['s3Urls'] = get_s3_urls()
     return result
 
 
