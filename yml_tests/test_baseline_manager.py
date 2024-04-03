@@ -161,7 +161,8 @@ class test_baseline():
             else:
                 content_type = "download"
         ## GEOJSON
-        elif content_type == "geojson":
+        elif content_type == "geo+json":
+            content_type = "geojson"
             if file_content == '{\n  "features": [],\n  "type": "FeatureCollection"\n}':
                 content_type = "empty geojson"
 

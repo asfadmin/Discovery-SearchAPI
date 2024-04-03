@@ -173,7 +173,8 @@ class test_URL_Manager():
             else:
                 content_type = "x-python"
         ## GEOJSON
-        elif content_type == "geojson":
+        elif content_type == "geo+json":
+            content_type = "geojson"
             if file_content == '{\n  "features": [],\n  "type": "FeatureCollection"\n}':
                 content_type = "empty geojson"
 
