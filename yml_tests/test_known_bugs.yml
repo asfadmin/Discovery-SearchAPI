@@ -44,6 +44,8 @@ tests:
     expected code: 200
 
 #DS-1945 open bug for this
+# this is still an issue (FARADAY_ROTATION is labeled as a string type which makes searching via float ranges impossible)
+# https://cmr.earthdata.nasa.gov/search/collections.umm_json?attribute[]=FARADAY_ROTATION
 - maxFaradayRotation:
     maxFaradayRotation: 3
     maxResults: 10

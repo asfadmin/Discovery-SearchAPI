@@ -1,3 +1,4 @@
+import ast
 import requests, urllib     # For talking w/ API
 import json, csv            # File stuff
 import re                   # Opening/Reading the file stuff
@@ -253,7 +254,13 @@ class test_URL_Manager():
                             if isinstance(poss_list, type([])):
                                 expect_type = type(poss_list[0])
                                 # "found_param" is always a string. Convert it to match
-                                if expect_type(found_param) >= poss_list[0] and expect_type(found_param) <= poss_list[1]:
+                                if found_param.startswith('[') and found_param.endswith(']'):
+                                    found_param = ast.literal_eval(found_param)
+                                    for param in found_param:
+                                        if expect_type(param) >= poss_list[0] and expect_type(param) <= poss_list[1]:
+                                            found_in_list = True
+                                            break
+                                elif expect_type(found_param) >= poss_list[0] and expect_type(found_param) <= poss_list[1]:
                                     found_in_list = True
                                     break
                             # This part gets hit for single numbers, and strings. (ie "Platform"):
