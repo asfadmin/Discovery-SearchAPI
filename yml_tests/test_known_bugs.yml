@@ -4,6 +4,7 @@
 tests:
 #DS-2766 / DS-3194 open bug for absoluteOrbit - GRFN scenes search correct range, but file returns different value for absoluteOrbit
 #Note: This will fail on prod only, due to GRFN data differences in api-test
+#Note: This is because OrbitCalculatedSpatialDomains has 2 OrbitNumber fields for GRFN products. This can be ignored
 - absoluteOrbit range:
     absoluteOrbit: 5000-6000
     maxresults: 10
@@ -14,6 +15,7 @@ tests:
 
 #WEB2-1956 open bug for asfframe - for R1, frame in file will not match frame in query
 #tests that will fail: asfframe R1 single, asfframe R1 list, asfframe R1 range
+# Need to grab FRAME_NUMBER instead of ESA_FRAME for radatasat products to pass these 3 asfframe tests
 - asfframe R1 single:
     asfframe: 307
     platform: R1
