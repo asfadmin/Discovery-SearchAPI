@@ -1,7 +1,6 @@
 from math import sqrt, cos, sin, radians
 import numpy as np
-import dateparser
-
+import ciso8601
 # WGS84 constants
 a = 6378137
 f = pow((1.0 - 1 / 298.257224), 2)
@@ -15,17 +14,17 @@ def calculate_perpendicular_baselines(reference, stack):
             product['noStateVectors'] = True
             continue
 
-        asc_node_time = dateparser.parse(product['ascendingNodeTime']).timestamp()
+        asc_node_time = ciso8601.parse_datetime(product['ascendingNodeTime']).timestamp()
 
-        start = dateparser.parse(product['startTime']).timestamp()
-        end = dateparser.parse(product['stopTime']).timestamp()
+        start = ciso8601.parse_datetime(product['startTime']).timestamp()
+        end = ciso8601.parse_datetime(product['stopTime']).timestamp()
         center = start + ((end - start) / 2)
         product['relative_start_time'] = start - asc_node_time
         product['relative_center_time'] = center - asc_node_time
         product['relative_end_time'] = end - asc_node_time
 
-        t_pre = dateparser.parse(product['sv_t_pos_pre']).timestamp()
-        t_post = dateparser.parse(product['sv_t_pos_post']).timestamp()
+        t_pre = ciso8601.parse_datetime(product['sv_t_pos_pre']).timestamp()
+        t_post = ciso8601.parse_datetime(product['sv_t_pos_post']).timestamp()
         product['relative_sv_pre_time'] = t_pre - asc_node_time
         product['relative_sv_post_time'] = t_post - asc_node_time
 
