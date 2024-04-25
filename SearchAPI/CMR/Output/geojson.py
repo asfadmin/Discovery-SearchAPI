@@ -64,7 +64,9 @@ class GeoJSONStreamArray(JSONStreamArray):
         coordinates = []
         
         if p.get('shape') is not None:
-            coordinates = [[float(c['lon']), float(c['lat'])] for c in p.get('shape')]
+            coordinates = [
+                [[float(c['lon']), float(c['lat'])] for c in p.get('shape')]
+            ]
         
         result = {
             'type': 'Feature',
