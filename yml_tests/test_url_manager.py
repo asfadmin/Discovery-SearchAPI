@@ -257,7 +257,7 @@ class test_URL_Manager():
                                 if found_param.startswith('[') and found_param.endswith(']'):
                                     found_param = ast.literal_eval(found_param)
                                     for param in found_param:
-                                        if expect_type(param) >= poss_list[0] and expect_type(param) <= poss_list[1]:
+                                        if param >= poss_list[0] and param <= poss_list[1]:
                                             found_in_list = True
                                             break
                                 elif expect_type(found_param) >= poss_list[0] and expect_type(found_param) <= poss_list[1]:
@@ -266,7 +266,20 @@ class test_URL_Manager():
                             # This part gets hit for single numbers, and strings. (ie "Platform"):
                             else:
                                 expect_type = type(poss_list)
-                                if expect_type(found_param) == poss_list:
+                                if isinstance(found_param, str) and found_param.startswith('[') and found_param.endswith(']'):
+                                    # expect_type = type(poss_list)
+                                    found_param = ast.literal_eval(found_param)
+                                    for param in found_param:
+                                        if param == poss_list:
+                                        # if expect_type(param) >= poss_list[0] and expect_type(param) <= poss_list[1]:
+                                            found_in_list = True
+                                            break
+                                elif isinstance(found_param, list):
+                                    for param in found_param:
+                                        if param == poss_list:
+                                            found_in_list = True
+                                            break
+                                elif expect_type(found_param) == poss_list:
                                     found_in_list = True
                                     break
                         # If inner for-loop found it, break out of this one too:
