@@ -2427,8 +2427,8 @@ tests:
     expected file: csv
     expected code: 200
 
-- start yesterday count:
-    start: yesterday
+- start 3 days ago count:
+    start: 3 days ago
     output: count
 
     expected file: count
@@ -2441,8 +2441,8 @@ tests:
     expected file: count
     expected code: 200
 
-- start 1dayago count:
-    start: 1+day+ago
+- start 3daysago count:
+    start: 3+days+ago
     output: count
 
     expected file: count
