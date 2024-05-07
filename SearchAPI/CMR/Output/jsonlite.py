@@ -43,7 +43,8 @@ def req_fields_jsonlite():
         'pgeVersion',
         'operaBurstID',
         'additionalUrls',
-        's3Urls'
+        's3Urls',
+        'ariaVersion',
     ]
     return fields
 
@@ -192,5 +193,11 @@ class JSONLiteStreamArray(JSONStreamArray):
                 'additionalUrls': p.get('additionalUrls', []),
                 's3Urls': p.get('s3Urls', [])
             }
+
+        
+        if p.get('ariaVersion') is not None:
+            granule_name = p.get('granuleName')
+            if granule_name is not None and 'gunw' in granule_name.lower():
+                result['ariaVersion'] = p.get('ariaVersion')
 
         return result

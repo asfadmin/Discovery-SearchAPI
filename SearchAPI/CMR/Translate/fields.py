@@ -74,6 +74,8 @@ def get_field_paths():
         'subswath':                 attr_path('SUBSWATH_NAME'),
         
         # OPERA RTC FIELDS
-        'operaBurstID':                  attr_path('OPERA_BURST_ID'),
+        'operaBurstID':             attr_path('OPERA_BURST_ID'),
+
+        'ariaVersion':              attr_path('VERSION'),
     }
     return paths
