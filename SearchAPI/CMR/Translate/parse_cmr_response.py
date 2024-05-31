@@ -2,7 +2,7 @@ import logging
 from defusedxml.lxml import fromstring
 import datetime
 from .fields import get_field_paths, attr_path
-
+import re
 
 def parse_cmr_response(r, req_fields):
     """
@@ -237,9 +237,14 @@ def parse_granule(granule, req_fields):
 
         if 'STATIC' in result['processingLevel']:
             result['validityStartDate'] = get_val('./Temporal/SingleDateTime')
+    elif result.get('product_file_id', '').startswith('S1-GUNW') and result['ariaVersion'] is None:
+        version_unformatted = result.get('granuleName').split('v')[-1]
+        result['ariaVersion'] = re.sub(r'[^0-9\.]', '', version_unformatted.replace("_", '.'))
+
     if result.get('platform', '') == 'NISAR':
         result['additionalUrls'] = get_http_urls()
         result['s3Urls'] = get_s3_urls()
+    
     return result
 
 
