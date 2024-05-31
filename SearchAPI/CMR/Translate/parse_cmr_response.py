@@ -237,7 +237,7 @@ def parse_granule(granule, req_fields):
 
         if 'STATIC' in result['processingLevel']:
             result['validityStartDate'] = get_val('./Temporal/SingleDateTime')
-    elif result.get('product_file_id', '').startswith('S1-GUNW') and result['ariaVersion'] is None:
+    elif result.get('product_file_id', '').startswith('S1-GUNW') and result.get('ariaVersion') is None:
         version_unformatted = result.get('granuleName').split('v')[-1]
         result['ariaVersion'] = re.sub(r'[^0-9\.]', '', version_unformatted.replace("_", '.'))
 
