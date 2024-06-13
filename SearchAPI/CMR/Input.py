@@ -139,6 +139,9 @@ def parse_coord_string(v):
             raise ValueError(f'Invalid coordinate: {c}') from e
     if len(v) % 2 != 0:
         raise ValueError(f'Invalid coordinate list, odd number of values provided: {v}')
+    for i in range(len(v)):
+        if float(v[i]) < 1.0 and float(v[i]) > 0.0 :
+            v[i] = '0' + v[i]
     return ','.join(v)
 
 # Parse and validate a bbox coordinate string
