@@ -1069,8 +1069,8 @@ tests:
 
 - platform SB:
     platform: SB
-    start: 1+year+ago
-    end: now
+    start: "2016-01-01T00:00:00Z"
+    end: "2017-01-02T00:00:00Z"
     maxResults: 200
     output: csv
 
@@ -2472,8 +2472,8 @@ tests:
     expected file: csv
     expected code: 200
 
-- start yesterday count:
-    start: yesterday
+- start 3 days ago count:
+    start: 3 days ago
     output: count
 
     expected file: count
@@ -2486,8 +2486,8 @@ tests:
     expected file: count
     expected code: 200
 
-- start 1dayago count:
-    start: 1+day+ago
+- start 3daysago count:
+    start: 3+days+ago
     output: count
 
     expected file: count

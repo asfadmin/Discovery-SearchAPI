@@ -1,4 +1,4 @@
-import dateparser
+import ciso8601
 from SearchAPI.CMR.Translate import translate_params, input_fixer
 from SearchAPI.CMR.Query import CMRQuery
 from .Calc import calculate_perpendicular_baselines
@@ -178,13 +178,13 @@ def get_default_product_type(reference):
 def calculate_temporal_baselines(reference, stack):
     for product in stack:
         if product['granuleName'] == reference:
-            reference_start = dateparser.parse(product['startTime'])
+            reference_start = ciso8601.parse_datetime(product['startTime'])
             break
     for product in stack:
         if product['granuleName'] == reference:
             product['temporalBaseline'] = 0
         else:
-            start = dateparser.parse(product['startTime'])
+            start = ciso8601.parse_datetime(product['startTime'])
             product['temporalBaseline'] = (start.date() - reference_start.date()).days
     return stack
 

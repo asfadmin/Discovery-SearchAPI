@@ -61,6 +61,7 @@ def get_field_paths():
         'track':                    attr_path('PATH_NUMBER'),
         'pgeVersion':               "./PGEVersionClass/PGEVersion",
         'additionalUrls':           "./OnlineAccessURLs",
+        's3Urls':                   "./OnlineAccessURLs",
 
         # BURST FIELDS
         'absoluteBurstID':          attr_path('BURST_ID_ABSOLUTE'),
@@ -73,6 +74,8 @@ def get_field_paths():
         'subswath':                 attr_path('SUBSWATH_NAME'),
         
         # OPERA RTC FIELDS
-        'operaBurstID':                  attr_path('OPERA_BURST_ID'),
+        'operaBurstID':             attr_path('OPERA_BURST_ID'),
+
+        'ariaVersion':              attr_path('VERSION'),
     }
     return paths

@@ -114,7 +114,7 @@ def subquery_list_from(params):
         if chunk_type in params:
             params[chunk_type] = chunk_list(list(set(params[chunk_type])), 500) # distinct and split
 
-    list_param_names = ['platform', 'collections'] # these parameters will dodge the subquery system
+    list_param_names = ['platform', 'collections', 'shortname'] # these parameters will dodge the subquery system
 
     for k, v in params.items():
         if k in list_param_names:

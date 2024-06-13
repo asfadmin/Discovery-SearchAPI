@@ -42,7 +42,9 @@ def req_fields_jsonlite():
         'subswath',
         'pgeVersion',
         'operaBurstID',
-        'additionalUrls'
+        'additionalUrls',
+        's3Urls',
+        'ariaVersion',
     ]
     return fields
 
@@ -181,7 +183,21 @@ class JSONLiteStreamArray(JSONStreamArray):
         if p.get('operaBurstID') is not None or result['productID'].startswith('OPERA'):
             result['opera'] = {
                 'operaBurstID': p.get('operaBurstID'),
-                'additionalUrls': p.get('additionalUrls')
+                'additionalUrls': p.get('additionalUrls'),
             }
+            if p.get('validityStartDate'):
+                result['opera']['validityStartDate'] = p.get('validityStartDate')
+
+        if p.get('platform') == 'NISAR':
+            result['nisar'] = {
+                'additionalUrls': p.get('additionalUrls', []),
+                's3Urls': p.get('s3Urls', [])
+            }
+
+        
+        if p.get('ariaVersion') is not None:
+            granule_name = p.get('granuleName')
+            if granule_name is not None and 'gunw' in granule_name.lower():
+                result['ariaVersion'] = p.get('ariaVersion')
 
         return result
