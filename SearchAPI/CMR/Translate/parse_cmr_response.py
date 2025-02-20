@@ -70,7 +70,7 @@ def parse_granule(granule, req_fields):
     if 'frameNumber' in req_fields:
         asf_frame_platforms = [
             'Sentinel-1A', 'Sentinel-1B', 'ALOS', 'SENTINEL-1A', 'SENTINEL-1B',
-            'ERS-1', 'ERS-2', 'JERS-1', 'RADARSAT-1'
+            'ERS-1', 'ERS-2', 'JERS-1', 'RADARSAT-1', 'ALOS-2'
         ]
 
         if result['platform'] in asf_frame_platforms:
@@ -90,7 +90,7 @@ def parse_granule(granule, req_fields):
         result['fileName'] = file_name.split('/')[-1] if file_name else None
         remove_field('fileName')
 
-    if 'stateVectors' in req_fields or ('canInsar' in req_fields and result['platform'] not in ['ALOS', 'RADARSAT-1', 'JERS-1', 'ERS-1', 'ERS-2']):
+    if 'stateVectors' in req_fields or ('canInsar' in req_fields and result['platform'] not in ['ALOS', 'ALOS-2', 'RADARSAT-1', 'JERS-1', 'ERS-1', 'ERS-2']):
         def parse_sv(sv):
             def float_or_none(a):
                 try:
@@ -131,7 +131,7 @@ def parse_granule(granule, req_fields):
         remove_field('stateVectors')
 
     if 'canInsar' in req_fields:
-        if result['platform'] in ['ALOS', 'RADARSAT-1', 'JERS-1', 'ERS-1', 'ERS-2']:
+        if result['platform'] in ['ALOS', 'ALOS-2', 'RADARSAT-1', 'JERS-1', 'ERS-1', 'ERS-2']:
             result['insarGrouping'] = get_val(field_paths['insarGrouping'])
 
             insarBaseline = get_val(field_paths['insarBaseline'])
@@ -204,9 +204,9 @@ def parse_granule(granule, req_fields):
         if len(urls):
             result['downloadUrl'] = urls[0]
             result['fileName'] = result['granuleName'] + '.' + urls[0].split('.')[-1]
+    if result['platform'] in ['ALOS-2']:
+        result['beamMode'] = get_val(attr_path('BEAM_MODE'))
 
-
-    
     def get_all_urls():
         accessPath = './OnlineAccessURLs/OnlineAccessURL/URL'
         resourcesPath = './OnlineResources/OnlineResource/URL'
