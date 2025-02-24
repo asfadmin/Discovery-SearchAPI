@@ -135,6 +135,9 @@ platform_datasets = {
     "ALOS-2": [
         "C3315903479-ASF"
     ],
+    "OPERA-DISP" : [
+        "C1271830354-ASF"
+    ],
     "ALOS PALSAR": [
         "C1206487504-ASF",
         "C1206485940-ASF",

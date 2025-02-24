@@ -227,7 +227,7 @@ def parse_granule(granule, req_fields):
     def get_s3_urls():
         return [url for url in get_all_urls() if not url.endswith('.md5') and (url.startswith('s3://') or 's3credentials' in url)]
 
-    if result.get('product_file_id', '').startswith('OPERA'):
+    if result.get('product_file_id', '').startswith('OPERA') and not result.get('product_file_id', '').startswith('OPERA_L3_DISP'):
         result['beamMode'] = get_val(attr_path('BEAM_MODE'))
         result['additionalUrls'] = get_http_urls()
         result['configurationName'] = "Interferometric Wide. 250 km swath, 5 m x 20 m spatial resolution and burst synchronization for interferometry. IW is considered to be the standard mode over land masses."
@@ -240,11 +240,13 @@ def parse_granule(granule, req_fields):
     elif result.get('product_file_id', '').startswith('S1-GUNW') and result.get('ariaVersion') is None:
         version_unformatted = result.get('granuleName').split('v')[-1]
         result['ariaVersion'] = re.sub(r'[^0-9\.]', '', version_unformatted.replace("_", '.'))
+    if result.get('product_file_id', '').startswith('OPERA_L3_DISP'):
+        if (providerbrowseUrls := get_all_vals('./AssociatedBrowseImageUrls/ProviderBrowseUrl/URL')):
+            result['browse'] = [url for url in providerbrowseUrls if not url.startswith('s3://')]
 
     if result.get('platform', '') == 'NISAR':
         result['additionalUrls'] = get_http_urls()
         result['s3Urls'] = get_s3_urls()
-    
     return result
 
 
