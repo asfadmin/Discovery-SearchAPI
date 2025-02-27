@@ -132,6 +132,12 @@ platform_datasets = {
         "C2803501097-ASF",
     ],
     "SLC-BURST": ["C2709161906-ASF", "C1257024016-ASF"],
+    "ALOS-2": [
+        "C3315903479-ASF"
+    ],
+    "OPERA-DISP" : [
+        "C1271830354-ASF"
+    ],
     "ALOS PALSAR": [
         "C1206487504-ASF",
         "C1206485940-ASF",

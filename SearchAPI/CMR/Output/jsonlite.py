@@ -179,8 +179,7 @@ class JSONLiteStreamArray(JSONStreamArray):
             burst['subswath'] = p['subswath']
 
             result['burst'] = burst
-
-        if p.get('operaBurstID') is not None or result['productID'].startswith('OPERA'):
+        if (p.get('operaBurstID') is not None or result['productID'].startswith('OPERA')) and not result['productID'].startswith('OPERA_L3_DISP'):
             result['opera'] = {
                 'operaBurstID': p.get('operaBurstID'),
                 'additionalUrls': p.get('additionalUrls'),
