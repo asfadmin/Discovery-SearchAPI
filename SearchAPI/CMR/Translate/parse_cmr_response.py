@@ -66,6 +66,8 @@ def parse_granule(granule, req_fields):
             platform = get_val('./Platforms/Platform/ShortName')
         result['platform'] = platform
         remove_field('platform')
+        if result['platform'] in ['ALOS-2']:
+            result['beamMode'] = get_val(attr_path('BEAM_MODE'))
 
     if 'frameNumber' in req_fields:
         asf_frame_platforms = [
@@ -204,8 +206,7 @@ def parse_granule(granule, req_fields):
         if len(urls):
             result['downloadUrl'] = urls[0]
             result['fileName'] = result['granuleName'] + '.' + urls[0].split('.')[-1]
-    if result['platform'] in ['ALOS-2']:
-        result['beamMode'] = get_val(attr_path('BEAM_MODE'))
+
 
     def get_all_urls():
         accessPath = './OnlineAccessURLs/OnlineAccessURL/URL'
