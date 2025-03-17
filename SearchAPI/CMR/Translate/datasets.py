@@ -124,6 +124,7 @@ platform_datasets = {
         "C1259981910-ASF",
         "C1257995186-ASF",
         "C1259974840-ASF",
+        "C1271830354-ASF", # OPERA-DISP
     ],
     "OPERA-S1-CALVAL": [
         "C1260721945-ASF",  # CSLC
@@ -134,9 +135,6 @@ platform_datasets = {
     "SLC-BURST": ["C2709161906-ASF", "C1257024016-ASF"],
     "ALOS-2": [
         "C3315903479-ASF"
-    ],
-    "OPERA-DISP" : [
-        "C1271830354-ASF"
     ],
     "ALOS PALSAR": [
         "C1206487504-ASF",
