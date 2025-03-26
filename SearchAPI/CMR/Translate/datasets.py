@@ -125,7 +125,7 @@ platform_datasets = {
         "C1257995186-ASF",
         "C1259974840-ASF",
         "C1271830354-ASF", # OPERA-DISP
-        "C3294057315-ASF"
+        "C3294057315-ASF",
     ],
     "OPERA-S1-CALVAL": [
         "C1260721945-ASF",  # CSLC
