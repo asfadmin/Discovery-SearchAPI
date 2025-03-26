@@ -43,6 +43,7 @@ def input_map():
         'bbox':                 ['bounding_box',            '{0}',                              parse_bbox_string],
         'circle':               ['circle[]',                  '{0}',                            parse_circle_string],
         'processinglevel':      ['attribute[]',             'string,PROCESSING_TYPE,{0}',       parse_string_list],
+        'processingtype':      ['attribute[]',             'string,PROCESSING_LEVEL,{0}',       parse_string_list],
         'relativeorbit':        ['attribute[]',             'int,PATH_NUMBER,{0}',              parse_int_or_range_list],
         'processingdate':       ['updated_since',           '{0}',                              parse_date],
         'start':                [None,                      '{0}',                              parse_date],
