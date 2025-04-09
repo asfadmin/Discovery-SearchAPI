@@ -40,6 +40,8 @@ def input_map():
         'platform':             ['platform[]',              '{0}',                              parse_string_list],
         'asfplatform':          ['attribute[]',             'string,ASF_PLATFORM,{0}',          parse_string_list],
         'polarization':         ['attribute[]',             'string,POLARIZATION,{0}',          parse_string_list],
+        'mainbandpolarization': ['attribute[]',             'string,FREQUENCY_A_POLARIZATION_CONCAT,{0}', parse_string_list],
+        'sidebandpolarization': ['attribute[]',             'string,FREQUENCY_B_POLARIZATION_CONCAT,{0}', parse_string_list],
         'polygon':              ['polygon',                 '{0}',                              parse_coord_string], # intersectsWith ends up here
         'linestring':           ['line',                    '{0}',                              parse_coord_string], # or here
         'point':                ['point',                   '{0}',                              parse_point_string], # or here
