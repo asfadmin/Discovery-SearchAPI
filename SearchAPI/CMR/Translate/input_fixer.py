@@ -29,6 +29,13 @@ def input_fixer(params, is_prod: bool = False, provider: str = "ASF"):
                 'A': 'ASCENDING',
                 'D': 'DESCENDING'
             }[v[0].upper()]
+        elif k == 'framecoverage':
+            if v[0].upper() not in ['F', 'P']:
+                raise ValueError(f'Invalid frame coverage selected: {v}')
+            fixed_params[k] = {
+                'F': True,
+                'P': False,
+            }[v[0].upper()]
         elif k == 'season':  # clamp range or abort
             if len(v) != 2:
                 raise ValueError(
