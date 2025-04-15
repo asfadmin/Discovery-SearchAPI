@@ -45,6 +45,11 @@ def req_fields_jsonlite():
         'additionalUrls',
         's3Urls',
         'ariaVersion',
+        'framecoverage',
+        'jointobservation',
+        'mainbandpolarization',
+        'sidebandpolarization',
+        'rangebandwidth'
     ]
     return fields
 
@@ -190,7 +195,12 @@ class JSONLiteStreamArray(JSONStreamArray):
         if p.get('platform') == 'NISAR':
             result['nisar'] = {
                 'additionalUrls': p.get('additionalUrls', []),
-                's3Urls': p.get('s3Urls', [])
+                's3Urls': p.get('s3Urls', []),
+                'frameCoverage': p.get('framecoverage'),
+                'jointObservation': p.get('jointobservation'),
+                'mainBandPolarization': p.get('mainbandpolarization'),
+                'sideBandPolarization': p.get('sidebandpolarization'),
+                'rangeBandwidth': p.get('rangebandwidth')
             }
 
         
