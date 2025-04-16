@@ -57,7 +57,7 @@ def input_map():
         'temporal':             ['temporal',                '{0}',                              None], # start/end end up here
         'groupid':              ['attribute[]',             'string,GROUP_ID,{0}',              parse_string_list],
         'insarstackid':         ['attribute[]',             'int,INSAR_STACK_ID,{0}',           parse_string],
-        'instrument':           ['instrument[]',            '{0}',                              parse_string],
+        'instrument':           ['instrument[]',            '{0}',                              parse_string_list],
         'collections':          ['echo_collection_id[]',            '{0}',                      parse_string_list],
         'relativeburstid':      ['attribute[]',             'int,BURST_ID_RELATIVE,{0}',        parse_int_list],
         'absoluteburstid':      ['attribute[]',             'int,BURST_ID_ABSOLUTE,{0}',        parse_int_list],
