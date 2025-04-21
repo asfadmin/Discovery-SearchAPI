@@ -27,6 +27,9 @@ def input_map():
         'flightdirection':      ['attribute[]',             'string,ASCENDING_DESCENDING,{0}',  parse_string],
         'flightline':           ['attribute[]',             'string,FLIGHT_LINE,{0}',           parse_string],
         'frame':                ['attribute[]',             'int,CENTER_ESA_FRAME,{0}',         parse_int_or_range_list],
+        'framecoverage':        ['attribute[]',             'string,FULL_FRAME,{0}',            parse_string],
+        'jointobservation':     ['attribute[]',             'string,JOINT_OBSERVATION,{0}',     parse_string],
+        'rangebandwidth':       ['attribute[]',             'string,RANGE_BANDWIDTH_CONCAT,{0}',parse_string_list],
         'granule_list':         ['readable_granule_name[]', '{0}',                              parse_string_list],
         'product_list':         ['granule_ur[]',            '{0}',                              parse_string_list],
         'maxinsarstacksize':    ['attribute[]',             'int,INSAR_STACK_SIZE,,{0}',        parse_int],
@@ -37,12 +40,15 @@ def input_map():
         'platform':             ['platform[]',              '{0}',                              parse_string_list],
         'asfplatform':          ['attribute[]',             'string,ASF_PLATFORM,{0}',          parse_string_list],
         'polarization':         ['attribute[]',             'string,POLARIZATION,{0}',          parse_string_list],
+        'mainbandpolarization': ['attribute[]',             'string,FREQUENCY_A_POLARIZATION_CONCAT,{0}', parse_string_list],
+        'sidebandpolarization': ['attribute[]',             'string,FREQUENCY_B_POLARIZATION_CONCAT,{0}', parse_string_list],
         'polygon':              ['polygon',                 '{0}',                              parse_coord_string], # intersectsWith ends up here
         'linestring':           ['line',                    '{0}',                              parse_coord_string], # or here
         'point':                ['point',                   '{0}',                              parse_point_string], # or here
         'bbox':                 ['bounding_box',            '{0}',                              parse_bbox_string],
         'circle':               ['circle[]',                  '{0}',                            parse_circle_string],
         'processinglevel':      ['attribute[]',             'string,PROCESSING_TYPE,{0}',       parse_string_list],
+        'processingtype':      ['attribute[]',             'string,PROCESSING_LEVEL,{0}',       parse_string_list],
         'relativeorbit':        ['attribute[]',             'int,PATH_NUMBER,{0}',              parse_int_or_range_list],
         'processingdate':       ['updated_since',           '{0}',                              parse_date],
         'start':                [None,                      '{0}',                              parse_date],
@@ -51,7 +57,7 @@ def input_map():
         'temporal':             ['temporal',                '{0}',                              None], # start/end end up here
         'groupid':              ['attribute[]',             'string,GROUP_ID,{0}',              parse_string_list],
         'insarstackid':         ['attribute[]',             'int,INSAR_STACK_ID,{0}',           parse_string],
-        'instrument':           ['instrument[]',            '{0}',                              parse_string],
+        'instrument':           ['instrument[]',            '{0}',                              parse_string_list],
         'collections':          ['echo_collection_id[]',            '{0}',                      parse_string_list],
         'relativeburstid':      ['attribute[]',             'int,BURST_ID_RELATIVE,{0}',        parse_int_list],
         'absoluteburstid':      ['attribute[]',             'int,BURST_ID_ABSOLUTE,{0}',        parse_int_list],

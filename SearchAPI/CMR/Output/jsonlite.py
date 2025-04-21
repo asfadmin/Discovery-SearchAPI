@@ -45,6 +45,11 @@ def req_fields_jsonlite():
         'additionalUrls',
         's3Urls',
         'ariaVersion',
+        'framecoverage',
+        'jointobservation',
+        'mainbandpolarization',
+        'sidebandpolarization',
+        'rangebandwidth',
     ]
     return fields
 
@@ -179,8 +184,7 @@ class JSONLiteStreamArray(JSONStreamArray):
             burst['subswath'] = p['subswath']
 
             result['burst'] = burst
-
-        if p.get('operaBurstID') is not None or result['productID'].startswith('OPERA'):
+        if (p.get('operaBurstID') is not None or result['productID'].startswith('OPERA')) and not result['productID'].startswith('OPERA_L3_DISP'):
             result['opera'] = {
                 'operaBurstID': p.get('operaBurstID'),
                 'additionalUrls': p.get('additionalUrls'),
@@ -191,7 +195,12 @@ class JSONLiteStreamArray(JSONStreamArray):
         if p.get('platform') == 'NISAR':
             result['nisar'] = {
                 'additionalUrls': p.get('additionalUrls', []),
-                's3Urls': p.get('s3Urls', [])
+                's3Urls': p.get('s3Urls', []),
+                'frameCoverage': p.get('framecoverage'),
+                'jointObservation': p.get('jointobservation'),
+                'mainBandPolarization': p.get('mainbandpolarization'),
+                'sideBandPolarization': p.get('sidebandpolarization'),
+                'rangeBandwidth': p.get('rangebandwidth')
             }
 
         

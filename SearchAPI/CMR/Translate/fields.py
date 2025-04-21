@@ -62,7 +62,12 @@ def get_field_paths():
         'pgeVersion':               "./PGEVersionClass/PGEVersion",
         'additionalUrls':           "./OnlineAccessURLs",
         's3Urls':                   "./OnlineAccessURLs",
+        'framecoverage':            attr_path('FULL_FRAME'),
+        'jointobservation':         attr_path('JOINT_OBSERVATION'),
+        'rangebandwidth':            attr_path('RANGE_BANDWIDTH_CONCAT'),
 
+        'mainbandpolarization':     attr_path('FREQUENCY_A_POLARIZATION_CONCAT'),
+        'sidebandpolarization':     attr_path('FREQUENCY_B_POLARIZATION_CONCAT'),
         # BURST FIELDS
         'absoluteBurstID':          attr_path('BURST_ID_ABSOLUTE'),
         'relativeBurstID':          attr_path('BURST_ID_RELATIVE'),

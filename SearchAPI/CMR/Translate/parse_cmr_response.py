@@ -66,11 +66,13 @@ def parse_granule(granule, req_fields):
             platform = get_val('./Platforms/Platform/ShortName')
         result['platform'] = platform
         remove_field('platform')
+        if result['platform'] in ['ALOS-2']:
+            result['beamMode'] = get_val(attr_path('BEAM_MODE'))
 
     if 'frameNumber' in req_fields:
         asf_frame_platforms = [
             'Sentinel-1A', 'Sentinel-1B', 'ALOS', 'SENTINEL-1A', 'SENTINEL-1B',
-            'ERS-1', 'ERS-2', 'JERS-1', 'RADARSAT-1'
+            'ERS-1', 'ERS-2', 'JERS-1', 'RADARSAT-1', 'ALOS-2', 'NISAR'
         ]
 
         if result['platform'] in asf_frame_platforms:
@@ -90,7 +92,7 @@ def parse_granule(granule, req_fields):
         result['fileName'] = file_name.split('/')[-1] if file_name else None
         remove_field('fileName')
 
-    if 'stateVectors' in req_fields or ('canInsar' in req_fields and result['platform'] not in ['ALOS', 'RADARSAT-1', 'JERS-1', 'ERS-1', 'ERS-2']):
+    if 'stateVectors' in req_fields or ('canInsar' in req_fields and result['platform'] not in ['ALOS', 'ALOS-2', 'RADARSAT-1', 'JERS-1', 'ERS-1', 'ERS-2']):
         def parse_sv(sv):
             def float_or_none(a):
                 try:
@@ -131,7 +133,7 @@ def parse_granule(granule, req_fields):
         remove_field('stateVectors')
 
     if 'canInsar' in req_fields:
-        if result['platform'] in ['ALOS', 'RADARSAT-1', 'JERS-1', 'ERS-1', 'ERS-2']:
+        if result['platform'] in ['ALOS', 'ALOS-2', 'RADARSAT-1', 'JERS-1', 'ERS-1', 'ERS-2']:
             result['insarGrouping'] = get_val(field_paths['insarGrouping'])
 
             insarBaseline = get_val(field_paths['insarBaseline'])
@@ -206,7 +208,6 @@ def parse_granule(granule, req_fields):
             result['fileName'] = result['granuleName'] + '.' + urls[0].split('.')[-1]
 
 
-    
     def get_all_urls():
         accessPath = './OnlineAccessURLs/OnlineAccessURL/URL'
         resourcesPath = './OnlineResources/OnlineResource/URL'
@@ -227,7 +228,7 @@ def parse_granule(granule, req_fields):
     def get_s3_urls():
         return [url for url in get_all_urls() if not url.endswith('.md5') and (url.startswith('s3://') or 's3credentials' in url)]
 
-    if result.get('product_file_id', '').startswith('OPERA'):
+    if result.get('product_file_id', '').startswith('OPERA') and not result.get('product_file_id', '').startswith('OPERA_L3_DISP'):
         result['beamMode'] = get_val(attr_path('BEAM_MODE'))
         result['additionalUrls'] = get_http_urls()
         result['configurationName'] = "Interferometric Wide. 250 km swath, 5 m x 20 m spatial resolution and burst synchronization for interferometry. IW is considered to be the standard mode over land masses."
@@ -240,11 +241,13 @@ def parse_granule(granule, req_fields):
     elif result.get('product_file_id', '').startswith('S1-GUNW') and result.get('ariaVersion') is None:
         version_unformatted = result.get('granuleName').split('v')[-1]
         result['ariaVersion'] = re.sub(r'[^0-9\.]', '', version_unformatted.replace("_", '.'))
+    if result.get('product_file_id', '').startswith('OPERA_L3_DISP'):
+        if (providerbrowseUrls := get_all_vals('./AssociatedBrowseImageUrls/ProviderBrowseUrl/URL')):
+            result['browse'] = [url for url in providerbrowseUrls if not url.startswith('s3://')]
 
     if result.get('platform', '') == 'NISAR':
         result['additionalUrls'] = get_http_urls()
         result['s3Urls'] = get_s3_urls()
-    
     return result
 
 
