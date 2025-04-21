@@ -49,7 +49,7 @@ def req_fields_jsonlite():
         'jointobservation',
         'mainbandpolarization',
         'sidebandpolarization',
-        'rangebandwidth'
+        'rangebandwidth',
     ]
     return fields
 
