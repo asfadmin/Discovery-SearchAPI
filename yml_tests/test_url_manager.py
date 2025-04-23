@@ -621,6 +621,7 @@ class test_URL_Manager():
                     del json_dict["Platform"][i]
                     json_dict["Platform"].append("Sentinel-1A")
                     json_dict["Platform"].append("Sentinel-1B")
+                    json_dict["Platform"].append("Sentinel-1C")
                     json_dict["Platform"].append("Sentinel-1 Interferogram (BETA)")
                 # Sentinel-1A
                 elif platform in ["SENTINEL-1A", "SA"]:
@@ -629,6 +630,9 @@ class test_URL_Manager():
                 # Sentinel-1B
                 elif platform in ["SENTINEL-1B", "SB"]:
                     json_dict["Platform"][i] = "Sentinel-1B"
+                    json_dict["Platform"].append("Sentinel-1 Interferogram (BETA)")
+                elif platform in ["SENTINEL-1C", "SC"]:
+                    json_dict["Platform"][i] = "Sentinel-1C"
                     json_dict["Platform"].append("Sentinel-1 Interferogram (BETA)")
                 # Sir-C
                 elif platform in ["SIR-C"]:
