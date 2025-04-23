@@ -60,7 +60,7 @@ class CMRSubQuery:
         return final
 
     def should_use_asf_frame(self):
-        asf_frame_platforms = ['SENTINEL-1A', 'SENTINEL-1B', 'SENTINEL-1C' 'ALOS']
+        asf_frame_platforms = ['SENTINEL-1A', 'SENTINEL-1B', 'SENTINEL-1C', 'ALOS']
         asf_frame_datasets = ['SENTINEL-1', 'OPERA-S1', 'SLC-BURST', 'ALOS PALSAR', 'ALOS AVNIR-2', 'ALOS-2', 'NISAR']
         
         asf_frame_collections = []
