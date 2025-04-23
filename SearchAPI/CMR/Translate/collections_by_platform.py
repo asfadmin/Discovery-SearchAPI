@@ -334,23 +334,74 @@ collections_by_platform = {
       }
    ],
    "SENTINEL-1C": [
-      { "collection": "SENTINEL-1C_RAW", "concept-id":	"C3486496642-ASF"},
-      { "collection": "SENTINEL-1C_SLC", "concept-id":	"C3470873558-ASF"},
-      { "collection": "SENTINEL-1C_META_SLC", "concept-id":	"C3484561061-ASF"},
-      { "collection": "SENTINEL-1C_OCN", "concept-id":	"C3484661603-ASF"},
-      { "collection": "SENTINEL-1C_META_OCN", "concept-id":	"C3484670556-ASF"},
-      { "collection": "SENTINEL-1C_DP_GRD_HIGH", "concept-id":	"C3486566209-ASF"},
-      { "collection": "SENTINEL-1C_DP_META_GRD_HIGH", "concept-id":	"C3486580531-ASF"},
-      { "collection": "SENTINEL-1C_DP_GRD_MEDIUM", "concept-id":	"C3486605959-ASF"},
-      { "collection": "SENTINEL-1C_DP_META_GRD_MEDIUM", "concept-id":	"C3486616327-ASF"},
-      { "collection": "SENTINEL-1C_DP_GRD_FULL", "concept-id":	"C3486646217-ASF"},
-      { "collection": "SENTINEL-1C_DP_META_GRD_FULL", "concept-id":	"C3486655250-ASF"},
-      { "collection": "SENTINEL-1C_SP_GRD_HIGH", "concept-id":	"C3488402208-ASF"},
-      { "collection": "SENTINEL-1C_SP_META_GRD_HIGH", "concept-id":	"C3488406939-ASF"},
-      { "collection": "SENTINEL-1C_SP_GRD_MEDIUM", "concept-id":	"C3488414315-ASF"},
-      { "collection": "SENTINEL-1C_SP_META_GRD_MEDIUM", "concept-id":	"C3488417229-ASF"},
-      { "collection": "SENTINEL-1C_SP_GRD_FULL", "concept-id":	"C3488389367-ASF"},
-      { "collection": "SENTINEL-1C_SP_META_GRD_FULL", "concept-id":	"C3488394269-ASF"},
+      {
+         "collection": "SENTINEL-1C_RAW",
+         "concept-id":	"C3486496642-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_SLC",
+         "concept-id":	"C3470873558-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_META_SLC",
+         "concept-id":	"C3484561061-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_OCN",
+         "concept-id":	"C3484661603-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_META_OCN",
+         "concept-id":	"C3484670556-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_DP_GRD_HIGH",
+         "concept-id":	"C3486566209-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_DP_META_GRD_HIGH",
+         "concept-id":	"C3486580531-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_DP_GRD_MEDIUM",
+         "concept-id":	"C3486605959-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_DP_META_GRD_MEDIUM",
+         "concept-id":	"C3486616327-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_DP_GRD_FULL",
+         "concept-id":	"C3486646217-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_DP_META_GRD_FULL",
+         "concept-id":	"C3486655250-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_SP_GRD_HIGH",
+         "concept-id":	"C3488402208-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_SP_META_GRD_HIGH",
+         "concept-id":	"C3488406939-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_SP_GRD_MEDIUM",
+         "concept-id":	"C3488414315-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_SP_META_GRD_MEDIUM",
+         "concept-id":	"C3488417229-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_SP_GRD_FULL",
+         "concept-id":	"C3488389367-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_SP_META_GRD_FULL",
+         "concept-id":	"C3488394269-ASF"
+      },
    ],
    "SMAP": [
       {
