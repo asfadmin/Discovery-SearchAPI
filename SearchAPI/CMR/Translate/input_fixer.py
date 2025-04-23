@@ -61,9 +61,9 @@ def input_fixer(params, is_prod: bool = False, provider: str = "ASF"):
             # conversion
 
             plat_aliases = {
-                'S1': ['SENTINEL-1A', 'SENTINEL-1B'],
-                'SENTINEL-1': ['SENTINEL-1A', 'SENTINEL-1B'],
-                'SENTINEL': ['SENTINEL-1A', 'SENTINEL-1B'],
+                'S1': ['SENTINEL-1A', 'SENTINEL-1B', 'SENTINEL-1C'],
+                'SENTINEL-1': ['SENTINEL-1A', 'SENTINEL-1B', 'SENTINEL-1C'],
+                'SENTINEL': ['SENTINEL-1A', 'SENTINEL-1B', 'SENTINEL-1C'],
                 'ERS': ['ERS-1', 'ERS-2'],
                 'SIR-C': ['STS-59', 'STS-68']
             }
@@ -80,6 +80,7 @@ def input_fixer(params, is_prod: bool = False, provider: str = "ASF"):
                 'SEASAT': 'SEASAT 1',
                 'SA': 'SENTINEL-1A',
                 'SB': 'SENTINEL-1B',
+                'SC': 'SENTINEL-1C',
                 'SP': 'SMAP',
                 'UA': 'G-III',
                 'UAVSAR': 'G-III'
@@ -105,12 +106,13 @@ def input_fixer(params, is_prod: bool = False, provider: str = "ASF"):
             for p in v:
                 if p.upper() in plat_aliases:
                     for x in plat_aliases[p.upper()]:
-                        if x in ['SENTINEL-1A', 'SENTINEL-1B'] and any_processing_level:
+                        if x in ['SENTINEL-1A', 'SENTINEL-1B', 'SENTINEL-1C'] and any_processing_level:
                             collection_list.extend([id_by_platform['concept-id'] for id_by_platform in to_collections[x]])
                         platform_list.append(x)
                 else:
-                    if ((p.upper() in plat_names and p.upper() in ['SA', 'SB']) or p.upper() in ['SENTINEL-1A', 'SENTINEL-1B'])  and any_processing_level:
-                        if p.upper() in plat_names and p.upper() in ['SA', 'SB']:
+                    if ((p.upper() in plat_names and p.upper() in ['SA', 'SB', 'SC']) or p.upper() in ['SENTINEL-1A', 'SENTINEL-1B', 'SENTINEL-1C'])  and any_processing_level:
+                        if p.upper() in plat_names and p.upper() in ['SA', 'SB', 'SC']:
+                            to_collections
                             collection_list.extend([id_by_platform['concept-id'] for id_by_platform in to_collections[plat_names[p.upper()]]])
                         else:
                             collection_list.extend([id_by_platform['concept-id'] for id_by_platform in to_collections[p.upper()]])                
