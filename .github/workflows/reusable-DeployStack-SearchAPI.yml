@@ -98,15 +98,15 @@ jobs:
       # to run suite either way.
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.9'
+          python-version: 3.9
       - name: Install pytest requirements
         if: github.event_name == 'pull_request'
         run: |
           sudo apt-get update
           sudo apt-get install libgdal-dev
-          python3 -m pip install --no-cache-dir --upgrade pip
-          python3 -m pip install --no-cache-dir wheel Cython
-          python3 -m pip install -r requirements.txt --use-deprecated=legacy-resolver
+          python3 -m pip install --use-pep517 --no-build-isolation --no-cache-dir --upgrade pip
+          python3 -m pip install --use-pep517 --no-build-isolation --no-cache-dir wheel Cython
+          python3 -m pip install --use-pep517 --no-build-isolation -r requirements.txt --use-deprecated=legacy-resolver
       - name: Run Pytest
         if: github.event_name == 'pull_request'
         run: |
