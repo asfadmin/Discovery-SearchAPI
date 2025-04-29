@@ -333,6 +333,76 @@ collections_by_platform = {
          "concept-id": "C1327985661-ASF"
       }
    ],
+   "SENTINEL-1C": [
+      {
+         "collection": "SENTINEL-1C_RAW",
+         "concept-id":	"C3486496642-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_SLC",
+         "concept-id":	"C3470873558-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_META_SLC",
+         "concept-id":	"C3484561061-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_OCN",
+         "concept-id":	"C3484661603-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_META_OCN",
+         "concept-id":	"C3484670556-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_DP_GRD_HIGH",
+         "concept-id":	"C3486566209-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_DP_META_GRD_HIGH",
+         "concept-id":	"C3486580531-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_DP_GRD_MEDIUM",
+         "concept-id":	"C3486605959-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_DP_META_GRD_MEDIUM",
+         "concept-id":	"C3486616327-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_DP_GRD_FULL",
+         "concept-id":	"C3486646217-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_DP_META_GRD_FULL",
+         "concept-id":	"C3486655250-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_SP_GRD_HIGH",
+         "concept-id":	"C3488402208-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_SP_META_GRD_HIGH",
+         "concept-id":	"C3488406939-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_SP_GRD_MEDIUM",
+         "concept-id":	"C3488414315-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_SP_META_GRD_MEDIUM",
+         "concept-id":	"C3488417229-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_SP_GRD_FULL",
+         "concept-id":	"C3488389367-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_SP_META_GRD_FULL",
+         "concept-id":	"C3488394269-ASF"
+      },
+   ],
    "SMAP": [
       {
          "collection": "SMAP_L1A_RADAR_METADATA_V001",
@@ -942,6 +1012,8 @@ collections_by_platform_uat = {
          "concept-id": "C1216244348-ASF"
       }
    ],
+   "SENTINEL-1C": [
+   ],
    "SMAP": [
       {
          "collection": "SMAP_L1A_RADAR_METADATA_V001",
@@ -1476,6 +1548,8 @@ collections_by_platform_uat_asfdev = {
          "collection": "SENTINEL-1B_SLC",
          "concept-id": "C1234413263-ASFDEV"
       }
+   ],
+   "SENTINEL-1C": [
    ],
    "STS-59": [
       {

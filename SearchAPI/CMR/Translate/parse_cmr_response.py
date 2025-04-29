@@ -71,7 +71,7 @@ def parse_granule(granule, req_fields):
 
     if 'frameNumber' in req_fields:
         asf_frame_platforms = [
-            'Sentinel-1A', 'Sentinel-1B', 'ALOS', 'SENTINEL-1A', 'SENTINEL-1B',
+            'Sentinel-1A', 'Sentinel-1B', 'Sentinel-1C', 'ALOS', 'SENTINEL-1A', 'SENTINEL-1B', 'SENTINEL-1C'
             'ERS-1', 'ERS-2', 'JERS-1', 'RADARSAT-1', 'ALOS-2', 'NISAR'
         ]
 
