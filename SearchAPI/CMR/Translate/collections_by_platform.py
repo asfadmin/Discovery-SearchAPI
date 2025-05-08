@@ -1013,6 +1013,78 @@ collections_by_platform_uat = {
       }
    ],
    "SENTINEL-1C": [
+      {
+         "collection": "SENTINEL-1C_RAW",
+         "concept-id":	"C1273090818-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_META_RAW",
+         "concept-id":	"C1273090821-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_SLC",
+         "concept-id":	"C1273088271-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_META_SLC",
+         "concept-id":	"C1273088273-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_OCN",
+         "concept-id":	"C1273090807-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_META_OCN",
+         "concept-id":	"C1273090814-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_DP_GRD_HIGH",
+         "concept-id":	"C1273088720-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_DP_META_GRD_HIGH",
+         "concept-id":	"C1273088738-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_DP_GRD_MEDIUM",
+         "concept-id":	"C1273088761-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_DP_META_GRD_MEDIUM",
+         "concept-id":	"C1273088779-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_DP_GRD_FULL",
+         "concept-id":	"C1273088811-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_DP_META_GRD_FULL",
+         "concept-id":	"C1273088813-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_SP_GRD_HIGH",
+         "concept-id":	"C1273088882-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_SP_META_GRD_HIGH",
+         "concept-id":	"C1273088884-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_SP_GRD_MEDIUM",
+         "concept-id":	"C1273090772-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_SP_META_GRD_MEDIUM",
+         "concept-id":	"C1273090777-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_SP_GRD_FULL",
+         "concept-id":	"C1273088826-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_SP_META_GRD_FULL",
+         "concept-id":	"C1273088860-ASF"
+      },
    ],
    "SMAP": [
       {
@@ -1550,6 +1622,78 @@ collections_by_platform_uat_asfdev = {
       }
    ],
    "SENTINEL-1C": [
+             {
+         "collection": "SENTINEL-1C_RAW",
+         "concept-id":	"C1273090818-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_META_RAW",
+         "concept-id":	"C1273090821-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_SLC",
+         "concept-id":	"C1273088271-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_META_SLC",
+         "concept-id":	"C1273088273-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_OCN",
+         "concept-id":	"C1273090807-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_META_OCN",
+         "concept-id":	"C1273090814-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_DP_GRD_HIGH",
+         "concept-id":	"C1273088720-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_DP_META_GRD_HIGH",
+         "concept-id":	"C1273088738-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_DP_GRD_MEDIUM",
+         "concept-id":	"C1273088761-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_DP_META_GRD_MEDIUM",
+         "concept-id":	"C1273088779-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_DP_GRD_FULL",
+         "concept-id":	"C1273088811-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_DP_META_GRD_FULL",
+         "concept-id":	"C1273088813-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_SP_GRD_HIGH",
+         "concept-id":	"C1273088882-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_SP_META_GRD_HIGH",
+         "concept-id":	"C1273088884-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_SP_GRD_MEDIUM",
+         "concept-id":	"C1273090772-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_SP_META_GRD_MEDIUM",
+         "concept-id":	"C1273090777-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_SP_GRD_FULL",
+         "concept-id":	"C1273088826-ASF"
+      },
+      {
+         "collection": "SENTINEL-1C_SP_META_GRD_FULL",
+         "concept-id":	"C1273088860-ASF"
+      },
    ],
    "STS-59": [
       {
