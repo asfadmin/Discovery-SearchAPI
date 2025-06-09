@@ -1,3 +1,8 @@
+> [!WARNING]
+> SearchAPI-V2 is now deprecated and this repo is no longer under active development.
+> 
+> Please refer to [SearchAPI-V3](https://github.com/asfadmin/Discovery-SearchAPI-v3).
+
 # SearchAPI
 
 Docs on how to interface against our API instances [here](https://docs.asf.alaska.edu/api/basics/).
